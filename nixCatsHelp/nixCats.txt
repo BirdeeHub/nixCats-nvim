@@ -1,7 +1,7 @@
 =======================================================================================
 NIX CATEGORIES                                                       *nixCats*
 
-For help with the nix flake files, see :help birdee.flake
+For help with the nix flake files, see :help nixCats.flake
 
 nixCats: returns category names included by nix for this package 
 
@@ -26,7 +26,7 @@ categories are included in each package in the flake.nix file.
 If in your flake, your package definition looked like this:
 
 # see :help birdee.flake.outputs.packaging
-birdeeVim = birdeeVimBuild {
+nixCats = nixVimBuilder settings.nixCats {
   bash = true;
   cmp = true;
   telescope = true;

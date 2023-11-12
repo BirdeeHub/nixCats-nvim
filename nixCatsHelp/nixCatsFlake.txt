@@ -62,10 +62,6 @@ with 'pkgs.neovimPlugins.somepluginname'
 -- The second is ./customPluginOverlay:
 If you need to interact with one of these overlays, it will be this one.
 You should not need to do it much. 
-As of writing this, I have only needed it once.
-At the time of saying that, I only am missing lua config for debug and lint.
-I can install the programs fine I just dont know how to do neovim.
-I needed it for markdown-preview of all things.
 
 It is used for defining plugins with build steps that 
 were not well handled by nixpkgs.
@@ -76,9 +72,13 @@ with 'pkgs.customPlugins.somepluginname'
 
 After the overlays we wish to include are all defined:
 
-we now generate the pkgs set that contains all the nixpkgs and overlay packages, 
-and the system variable from flake-utils.
-It will contain all our plugins and programs we will need from this point on.
+We now generate the pkgs set that contains all the nixpkgs and overlay packages, 
+and the system variable from flake-utils. If you imported any flakes with
+overlays, add their overlay here as well.
+
+pkgs will contain all our plugins and programs we will need from this point on.
+with the occasional exception of a flake that has no overlays, which you just
+add to a category directly.
 
 ---------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
@@ -89,7 +89,7 @@ It does this by importing nix/NeovimBuilder.
 
 The default settings for the settings set are defined below. 
 They did not make sense to include in the categories system.
-see :help birdee.flake.outputs.settings
+see :help nixCats.flake.outputs.settings
 
 the set of categories is a set of named boolean values like this:
 { categoryname1 = true; categoryname2 = false; etc... }
@@ -135,9 +135,13 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   each containing a list of FUNCTIONS that return lists of python packages.
   These functions are the same thing that you would pass to python.withPackages.
 
-- a flexible set of categories, each containing a list of extra Lua packages.
+- a flexible set of categories, each containing a list of FUNCTIONS 
+  that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
 }
+
+how this function actually works is covered in 
+:help nixCats.flake.nixperts.nvimBuilder
 
 ---------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
@@ -147,7 +151,7 @@ These are the defaults:
     defaults = {
       # do you want to use lua from this flake?
       # or would you rather do it in your .config/nvim?
-      # nixCats will work either way.
+      # nixCats and this help will work either way.
       wrapRc = true;
 
       # RCName: the name of folder to require within lua directory.
@@ -193,7 +197,7 @@ as well as the general startupPlugins category.
 
 an example package definition:
 
-        birdeeVim = birdeeVimBuild settings.defaults {
+        nixCats = nixVimBuilder settings.nixCats {
           custom = true;
           gitPlugins = true;
           general = true;
