@@ -53,7 +53,7 @@ The solution:
     I still wanted my config to know what plugins and LSPs I included in the package
         so I created nixCats
 
-You should not have to leave flake.nix or very occasionally customPluginOverlay.nix, although there is a guide to doing so.
+You should not have to leave [flake.nix](./flake.nix) or VERY occasionally [customPluginOverlay](./customPluginOverlay.nix), although there is a guide to doing so.
 
 All config folders like ftplugin work, if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
 
