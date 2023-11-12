@@ -11,14 +11,16 @@
 
 -- a collection of mappings to allow you to yank to clipboard using <leader>y
 -- as well as a few nice paste options, and ctrl+a
--- in normal mode, it accepts motions as well, but I didn't know how to put that in which-key
+-- in normal mode, it accepts motions as well.
 vim.cmd([[
-  nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
+  " may come in handy, so comment it out rather than deleting.
+  " nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
   function! Yank_to_clipboard(type)
     silent exec 'normal! `[v`]"+y'
     silent exec 'let @/=@"'
   endfunction
 ]])
+vim.keymap.set("n", '<leader>y', [[:set opfunc=Yank_to_clipboard<CR>g@]], { silent = true, desc = 'Yank to clipboard (accepts motions)' })
 vim.keymap.set({"v", "x"}, '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
 vim.keymap.set({"n", "v", "x"}, '<leader>yy', '"+yy', { noremap = true, silent = true, desc = 'Yank line to clipboard' })
 vim.keymap.set({"n", "v", "x"}, '<leader>Y', '"+yy', { noremap = true, silent = true, desc = 'Yank line to clipboard' })
