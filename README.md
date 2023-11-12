@@ -2,7 +2,7 @@
 
 This is a kickstarter style repo. It borrows a lot of lua from kickstarter.nvim. It has most of the same plugins.
 
-It is not all 1 file. Because I dont like that much at all. It could be though.
+The lua is not all 1 file. Because I dont like that much at all. It could be though.
 
 It is aimed at people who know enough lua to comfortably proceed from a kickstarter level setup
 
