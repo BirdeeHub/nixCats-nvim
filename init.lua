@@ -8,7 +8,7 @@
 -- the generated init.lua just requires whatever folder
 -- in the lua directory that you set RCName to.
 
--- this is just here so that lua_ls doesnt ask me
+-- this file is just here so that lua_ls doesnt ask me
 -- if I want to configure my workspace as luv
 -- every single time.
 -- print(vim.inspect(require('nixCats')))
