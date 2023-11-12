@@ -18,7 +18,7 @@
   , extraLuaPackages ? {}
   }:
   # for a more extensive guide to this file
-  # see :help birdee.nixperts.neovimBuilder
+  # see :help nixCats.flake.nixperts.nvimBuilder
   let
     config = {
       wrapRc = true;

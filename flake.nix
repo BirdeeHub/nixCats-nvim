@@ -111,7 +111,7 @@
           # to define and use a new category, simply add a new list to the set here, 
           # and later, you will include categoryname = true; in the set you
           # provide when you build the package using this builder function.
-          # see :help birdee.flake.outputs.packaging for info on that section.
+          # see :help nixCats.flake.outputs.packaging for info on that section.
 
           # propagatedBuildInputs:
           # this section is for dependencies that should be available
