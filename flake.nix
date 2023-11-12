@@ -243,7 +243,6 @@
           };
           unwrappedLua = {
             wrapRc = false;
-            RCName = "myLuaConf";
             viAlias = true;
             vimAlias = true;
           };
