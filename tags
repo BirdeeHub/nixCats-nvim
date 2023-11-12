@@ -15,8 +15,8 @@ categories	flake.nix	/^          inherit categories;$/;"	m
 colorscheme	flake.nix	/^          colorscheme = "onedark";$/;"	m
 colorscheme	flake.nix	/^          colorscheme = "onedark";$/;"	m
 configure	nix/NeovimBuilder.nix	/^  configure = {$/;"	m
-custom	flake.nix	/^            custom = with pkgs.customPlugins; [ ];$/;"	m
 custom	flake.nix	/^          custom = true;$/;"	m
+custom	flake.nix	/^            custom = with pkgs.customPlugins; [ ];$/;"	m
 custom	flake.nix	/^          custom = true;$/;"	m
 customPlugins	customPluginOverlay.nix	/^    customPlugins = {$/;"	m
 customRC	nix/wrapNeovim.nix	/^        customRC = configure.customRC or "";$/;"	m
@@ -24,14 +24,14 @@ customRC	nix/NeovimBuilder.nix	/^    inherit customRC;$/;"	m
 debug	flake.nix	/^          debug = false;$/;"	m
 debug	flake.nix	/^          debug = false;$/;"	m
 debug	flake.nix	/^            debug = with pkgs.vimPlugins; [$/;"	m
-default	flake.nix	/^          default = nixCats;$/;"	m
 default	flake.nix	/^          default = final: prev: { inherit nixCats; };$/;"	f
+default	flake.nix	/^          default = nixCats;$/;"	m
 description	flake.nix	/^  description = "A Lua-natic's neovim flake, with extra cats! nixCats!";$/;"	m
 devShell	flake.nix	/^        devShell = pkgs.mkShell {$/;"	m
 doInstallCheck	customPluginOverlay.nix	/^        doInstallCheck = true;$/;"	m
 environmentVariables	flake.nix	/^          environmentVariables = {$/;"	m
-extraLuaPackages	flake.nix	/^          extraLuaPackages = {$/;"	m
 extraLuaPackages	nix/NeovimBuilder.nix	/^  extraLuaPackages = combineCatsOfFuncs extraLuaPackages;$/;"	m
+extraLuaPackages	flake.nix	/^          extraLuaPackages = {$/;"	m
 extraLuaPackages	nix/wrapNeovim.nix	/^        inherit extraLuaPackages;$/;"	m
 extraMakeWrapperArgs	nix/NeovimBuilder.nix	/^  inherit extraMakeWrapperArgs;$/;"	m
 extraName	nix/NeovimBuilder.nix	/^      extraName = "";$/;"	m
@@ -61,10 +61,10 @@ general	flake.nix	/^            general = with pkgs.vimPlugins; [ ];$/;"	m
 generalBuildInputs	flake.nix	/^            generalBuildInputs = with pkgs; [$/;"	m
 generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
 generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
-gitPlugins	flake.nix	/^          gitPlugins = true;$/;"	m
 gitPlugins	flake.nix	/^            gitPlugins = with pkgs.neovimPlugins; [$/;"	m
 gitPlugins	flake.nix	/^          gitPlugins = true;$/;"	m
 gitPlugins	flake.nix	/^            gitPlugins = with pkgs.neovimPlugins; [ ];$/;"	m
+gitPlugins	flake.nix	/^          gitPlugins = true;$/;"	m
 hash	customPluginOverlay.nix	/^            hash = "sha256-kzc9jm6d9PJ07yiWfIOwqxOTAAydTpaLXVK6sEWM8gg=";$/;"	m
 inputs	flake.nix	/^  inputs = {$/;"	m
 inputsFrom	flake.nix	/^          inputsFrom = [ ];$/;"	m
@@ -75,23 +75,24 @@ lspDebugMode	flake.nix	/^          lspDebugMode = false;$/;"	m
 lspsAndRuntimeDeps	flake.nix	/^          lspsAndRuntimeDeps = {$/;"	m
 luaListPrinter	nix/utils.nix	/^  luaListPrinter = theList: let$/;"	f
 luaTablePrinter	nix/utils.nix	/^  luaTablePrinter = attrSet: let$/;"	f
-markdown	flake.nix	/^          markdown = true;$/;"	m
 markdown	flake.nix	/^            markdown = with pkgs.customPlugins; [$/;"	m
+markdown	flake.nix	/^          markdown = true;$/;"	m
 markdown	flake.nix	/^          markdown = true;$/;"	m
 markdown-preview-nvim	customPluginOverlay.nix	/^      markdown-preview-nvim =  let$/;"	m
 myVimPackage	nix/NeovimBuilder.nix	/^    packages.myVimPackage = {$/;"	m
-name	nix/NeovimBuilder.nix	/^        name = config.RCName;$/;"	m
-name	nix/NeovimBuilder.nix	/^      name = "nixCats";$/;"	m
-name	flake.nix	/^          name = "nixCats.nvim";$/;"	m
 name	nix/pluginOverlay.nix	/^      name = plugName plugin;$/;"	m
+name	nix/NeovimBuilder.nix	/^      name = "nixCats";$/;"	m
+name	nix/NeovimBuilder.nix	/^        name = config.RCName;$/;"	m
+name	flake.nix	/^          name = "nixCats.nvim";$/;"	m
 nativeBuildInputs	customPluginOverlay.nix	/^        nativeBuildInputs = [ super.nodejs ];$/;"	m
+neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
+neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
 neonixdev	flake.nix	/^            neonixdev = [$/;"	m
-neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
 neonixdev	flake.nix	/^            neonixdev = with pkgs; [$/;"	m
-neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
 neovimPlugins	nix/pluginOverlay.nix	/^  neovimPlugins = builtins.listToAttrs (map$/;"	m
 nixCats	flake.nix	/^          nixCats = {$/;"	m
 nixCats	flake.nix	/^          default = final: prev: { inherit nixCats; };$/;"	m
+nixCats	flake.nix	/^          inherit nixCats;$/;"	m
 offlineCache	customPluginOverlay.nix	/^          offlineCache = super.fetchYarnDeps {$/;"	m
 opt	nix/NeovimBuilder.nix	/^      inherit opt;$/;"	m
 optional	nix/wrapNeovim.nix	/^        start ++ (map (p: { plugin = p; optional = true; }) opt);$/;"	m
@@ -100,8 +101,8 @@ outputs	flake.nix	/^  outputs = { self, nixpkgs, flake-utils, ... }@inputs:$/;"	
 overlays	flake.nix	/^        overlays = {$/;"	m
 overlays	flake.nix	/^          overlays = [$/;"	m
 packageJSON	customPluginOverlay.nix	/^          packageJSON = "\${super.vimPlugins.markdown-preview-nvim.src}\/package.json";$/;"	m
-packages	flake.nix	/^        packages = {$/;"	m
 packages	flake.nix	/^          packages = [ nixCats ];$/;"	m
+packages	flake.nix	/^        packages = {$/;"	m
 pkgs	flake.nix	/^          inherit pkgs;$/;"	m
 plugin	nix/wrapNeovim.nix	/^        start ++ (map (p: { plugin = p; optional = true; }) opt);$/;"	m
 plugins	nix/wrapNeovim.nix	/^        inherit plugins;$/;"	m
@@ -111,8 +112,8 @@ postInstall	customPluginOverlay.nix	/^        postInstall = ''$/;"	m
 propagatedBuildInputs	flake.nix	/^          propagatedBuildInputs = {$/;"	m
 propagatedBuildInputs	nix/NeovimBuilder.nix	/^      propagatedBuildInputs = buildInputs;$/;"	m
 regularCats	flake.nix	/^          regularCats = final: prev: { inherit regularCats; };$/;"	f
-regularCats	flake.nix	/^          regularCats = final: prev: { inherit regularCats; };$/;"	m
 regularCats	flake.nix	/^          inherit regularCats;$/;"	m
+regularCats	flake.nix	/^          regularCats = final: prev: { inherit regularCats; };$/;"	m
 self	flake.nix	/^          inherit self;$/;"	m
 settings	flake.nix	/^          inherit settings;$/;"	m
 shellHook	flake.nix	/^          shellHook = ''$/;"	m
@@ -120,13 +121,13 @@ src	nix/pluginOverlay.nix	/^    src = builtins.getAttr name inputs;$/;"	m
 start	nix/NeovimBuilder.nix	/^      inherit start;$/;"	m
 startupPlugins	flake.nix	/^          startupPlugins = {$/;"	m
 system	flake.nix	/^          inherit system;$/;"	m
-test	flake.nix	/^            test = [ (_:[]) ];$/;"	m
 test	flake.nix	/^          test = true;$/;"	m
 test	flake.nix	/^          test = true;$/;"	m
 test	flake.nix	/^            test = [ (_:[]) ];$/;"	m
-test	flake.nix	/^            test = [$/;"	m
+test	flake.nix	/^            test = [ (_:[]) ];$/;"	m
 test	flake.nix	/^            test = {$/;"	m
 test	flake.nix	/^            test = [ (_:[]) ];$/;"	m
+test	flake.nix	/^            test = [$/;"	m
 theWorstCat	flake.nix	/^          theWorstCat = {$/;"	m
 theWorstCat	flake.nix	/^          theWorstCat = {$/;"	m
 thing1	flake.nix	/^            thing1 = [ "MEOW" "HISSS" ];$/;"	m
@@ -138,17 +139,17 @@ thing3	flake.nix	/^                thing3 = [ "give" "treat" ];$/;"	m
 thing4	flake.nix	/^            thing4 = "couch is for scratching";$/;"	m
 thing4	flake.nix	/^            thing4 = "couch is for scratching";$/;"	m
 unwrappedLua	flake.nix	/^          unwrappedLua = {$/;"	m
-url	flake.nix	/^    nixpkgs.url = "github:nixos\/nixpkgs\/nixpkgs-unstable";$/;"	m
-url	flake.nix	/^      url = "github:numToStr\/Comment.nvim";$/;"	m
-url	flake.nix	/^      url = "github:ThePrimeagen\/harpoon";$/;"	m
-url	flake.nix	/^      url = "github:m-demare\/hlargs.nvim";$/;"	m
-url	flake.nix	/^      url = "github:neovim\/nvim-lspconfig";$/;"	m
-url	flake.nix	/^      url = "github:nvim-lualine\/lualine.nvim";$/;"	m
 url	flake.nix	/^      url = "github:folke\/which-key.nvim";$/;"	m
-url	flake.nix	/^      url = "github:lewis6991\/gitsigns.nvim";$/;"	m
-url	flake.nix	/^      url = "github:joshdick\/onedark.vim";$/;"	m
-url	flake.nix	/^      url = "github:numtide\/flake-utils";$/;"	m
+url	flake.nix	/^    nixpkgs.url = "github:nixos\/nixpkgs\/nixpkgs-unstable";$/;"	m
 url	flake.nix	/^    nixd.url = "github:nix-community\/nixd";$/;"	m
+url	flake.nix	/^      url = "github:numtide\/flake-utils";$/;"	m
+url	flake.nix	/^      url = "github:joshdick\/onedark.vim";$/;"	m
+url	flake.nix	/^      url = "github:lewis6991\/gitsigns.nvim";$/;"	m
+url	flake.nix	/^      url = "github:numToStr\/Comment.nvim";$/;"	m
+url	flake.nix	/^      url = "github:m-demare\/hlargs.nvim";$/;"	m
+url	flake.nix	/^      url = "github:nvim-lualine\/lualine.nvim";$/;"	m
+url	flake.nix	/^      url = "github:ThePrimeagen\/harpoon";$/;"	m
+url	flake.nix	/^      url = "github:neovim\/nvim-lspconfig";$/;"	m
 value	nix/pluginOverlay.nix	/^      value = buildPlug plugin;$/;"	m
 version	nix/pluginOverlay.nix	/^    version = "master";$/;"	m
 version	customPluginOverlay.nix	/^          inherit (super.vimPlugins.markdown-preview-nvim) pname version;$/;"	m
@@ -157,10 +158,10 @@ viAlias	flake.nix	/^            viAlias = true;$/;"	m
 viAlias	nix/NeovimBuilder.nix	/^  viAlias = config.viAlias;$/;"	m
 viAlias	nix/NeovimBuilder.nix	/^      viAlias = false;$/;"	m
 viAlias	nix/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
+vimAlias	nix/NeovimBuilder.nix	/^  vimAlias = config.vimAlias;$/;"	m
 vimAlias	nix/NeovimBuilder.nix	/^      vimAlias = false;$/;"	m
 vimAlias	flake.nix	/^            vimAlias = true;$/;"	m
 vimAlias	flake.nix	/^            vimAlias = true;$/;"	m
-vimAlias	nix/NeovimBuilder.nix	/^  vimAlias = config.vimAlias;$/;"	m
 vimAlias	nix/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
 withNodeJs	nix/NeovimBuilder.nix	/^      withNodeJs = false;$/;"	m
 withNodeJs	nix/NeovimBuilder.nix	/^  withNodeJs = config.withNodeJs;$/;"	m
