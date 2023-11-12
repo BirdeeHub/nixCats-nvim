@@ -13,12 +13,25 @@
 -- as well as a few nice paste options, and ctrl+a
 -- in normal mode, it accepts motions as well.
 vim.cmd([[
-  " may come in handy, so comment it out rather than deleting.
-  " nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
   function! Yank_to_clipboard(type)
     silent exec 'normal! `[v`]"+y'
     silent exec 'let @/=@"'
   endfunction
+  " nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
+  " vnoremap <silent> <leader>y "+y
+  " xnoremap <silent> <leader>y "+y
+  " nnoremap <silent> <leader>yy "+yy
+  " vnoremap <silent> <leader>yy "+yy
+  " xnoremap <silent> <leader>yy "+yy
+  " nnoremap <silent> <leader>Y "+yy
+  " vnoremap <silent> <leader>Y "+yy 
+  " xnoremap <silent> <leader>Y "+yy
+  " nnoremap <silent> <C-a> gg0vG$
+  " vnoremap <silent> <C-a> gg0vG$
+  " xnoremap <silent> <C-a> gg0vG$
+  " nnoremap <silent> <leader>p "+p
+  " inoremap <silent> <C-p> <C-r>+
+  " xnoremap <silent> <leader>P "_dP
 ]])
 vim.keymap.set("n", '<leader>y', [[:set opfunc=Yank_to_clipboard<CR>g@]], { silent = true, desc = 'Yank to clipboard (accepts motions)' })
 vim.keymap.set({"v", "x"}, '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
@@ -29,20 +42,3 @@ vim.keymap.set('n', '<leader>p', '"+p', { noremap = true, silent = true, desc = 
 vim.keymap.set('i', '<C-p>', '<C-r>+', { noremap = true, silent = true, desc = 'Paste from clipboard from within insert mode' })
 vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc = 'Paste over selection without erasing unnamed register' })
 
--- vim.cmd([[
---   nnoremap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
---   vnoremap <silent> <leader>y "+y
---   xnoremap <silent> <leader>y "+y
---   nnoremap <silent> <leader>yy "+yy
---   vnoremap <silent> <leader>yy "+yy
---   xnoremap <silent> <leader>yy "+yy
---   nnoremap <silent> <leader>Y "+yy
---   vnoremap <silent> <leader>Y "+yy 
---   xnoremap <silent> <leader>Y "+yy
---   nnoremap <silent> <C-a> gg0vG$
---   vnoremap <silent> <C-a> gg0vG$
---   xnoremap <silent> <C-a> gg0vG$
---   nnoremap <silent> <leader>p "+p
---   inoremap <silent> <C-p> <C-r>+
---   xnoremap <silent> <leader>P "_dP
--- ]])
