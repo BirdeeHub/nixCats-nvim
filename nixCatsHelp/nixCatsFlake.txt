@@ -147,6 +147,7 @@ how this function actually works is covered in
 Settings Profiles:                             *nixCats.flake.outputs.settings*
                                                  *nixCats.flake.outputs.RCName*
 These are the defaults:
+>nix
   settings = {
     defaults = {
       # do you want to use lua from this flake?
@@ -167,7 +168,7 @@ These are the defaults:
       withPython3 = true;
     };
   };
-
+<
 If you wish to have something different, you may define some or all of these
 options, in a set within the settings set to be included in the packaging section below.
 
@@ -196,24 +197,24 @@ hence, general = true; will include the general lspsAndDeps category,
 as well as the general startupPlugins category.
 
 an example package definition:
+>nix
+    nixCats = nixVimBuilder settings.nixCats {
+      custom = true;
+      gitPlugins = true;
+      general = true;
+      neonixdev = true;
 
-        nixCats = nixVimBuilder settings.nixCats {
-          custom = true;
-          gitPlugins = true;
-          general = true;
-          neonixdev = true;
+      # this does not have an associated category of plugins, 
+      # but lua can still check for it
+      lspDebugMode = false;
 
-          # this does not have an associated category of plugins, 
-          # but lua can still check for it
-          lspDebugMode = false;
-
-          # you could also pass something else and it calls 
-          # builtins.toString on it and passes it in as a string
-          theBestCat = "says meow!!!";
-          # maybe you need to pass a port or path in or something idk.
-          # you could :lua print(require('nixCats').theBestCat)
-        };
-
+      # you could also pass something else and it calls 
+      # builtins.toString on it and passes it in as a string
+      theBestCat = "says meow!!!";
+      # maybe you need to pass a port or path in or something idk.
+      # you could :lua print(require('nixCats').theBestCat)
+    };
+<
 You can require('nixCats') for the set you define here in your lua
 It returns a lua table of the same format.
 
