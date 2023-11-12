@@ -56,12 +56,10 @@
       '';
     };
 
-    # and create our customRC to call it
-    customRC = if config.RCName != "" && config.wrapRc != false then 
-        "lua require('" + config.RCName + "')" 
-      else "";
+    wrapRc = if config.RCName != "" then config.wrapRc else false;
 
-    wrapRc = if customRC != "" then config.wrapRc else false;
+    # and create our customRC to call it
+    customRC = if wrapRc then "lua require('" + config.RCName + "')" else "";
 
     extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 
