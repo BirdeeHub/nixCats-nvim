@@ -44,9 +44,9 @@ The solution:
 #### These are the reasons I wanted to do it this way: 
 
     The setup instructions for new plugins are all in Lua so translating them is effort.
-    
+
     I didnt want to be forced into creating a new lua file for every plugin.
-    
+
     I wanted my neovim config to be neovim flavored 
         (so that I can take advantage of all the neovim dev tools with minimal fuss)
 
