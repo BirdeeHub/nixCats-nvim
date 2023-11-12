@@ -96,4 +96,5 @@ require('which-key').register {
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
   ['<leader>m'] = { name = '[M]arkdown', _ = 'which_key_ignore' },
   ['<leader>F'] = { name = '[F]ile explorer', _ = 'which_key_ignore' },
+  ['<leader>h'] = { name = '[H]arpoon', _ = 'which_key_ignore' },
 }
