@@ -167,6 +167,10 @@ Or, you could clone the repo to your .config dir, name it nvim, and leave it wra
 
 I don't know how to set up formatters in lua, so there is only lsp formatting right now.
 
+4:
+
+How would I add the motions on yank to clipboard to which-key like for regular yank?
+
 ---
 
 If someone figures any of those out, please let me know.
