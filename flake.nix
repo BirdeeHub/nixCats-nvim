@@ -4,7 +4,7 @@
         # install debuggers for languages (dap & dapui installed)
         # install formatters
 
-    # see :help birdee.flake.inputs
+    # see :help nixCats.flake.inputs
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils = {
@@ -56,13 +56,13 @@
     nixd.url = "github:nix-community/nixd";
   };
 
-  # see :help birdee.flake.outputs
+  # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, flake-utils, ... }@inputs:
     # This line makes this package availeable for all systems
     # ("x86_64-linux", "aarch64-linux", "i686-linux", "x86_64-darwin",...)
     flake-utils.lib.eachDefaultSystem (system:
       let
-        # see :help birdee.flake.outputs.overlays
+        # see :help nixCats.flake.outputs.overlays
 
         # If you cant import them with the standard overlay, 
         # define a derivation in ./customPluginOverlay.nix
@@ -87,7 +87,7 @@
           # config.allowUnfree = true;
         };
 
-        # see :help birdee.flake.outputs.builder
+        # see :help nixCats.flake.outputs.builder
 
         # Now that our plugin inputs/overlays and pkgs have been defined,
         # We define a function to facilitate package building for particular categories
@@ -103,7 +103,7 @@
           inherit categories;
           inherit settings;
 
-          # see :help birdee.flake.outputs.builder
+          # see :help nixCats.flake.outputs.builder
           # to define and use a new category, simply add a new list to the set here, 
           # and later, you will include categoryname = true; in the set you
           # provide when you build the package using this builder function.
@@ -226,12 +226,9 @@
           extraLuaPackages = {
             test = [ (_:[]) ];
           };
-
-          # there are more available sections, extraPythonPackages, extraPython3Packages, extraLuaPackages.
-          # see :help birdee.flake.outputs.builder and :help birdee.nixperts.neovimBuilder
         });
 
-        # see :help birdee.flake.outputs.settings
+        # see :help nixCats.flake.outputs.settings
         settings = {
           nixCats = {
             wrapRc = true;
@@ -253,14 +250,13 @@
         };
 
 
-
         # And then build a package with specific categories from above here:
         # All categories you wish to include must be marked true,
         # but false may be omitted.
         # This entire set is also passed to nixCats for querying within the lua.
         # It is passed as a Lua table with values name = boolean. same as here.
 
-        # see :help birdee.flake.outputs.packaging
+        # see :help nixCats.flake.outputs.packaging
         nixCats = nixVimBuilder settings.nixCats {
           generalBuildInputs = true;
           markdown = true;
@@ -314,7 +310,7 @@
 
 
 
-      # see :help birdee.flake.outputs.packages
+      # see :help nixCats.flake.outputs.packages
 
       { # choose your package
         overlays = {
