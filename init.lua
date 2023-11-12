@@ -11,7 +11,6 @@
 -- this file is just here so that lua_ls doesnt ask me
 -- if I want to configure my workspace as luv
 -- every single time.
--- print(vim.inspect(require('nixCats')))
 
 -- This is here so you can clone the repo to your .config/nvim and unwrap RC and it will still work.
 require('myLuaConf')
