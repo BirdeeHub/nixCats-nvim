@@ -1,5 +1,16 @@
 
+-- kickstart.nvim starts you with this. 
+-- But it constantly clobbers your system clipboard whenever you delete anything.
+
+-- Sync clipboard between OS and Neovim.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+-- vim.o.clipboard = 'unnamedplus'
+
+-- So, meet clippy.lua
+
 -- a collection of mappings to allow you to yank to clipboard using <leader>y
+-- as well as a few nice paste options, and ctrl+a
 -- in normal mode, it accepts motions as well, but I didn't know how to put that in which-key
 vim.cmd([[
   nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
