@@ -108,7 +108,8 @@ just doing this and including more comments than code.
     # and then maps name and value
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
-    # you will use this to create categories for wrapper arguments
+    # you may use this to create entirely new 
+    # categories in the builder for wrapper arguments
     # more info on wrapper arguments below.
 
     filterAndFlattenWrapAttrs = (import ./utils.nix)
