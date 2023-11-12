@@ -145,6 +145,11 @@
 
           # This is for plugins that will load at startup without using packadd:
           startupPlugins = {
+            debug = with pkgs.vimPlugins; [
+              nvim-dap
+              nvim-dap-ui
+              nvim-dap-virtual-text
+            ];
             neonixdev = [
               pkgs.vimPlugins.neodev-nvim
             ];
@@ -181,6 +186,7 @@
               nvim-surround
               indent-blankline-nvim
               lualine-lsp-progress
+              nvim-web-devicons
               luasnip
               cmp_luasnip
               cmp-buffer
@@ -265,6 +271,7 @@
           custom = true;
           neonixdev = true;
           test = true;
+          debug = false;
           # this does not have an associated category of plugins, 
           # but lua can still check for it
           lspDebugMode = false;
@@ -292,6 +299,7 @@
           general = true;
           custom = true;
           neonixdev = true;
+          debug = false;
           test = true;
           lspDebugMode = false;
           colorscheme = "onedark";

@@ -47,8 +47,6 @@ function M.get_capabilities()
   -- if you make a package without it, make sure to check if it exists with nixCats!
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-  --vim.tbl_extend('keep', capabilities, require'coq'.lsp_ensure_capabilities())
-  --vim.api.nvim_out_write(vim.inspect(capabilities))
   return capabilities
 end
 return M
