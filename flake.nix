@@ -332,6 +332,7 @@
         packages = {
           default = nixCats;
           inherit regularCats;
+          inherit nixCats;
         };
       }
 
