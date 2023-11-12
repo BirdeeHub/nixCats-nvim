@@ -50,6 +50,10 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
+    "plugins-harpoon" = {
+      url = "github:ThePrimeagen/harpoon";
+      flake = false;
+    };
     # a flake import. We will import this one with an overlay
     # but you could also import the package itself instead.
     # overlays are just nice if they are offered.
@@ -152,6 +156,7 @@
               onedark-vim
               gitsigns
               which-key
+              harpoon
               lspconfig
               lualine
               hlargs
