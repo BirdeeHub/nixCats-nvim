@@ -241,10 +241,6 @@
             RCName = "myLuaConf";
             viAlias = true;
             vimAlias = true;
-            withNodeJs = false;
-            withRuby = true;
-            extraName = "";
-            withPython3 = true;
           };
           unwrappedLua = {
             wrapRc = false;
