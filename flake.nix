@@ -1,8 +1,5 @@
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
-        # TO DO: 
-        # install debuggers for languages (dap & dapui installed)
-        # install formatters
 
     # see :help nixCats.flake.inputs
   inputs = {
