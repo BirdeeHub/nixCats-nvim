@@ -1,0 +1,226 @@
+=======================================================================================
+Flake Help                                                      *nixCats.flake*
+
+A Lua-natic's neovim flake, with extra cats! nixCats!;
+
+This is the documentation for the flake itself.
+This flake uses nix for importing plugins, lsps, dependencies, and more,
+in place of usual nvim package managers such as packer, lazy or mason.
+
+Everything else is done in a regular lua config style.
+Simply pretend the root of the flake is the root of your Lua config,
+except without the root level init.lua folder. 
+Set RCName to set which lua folder to require first! Details on RCName below.
+
+Related:
+For detecting what was included by 
+the flake in your Lua, see:
+:help nixCats
+
+=======================================================================================
+Flake Inputs:                                            *nixCats.flake.inputs*
+
+If they dont have a build step, name the plugins you import from github 
+plugins-somepluginname 
+They will be processed automatically into plugins by pluginOverlay
+
+If they have a build step or are not a plugin, 
+i.e. an lsp, dont name them in that format.
+
+If they are on nixpkgs, you dont necessarily need to put them in inputs,
+because you will be able to access them through pkgs.vimPlugins variable later.
+
+Context for later:
+
+If they have a build step, you will deal with them in customPluginOverlay
+then import them into a category of the builder. 
+(assuming nixpkgs hasn't already done it!!)
+
+If they are not a plugin:
+You will import them into a category of the builder under lspsAndDeps, 
+unless they are for build time, then put them under propagatedBuildInputs
+
+=======================================================================================
+Flake Outputs Introduction                              *nixCats.flake.outputs*
+
+With our inputs to our flake taken care of:
+
+First, we call flake utils to get system variable for all default systems.
+
+                                               *nixCats.flake.outputs.overlays*
+Then, we define our overlays. We have 2 main ones to discuss.
+
+-- The first is ./nix/pluginOverlay:
+
+It takes all the inputs named in the format
+'plugins-somepluginname' and makes them into plugins. 
+If the plugin doesn't have a build step,
+and it wasnt on nixpkgs, then use this method.
+Access them to add them to a category of the builder function 
+with 'pkgs.neovimPlugins.somepluginname'
+
+-- The second is ./customPluginOverlay:
+If you need to interact with one of these overlays, it will be this one.
+You should not need to do it much. 
+As of writing this, I have only needed it once.
+At the time of saying that, I only am missing lua config for debug and lint.
+I can install the programs fine I just dont know how to do neovim.
+I needed it for markdown-preview of all things.
+
+It is used for defining plugins with build steps that 
+were not well handled by nixpkgs.
+It is passed flake inputs, and super is pkgs.
+Define the things within the file. 
+Then, access plugins defined there later 
+with 'pkgs.customPlugins.somepluginname'
+
+After the overlays we wish to include are all defined:
+
+we now generate the pkgs set that contains all the nixpkgs and overlay packages, 
+and the system variable from flake-utils.
+It will contain all our plugins and programs we will need from this point on.
+
+---------------------------------------------------------------------------------------
+Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
+
+we now create a builder function that takes 2 arguments. 
+A set of categories and a set of settings. 
+It does this by importing nix/NeovimBuilder.
+
+The default settings for the settings set are defined below. 
+They did not make sense to include in the categories system.
+see :help birdee.flake.outputs.settings
+
+the set of categories is a set of named boolean values like this:
+{ categoryname1 = true; categoryname2 = false; etc... }
+
+To define this function that takes this set of categories and 
+the settings as an argument, we import nix/NeovimBuilder 
+and provide it a set containing the following info.
+
+{
+
+- a reference to the self variable that gives us the path to the flake.
+
+- the pkgs set with the overlays
+
+- the settings set that this function took as an argument.
+
+- the categories set that this function took as an argument.
+      It will define which of the categories to include from the following:
+
+- a flexible set of categories, each containing a list of 
+      internal BUILD TIME dependencies
+
+- a flexible set of categories, each containing a list of LSP's or 
+      other internal runtime dependencies such as ctags or debuggers
+      these are available to the path while within neovim program.
+      this includes the neovim terminal.
+
+- a flexible set of categories, each containing a list of startup plugins.
+      Startup plugins are loaded and can be required. 
+
+- a flexible set of categories, each containing a list of optional plugins.
+      Optional plugins need to be added with packadd before being required.
+
+- a flexible set of categories, each containing an ATTRIBUTE SET of 
+      EnvironmentVariableName = "EnvironmentVariableValue";
+
+- a flexible set of categories, each containing a list of 
+      extra wrapper arguments.
+      If you don't know what that is, see here:
+github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+
+- 2 flexible sets of categories, one for python and the other for python3,
+  each containing a list of FUNCTIONS that return lists of python packages.
+  These functions are the same thing that you would pass to python.withPackages.
+
+- a flexible set of categories, each containing a list of extra Lua packages.
+  These functions are the same thing that you would pass to lua.withPackages.
+}
+
+---------------------------------------------------------------------------------------
+Settings Profiles:                             *nixCats.flake.outputs.settings*
+                                                 *nixCats.flake.outputs.RCName*
+These are the defaults:
+  settings = {
+    defaults = {
+      # do you want to use lua from this flake?
+      # or would you rather do it in your .config/nvim?
+      # nixCats will work either way.
+      wrapRc = true;
+
+      # RCName: the name of folder to require within lua directory.
+      # the default is empty, and if left empty, 
+      # wrapRc will default to false.
+      RCName = "";
+
+      viAlias = false;
+      vimAlias = false;
+      withNodeJs = false;
+      withRuby = true;
+      extraName = "";
+      withPython3 = true;
+    };
+  };
+
+If you wish to have something different, you may define some or all of these
+options, in a set within the settings set to be included in the packaging section below.
+
+---------------------------------------------------------------------------------------
+Package Generation:                           *nixCats.flake.outputs.packaging*
+
+generate packages by calling that builder function we just created.
+
+First, pick the set of settings you wish to include.
+
+Then, pass it a set of named boolean values like this:
+{ categoryname1 = true; categoryname2 = false; etc... }
+False may be omitted. True may not be omitted.
+Only true matters for what plugins will be added.
+
+These categories are defined in the Builder function above 
+by placing named lists of plugins in the flexible sets provided.
+The category names are the names of those lists. 
+Add a new list, then enable the category here.
+
+If you have categories with the same name in 
+multiple different sets outlined above in the builder,
+all plugins in those categories will be
+included when you set "thatname = true;" here.
+hence, general = true; will include the general lspsAndDeps category,
+as well as the general startupPlugins category.
+
+an example package definition:
+
+        birdeeVim = birdeeVimBuild settings.defaults {
+          custom = true;
+          gitPlugins = true;
+          general = true;
+          neonixdev = true;
+
+          # this does not have an associated category of plugins, 
+          # but lua can still check for it
+          lspDebugMode = false;
+
+          # you could also pass something else and it calls 
+          # builtins.toString on it and passes it in as a string
+          theBestCat = "says meow!!!";
+          # maybe you need to pass a port or path in or something idk.
+          # you could :lua print(require('nixCats').theBestCat)
+        };
+
+You can require('nixCats') for the set you define here in your lua
+It returns a lua table of the same format.
+
+see :help nixCats
+
+---------------------------------------------------------------------------------------
+Flake devShell and package definitions         *nixCats.flake.outputs.packages*
+
+Put the names of the packages you created in the above 
+packaging section into the appropriate flake output category, 
+i.e. as a Packages or devShell item
+
+---------------------------------------------------------------------------------------
+vim:tw=78:ts=8:ft=help:norl:
