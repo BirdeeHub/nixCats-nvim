@@ -1,5 +1,4 @@
 local categories = require('nixCats')
-local hlargsColor =  '#32a88f' -- if this doesnt work for new theme, change it here
 
 vim.cmd.colorscheme(require('nixCats').colorscheme)
 
@@ -21,7 +20,7 @@ vim.g.undotree_WindowLayout = 1
 vim.g.undotree_SplitWidth = 40
 
 require('hlargs').setup({
-  color = hlargsColor,
+  color = '#32a88f',
 })
 require('Comment').setup()
 require('fidget').setup()
