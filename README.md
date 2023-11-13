@@ -24,8 +24,6 @@ You can also specify programs and environment variables accessible only to neovi
 
 [:help nixCats.flake](./nixCatsHelp/nixCatsFlake.txt)
 
-[:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt)
-
 #### Introduction:
  
 ```
@@ -53,7 +51,7 @@ The solution:
     I still wanted my config to know what plugins and LSPs I included in the package
         so I created nixCats
 
-You should not have to leave [flake.nix](./flake.nix) or VERY occasionally [customPluginOverlay](./customPluginOverlay.nix), although there is a guide to doing so.
+You should not have to leave [flake.nix](./flake.nix) or VERY occasionally [customPluginOverlay](./customPluginOverlay.nix), although there is a guide to doing so. [:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt)
 
 All config folders like ftplugin work, if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
 
