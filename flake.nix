@@ -51,6 +51,10 @@
       url = "github:ThePrimeagen/harpoon";
       flake = false;
     };
+    "plugins-fidget" = {
+      url = "github:j-hui/fidget.nvim/legacy";
+      flake = false;
+    };
     # a flake import. We will import this one with an overlay
     # but you could also import the package itself instead.
     # overlays are just nice if they are offered.
@@ -163,6 +167,7 @@
               lualine
               hlargs
               Comment
+              fidget
             ];
             general = with pkgs.vimPlugins; [
               telescope-fzf-native-nvim
@@ -182,7 +187,7 @@
               # ))
               nvim-surround
               indent-blankline-nvim
-              lualine-lsp-progress
+              # lualine-lsp-progress # replaced by fidget
               nvim-web-devicons
               luasnip
               cmp_luasnip

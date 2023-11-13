@@ -25,7 +25,7 @@ require('hlargs').setup({
   color = hlargsColor,
 })
 require('Comment').setup()
-  -- require('fidget').setup()
+require('fidget').setup()
 require('lualine').setup({
   options = {
     icons_enabled = false,
@@ -38,7 +38,7 @@ require('lualine').setup({
       {
         'filename', path = 1, status = true,
       },
-      'lsp_progress',
+      -- 'lsp_progress',
     },
   },
 })
