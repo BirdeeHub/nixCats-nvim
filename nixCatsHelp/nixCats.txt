@@ -1,7 +1,7 @@
 =======================================================================================
 NIX CATEGORIES                                                       *nixCats*
 
-For help with the nix flake files, see :help nixCats.flake
+For help with the nix flake files, see :help `nixCats.flake`
 
 nixCats: returns category names included by nix for this package 
 
@@ -24,8 +24,8 @@ and is the same as the table you provided to choose what
 categories are included in each package in the flake.nix file.
 
 If in your flake, your package definition looked like this:
+  (see :help `birdee.flake.outputs.packaging`)
 >nix
-  # see :help birdee.flake.outputs.packaging
   nixCats = nixVimBuilder settings.nixCats {
     bash = true;
     cmp = true;
@@ -62,34 +62,36 @@ If in your flake, your package definition looked like this:
   };
 <
 Using:
-
+>vim
     :lua print(vim.inspect(require('nixCats')))
-
+    or
+    :NixCats
+<
 will return something like this:
 >lua
-    {
-      AI = true,
-      bash = true,
-      cmp = true,
-      customPlugins = true,
-      general = true,
-      gitPlugins = true,
-      java = false,
-      kotlin = true,
-      lspDebugMode = false,
-      markdown = true,
-      neonixdev = true,
-      telescope = true,
-      theBestCat = "says meow!!!",
-      theWorstCat = {
-        thing1 = { "MEOW", "HISSS" },
-        thing2 = { {
-            thing3 = { "give", "treat" }
-          }, "I LOVE KEYBOARDS" },
-        thing4 = "couch is for scratching"
-      },
-      treesitter = true
-    }
+  {
+    AI = true,
+    bash = true,
+    cmp = true,
+    customPlugins = true,
+    general = true,
+    gitPlugins = true,
+    java = false,
+    kotlin = true,
+    lspDebugMode = false,
+    markdown = true,
+    neonixdev = true,
+    telescope = true,
+    theBestCat = "says meow!!!",
+    theWorstCat = {
+      thing1 = { "MEOW", "HISSS" },
+      thing2 = { {
+          thing3 = { "give", "treat" }
+        }, "I LOVE KEYBOARDS" },
+      thing4 = "couch is for scratching"
+    },
+    treesitter = true
+  }
 <
 Note: it also accepts other things.
 lists will become arrays

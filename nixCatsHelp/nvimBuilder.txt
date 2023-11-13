@@ -7,10 +7,11 @@ just doing this and including more comments than code.
 
 --------------------------------------------------------------------------
                                 *nixCats.flake.nixperts.nvimBuilder.arguments*
->nix
+
   # this function takes a set with the following items:
+  # our arguments ? and their default values
+>nix
   { 
-    # our arguments ? and their default values
     self
     , pkgs
     , categories ? {}
@@ -22,20 +23,30 @@ just doing this and including more comments than code.
     , propagatedBuildInputs ? {}
     , environmentVariables ? {}
     , extraWrapperArgs ? {}
+<
     # these ones take sets of lists of FUNCTIONS,
     # and those functions return lists of packages.
+    # i.e. (_:[]) as a default argument
+    # so now you can put categories of lists of them in
+    # and they will be sorted like everything else
     # Idk why they work that way, 
-    # but I combine the outputs.
+    # but just made a function to filter them, 
+    # call them, then combine the outputs.
+    # and I pass that in instead.
     # the source says:
       /* the function you would have passed to python.withPackages */
+>nix
     , extraPythonPackages ? {}
     , extraPython3Packages ? {}
     # same thing except for lua.withPackages
     , extraLuaPackages ? {}
     }:
     let
-      # when packaging, one of these is passed, but it may not have everything.
-      # update the default config with whatever new options were passed
+<
+      # when packaging, one of these is passed, 
+      # but we dont want to have to define all of them every time.
+      # so we update the default config with whatever new options were passed
+>nix
       config = {
         wrapRc = true;
         RCName = "";
@@ -49,8 +60,9 @@ just doing this and including more comments than code.
 <
 --------------------------------------------------------------------------
                                    *nixCats.flake.nixperts.nvimBuilder.opener*
->nix
+
     # package the entire flake as plugin
+>nix
     LuaConfig = pkgs.stdenv.mkDerivation {
         name = config.RCName;
         builder = builtins.toFile "builder.sh" ''
@@ -59,8 +71,12 @@ just doing this and including more comments than code.
           cp -r ${self}/* $out
         '';
       };
-
-    # see :help nixCats
+<
+    # see :help `nixCats`
+    # here is where nixCats is generated
+    # it uses some recursive stuff in utils to print a lua table to a file.
+    # Thats it. Also it defines a user command.
+>nix
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
@@ -70,6 +86,7 @@ just doing this and including more comments than code.
             { desc = 'So Cute!' })
             return ${(import ./utils.nix).luaTablePrinter categories}
           '';
+      # It installs itself and these docs to wherever it installs to.
       in builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out/lua
@@ -78,12 +95,13 @@ just doing this and including more comments than code.
         cp -r ${self}/nixCatsHelp/* $out/doc
       '';
     };
-
+    # check if we should wrap the lua config, or use regular directory
     wrapRc = if config.RCName != "" then config.wrapRc else false;
 
     # and create our customRC to call it
     customRC = if wrapRc then "lua require('" + config.RCName + "')" else "";
 
+    # only include LuaConfig if we want it
     extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 <
 ---------------------------------------------------------------------------------
@@ -102,10 +120,10 @@ just doing this and including more comments than code.
     buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ filterAndFlatten propagatedBuildInputs;
     start = extraPlugins ++ filterAndFlatten startupPlugins;
     opt = filterAndFlatten optionalPlugins;
-<
-    # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
-    # It has cmake in it I think among other things?
 
+    # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
+    # It has cmake in it among other things.
+<
 ---------------------------------------------------------------------------------
                            *nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
 
@@ -146,10 +164,11 @@ just doing this and including more comments than code.
           (name: value: ''--set ${name} "${value}"'');
 <
     # and this one we define a function that just passes an arg through.
-    # this one takes an a set of lists rather than a set of sets
+    # this one takes in a set of lists rather than a set of sets
 >nix
     FandF_passWrapperArgs = filterAndFlattenWrapLists (value: value);
 <
+
     # you can use filterAndFlattenWrapLists and its attr set counterpart in order
     # to create new sets of categories in the flake's builder function
     # that are to do with wrapper args.
@@ -166,16 +185,19 @@ just doing this and including more comments than code.
 <
     # this next part takes those wrapper args and 
     # concatenates them together with a space
-    # we will send this to the official wrapNeovim stable
+    # More info at:
+# https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+
+    # we will send this to our rendition of the official wrapNeovim stable
+    # which is just pkgs.wrapNeovim with an extra argument
 >nix
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       # We call the functions above and add them into a big list
+      # which we then call concatStringsSep " " on
       (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
       ++ (FandF_envVarSet environmentVariables)
       ++ (FandF_passWrapperArgs extraWrapperArgs)
 
-      # More info at:
-      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
 
     );
 <
@@ -198,11 +220,12 @@ just doing this and including more comments than code.
 <
 ---------------------------------------------------------------------------------
                          *nixCats.flake.nixperts.nvimBuilder.generatingNeovim*
+
+    # here is where we add our propagated build dependencies
 >nix
-      # here is where we add our propagated build dependencies
-      myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
-        propagatedBuildInputs = buildInputs;
-      });
+    myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+      propagatedBuildInputs = buildInputs;
+    });
     in
     # add all our stuff, and wrap it all up!
     # the following is just the regular pkgs.wrapNeovim
@@ -220,10 +243,8 @@ just doing this and including more comments than code.
       };
     };
 
-    # I dont know what these do, but I implemented them for completeness?
     # the extra packages arguments take (_: []) as a default argument
 
-    # I dont know what these do, but I implemented them?
       /* the function you would have passed to python.withPackages */
     extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
       /* the function you would have passed to python.withPackages */

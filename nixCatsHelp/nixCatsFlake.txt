@@ -15,7 +15,7 @@ Set RCName to set which lua folder to require first! Details on RCName below.
 Related:
 For detecting what was included by 
 the flake in your Lua, see:
-:help nixCats
+:help `nixCats`
 
 =======================================================================================
 Flake Inputs:                                            *nixCats.flake.inputs*
@@ -89,7 +89,7 @@ It does this by importing nix/NeovimBuilder.
 
 The default settings for the settings set are defined below. 
 They did not make sense to include in the categories system.
-see :help nixCats.flake.outputs.settings
+see :help `nixCats.flake.outputs.settings`
 
 the set of categories is a set of named boolean values like this:
 { categoryname1 = true; categoryname2 = false; etc... }
@@ -141,24 +141,27 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
 }
 
 how this function actually works is covered in 
-:help nixCats.flake.nixperts.nvimBuilder
+:help `nixCats.flake.nixperts.nvimBuilder`
 
 ---------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
-                                                 *nixCats.flake.outputs.RCName*
 These are the defaults:
 >nix
   settings = {
     defaults = {
-      # do you want to use lua from this flake?
-      # or would you rather do it in your .config/nvim?
-      # nixCats and this help will work either way.
-      wrapRc = true;
-
+<
+                                                 *nixCats.flake.outputs.RCName*
       # RCName: the name of folder to require within lua directory.
       # the default is empty, and if left empty, 
       # wrapRc will default to false.
+>nix
       RCName = "";
+<
+      # do you want to use lua from this flake?
+      # or would you rather do it in your .config/nvim?
+      # nixCats and this help will work either way.
+>nix
+      wrapRc = true;
 
       viAlias = false;
       vimAlias = false;
@@ -198,27 +201,27 @@ as well as the general startupPlugins category.
 
 an example package definition:
 >nix
-    nixCats = nixVimBuilder settings.nixCats {
-      custom = true;
-      gitPlugins = true;
-      general = true;
-      neonixdev = true;
+  nixCats = nixVimBuilder settings.nixCats {
+    custom = true;
+    gitPlugins = true;
+    general = true;
+    neonixdev = true;
 
-      # this does not have an associated category of plugins, 
-      # but lua can still check for it
-      lspDebugMode = false;
+    # this does not have an associated category of plugins, 
+    # but lua can still check for it
+    lspDebugMode = false;
 
-      # you could also pass something else and it calls 
-      # builtins.toString on it and passes it in as a string
-      theBestCat = "says meow!!!";
-      # maybe you need to pass a port or path in or something idk.
-      # you could :lua print(require('nixCats').theBestCat)
-    };
+    # you could also pass something else and it calls 
+    # builtins.toString on it and passes it in as a string
+    theBestCat = "says meow!!!";
+    # maybe you need to pass a port or path in or something idk.
+    # you could :lua print(require('nixCats').theBestCat)
+  };
 <
 You can require('nixCats') for the set you define here in your lua
 It returns a lua table of the same format.
 
-see :help nixCats
+see :help `nixCats`
 
 ---------------------------------------------------------------------------------------
 Flake devShell and package definitions         *nixCats.flake.outputs.packages*
