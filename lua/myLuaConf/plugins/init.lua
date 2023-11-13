@@ -1,8 +1,7 @@
 local categories = require('nixCats')
-local colorschemer = categories.colorscheme-- also schemes lualine
 local hlargsColor =  '#32a88f' -- if this doesnt work for new theme, change it here
 
-vim.cmd.colorscheme(colorschemer)
+vim.cmd.colorscheme(require('nixCats').colorscheme)
 
 require('myLuaConf.plugins.telescope')
 
@@ -29,7 +28,7 @@ require('fidget').setup()
 require('lualine').setup({
   options = {
     icons_enabled = false,
-    theme = colorschemer,
+    theme = require('nixCats').colorscheme,
     component_separators = '|',
     section_separators = '',
   },
