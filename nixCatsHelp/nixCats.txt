@@ -24,7 +24,7 @@ and is the same as the table you provided to choose what
 categories are included in each package in the flake.nix file.
 
 If in your flake, your package definition looked like this:
-  see :help `birdee.flake.outputs.packaging`
+  see :help `nixCats.flake.outputs.packaging`
 >nix
   nixCats = nixVimBuilder settings.nixCats {
     bash = true;
