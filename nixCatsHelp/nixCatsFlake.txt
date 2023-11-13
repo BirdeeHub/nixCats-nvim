@@ -12,6 +12,13 @@ Simply pretend the root of the flake is the root of your Lua config,
 except without the root level init.lua folder. 
 Set RCName to set which lua folder to require first! Details on RCName below.
 
+*******************************************************
+One IMPORTANT note:
+When editing the lua within the flake directory,
+nix will not package a new file if it isn't staged in git.
+run git add before rebuilding it whenever adding a new file.
+*******************************************************
+
 Related:
 For detecting what was included by 
 the flake in your Lua, see:

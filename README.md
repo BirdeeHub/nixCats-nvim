@@ -24,6 +24,12 @@ You can also specify programs and environment variables accessible only to neovi
 
 [:help nixCats.flake](./nixCatsHelp/nixCatsFlake.txt)
 
+    An important note: if you add a lua file, 
+    nix will not package it unless you add it 
+    to your git staging before you build it...
+    So nvim wont be able to find it...
+    Run git add before you build.
+
 #### Introduction:
  
 ```

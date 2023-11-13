@@ -3,6 +3,13 @@ NIX CATEGORIES                                                       *nixCats*
 
 For help with the nix flake files, see :help `nixCats.flake`
 
+*******************************************************
+One IMPORTANT note:
+When editing the lua within the flake directory,
+nix will not package a new file if it isn't staged in git.
+run git add before rebuilding it whenever adding a new file.
+*******************************************************
+
 nixCats: returns category names included by nix for this package 
 
 Use this to check if this neovim was packaged with 
