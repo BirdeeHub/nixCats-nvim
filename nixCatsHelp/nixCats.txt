@@ -103,7 +103,7 @@ How did treesitter end up last?
 
 everything that isnt true, false, null, 
 a list, or a set becomes a lua string.
-it uses "[[''${builtins.toString value}]]"
+it uses "[[${builtins.toString value}]]"
 in order to achieve this.
 
 If theBestCat says meow, and you use this syntax,
