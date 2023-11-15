@@ -1,6 +1,6 @@
 # nixCats-nvim: A Luanatic's kickstarter flake
 
-This is a kickstarter style repo. It borrows a lot of lua from kickstarter.nvim. It has most of the same plugins.
+This is a kickstarter style repo. It borrows a lot of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has most of the same plugins.
 
 The lua is not all 1 file. Because I dont like that much at all. It could be though.
 
