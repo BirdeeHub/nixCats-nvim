@@ -40,7 +40,6 @@ The mission:
 The solution: 
     Include the flake itself as a plugin
     Create nixCats so the lua may know what categories are packaged
-    Also I added some really nice copy paste keybinds in clippy.lua
     You may optionally have your config in your normal directory as well.
         (You will still be able to reference nixCats and the help should you do this.)
 ```
