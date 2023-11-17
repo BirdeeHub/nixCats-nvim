@@ -1,7 +1,7 @@
 =======================================================================================
 Flake Help                                                      *nixCats.flake*
 
-A Lua-natic's neovim flake, with extra cats! nixCats!;
+A Lua-natic's neovim flake, with extra cats! nixCats!
 
 This is the documentation for the flake itself.
 This flake uses nix for importing plugins, lsps, dependencies, and more,
