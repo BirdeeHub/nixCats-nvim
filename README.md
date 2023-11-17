@@ -184,3 +184,5 @@ If someone figures any of those out, please let me know.
     How would I add the motions on yank to clipboard to which-key like for regular yank?
 
 
+
+
