@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
 inputs: let
   customBuildsOverlay = self: super: { 
     customPlugins = {
@@ -39,4 +41,3 @@ inputs: let
   };
 in
 customBuildsOverlay
-

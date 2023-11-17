@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
 { 
   self
   , pkgs
@@ -148,4 +150,3 @@
     /* the function you would have passed to lua.withPackages */
   extraLuaPackages = combineCatsOfFuncs extraLuaPackages;
 }
-

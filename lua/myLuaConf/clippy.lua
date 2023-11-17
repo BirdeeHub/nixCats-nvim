@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 
 -- kickstart.nvim starts you with this. 
 -- But it constantly clobbers your system clipboard whenever you delete anything.

@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -75,4 +77,3 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.g.netrw_liststyle=0
 vim.g.netrw_banner=0
-

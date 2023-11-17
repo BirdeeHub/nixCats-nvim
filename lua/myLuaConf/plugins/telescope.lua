@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`

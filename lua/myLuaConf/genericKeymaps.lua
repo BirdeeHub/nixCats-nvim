@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
@@ -38,4 +40,3 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<C-W>', '<c-w>', { desc = '+window'})
 vim.keymap.set({"n", "v", "x"}, '"', '"', { desc = '+registers'})
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-

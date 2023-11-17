@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 require("myLuaConf.genericKeymaps")
