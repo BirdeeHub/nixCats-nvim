@@ -36,9 +36,10 @@ rec {
         inherit extraName;
       };
     in
+    # it uses the new wrapper!!!
     pkgs.wrapNeovimUnstable neovim (res // {
       wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
-      # and changed this
+      # I passed this out. I think this is the only extra option not covered?
       inherit wrapRc;
   });
 }
