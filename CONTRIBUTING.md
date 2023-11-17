@@ -8,8 +8,8 @@ So, again, when you figure a derivation out, regardless of what nvim related thi
 
 ---
 
-First person to find a semi general way for building vscode debuggers not on nixpkgs
-gets credited as a contributor if they want. Sorry I have no more to offer.
+First on the list is a way for building vscode debuggers not on nixpkgs.
+At least one of these should be merged into the main repo.
 
 Outside of that, clone or fork the repo and do as you please, 
 but adding plugins and bells and whistles to main gets in the way of the kickstarter spirit.
