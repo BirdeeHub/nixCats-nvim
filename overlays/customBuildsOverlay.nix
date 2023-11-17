@@ -1,5 +1,5 @@
 inputs: let
-  customPluginOverlay = self: super: { 
+  customBuildsOverlay = self: super: { 
     customPlugins = {
 
       # reddit user bin-c found this link for me,
@@ -38,5 +38,5 @@ inputs: let
     };
   };
 in
-customPluginOverlay
+customBuildsOverlay
 
