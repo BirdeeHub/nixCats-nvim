@@ -231,10 +231,8 @@ just doing this and including more comments than code.
     # the following is just the regular pkgs.wrapNeovim
     # except it also accepts wrapRc as an argument
   (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
-    inherit wrapRc;
-    inherit extraMakeWrapperArgs;
-    viAlias = config.viAlias;
-    vimAlias = config.vimAlias;
+    inherit wrapRc extraMakeWrapperArgs;
+    inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
     configure = {
       inherit customRC;
       packages.myVimPackage = {
@@ -252,9 +250,6 @@ just doing this and including more comments than code.
     extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
       /* the function you would have passed to lua.withPackages */
     extraLuaPackages = combineCatsOfFuncs extraLuaPackages;
-    withNodeJs = config.withNodeJs;
-    withRuby = config.withRuby;
-    extraName = config.extraName;
   }
 <
 ===========================================================================================================

@@ -20,6 +20,8 @@ except with the bonus of making sure ALL dependencies are installed and being ab
 
 You can also specify programs and environment variables accessible only to neovim's PATH.
 
+You should make use of the in-editor help at:
+
 [:help nixCats](./nixCatsHelp/nixCats.txt)
 
 [:help nixCats.flake](./nixCatsHelp/nixCatsFlake.txt)
@@ -28,7 +30,7 @@ You can also specify programs and environment variables accessible only to neovi
     nix will not package it unless you add it 
     to your git staging before you build it...
     So nvim wont be able to find it...
-    Run git add before you build.
+    So, run git add before you build.
 
 #### Introduction:
  
@@ -56,7 +58,7 @@ The solution:
     I still wanted my config to know what plugins and LSPs I included in the package
         so I created nixCats
 
-You should not have to leave [flake.nix](./flake.nix) or VERY occasionally [customPluginOverlay](./customPluginOverlay.nix), although there is a guide to doing so. [:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt)
+You should not have to leave [flake.nix](./flake.nix) or occasionally [customBuildsOverlay](./overlays/customBuildsOverlay.nix), although there is a guide to doing so. [:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt)
 
 All config folders like ftplugin work, if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
 
@@ -80,7 +82,7 @@ You can optionally ask what categories you have, whenever you require nixCats
 
 If you encounter any build steps that are not well handled by nixpkgs, 
 or you need to import a plugin straight from git that has a non-standard build step,
-and need to do a custom definition, [./customPluginOverlay.nix](./customPluginOverlay.nix) is the place for it.
+and need to do a custom definition, [customBuildsOverlay](./overlays/customBuildsOverlay.nix) is the place for it.
 
 You do not have to name your folder within the lua directory myLuaConf. Just change RCName in the flake.
 
@@ -91,7 +93,7 @@ You do not have to name your folder within the lua directory myLuaConf. Just cha
 ```bash
 # to test:
 nix shell github:BirdeeHub/nixCats-nvim#nixCats
-# If using zsh, be sure to escape the #
+# If using zsh with extra regexing, be sure to escape the #
 ```
 
 However, you should really just clone or fork the repo, 
@@ -135,7 +137,7 @@ If you want to add it to another flake, choose one of these methods:
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
-[pluginOverlay](./nix/pluginOverlay.nix) is a file copy pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
+[standardPluginOverlay in ./overlays/default.nix](./overlays/default.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
 
 Thank you!!! It taught me both about an overlay's existence and how it works.
 
@@ -143,39 +145,42 @@ I also borrowed some code from nixpkgs and included links.
 
 #### Issues:
 
-I'm somewhat new to neovim AND nix. However, all my issues are primarily related to lua.
+I'm somewhat new to neovim AND nix.
 
-I can install everything needed appropriately to do these things using nix, but I don't know enough about neovim to do the following:
+If someone figures any of those out, please let me know.
+
+##### Nix Questions:
 
 1:
 
-I haven't been able to connect a debugger to dap yet, but installing the stuff in nix is the easy part of that. I'm struggling with the lua...
+    only some of the vscode debuggers are on nixpkgs.
+    This means you have to define a build for the ones that aren't in customBuildsOverlay.nix.
+    On the bright side, most of them should have a VERY similar build process.
+    If I figure it out I'll post my solution.
+    When I get around to it, I will be starting by looking at how the
+    vscode debuggers on nixpkgs were built.
 
-dap, dap-ui, and dap-virtual-text are all already on nixpkgs, as are most if not all of the debuggers. I just have to connect them....
 
-As such, I have included the config I've been using for dap, dap-ui and dap-virtual-text which all work but I have not enabled the category for them, because there are no debuggers connected to them.
+##### LUA QUESTIONS:
+
+1:
+
+    Neodev only properly detects your library of plugins if your lua is in your .config folder. 
+    Otherwise it acts as if you were writing a plugin.
+    Strangely it does not matter if you have a wrapped or unwrapped rc, only where this flake is.
+    It should be easy to fix if you know how to configure neodev to use a different config root dir, but I do not.
+    There is an override option for it in the setup function but I haven't found docs for that.
+    If needed for that, you can pass the path to the flake from nix to the lua through nixCats.
+    
+    As a workaround you can just unwrap your lua using the setting and copy it to your config dir. 
+    Or, you could clone the repo to your .config dir, name it nvim, and leave it wrapped. Either allows for it to do library detection.
 
 2:
 
-neodev only properly detects your library of plugins if your lua is in your .config folder. Strangely it does not matter if you have a wrapped or unwrapped rc.
-
-It should be easy to fix if you know how to configure neodev to use a different config root dir, but I do not.
-
-There is an override option for it in the setup function but I havent found docs for that.
-
-If needed for that, you can pass the path to the flake from nix to the lua through nixCats.
-
-Alternatively you could just unwrap your lua using the setting and copy it to your config dir. 
-Or, you could clone the repo to your .config dir, name it nvim, and leave it wrapped. Either allows for it to do library detection.
+    I don't know how to set up formatters in lua, so there is only lsp formatting right now.
 
 3:
 
-I don't know how to set up formatters in lua, so there is only lsp formatting right now.
+    How would I add the motions on yank to clipboard to which-key like for regular yank?
 
-4:
 
-How would I add the motions on yank to clipboard to which-key like for regular yank?
-
----
-
-If someone figures any of those out, please let me know.

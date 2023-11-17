@@ -131,15 +131,12 @@
   in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
-  inherit wrapRc;
-  inherit extraMakeWrapperArgs;
-  viAlias = config.viAlias;
-  vimAlias = config.vimAlias;
+  inherit wrapRc extraMakeWrapperArgs;
+  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
-      inherit start;
-      inherit opt;
+      inherit start opt;
     };
   };
   # I dont know what these do, but I implemented them?
@@ -150,8 +147,5 @@
   extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
     /* the function you would have passed to lua.withPackages */
   extraLuaPackages = combineCatsOfFuncs extraLuaPackages;
-  withNodeJs = config.withNodeJs;
-  withRuby = config.withRuby;
-  extraName = config.extraName;
 }
 

@@ -1,7 +1,6 @@
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 
-    # see :help nixCats.flake.inputs
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils = {
@@ -11,8 +10,15 @@
             # warning: 
             # input 'flake-utils' has an override for a non-existent input 'nixpkgs'
     };
+
+    # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
+    # i.e. if it wasnt on nixpkgs, but doesnt have an extra build step.
     # Then you should name it "plugins-something"
+    # If you wish to define a custom build step not handled by nixpkgs,
+    # then you should name it in a different format, and deal with that in the
+    # overlay defined for custom builds in the overlays directory.
+
     # Theme
     "plugins-onedark-vim" = {
       url = "github:joshdick/onedark.vim";
@@ -69,26 +75,16 @@
       let
         # see :help nixCats.flake.outputs.overlays
 
-        # If you cant import them with the standard overlay, 
-        # define a derivation in ./customPluginOverlay.nix
-        # if it has a build step, do that there.
-        # afterwards, you can add as pkgs.customPlugins.pluginname
-        # If you do that, don't name the flake input "plugins-something",
-        # because that would be loaded by the standard overlay.
-        customPluginOverlay = import ./customPluginOverlay.nix inputs;
-
         # Apply the overlays and load nixpkgs as `pkgs`
         # Once we add these overlays to our nixpkgs, we are able to
-        # use `pkgs.neovimPlugins`, which is a map of our plugins.
-        # or use `pkgs.customPlugins`, which is a map of our custom built plugins.
-        standardPluginOverlay = import ./nix/pluginOverlay.nix inputs;
+        # use `pkgs.neovimPlugins`, which is a set of our "plugins-pluginname" plugins,
+        # or use `pkgs.customPlugins`, which is a set of our custom built plugins.
+        overlays = (import ./overlays inputs) ++ [
+          # add any flake overlays here.
+          inputs.nixd.outputs.overlays.default
+        ];
         pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            standardPluginOverlay
-            customPluginOverlay
-            inputs.nixd.outputs.overlays.default
-          ];
+          inherit system overlays;
           # config.allowUnfree = true;
         };
 
@@ -100,16 +96,14 @@
         # with a boolean value for each, and a set of settings
         # and then it imports NeovimBuilder.nix, passing it that categories set but also
         # our other information. This allows us to define our categories later.
-        nixVimBuilder = settings: categories: (import ./nix/NeovimBuilder.nix {
-          # these are required
-          inherit self;
-          inherit pkgs;
+        nixVimBuilder = settings: categories: (import ./builder {
+          # these are required by the builder
+          inherit self pkgs;
           # you supply these when you apply this function
-          inherit categories;
-          inherit settings;
+          inherit categories settings;
 
           # see :help nixCats.flake.outputs.builder
-          # to define and use a new category, simply add a new list to the set here, 
+          # to define and use a new category, simply add a new list to a set here, 
           # and later, you will include categoryname = true; in the set you
           # provide when you build the package using this builder function.
           # see :help nixCats.flake.outputs.packaging for info on that section.

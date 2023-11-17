@@ -28,11 +28,10 @@ rec {
         start ++ (map (p: { plugin = p; optional = true; }) opt);
 
       res = pkgs.neovimUtils.makeNeovimConfig {
-        inherit withPython3;
-        inherit extraPython3Packages;
-        inherit extraLuaPackages;
-        inherit withNodeJs withRuby viAlias vimAlias;
         customRC = configure.customRC or "";
+        inherit withPython3 extraPython3Packages;
+        inherit withNodeJs withRuby viAlias vimAlias;
+        inherit extraLuaPackages;
         inherit plugins;
         inherit extraName;
       };

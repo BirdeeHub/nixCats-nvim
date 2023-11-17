@@ -27,9 +27,10 @@ the flake in your Lua, see:
 =======================================================================================
 Flake Inputs:                                            *nixCats.flake.inputs*
 
-If they dont have a build step, name the plugins you import from github 
+If they dont have an extra build step, 
+name the plugins you import from github 
 plugins-somepluginname 
-They will be processed automatically into plugins by pluginOverlay
+They will be processed automatically into plugins by the default overlay.
 
 If they have a build step or are not a plugin, 
 i.e. an lsp, dont name them in that format.
@@ -39,7 +40,7 @@ because you will be able to access them through pkgs.vimPlugins variable later.
 
 Context for later:
 
-If they have a build step, you will deal with them in customPluginOverlay
+If they have a build step, you will deal with them in overlays/customBuildsOverlay.nix
 then import them into a category of the builder. 
 (assuming nixpkgs hasn't already done it!!)
 
@@ -55,9 +56,15 @@ With our inputs to our flake taken care of:
 First, we call flake utils to get system variable for all default systems.
 
                                                *nixCats.flake.outputs.overlays*
-Then, we define our overlays. We have 2 main ones to discuss.
+Then, we define our overlays. They are in the overlays directory.
+Thus, we can import that directory here,
+which runs overlays/default.nix.
+We have 2 main overlays to discuss.
 
--- The first is ./nix/pluginOverlay:
+-- The first is standardPluginOverlay:
+
+This overlay is defined in full in overlays/default.nix.
+You do not need to edit it to use it.
 
 It takes all the inputs named in the format
 'plugins-somepluginname' and makes them into plugins. 
@@ -66,9 +73,12 @@ and it wasnt on nixpkgs, then use this method.
 Access them to add them to a category of the builder function 
 with 'pkgs.neovimPlugins.somepluginname'
 
--- The second is ./customPluginOverlay:
+-- The second is overlays/customBuildsOverlay.nix:
+
 If you need to interact with one of these overlays, it will be this one.
 You should not need to do it much. 
+overlays/default.nix imports this overlay, 
+and will return it along with the standard one.
 
 It is used for defining plugins with build steps that 
 were not well handled by nixpkgs.
@@ -77,7 +87,7 @@ Define the things within the file.
 Then, access plugins defined there later 
 with 'pkgs.customPlugins.somepluginname'
 
-After the overlays we wish to include are all defined:
+-- After the overlays we wish to include are all defined:
 
 We now generate the pkgs set that contains all the nixpkgs and overlay packages, 
 and the system variable from flake-utils. If you imported any flakes with
@@ -92,7 +102,7 @@ Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
 we now create a builder function that takes 2 arguments. 
 A set of categories and a set of settings. 
-It does this by importing nix/NeovimBuilder.
+It does this by importing the builder's default.nix.
 
 The default settings for the settings set are defined below. 
 They did not make sense to include in the categories system.
