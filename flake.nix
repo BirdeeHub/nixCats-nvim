@@ -96,7 +96,7 @@
         # We define a function to facilitate package building for particular categories
         # what that function does is it intakes a set of categories 
         # with a boolean value for each, and a set of settings
-        # and then it imports NeovimBuilder.nix, passing it that categories set but also
+        # and then it imports ./builder/default.nix, passing it that categories set but also
         # our other information. This allows us to define our categories later.
         nixVimBuilder = settings: categories: (import ./builder {
           # these are required by the builder
