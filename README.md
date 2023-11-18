@@ -102,6 +102,12 @@ because to edit your config, you edit the lua in your flake.
 Unless you are using regularCats package, in which case your config will
 be in the normal place, and you only need to flake itself to install new things.
 
+If you wish to have plugin library completion, you will need to put it as your .config/nvim folder
+
+Achieve this by cloning it there or using wrapRc = false and putting your lua there.
+
+Otherwise neodev will treat it as if you are developing a plugin.
+
 If you want to add it to another flake, choose one of these methods:
 
 ```nix
