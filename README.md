@@ -143,46 +143,6 @@ Thank you!!! It taught me both about an overlay's existence and how it works.
 
 I also borrowed some code from nixpkgs and included links.
 
-#### Issues:
+#### Drawbacks:
 
-I'm somewhat new to neovim AND nix.
-
-If someone figures any of those out, please let me know.
-
-##### Nix Questions:
-
-1:
-
-    only some of the vscode debuggers are on nixpkgs.
-    This means you have to define a build for the ones that aren't in customBuildsOverlay.nix.
-    On the bright side, most of them should have a VERY similar build process.
-    If I figure it out I'll post my solution.
-    When I get around to it, I will be starting by looking at how the
-    vscode debuggers on nixpkgs were built.
-
-
-##### LUA QUESTIONS:
-
-1:
-
-    Neodev only properly detects your library of plugins if your lua is in your .config folder. 
-    Otherwise it acts as if you were writing a plugin.
-    Strangely it does not matter if you have a wrapped or unwrapped rc, only where this flake is.
-    It should be easy to fix if you know how to configure neodev to use a different config root dir, but I do not.
-    There is an override option for it in the setup function but I haven't found docs for that.
-    If needed for that, you can pass the path to the flake from nix to the lua through nixCats.
-    
-    As a workaround you can just unwrap your lua using the setting and copy it to your config dir. 
-    Or, you could clone the repo to your .config dir, name it nvim, and leave it wrapped. Either allows for it to do library detection.
-
-2:
-
-    I don't know how to set up formatters in lua, so there is only lsp formatting right now.
-
-3:
-
-    How would I add the motions on yank to clipboard to which-key like for regular yank?
-
-
-
-
+Some vscode debuggers are not on nixpkgs so you have to build them. Let me know when you figure it out I'm kinda a noob still.

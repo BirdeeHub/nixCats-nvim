@@ -11,13 +11,14 @@ So, again, when you figure a derivation out, regardless of what nvim related thi
 First on the list is a way for building vscode debuggers not on nixpkgs.
 At least one of these should be merged into the main repo.
 
+Second is maybe telling neodev the config is in a different root dir so that it gets plugin library detection always?
+
+Third is 1 formatter/linter setup for 1 language, preferrable nix and/or lua
+
+4th is add motions to which key popup for <leader>y.
+
+After that this repo will simply be recieving maintenance and be kept up to date.
+
 Outside of that, clone or fork the repo and do as you please, 
 but adding plugins and bells and whistles to main gets in the way of the kickstarter spirit.
 
----
-
-I would like to add 1 custom built vscode debugger that wasnt on nixpkgs as an example.
-
-I would like to add a formatter or linter setup for 1 language as an example.
-
-After that this repo will simply be recieving maintenance and be kept up to date.
