@@ -60,7 +60,7 @@ The solution:
 
 You should not have to leave [flake.nix](./flake.nix) or occasionally [customBuildsOverlay](./overlays/customBuildsOverlay.nix), although there is a guide to doing so. [:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt)
 
-All config folders like ftplugin work, if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
+All config folders like ftplugin and after work, if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
 
 You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste
 
