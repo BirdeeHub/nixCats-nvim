@@ -147,8 +147,9 @@
               nvim-dap-ui
               nvim-dap-virtual-text
             ];
-            neonixdev = [
-              pkgs.vimPlugins.neodev-nvim
+            neonixdev = with pkgs.vimPlugins; [
+              neodev-nvim
+              neoconf-nvim
             ];
             markdown = with pkgs.customPlugins; [
               markdown-preview-nvim
