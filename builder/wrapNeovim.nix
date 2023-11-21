@@ -1,5 +1,3 @@
-# Copyright (c) 2023 BirdeeHub 
-# Licensed under the MIT license 
 rec {
 # Source: https://github.com/NixOS/nixpkgs/blob/41de143fda10e33be0f47eab2bfe08a50f234267/pkgs/applications/editors/neovim/utils.nix#L24C9-L24C9
   # this is the code for wrapNeovim from nixpkgs
