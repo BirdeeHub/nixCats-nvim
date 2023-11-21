@@ -9,11 +9,11 @@ So, again, when you figure a derivation out, regardless of what nvim related thi
 ---
 
 First on the list is a way for building vscode debuggers not on nixpkgs.
-At least one of these should be merged into the main repo.
+At least one of these should be merged into the main repo for use as a reasonable template.
 
-second is 1 formatter/linter setup for 1 language, preferrable nix and/or lua
+Second is 1 formatter/linter setup for 1 language, preferrably nix and/or lua
 
-third is add motions to which key popup for \<leader\>y.
+Third is add motions to the which-key.nvim popup for \<leader\>y. Maybe. Doesn't matter much.
 
 After that this repo will simply be recieving maintenance and be kept up to date.
 

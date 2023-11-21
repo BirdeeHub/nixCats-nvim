@@ -184,7 +184,6 @@
               # ))
               nvim-surround
               indent-blankline-nvim
-              # lualine-lsp-progress # replaced by fidget
               nvim-web-devicons
               luasnip
               cmp_luasnip
@@ -244,12 +243,12 @@
             wrapRc = true;
             # to use a different lua folder other than myLuaConf, change this value:
             RCName = "myLuaConf";
-            viAlias = true;
+            viAlias = false;
             vimAlias = true;
           };
           unwrappedLua = {
             wrapRc = false;
-            viAlias = true;
+            viAlias = false;
             vimAlias = true;
           };
         };
