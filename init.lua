@@ -1,5 +1,4 @@
--- Copyright (c) 2023 BirdeeHub 
--- Licensed under the MIT license 
+
 -- this is a dummy file.
 
 -- nothing will happen if you put stuff in here.
