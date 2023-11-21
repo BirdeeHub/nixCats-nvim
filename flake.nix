@@ -248,6 +248,8 @@
           };
           unwrappedLua = {
             wrapRc = false;
+            # will now look for nixCats-nvim within .config and .local and others
+            configDirName = "nixCats-nvim";
             viAlias = false;
             vimAlias = true;
           };

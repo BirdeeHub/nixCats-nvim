@@ -179,6 +179,13 @@ These are the defaults:
       # nixCats and this help will work either way.
 >nix
       wrapRc = true;
+<
+      # What should the name of the folder within standard directories
+      # i.e. .config, .local, etc... be?
+      # This option is very useful when you want 
+      # to clone an unwrapped config straight to the .config dir.
+>nix
+      configDirName = "nvim";
 
       viAlias = false;
       vimAlias = false;

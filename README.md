@@ -134,10 +134,14 @@ nix shell github:BirdeeHub/nixCats-nvim#nixCats
 However, you should really just clone or fork the repo,
 because to edit your config, you edit the lua in your flake. 
 
-If you use the regularCats package, it will look for your config
-in the normal place, and you only need to edit the flake itself to install new things.
+If you use the regularCats package, you only need to edit the flake itself to install new things.
+
 This is useful for faster iteration while editing lua config, as you then only have to restart it rather than rebuild.
-You should clone this one to your ~/.config/ directory and rename it to nvim.
+
+You should clone regularCats to your ~/.config/ directory and make sure the filename is ```nixCats-nvim```
+
+If it is named something else, you will have to change configDirName in the settings section of flake.nix, or the name of the directory
+This also affects .local and the like.
 
 If you want to add it to another flake, choose one of these methods:
 
@@ -167,6 +171,8 @@ If you want to add it to another flake, choose one of these methods:
     );
 }
 ```
+
+Although, again, it is preferrable to just clone it, either from within nix, or outside of it.
 
 ---
 

@@ -31,6 +31,7 @@
       withRuby = true;
       extraName = "";
       withPython3 = true;
+      configDirName = "nvim";
     } // settings;
 
     # package the entire flake as plugin
@@ -117,9 +118,14 @@
       in
       uniquifiedList);
 
+    # this sets the name of the folder to look for nvim stuff in
+    configDirName = if config.configDirName != "nvim" &&
+      config.configDirName != null && config.configDirName != ""
+        then [ ''--set NVIM_APPNAME "${config.configDirName}"'' ] else [];
     # cat our args
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
-      (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
+      configDirName
+      ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
       ++ (FandF_envVarSet environmentVariables)
       ++ (FandF_passWrapperArgs extraWrapperArgs)
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh

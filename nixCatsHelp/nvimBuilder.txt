@@ -56,6 +56,7 @@ just doing this and including more comments than code.
         withRuby = true;
         extraName = "";
         withPython3 = true;
+        configDirName = "nvim";
       } // settings;
 <
 --------------------------------------------------------------------------
@@ -191,10 +192,16 @@ just doing this and including more comments than code.
     # we will send this to our rendition of the official wrapNeovim stable
     # which is just pkgs.wrapNeovim with an extra argument
 >nix
+    # this sets the name of the folder to look for nvim stuff in
+    configDirName = if config.configDirName != "nvim" &&
+      config.configDirName != null && config.configDirName != ""
+        then [ ''--set NVIM_APPNAME "${config.configDirName}"'' ] else [];
+
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       # We call the functions above and add them into a big list
       # which we then call concatStringsSep " " on
-      (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
+      configDirName
+      ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
       ++ (FandF_envVarSet environmentVariables)
       ++ (FandF_passWrapperArgs extraWrapperArgs)
 
