@@ -43,7 +43,6 @@ vim.o.smartcase = true
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
 vim.wo.relativenumber = true
-vim.cmd([[hi LineNr guifg=#bb9af7]])
 
 -- Decrease update time
 vim.o.updatetime = 250
