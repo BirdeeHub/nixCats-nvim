@@ -190,7 +190,7 @@ I also borrowed some code from nixpkgs and included links.
 
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
-  Does not use Nix to manage plugins. Use this one after if you want to move your version of kickstart to nix.
+  It does not use Nix to manage plugins. Use nixCats after this one if you want to move your version of kickstart to nix.
 - [`neovim-flake`](https://github.com/jordanisaacs/neovim-flake):
   Configured using a Nix module DSL.
 - [`NixVim`](https://github.com/nix-community/nixvim):
