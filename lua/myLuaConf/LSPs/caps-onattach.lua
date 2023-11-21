@@ -1,5 +1,3 @@
--- Copyright (c) 2023 BirdeeHub 
--- Licensed under the MIT license 
 local M = {}
 function M.on_attach(_, bufnr)
   -- we create a function that lets us more easily define mappings specific

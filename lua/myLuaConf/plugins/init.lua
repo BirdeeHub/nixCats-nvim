@@ -1,5 +1,3 @@
--- Copyright (c) 2023 BirdeeHub 
--- Licensed under the MIT license 
 local categories = require('nixCats')
 
 vim.cmd.colorscheme(require('nixCats').colorscheme)

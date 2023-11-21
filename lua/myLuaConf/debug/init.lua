@@ -1,5 +1,3 @@
--- Copyright (c) 2023 BirdeeHub 
--- Licensed under the MIT license 
 local dap = require 'dap'
 local dapui = require 'dapui'
 

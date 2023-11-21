@@ -1,5 +1,3 @@
--- Copyright (c) 2023 BirdeeHub 
--- Licensed under the MIT license 
 local categories = require('nixCats')
 if (categories.neonixdev) then
   require('neodev').setup({})
