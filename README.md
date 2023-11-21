@@ -140,7 +140,7 @@ This is useful for faster iteration while editing lua config, as you then only h
 
 You should clone regularCats to your ~/.config/ directory and make sure the filename is ```nixCats-nvim```
 
-If it is named something else, you will have to change configDirName in the settings section of flake.nix, or the name of the directory
+If it is named something else, you will have to change configDirName in the settings section of flake.nix, or the name of the directory. 
 This also affects .local and the like.
 
 If you want to add it to another flake, choose one of these methods:
