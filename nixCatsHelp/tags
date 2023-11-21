@@ -10,7 +10,6 @@ nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats	nvimBuilder.txt	/*nixCats.flak
 nixCats.flake.nixperts.nvimBuilder.opener	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.opener*
 nixCats.flake.nixperts.nvimBuilder.usingWrapArgMap	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.usingWrapArgMap*
 nixCats.flake.outputs	nixCatsFlake.txt	/*nixCats.flake.outputs*
-nixCats.flake.outputs.RCName	nixCatsFlake.txt	/*nixCats.flake.outputs.RCName*
 nixCats.flake.outputs.builder	nixCatsFlake.txt	/*nixCats.flake.outputs.builder*
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packages	nixCatsFlake.txt	/*nixCats.flake.outputs.packages*

@@ -167,7 +167,6 @@ These are the defaults:
   settings = {
     defaults = {
 <
-                                                 *nixCats.flake.outputs.RCName*
       # RCName: the name of folder to require within lua directory.
       # the default is empty, and if left empty, 
       # wrapRc will default to false.
@@ -184,9 +183,13 @@ These are the defaults:
       # i.e. .config, .local, etc... be?
       # This option is very useful when you want 
       # to clone an unwrapped config straight to the .config dir.
+      # IMPORTANT: because this affects all nvim directories, you will need to
+      # log into anything that needs auth again for it to save the auth to the
+      # new folders when you change this.
 >nix
       configDirName = "nvim";
 
+      # and the rest:
       viAlias = false;
       vimAlias = false;
       withNodeJs = false;
