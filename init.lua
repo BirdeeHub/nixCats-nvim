@@ -13,5 +13,5 @@
 -- if I want to configure my workspace as luv
 -- every single time.
 
--- This is here so you can clone the repo to your .config/nvim and unwrap RC and it will still work.
+-- This is here so you can clone the repo to your .config and unwrap RC and it will still work.
 require('myLuaConf')
