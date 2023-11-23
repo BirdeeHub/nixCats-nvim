@@ -1,7 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-# I don't really care if you don't include this header.
-# just credit me in the nix parts or fork it.
+# Only 3 files are marked with this header.
+# Please leave them in.
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 
