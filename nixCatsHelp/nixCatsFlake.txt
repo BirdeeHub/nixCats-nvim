@@ -91,7 +91,7 @@ with 'pkgs.customPlugins.somepluginname'
 
 If you decide you wish to split your customBuildsOverlay up, add the new file
 to the overlays directory then add a new line like
-the following to overlays/default.nix, repacing the <indicated_text>:
+the following to overlays/default.nix, replacing the <indicated_text>:
 >nix
     <some_name> = import ./<some_overlay_file.nix> inputs;
 
