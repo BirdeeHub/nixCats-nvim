@@ -34,15 +34,24 @@
       configDirName = "nvim";
     } // settings;
 
-    # package the entire flake as plugin
+    # package the entire runtimepath as plugin
+    # see :h rtp
+    # it simply copies each of the folders mentioned the same as we do for luaAfter
     LuaConfig = pkgs.stdenv.mkDerivation {
-        name = config.RCName;
-        builder = builtins.toFile "builder.sh" ''
+      name = config.RCName;
+      builder = builtins.toFile "builder.sh" ((import ./utils.nix).runtimepathcopier self);
+    };
+    # We package after separately to make sure it is run last
+    luaAfter = pkgs.stdenv.mkDerivation {
+      name = "${config.RCName}_after";
+      builder = builtins.toFile "builder.sh" ''
           source $stdenv/setup
-          mkdir -p $out
-          cp -r ${self}/* $out
-        '';
-      };
+          mkdir -p $out/
+          if [ -d ${self}/after ]; then
+            mkdir -p $out/after && cp -r ${self}/after/* $out/after
+          fi
+      '';
+    };
 
     # see :help nixCats
     nixCats = pkgs.stdenv.mkDerivation {
@@ -66,7 +75,13 @@
     wrapRc = if config.RCName != "" then config.wrapRc else false;
 
     # and create our customRC to call it
-    customRC = if wrapRc then ''lua require('${config.RCName}')'' else "";
+    customRC = if wrapRc then ''
+        packadd ${config.RCName}
+        lua require('${config.RCName}')
+        set runtimepath+=${luaAfter}
+      '' else "";
+    # This makes sure our config is loaded first and our after is loaded last
+    # and it also requires the chosen directory or file in the lua directory
 
     extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 
