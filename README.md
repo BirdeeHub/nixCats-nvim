@@ -197,8 +197,7 @@ I also borrowed some code from nixpkgs and included links.
   A Neovim distribution configured using a NixOS module.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project with a similar philosophy to this one, but does not have a category system,
-  and has some devShell stuff for autodownloading stuff only within dev shell.
+  A project with a similar philosophy to this one, but it has some devShell stuff for autodownloading stuff only within dev shell, and it does not have a category system or after folder.
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions.
