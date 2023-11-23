@@ -57,11 +57,12 @@
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
+        categoriesPlus = categories // { RCName = config.RCName; inherit wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter ( categories // { RCName = config.RCName; inherit wrapRc; })}
+            return ${(import ./utils.nix).luaTablePrinter categoriesPlus}
           '';
       in builtins.toFile "builder.sh" ''
         source $stdenv/setup

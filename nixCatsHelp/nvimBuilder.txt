@@ -92,11 +92,12 @@ just doing this and including more comments than code.
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
+        categoriesPlus = categories // { RCName = config.RCName; inherit wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter ( categories // { RCName = config.RCName; inherit wrapRc; })}
+            return ${(import ./utils.nix).luaTablePrinter categoriesPlus}
           '';
       # It installs itself and these docs to wherever it installs to.
       in builtins.toFile "builder.sh" ''
