@@ -61,7 +61,7 @@
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter categories}
+            return ${(import ./utils.nix).luaTablePrinter ( categories // { RCName = config.RCName; inherit wrapRc; })}
           '';
       in builtins.toFile "builder.sh" ''
         source $stdenv/setup

@@ -86,6 +86,7 @@ just doing this and including more comments than code.
     # see :help `nixCats`
     # here is where nixCats is generated
     # it uses some recursive stuff in utils to print a lua table to a file.
+    # That table is the categories we were including, plus RCName and wrapRc
     # Thats it. Also it defines a user command.
 >nix
     nixCats = pkgs.stdenv.mkDerivation {
@@ -95,7 +96,7 @@ just doing this and including more comments than code.
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter categories}
+            return ${(import ./utils.nix).luaTablePrinter ( categories // { RCName = config.RCName; inherit wrapRc; })}
           '';
       # It installs itself and these docs to wherever it installs to.
       in builtins.toFile "builder.sh" ''

@@ -252,6 +252,7 @@
             wrapRc = false;
             # will now look for nixCats-nvim within .config and .local and others
             configDirName = "nixCats-nvim";
+            RCName = "myLuaConf";
             viAlias = false;
             vimAlias = true;
           };

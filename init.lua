@@ -4,4 +4,4 @@
 -- when wrapRc setting is false, this file will be executed.
 -- Leave it unchanged, so that you dont have a different config
 -- between unwrapped and wrapped lua configurations.
-require('myLuaConf')
+require(require('nixCats').RCName)
