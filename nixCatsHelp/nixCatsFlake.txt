@@ -112,7 +112,7 @@ the set of categories is a set of named boolean values like this:
 { categoryname1 = true; categoryname2 = false; etc... }
 
 To define this function that takes this set of categories and 
-the settings as an argument, we import nix/NeovimBuilder 
+the settings as an argument, we import ./builder/default.nix
 and provide it a set containing the following info.
 
 {
