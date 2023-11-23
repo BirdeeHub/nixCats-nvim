@@ -62,8 +62,7 @@ just doing this and including more comments than code.
 --------------------------------------------------------------------------
                                    *nixCats.flake.nixperts.nvimBuilder.opener*
 
-    # package the entire runtimepath as plugin
-    # see :h rtp
+    # package the entire runtimepath as plugin. see :help `'rtp'`
     # it simply copies each of the folders mentioned the same as we do for luaAfter
 >nix
     LuaConfig = pkgs.stdenv.mkDerivation {

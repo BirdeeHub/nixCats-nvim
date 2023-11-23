@@ -61,6 +61,7 @@ Thus, we can import that directory here,
 which runs overlays/default.nix.
 We have 2 main overlays to discuss.
 
+<1>
 -- The first is standardPluginOverlay:
 
 This overlay is defined in full in overlays/default.nix.
@@ -73,6 +74,7 @@ and it wasnt on nixpkgs, then use this method.
 Access them to add them to a category of the builder function 
 with 'pkgs.neovimPlugins.somepluginname'
 
+<2>
 -- The second is overlays/customBuildsOverlay.nix:
 
 If you need to interact with one of these overlays, it will be this one.
@@ -86,6 +88,13 @@ It is passed flake inputs, and super is pkgs.
 Define the things within the file. 
 Then, access plugins defined there later 
 with 'pkgs.customPlugins.somepluginname'
+
+If you decide you wish to split your customBuildsOverlay up, add the new file
+to the overlays directory then add a new line like
+the following to overlays/default.nix, repacing the <indicated_text>:
+>nix
+    <some_name> = import ./<some_overlay_file.nix> inputs;
+
 
 -- After the overlays we wish to include are all defined:
 
