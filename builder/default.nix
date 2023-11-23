@@ -48,7 +48,7 @@
           source $stdenv/setup
           mkdir -p $out/
           if [ -d ${self}/after ]; then
-            mkdir -p $out/after && cp -r ${self}/after/* $out/after
+             cp -r ${self}/after/* $out/
           fi
       '';
     };
