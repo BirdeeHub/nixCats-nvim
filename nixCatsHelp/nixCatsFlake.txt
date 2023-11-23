@@ -179,6 +179,7 @@ These are the defaults:
       # RCName: the name of folder to require within lua directory.
       # the default is empty, and if left empty, 
       # wrapRc will default to false.
+      # this value, and wrapRc value will also be passed to nixCats.
 >nix
       RCName = "";
 <
