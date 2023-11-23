@@ -189,7 +189,7 @@ These are the defaults:
       wrapRc = true;
 <
       # What should the name of the folder within standard directories
-      # i.e. .config, .local, etc... be?
+      # i.e. .config, .local/share, .local/state, .cache, etc... be?
       # This option is very useful when you want 
       # to clone an unwrapped config straight to the .config dir.
       # IMPORTANT: because this affects all nvim directories, you will need to
