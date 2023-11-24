@@ -246,6 +246,7 @@
             wrapRc = true;
             # to use a different lua folder other than myLuaConf, change this value:
             RCName = "myLuaConf";
+            configDirName = "nixCats-nvim";
             viAlias = false;
             vimAlias = true;
           };
