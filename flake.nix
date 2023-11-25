@@ -168,13 +168,11 @@
             fidget
           ];
           general = with pkgs.vimPlugins; [
+            # telescope
             telescope-fzf-native-nvim
             plenary-nvim
             telescope-nvim
-            vim-sleuth
-            vim-fugitive
-            vim-rhubarb
-            vim-repeat
+            # treesitter
             nvim-treesitter-textobjects
             nvim-treesitter.withAllGrammars
             # This is for if you only want some of the grammars
@@ -184,10 +182,6 @@
             #     lua
             #   ]
             # ))
-            undotree
-            nvim-surround
-            indent-blankline-nvim
-            nvim-web-devicons
             # cmp stuff
             nvim-cmp
             luasnip
@@ -201,6 +195,15 @@
             cmp-nvim-lsp-signature-help
             cmp-cmdline-history
             lspkind-nvim
+            # other
+            vim-sleuth
+            vim-fugitive
+            vim-rhubarb
+            vim-repeat
+            undotree
+            nvim-surround
+            indent-blankline-nvim
+            nvim-web-devicons
           ];
         };
 
