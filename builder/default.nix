@@ -34,12 +34,23 @@
       configDirName = "nvim";
     } // settings;
 
-    # package the entire runtimepath as plugin
-    # see :h rtp
-    # it simply copies each of the folders mentioned the same as we do for luaAfter
+    # package everything other than after as a plugin
     LuaConfig = pkgs.stdenv.mkDerivation {
       name = config.RCName;
-      builder = builtins.toFile "builder.sh" ((import ./utils.nix).runtimepathcopier self);
+      builder = builtins.toFile "builder.sh" ''
+        source $stdenv/setup
+        mkdir -p $out
+        for f in ${self}/*; do
+          if [ "$f" != "${self}/after" ]; then
+            folderName=$(basename "$f")
+            if [ -d $f ]; then
+              mkdir -p $out/$folderName && cp -r ${self}/$folderName/* $out/$folderName
+            else
+              cp -r $f $out/
+            fi
+          fi  
+        done
+      '';
     };
     # We package after separately to make sure it is run last
     luaAfter = pkgs.stdenv.mkDerivation {
