@@ -187,6 +187,9 @@ These are the defaults:
       # do you want to use lua from this flake?
       # or would you rather do it in your .config/nvim?
       # nixCats and this help will work either way.
+      # When wrapRc == true,
+      # Instead of the init.lua file at the root level of this repo,
+      # one will be generated that does require(${RCName))
 >nix
       wrapRc = true;
 <
