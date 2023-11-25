@@ -180,6 +180,7 @@ These are the defaults:
       # the default is empty, and if left empty, 
       # wrapRc will default to false.
       # this value, and wrapRc value will also be passed to nixCats.
+      # this is a required field when using wrapRc = true;
 >nix
       RCName = "";
 <

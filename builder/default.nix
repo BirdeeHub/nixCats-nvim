@@ -75,14 +75,20 @@
 
     wrapRc = if config.RCName != "" then config.wrapRc else false;
 
-    # and create our customRC to call it
+    # create our customRC to call it
+    configDir = if config.configDirName != null && config.configDirName != ""
+      then config.configDirName else "nvim";
     customRC = if wrapRc then ''
+        let configdir = expand('~') . "/.config/${configDir}"
+        execute "set runtimepath-=" . configdir
+        execute "set runtimepath-=" . configdir . "/after"
         packadd ${config.RCName}
-        lua require('${config.RCName}')
         set runtimepath+=${luaAfter}
+        lua require('${config.RCName}')
       '' else "";
     # This makes sure our config is loaded first and our after is loaded last
     # and it also requires the chosen directory or file in the lua directory
+    # it also removes the regular config dir from the path.
 
     extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 
@@ -135,12 +141,11 @@
       uniquifiedList);
 
     # this sets the name of the folder to look for nvim stuff in
-    configDirName = if config.configDirName != "nvim" &&
-      config.configDirName != null && config.configDirName != ""
-        then [ ''--set NVIM_APPNAME "${config.configDirName}"'' ] else [];
+    configDirName = if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [];
     # cat our args
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       configDirName
+      # and these are our other now sorted args
       ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
       ++ (FandF_envVarSet environmentVariables)
       ++ (FandF_passWrapperArgs extraWrapperArgs)
