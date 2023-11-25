@@ -6,14 +6,10 @@
 CATTESTVAR	flake.nix	/^            CATTESTVAR = "It worked!";$/;"	m
 FilterAttrsOfAttrsFlatMapInner	builder/utils.nix	/^  FilterAttrsOfAttrsFlatMapInner = pkgs: categories: twoArgFunc: SetOfCategoryAttrs: let$/;"	f
 FilterAttrsOfListsFlatMapInner	builder/utils.nix	/^  FilterAttrsOfListsFlatMapInner = pkgs: categories: oneArgFunc: SetOfCategoryLists: let$/;"	f
-RCName	flake.nix	/^          RCName = "myLuaConf";$/;"	m
-RCName	builder/default.nix	/^      RCName = "";$/;"	m
-RCName	builder/default.nix	/^        categoriesPlus = categories \/\/ { RCName = config.RCName; inherit wrapRc; };$/;"	m
-RCName	flake.nix	/^          RCName = "myLuaConf";$/;"	m
 buildVimPlugin	overlays/default.nix	/^      inherit (super.vimUtils) buildVimPlugin;$/;"	m
 builder	builder/default.nix	/^      builder = builtins.toFile "builder.sh" ''$/;"	m
 builder	builder/default.nix	/^      builder = let$/;"	m
-builder	builder/default.nix	/^      builder = builtins.toFile "builder.sh" ((import .\/utils.nix).runtimepathcopier self);$/;"	m
+builder	builder/default.nix	/^      builder = builtins.toFile "builder.sh" ''$/;"	m
 categories	flake.nix	/^        inherit categories settings;$/;"	m
 colorscheme	flake.nix	/^          colorscheme = "onedark";$/;"	m
 colorscheme	flake.nix	/^          colorscheme = "onedark";$/;"	m
@@ -21,15 +17,15 @@ configDirName	builder/default.nix	/^      configDirName = "nvim";$/;"	m
 configDirName	flake.nix	/^          configDirName = "nixCats-nvim";$/;"	m
 configDirName	flake.nix	/^          configDirName = "nixCats-nvim";$/;"	m
 configure	builder/default.nix	/^  configure = {$/;"	m
+custom	flake.nix	/^          custom = true;$/;"	m
+custom	flake.nix	/^          custom = true;$/;"	m
 custom	flake.nix	/^          custom = with pkgs.customPlugins; [ ];$/;"	m
-custom	flake.nix	/^          custom = true;$/;"	m
-custom	flake.nix	/^          custom = true;$/;"	m
 customBuilds	overlays/default.nix	/^    customBuilds = import .\/customBuildsOverlay.nix inputs;$/;"	m
 customPlugins	overlays/customBuildsOverlay.nix	/^    customPlugins = {$/;"	m
 customRC	builder/wrapNeovim.nix	/^        customRC = configure.customRC or "";$/;"	m
 customRC	builder/default.nix	/^    inherit customRC;$/;"	m
-debug	flake.nix	/^          debug = false;$/;"	m
 debug	flake.nix	/^          debug = with pkgs.vimPlugins; [$/;"	m
+debug	flake.nix	/^          debug = false;$/;"	m
 debug	flake.nix	/^          debug = false;$/;"	m
 default	flake.nix	/^      packages = { default = packageDefinitions.nixCats; }$/;"	m
 default	flake.nix	/^      overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }$/;"	f
@@ -40,10 +36,10 @@ environmentVariables	flake.nix	/^        environmentVariables = {$/;"	m
 extraLuaPackages	flake.nix	/^        extraLuaPackages = {$/;"	m
 extraLuaPackages	builder/default.nix	/^  extraLuaPackages = combineCatsOfFuncs extraLuaPackages;$/;"	m
 extraLuaPackages	builder/wrapNeovim.nix	/^        inherit extraLuaPackages;$/;"	m
-extraMakeWrapperArgs	builder/default.nix	/^  inherit wrapRc extraMakeWrapperArgs;$/;"	m
+extraMakeWrapperArgs	builder/default.nix	/^  inherit extraMakeWrapperArgs;$/;"	m
 extraName	builder/default.nix	/^      extraName = "";$/;"	m
+extraName	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 extraName	builder/wrapNeovim.nix	/^        inherit extraName;$/;"	m
-extraName	builder/default.nix	/^  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 extraPython3Packages	flake.nix	/^        extraPython3Packages = {$/;"	m
 extraPython3Packages	builder/default.nix	/^  extraPython3Packages = combineCatsOfFuncs extraPython3Packages;$/;"	m
 extraPython3Packages	builder/wrapNeovim.nix	/^        inherit withPython3 extraPython3Packages;$/;"	m
@@ -61,17 +57,17 @@ flake	flake.nix	/^      flake = false;$/;"	m
 flake	flake.nix	/^      flake = false;$/;"	m
 flake	flake.nix	/^      flake = false;$/;"	m
 flake-utils	flake.nix	/^    flake-utils = {$/;"	m
-general	flake.nix	/^          general = with pkgs.vimPlugins; [$/;"	m
-general	flake.nix	/^          general = true;$/;"	m
 general	flake.nix	/^          general = with pkgs.vimPlugins; [ ];$/;"	m
 general	flake.nix	/^          general = with pkgs; [$/;"	m
+general	flake.nix	/^          general = with pkgs.vimPlugins; [$/;"	m
 general	flake.nix	/^          general = true;$/;"	m
+general	flake.nix	/^          general = true;$/;"	m
+generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
+generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
 generalBuildInputs	flake.nix	/^          generalBuildInputs = with pkgs; [$/;"	m
-generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
-generalBuildInputs	flake.nix	/^          generalBuildInputs = true;$/;"	m
 gitPlugins	flake.nix	/^          gitPlugins = true;$/;"	m
-gitPlugins	flake.nix	/^          gitPlugins = with pkgs.neovimPlugins; [$/;"	m
 gitPlugins	flake.nix	/^          gitPlugins = with pkgs.neovimPlugins; [ ];$/;"	m
+gitPlugins	flake.nix	/^          gitPlugins = with pkgs.neovimPlugins; [$/;"	m
 gitPlugins	flake.nix	/^          gitPlugins = true;$/;"	m
 hash	overlays/customBuildsOverlay.nix	/^            hash = "sha256-kzc9jm6d9PJ07yiWfIOwqxOTAAydTpaLXVK6sEWM8gg=";$/;"	m
 inputs	flake.nix	/^  inputs = {$/;"	m
@@ -83,20 +79,20 @@ lspDebugMode	flake.nix	/^          lspDebugMode = false;$/;"	m
 lspsAndRuntimeDeps	flake.nix	/^        lspsAndRuntimeDeps = {$/;"	m
 luaListPrinter	builder/utils.nix	/^  luaListPrinter = theList: let$/;"	f
 luaTablePrinter	builder/utils.nix	/^  luaTablePrinter = attrSet: let$/;"	f
-markdown	flake.nix	/^          markdown = true;$/;"	m
-markdown	flake.nix	/^          markdown = true;$/;"	m
 markdown	flake.nix	/^          markdown = with pkgs.customPlugins; [$/;"	m
+markdown	flake.nix	/^          markdown = true;$/;"	m
+markdown	flake.nix	/^          markdown = true;$/;"	m
 markdown-preview-nvim	overlays/customBuildsOverlay.nix	/^      markdown-preview-nvim =  let$/;"	m
 myVimPackage	builder/default.nix	/^    packages.myVimPackage = {$/;"	m
-name	builder/default.nix	/^      name = config.RCName;$/;"	m
-name	overlays/default.nix	/^          name = plugName plugin;$/;"	m
-name	builder/default.nix	/^      name = "\${config.RCName}_after";$/;"	m
+name	builder/default.nix	/^      name = "\${LuaConfig.name}_after";$/;"	m
 name	flake.nix	/^        name = "nixCats.nvim";$/;"	m
+name	builder/default.nix	/^      name = builtins.baseNameOf self;$/;"	m
+name	overlays/default.nix	/^          name = plugName plugin;$/;"	m
 name	builder/default.nix	/^      name = "nixCats";$/;"	m
 nativeBuildInputs	overlays/customBuildsOverlay.nix	/^        nativeBuildInputs = [ super.nodejs ];$/;"	m
-neonixdev	flake.nix	/^          neonixdev = with pkgs.vimPlugins; [$/;"	m
-neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
 neonixdev	flake.nix	/^          neonixdev = with pkgs; [$/;"	m
+neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
+neonixdev	flake.nix	/^          neonixdev = with pkgs.vimPlugins; [$/;"	m
 neonixdev	flake.nix	/^          neonixdev = true;$/;"	m
 neovimPlugins	overlays/default.nix	/^      neovimPlugins = builtins.listToAttrs (map$/;"	m
 nixCats	flake.nix	/^        nixCats = {$/;"	m
@@ -110,18 +106,17 @@ outputs	flake.nix	/^  outputs = { self, nixpkgs, flake-utils, ... }@inputs:$/;"	
 overlays	flake.nix	/^      overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }$/;"	m
 overlays	flake.nix	/^        inherit system overlays;$/;"	m
 packageJSON	overlays/customBuildsOverlay.nix	/^          packageJSON = "\${super.vimPlugins.markdown-preview-nvim.src}\/package.json";$/;"	m
-packages	flake.nix	/^        packages = [ packageDefinitions.nixCats ];$/;"	m
 packages	flake.nix	/^      packages = { default = packageDefinitions.nixCats; }$/;"	m
+packages	flake.nix	/^        packages = [ packageDefinitions.nixCats ];$/;"	m
 pkgs	flake.nix	/^        inherit self pkgs;$/;"	m
 plugin	builder/wrapNeovim.nix	/^        start ++ (map (p: { plugin = p; optional = true; }) opt);$/;"	m
 plugins	builder/wrapNeovim.nix	/^        inherit plugins;$/;"	m
 pname	overlays/default.nix	/^        pname = plugName name;$/;"	m
 pname	overlays/customBuildsOverlay.nix	/^          inherit (super.vimPlugins.markdown-preview-nvim) pname version;$/;"	m
 postInstall	overlays/customBuildsOverlay.nix	/^        postInstall = ''$/;"	m
-propagatedBuildInputs	flake.nix	/^        propagatedBuildInputs = {$/;"	m
 propagatedBuildInputs	builder/default.nix	/^      propagatedBuildInputs = buildInputs;$/;"	m
+propagatedBuildInputs	flake.nix	/^        propagatedBuildInputs = {$/;"	m
 regularCats	flake.nix	/^        regularCats = nixVimBuilder settings.unwrappedLua {$/;"	m
-runtimepathcopier	builder/utils.nix	/^  runtimepathcopier = self: ''$/;"	f
 self	flake.nix	/^        inherit self pkgs;$/;"	m
 settings	flake.nix	/^        inherit categories settings;$/;"	m
 shellHook	flake.nix	/^        shellHook = ''$/;"	m
@@ -130,13 +125,13 @@ standardPluginOverlay	overlays/default.nix	/^    standardPluginOverlay = self: s
 start	builder/default.nix	/^      inherit start opt;$/;"	m
 startupPlugins	flake.nix	/^        startupPlugins = {$/;"	m
 system	flake.nix	/^        inherit system overlays;$/;"	m
-test	flake.nix	/^          test = [$/;"	m
+test	flake.nix	/^          test = true;$/;"	m
 test	flake.nix	/^          test = [ (_:[]) ];$/;"	m
 test	flake.nix	/^          test = [ (_:[]) ];$/;"	m
 test	flake.nix	/^          test = true;$/;"	m
+test	flake.nix	/^          test = [ (_:[]) ];$/;"	m
 test	flake.nix	/^          test = {$/;"	m
-test	flake.nix	/^          test = true;$/;"	m
-test	flake.nix	/^          test = [ (_:[]) ];$/;"	m
+test	flake.nix	/^          test = [$/;"	m
 theWorstCat	flake.nix	/^          theWorstCat = {$/;"	m
 theWorstCat	flake.nix	/^          theWorstCat = {$/;"	m
 thing1	flake.nix	/^            thing1 = [ "MEOW" "HISSS" ];$/;"	m
@@ -148,47 +143,47 @@ thing3	flake.nix	/^                thing3 = [ "give" "treat" ];$/;"	m
 thing4	flake.nix	/^            thing4 = "couch is for scratching";$/;"	m
 thing4	flake.nix	/^            thing4 = "couch is for scratching";$/;"	m
 unwrappedLua	flake.nix	/^        unwrappedLua = {$/;"	m
-url	flake.nix	/^      url = "github:j-hui\/fidget.nvim\/legacy";$/;"	m
-url	flake.nix	/^    nixd.url = "github:nix-community\/nixd";$/;"	m
-url	flake.nix	/^      url = "github:numtide\/flake-utils";$/;"	m
-url	flake.nix	/^      url = "github:joshdick\/onedark.vim";$/;"	m
-url	flake.nix	/^      url = "github:lewis6991\/gitsigns.nvim";$/;"	m
-url	flake.nix	/^      url = "github:folke\/which-key.nvim";$/;"	m
-url	flake.nix	/^      url = "github:nvim-lualine\/lualine.nvim";$/;"	m
-url	flake.nix	/^      url = "github:neovim\/nvim-lspconfig";$/;"	m
 url	flake.nix	/^      url = "github:numToStr\/Comment.nvim";$/;"	m
-url	flake.nix	/^      url = "github:m-demare\/hlargs.nvim";$/;"	m
-url	flake.nix	/^      url = "github:ThePrimeagen\/harpoon";$/;"	m
+url	flake.nix	/^      url = "github:folke\/which-key.nvim";$/;"	m
+url	flake.nix	/^      url = "github:neovim\/nvim-lspconfig";$/;"	m
+url	flake.nix	/^      url = "github:j-hui\/fidget.nvim\/legacy";$/;"	m
 url	flake.nix	/^    nixpkgs.url = "github:nixos\/nixpkgs\/nixpkgs-unstable";$/;"	m
+url	flake.nix	/^    nixd.url = "github:nix-community\/nixd";$/;"	m
+url	flake.nix	/^      url = "github:ThePrimeagen\/harpoon";$/;"	m
+url	flake.nix	/^      url = "github:lewis6991\/gitsigns.nvim";$/;"	m
+url	flake.nix	/^      url = "github:joshdick\/onedark.vim";$/;"	m
+url	flake.nix	/^      url = "github:m-demare\/hlargs.nvim";$/;"	m
+url	flake.nix	/^      url = "github:nvim-lualine\/lualine.nvim";$/;"	m
+url	flake.nix	/^      url = "github:numtide\/flake-utils";$/;"	m
 value	overlays/default.nix	/^          value = buildPlug plugin;$/;"	m
 version	overlays/default.nix	/^        version = "master";$/;"	m
 version	overlays/customBuildsOverlay.nix	/^          inherit (super.vimPlugins.markdown-preview-nvim) pname version;$/;"	m
-viAlias	flake.nix	/^          viAlias = false;$/;"	m
-viAlias	flake.nix	/^          viAlias = false;$/;"	m
 viAlias	builder/default.nix	/^      viAlias = false;$/;"	m
-viAlias	builder/default.nix	/^  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
+viAlias	flake.nix	/^          viAlias = false;$/;"	m
+viAlias	flake.nix	/^          viAlias = false;$/;"	m
 viAlias	builder/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
+viAlias	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 vimAlias	flake.nix	/^          vimAlias = true;$/;"	m
 vimAlias	flake.nix	/^          vimAlias = true;$/;"	m
 vimAlias	builder/default.nix	/^      vimAlias = false;$/;"	m
+vimAlias	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 vimAlias	builder/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
-vimAlias	builder/default.nix	/^  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 withNodeJs	builder/default.nix	/^      withNodeJs = false;$/;"	m
+withNodeJs	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 withNodeJs	builder/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
-withNodeJs	builder/default.nix	/^  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
-withPython3	builder/default.nix	/^  withPython3 = config.withPython3;$/;"	m
 withPython3	builder/default.nix	/^      withPython3 = true;$/;"	m
+withPython3	builder/default.nix	/^  withPython3 = config.withPython3;$/;"	m
 withPython3	builder/wrapNeovim.nix	/^        inherit withPython3 extraPython3Packages;$/;"	m
 withRuby	builder/default.nix	/^      withRuby = true;$/;"	m
+withRuby	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 withRuby	builder/wrapNeovim.nix	/^        inherit withNodeJs withRuby viAlias vimAlias;$/;"	m
-withRuby	builder/default.nix	/^  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
 wrapNeovim	builder/wrapNeovim.nix	/^  wrapNeovim = pkgs: neovim-unwrapped: pkgs.lib.makeOverridable (legacyWrapper pkgs neovim-unwrapped);$/;"	f
 wrapRc	builder/default.nix	/^      wrapRc = true;$/;"	m
-wrapRc	flake.nix	/^          wrapRc = true;$/;"	m
 wrapRc	flake.nix	/^          wrapRc = false;$/;"	m
+wrapRc	flake.nix	/^          wrapRc = true;$/;"	m
+wrapRc	builder/default.nix	/^  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;$/;"	m
+wrapRc	builder/default.nix	/^        categoriesPlus = categories \/\/ { inherit (config) wrapRc; };$/;"	m
 wrapRc	builder/wrapNeovim.nix	/^      inherit wrapRc;$/;"	m
-wrapRc	builder/default.nix	/^        categoriesPlus = categories \/\/ { RCName = config.RCName; inherit wrapRc; };$/;"	m
-wrapRc	builder/default.nix	/^  inherit wrapRc extraMakeWrapperArgs;$/;"	m
 wrapperArgs	builder/wrapNeovim.nix	/^      wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;$/;"	m
 yarnLock	overlays/customBuildsOverlay.nix	/^          yarnLock = "\${super.vimPlugins.markdown-preview-nvim.src}\/yarn.lock";$/;"	m
 yarnLock	overlays/customBuildsOverlay.nix	/^            inherit yarnLock;$/;"	m

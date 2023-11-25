@@ -104,8 +104,6 @@ You then set them up in your lua, using the default methods to do so. No more tr
 
 You can optionally ask what categories you have in this package, whenever you require nixCats
 
-You do not have to name your folder within the lua directory myLuaConf. Just change RCName in the flake. Doing this is documented in :help nixCats.flake.outputs.settings
-
 If you encounter any build steps that are not well handled by nixpkgs, 
 or you need to import a plugin straight from git that has a non-standard build step and no flake,
 and need to do a custom definition, [customBuildsOverlay](./overlays/customBuildsOverlay.nix) is the place for it. 
