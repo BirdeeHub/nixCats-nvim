@@ -33,33 +33,13 @@
       configDirName = "nvim";
     } // settings;
 
-    # package everything other than after as a plugin
+    # package entire flake into the store
     LuaConfig = pkgs.stdenv.mkDerivation {
       name = builtins.baseNameOf self;
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
-        for f in ${self}/*; do
-          if [ "$f" != "${self}/after" ]; then
-            folderName=$(basename "$f")
-            if [ -d $f ]; then
-              mkdir -p $out/$folderName && cp -r ${self}/$folderName/* $out/$folderName
-            else
-              cp -r $f $out/
-            fi
-          fi  
-        done
-      '';
-    };
-    # We package after separately to make sure it is run last
-    luaAfter = pkgs.stdenv.mkDerivation {
-      name = "${LuaConfig.name}_after";
-      builder = builtins.toFile "builder.sh" ''
-          source $stdenv/setup
-          mkdir -p $out/
-          if [ -d ${self}/after ]; then
-             cp -r ${self}/after/* $out/
-          fi
+        cp -r ${self}/* $out/
       '';
     };
 
@@ -84,22 +64,24 @@
     };
 
     # create our customRC to call it
+    # This makes sure our config is loaded first and our after is loaded last
+    # it also removes the regular config dir from the path.
     configDir = if config.configDirName != null && config.configDirName != ""
       then config.configDirName else "nvim";
     customRC = if config.wrapRc then ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-        packadd ${LuaConfig.name}
-        set runtimepath+=${luaAfter}
+        let new_directory = '${LuaConfig}'
+        let current_runtimepath = &runtimepath
+        let runtimepath_list = split(current_runtimepath, ',')
+        call insert(runtimepath_list, new_directory, 1)
+        let &runtimepath = join(runtimepath_list, ',')
+        set runtimepath+=${LuaConfig}/after
         lua package.path = package.path .. ';${LuaConfig}/init.lua'
         lua require('${builtins.baseNameOf LuaConfig}')
       '' else "";
-    # This makes sure our config is loaded first and our after is loaded last
-    # and it also requires the chosen directory or file in the lua directory
-    # it also removes the regular config dir from the path.
 
-    extraPlugins = if config.wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
@@ -109,7 +91,7 @@
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
     # It has cmake in it I think among other things?
     buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ filterAndFlatten propagatedBuildInputs;
-    start = extraPlugins ++ filterAndFlatten startupPlugins;
+    start = [ nixCats ] ++ filterAndFlatten startupPlugins;
     opt = filterAndFlatten optionalPlugins;
 
     # For wrapperArgs:
@@ -149,11 +131,10 @@
       in
       uniquifiedList);
 
-    # this sets the name of the folder to look for nvim stuff in
-    configDirName = if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [];
     # cat our args
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
-      configDirName
+      # this sets the name of the folder to look for nvim stuff in
+      (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
       # and these are our other now sorted args
       ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
       ++ (FandF_envVarSet environmentVariables)
@@ -177,7 +158,6 @@
       inherit start opt;
     };
   };
-  # I dont know what these do, but I implemented them?
     /* the function you would have passed to python.withPackages */
   extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
     /* the function you would have passed to python.withPackages */
