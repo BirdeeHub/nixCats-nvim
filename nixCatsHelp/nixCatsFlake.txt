@@ -220,6 +220,7 @@ options, in a set within the settings set to be included in the packaging sectio
 Package Generation:                           *nixCats.flake.outputs.packaging*
 
 generate packages by calling that builder function we just created.
+Place them in the packageDefinitions set.
 
 First, pick the set of settings you wish to include.
 
@@ -242,21 +243,23 @@ as well as the general startupPlugins category.
 
 an example package definition:
 >nix
-  nixCats = nixVimBuilder settings.nixCats {
-    custom = true;
-    gitPlugins = true;
-    general = true;
-    neonixdev = true;
+  packageDefinitions = {
+    nixCats = nixVimBuilder settings.nixCats {
+      custom = true;
+      gitPlugins = true;
+      general = true;
+      neonixdev = true;
 
-    # this does not have an associated category of plugins, 
-    # but lua can still check for it
-    lspDebugMode = false;
+      # this does not have an associated category of plugins, 
+      # but lua can still check for it
+      lspDebugMode = false;
 
-    # you could also pass something else and it calls 
-    # builtins.toString on it and passes it in as a string
-    theBestCat = "says meow!!!";
-    # maybe you need to pass a port or path in or something idk.
-    # you could :lua print(require('nixCats').theBestCat)
+      # you could also pass something else and it calls 
+      # builtins.toString on it and passes it in as a string
+      theBestCat = "says meow!!!";
+      # maybe you need to pass a port or path in or something idk.
+      # you could :lua print(require('nixCats').theBestCat)
+    };
   };
 <
 You can require('nixCats') for the set you define here in your lua
@@ -267,9 +270,10 @@ see :help `nixCats`
 ---------------------------------------------------------------------------------------
 Flake devShell and package definitions         *nixCats.flake.outputs.packages*
 
-Put the names of the packages you created in the above 
-packaging section into the appropriate flake output category, 
-i.e. as a Packages or devShell item
+This will automatically add all of the packages in the 
+packageDefinitions set defined in the section above. 
+
+However you still must choose your default packages.
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
