@@ -110,59 +110,63 @@ add to a category directly.
 ---------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
-we now create a builder function that takes 2 arguments. 
+We now create a builder function that takes 2 arguments. 
 A set of categories and a set of settings. 
 It does this by importing the builder's default.nix.
 
-The default settings for the settings set are defined below. 
+The settings set is defined in the next section. 
 They did not make sense to include in the categories system.
 see :help `nixCats.flake.outputs.settings`
+They are then passed in as an argument when we call the builder we make.
 
-the set of categories is a set of named boolean values like this:
+The other argument, the set of categories,
+is a set of named boolean values like this:
 { categoryname1 = true; categoryname2 = false; etc... }
+It will tell us which categories to include per package.
 
 To define this function that takes this set of categories and 
 the settings as an argument, we import ./builder/default.nix
 and provide it a set containing the following info.
 
+Arguments: <settings>: <categories>: 
 {
 
-- a reference to the self variable that gives us the path to the flake.
+<-> a reference to the self variable that gives us the path to the flake.
 
-- the pkgs set with the overlays
+<-> the pkgs set with the overlays
 
-- the settings set that this function took as an argument.
+<-> the <settings> set that this function took as an argument.
 
-- the categories set that this function took as an argument.
+<-> the <categories> set that this function took as an argument.
       It will define which of the categories to include from the following:
 
-- a flexible set of categories, each containing a list of 
+<-> a flexible set of categories, each containing a list of 
       internal BUILD TIME dependencies
 
-- a flexible set of categories, each containing a list of LSP's or 
+<-> a flexible set of categories, each containing a list of LSP's or 
       other internal runtime dependencies such as ctags or debuggers
       these are available to the path while within neovim program.
       this includes the neovim terminal.
 
-- a flexible set of categories, each containing a list of startup plugins.
+<-> a flexible set of categories, each containing a list of startup plugins.
       Startup plugins are loaded and can be required. 
 
-- a flexible set of categories, each containing a list of optional plugins.
+<-> a flexible set of categories, each containing a list of optional plugins.
       Optional plugins need to be added with packadd before being required.
 
-- a flexible set of categories, each containing an ATTRIBUTE SET of 
+<-> a flexible set of categories, each containing an ATTRIBUTE SET of 
       EnvironmentVariableName = "EnvironmentVariableValue";
 
-- a flexible set of categories, each containing a list of 
+<-> a flexible set of categories, each containing a list of 
       extra wrapper arguments.
       If you don't know what that is, see here:
 github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
 
-- 2 flexible sets of categories, one for python and the other for python3,
+<-> 2 flexible sets of categories, one for python and the other for python3,
   each containing a list of FUNCTIONS that return lists of python packages.
   These functions are the same thing that you would pass to python.withPackages.
 
-- a flexible set of categories, each containing a list of FUNCTIONS 
+<-> a flexible set of categories, each containing a list of FUNCTIONS 
   that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
 }
@@ -172,6 +176,7 @@ how this function actually works is covered in
 
 ---------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
+
 These are the defaults:
 >nix
   settings = {
