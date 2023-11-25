@@ -14,8 +14,8 @@ if (categories.neonixdev) then
       },
     },
   })
-  require("myLuaConf.LSPs.nix")
-  require("myLuaConf.LSPs.lua")
+  require("LSPs.nix")
+  require("LSPs.lua")
 end
 if (categories.lspDebugMode) then
   vim.lsp.set_log_level("debug")

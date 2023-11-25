@@ -248,8 +248,6 @@
       settings = {
         nixCats = {
           wrapRc = true;
-          # to use a different lua folder other than myLuaConf, change this value:
-          RCName = "myLuaConf";
           configDirName = "nixCats-nvim";
           viAlias = false;
           vimAlias = true;
@@ -258,7 +256,6 @@
           wrapRc = false;
           # will now look for nixCats-nvim within .config and .local and others
           configDirName = "nixCats-nvim";
-          RCName = "myLuaConf";
           viAlias = false;
           vimAlias = true;
         };

@@ -8,13 +8,14 @@ This flake uses nix for importing plugins, lsps, dependencies, and more,
 in place of usual nvim package managers such as packer, lazy or mason.
 
 Everything else is done in a regular lua config style.
-Simply pretend the root of the flake is the root of your Lua config,
-except without the root level init.lua folder. 
-Set RCName to set which lua folder to require first! Details on RCName below.
+Download in flake.nix and then, simply pretend the root of the flake 
+is the root of your Lua config. 1 exception, when wrapRc = true, 
+`stdpath('config')` will still point to ~/.config/<configDirName>.
+But your lua config will be in the store.
 
 *******************************************************
 One IMPORTANT note:
-When editing the lua within the flake directory,
+When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 *******************************************************
@@ -176,20 +177,10 @@ These are the defaults:
   settings = {
     defaults = {
 <
-      # RCName: the name of folder to require within lua directory.
-      # the default is empty, and if left empty, 
-      # wrapRc will default to false.
-      # this value, and wrapRc value will also be passed to nixCats.
-      # this is a required field when using wrapRc = true;
->nix
-      RCName = "";
-<
       # do you want to use lua from this flake?
-      # or would you rather do it in your .config/nvim?
+      # or would you rather do it in your .config/<configDirName>?
       # nixCats and this help will work either way.
-      # When wrapRc == true,
-      # Instead of the init.lua file at the root level of this repo,
-      # one will be generated that does require(${RCName))
+      # this value will also be included in nixCats.
 >nix
       wrapRc = true;
 <

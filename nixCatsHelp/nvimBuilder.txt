@@ -49,14 +49,13 @@ just doing this and including more comments than code.
 >nix
       config = {
         wrapRc = true;
-        RCName = "";
+        configDirName = "nvim";
         viAlias = false;
         vimAlias = false;
         withNodeJs = false;
         withRuby = true;
         extraName = "";
         withPython3 = true;
-        configDirName = "nvim";
       } // settings;
 <
 --------------------------------------------------------------------------
@@ -66,7 +65,7 @@ just doing this and including more comments than code.
     # see :help `'rtp'`
 >nix
     LuaConfig = pkgs.stdenv.mkDerivation {
-      name = config.RCName;
+      name = builtins.baseNameOf self;
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
@@ -86,7 +85,7 @@ just doing this and including more comments than code.
     # We package after separately to make sure it is run last
 >nix
     luaAfter = pkgs.stdenv.mkDerivation {
-      name = "${config.RCName}_after";
+      name = "${LuaConfig.name}_after";
       builder = builtins.toFile "builder.sh" ''
           source $stdenv/setup
           mkdir -p $out/
@@ -105,7 +104,7 @@ just doing this and including more comments than code.
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { RCName = config.RCName; inherit wrapRc; };
+        categoriesPlus = categories // { inherit (config) wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
@@ -121,8 +120,6 @@ just doing this and including more comments than code.
         cp -r ${self}/nixCatsHelp/* $out/doc
       '';
     };
-    # check if we should wrap the lua config, or use regular directory
-    wrapRc = if config.RCName != "" then config.wrapRc else false;
 
     # and create our customRC to call it
     # This makes sure our config is loaded first and our after is loaded last
@@ -130,17 +127,18 @@ just doing this and including more comments than code.
     # it also removes the regular config dir from the path.
     configDir = if config.configDirName != null && config.configDirName != ""
       then config.configDirName else "nvim";
-    customRC = if wrapRc then ''
+    customRC = if config.wrapRc then ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-        packadd ${config.RCName}
+        packadd ${LuaConfig.name}
         set runtimepath+=${luaAfter}
-        lua require('${config.RCName}')
+        lua package.path = package.path .. ';${LuaConfig}/init.lua'
+        lua require('${builtins.baseNameOf LuaConfig}')
       '' else "";
 
     # only include LuaConfig if we want it
-    extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
+    extraPlugins = if config.wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 <
 ---------------------------------------------------------------------------------
                              *nixCats.flake.nixperts.nvimBuilder.basicFlatmap*
@@ -271,8 +269,8 @@ just doing this and including more comments than code.
     # the following is just the regular pkgs.wrapNeovim
     # except it also accepts wrapRc as an argument
   (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
-    inherit wrapRc extraMakeWrapperArgs;
-    inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
+    inherit extraMakeWrapperArgs;
+    inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;
     configure = {
       inherit customRC;
       packages.myVimPackage = {

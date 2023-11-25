@@ -24,7 +24,6 @@
   let
     config = {
       wrapRc = true;
-      RCName = "";
       viAlias = false;
       vimAlias = false;
       withNodeJs = false;
@@ -36,7 +35,7 @@
 
     # package everything other than after as a plugin
     LuaConfig = pkgs.stdenv.mkDerivation {
-      name = config.RCName;
+      name = builtins.baseNameOf self;
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
@@ -54,7 +53,7 @@
     };
     # We package after separately to make sure it is run last
     luaAfter = pkgs.stdenv.mkDerivation {
-      name = "${config.RCName}_after";
+      name = "${LuaConfig.name}_after";
       builder = builtins.toFile "builder.sh" ''
           source $stdenv/setup
           mkdir -p $out/
@@ -68,7 +67,7 @@
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { RCName = config.RCName; inherit wrapRc; };
+        categoriesPlus = categories // { inherit (config) wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
@@ -84,24 +83,23 @@
       '';
     };
 
-    wrapRc = if config.RCName != "" then config.wrapRc else false;
-
     # create our customRC to call it
     configDir = if config.configDirName != null && config.configDirName != ""
       then config.configDirName else "nvim";
-    customRC = if wrapRc then ''
+    customRC = if config.wrapRc then ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-        packadd ${config.RCName}
+        packadd ${LuaConfig.name}
         set runtimepath+=${luaAfter}
-        lua require('${config.RCName}')
+        lua package.path = package.path .. ';${LuaConfig}/init.lua'
+        lua require('${builtins.baseNameOf LuaConfig}')
       '' else "";
     # This makes sure our config is loaded first and our after is loaded last
     # and it also requires the chosen directory or file in the lua directory
     # it also removes the regular config dir from the path.
 
-    extraPlugins = if wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
+    extraPlugins = if config.wrapRc then [ nixCats LuaConfig ] else [ nixCats ];
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
@@ -171,8 +169,8 @@
   in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
-  inherit wrapRc extraMakeWrapperArgs;
-  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
+  inherit extraMakeWrapperArgs;
+  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
