@@ -185,21 +185,23 @@
               #     lua
               #   ]
               # ))
+              undotree
               nvim-surround
               indent-blankline-nvim
               nvim-web-devicons
+              # cmp stuff
+              nvim-cmp
               luasnip
+              friendly-snippets
               cmp_luasnip
               cmp-buffer
               cmp-path
               cmp-nvim-lua
               cmp-nvim-lsp
-              friendly-snippets
               cmp-cmdline
               cmp-nvim-lsp-signature-help
               cmp-cmdline-history
               lspkind-nvim
-              undotree
             ];
           };
 
