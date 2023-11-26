@@ -47,7 +47,7 @@ If in your flake, your package definition looked like this:
     general = true;
     neonixdev = true;
     AI = true;
-    java = false; # is included in kotlin category
+    java = false;
     kotlin = true;
     # this does not have an associated category of plugins, 
     # but lua can still check for it
