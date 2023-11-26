@@ -151,7 +151,7 @@ Arguments: <settings>: <categories>:
 
 <-> a flexible set of categories, each containing a list of LSP's or 
       other internal runtime dependencies such as ctags or debuggers
-      these are available to the path while within neovim program.
+      these are available to the PATH while within neovim program.
       this includes the neovim terminal.
 
 <-> a flexible set of categories, each containing a list of startup plugins.
