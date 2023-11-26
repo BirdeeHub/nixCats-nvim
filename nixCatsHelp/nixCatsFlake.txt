@@ -15,8 +15,10 @@ But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
 it would be to find something outside the directory. 
 Inside is mostly handled by vim.
-You can use debug.getinfo(1, "S").source:sub(2) to get 
-current script directory for your uses.
+You can use debug.getinfo(1, "S").source:sub(2) or something similar 
+to get current script directory for your uses, if ever necessary.
+Keep in mind they will be read-only and theres definitely a more
+in built vim way to do it.
 
 *******************************************************
 One IMPORTANT note:
