@@ -295,8 +295,7 @@
             thing4 = "couch is for scratching";
           };
           # you could :lua print(vim.inspect(require('nixCats').theWorstCat))
-          # I honestly dont know what you would need a table like this for,
-          # but I got carried away and it worked FIRST TRY.
+          # I got carried away and it worked FIRST TRY.
           # see :help nixCats
         };
         regularCats = nixVimBuilder settings.unwrappedLua {

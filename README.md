@@ -130,7 +130,7 @@ nix shell github:BirdeeHub/nixCats-nvim#nixCats
 ```
 
 However, you should really just clone or fork the repo,
-because to edit your config, you edit the lua in your flake. 
+because to edit your config, you edit the lua in your flake.
 
 If you use the regularCats package, you only need to edit the flake itself to install new things.
 
@@ -145,7 +145,7 @@ If you want to add it to another flake, choose one of these methods:
 
 ```nix
 {
-    description = "How to import nixCats flake in a flake. 2 ways.";
+    description = "How to import nixCats flake in a flake. Several ways.";
     inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
         flake-utils.url = "github:numtide/flake-utils";
@@ -160,17 +160,39 @@ If you want to add it to another flake, choose one of these methods:
             nixCats-nvim.outputs.overlays.${system}.regularCats
           ];
         };
+        customvim = nixCats-nvim.outputs.customPackager.${system} {
+          wrapRc = true;
+          configDirName = "nixCats-nvim";
+          viAlias = false;
+          vimAlias = true;
+        } {
+          generalBuildInputs = true;
+          markdown = true;
+          gitPlugins = true;
+          general = true;
+          custom = true;
+          neonixdev = true;
+          test = true;
+          debug = false;
+          # this does not have an associated category of plugins, 
+          # but lua can still check for it
+          lspDebugMode = false;
+          # you could also pass something else:
+          colorscheme = "onedark";
+          # you could :lua print(vim.inspect(require('nixCats')))
+          # I got carried away and it worked FIRST TRY.
+          # see :help nixCats
     in
         {
             packages.default = nixCats-nvim.outputs.packages.${system}.nixCats;
             packages.nixCats = pkgs.nixCats;
             packages.regularCats = pkgs.regularCats;
+            packages.customvim = customvim;
         }
     );
 }
 ```
-
-Although, again, it is preferrable to just clone it, either from within nix, or outside of it.
+There are 2 more methods not covered in this readme, but are covered in the included help files.
 
 ---
 
