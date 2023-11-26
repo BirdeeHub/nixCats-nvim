@@ -1,9 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-{ 
-  self
-  , pkgs
-  , categories ? {}
+self: pkgs: { 
+  categories ? {}
   , settings ? {}
   , startupPlugins ? {}
   , optionalPlugins ? {}
@@ -18,6 +16,9 @@
   , extraPython3Packages ? {}
   # same thing except for lua.withPackages
   , extraLuaPackages ? {}
+  # only for use when importing flake in a flake 
+  # and need to add a bit of lua for an added plugin
+  , optionalLuaAdditions ? ""
   }:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
@@ -66,24 +67,41 @@
     # create our customRC to call it
     # This makes sure our config is loaded first and our after is loaded last
     # it also removes the regular config dir from the path.
+    # the wrapper we are using might put it in the wrong place for our uses.
+    # so we add in the config directory ourselves to prevent any issues.
     configDir = if config.configDirName != null && config.configDirName != ""
       then config.configDirName else "nvim";
-    customRC = if config.wrapRc then ''
+    customRC = ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-
-        let new_directory = '${LuaConfig}'
-        let current_runtimepath = &runtimepath
-        let runtimepath_list = split(current_runtimepath, ',')
-        call insert(runtimepath_list, new_directory, 0)
+      '' + (if config.wrapRc then ''
+        let runtimepath_list = split(&runtimepath, ',')
+        call insert(runtimepath_list, "${LuaConfig}", 0)
         let &runtimepath = join(runtimepath_list, ',')
 
         set runtimepath+=${LuaConfig}/after
 
         lua package.path = package.path .. ';${LuaConfig}/init.lua'
         lua require('${builtins.baseNameOf LuaConfig}')
-      '' else "";
+      '' else ''
+        let runtimepath_list = split(&runtimepath, ',')
+        call insert(runtimepath_list, configdir, 0)
+        let &runtimepath = join(runtimepath_list, ',')
+
+        execute "set runtimepath+=" . configdir . "/after"
+
+        lua package.path = package.path .. ';' .. vim.api.nvim_get_var('configdir') .. '/init.lua'
+        lua require('${configDir}')
+      '') + ''
+        lua << EOF
+        ${optionalLuaAdditions}
+        EOF
+      '';
+      # optionalLuaAdditions is not the suggested way to add lua to this flake
+      # only for use when importing flake in a flake 
+      # and need to add a bit of lua for an added plugin
+      # you could add a new directory though idk thats your buisness.
 
 
     # this is what allows for dynamic packaging in flake.nix
@@ -154,7 +172,7 @@
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
   inherit extraMakeWrapperArgs;
-  inherit (config) wrapRc vimAlias viAlias withRuby extraName withNodeJs;
+  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
   configure = {
     inherit customRC;
     packages.myVimPackage = {

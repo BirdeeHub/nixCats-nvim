@@ -98,13 +98,13 @@
       # what that function does is it intakes a set of categories 
       # with a boolean value for each, and a set of settings
       # and then it imports ./builder/default.nix, passing it that categories set but also
-      # our other information. This allows us to define our categories later.
-      nixVimBuilder = settings: categories: (import ./builder {
-        # these are required by the builder
-        inherit self pkgs;
-        # you supply these when you apply this function
-        inherit categories settings;
+      # our other information. This allows us to define our categories and settings later.
+      nixVimBuilder = (categoryDefs: settings: categories: 
+        (import ./builder self pkgs 
+        (categoryDefs // { inherit settings categories; }))
+        ) categoryDefinitions;
 
+      categoryDefinitions = {
         # see :help nixCats.flake.outputs.builder
         # to define and use a new category, simply add a new list to a set here, 
         # and later, you will include categoryname = true; in the set you
@@ -242,7 +242,7 @@
         extraLuaPackages = {
           test = [ (_:[]) ];
         };
-      });
+      };
 
       # see :help nixCats.flake.outputs.settings
       settings = {
@@ -328,6 +328,17 @@
 
     # see :help nixCats.flake.outputs.packages
     {
+      # These 2 will still recieve the flake's lua when wrapRc = true;
+      customBuilders = {
+        fresh = newPkgs: categoryDefs: settings: categories: 
+          (import ./builder self newPkgs 
+          (categoryDefs // { inherit settings categories; }));
+        merged = newPkgs: categoryDefs: settings: categories: 
+          (import ./builder self 
+          (pkgs // newPkgs) ((categoryDefinitions // categoryDefs) // { inherit settings categories; }));
+      };
+      # To choose settings and categories from the flake that calls this flake.
+      customPackager = nixVimBuilder;
       # choose your default overlay package
       overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }
         # this will make an overlay out of each of the packageDefinitions defined above

@@ -18,11 +18,9 @@ rec {
     , viAlias ? false
     , configure ? {}
     , extraName ? ""
-    # except I also passed this through
-    , wrapRc ? true
   }:
     let
-      # and removed an error that doesnt make sense for my flake.
+      # although I removed an error that doesnt make sense for my flake.
       plugins = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPlugin (configure.packages or {}));
       genPlugin = packageName: {start ? [], opt ? []}:
         start ++ (map (p: { plugin = p; optional = true; }) opt);
@@ -39,7 +37,8 @@ rec {
     # it uses the new wrapper!!!
     pkgs.wrapNeovimUnstable neovim (res // {
       wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
-      # I passed this out. I think this is the only extra option not covered?
-      inherit wrapRc;
+      # I handle this with customRC 
+      # otherwise it will get loaded in at the wrong time after startup plugins.
+      wrapRc = true;
   });
 }

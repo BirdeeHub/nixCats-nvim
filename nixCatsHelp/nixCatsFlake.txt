@@ -118,9 +118,8 @@ add to a category directly.
 ---------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
-We now create a builder function that takes 2 arguments. 
-A set of categories and a set of settings. 
-It does this by importing the builder's default.nix.
+We now create a builder function that takes 2 arguments.
+A set of categories and a set of settings.
 
 The settings set is defined in the next section. 
 They did not make sense to include in the categories system.
@@ -133,20 +132,27 @@ is a set of named boolean values like this:
 It will tell us which categories to include per package.
 
 To define this function that takes this set of categories and 
-the settings as an argument, we import ./builder/default.nix
-and provide it a set containing the following info.
+the settings as an argument, 
+we import ./builder/default.nix and supply it the following.
+1. The pkgs set so that it can use it for making its own derivations.
+2. A reference to self, so that it can get the path to the flake, 
+(it uses the self variable to wrap the lua when wrapRc = true)
+and a set containing the following info.
+3. the settings and categories from arguments
+4. our set of categoryDefinitions.
 
-Arguments: <settings>: <categories>: 
-{
+ourBuilderFunction = (<categoryDefs>: 
+    <settings>: <categories>: 
+      (import ./builder self pkgs 
+      (<categoryDefs> // { inherit <settings> <categories>; }))
 
-<-> a reference to the self variable that gives us the path to the flake.
+    ) <categoryDefinitions>; 
+    # notice how we then call it with the set we provide below?
+    # this will return a function that takes our other 2 remaining arguments!
 
-<-> the pkgs set with the overlays
+Then we define what is in our categories!
 
-<-> the <settings> set that this function took as an argument.
-
-<-> the <categories> set that this function took as an argument.
-      It will define which of the categories to include from the following:
+<categoryDefinitions> = {
 
 <-> a flexible set of categories, each containing a list of 
       internal BUILD TIME dependencies
@@ -278,6 +284,28 @@ This will automatically add all of the packages in the
 packageDefinitions set defined in the section above. 
 
 However you still must choose your default packages.
+
+In addition, it defines a way for you to choose what
+categories and settings are included in 
+the flake that imports this flake, rather than choosing
+a package you defined within the flake itself.
+This can be quite handy when you only need some things
+from a flake you defined, 
+but dont want to define a package in the flake for it.
+
+It also defines 2 ways to create your own builder 
+within another flake that calls this one for even more options.
+One is called fresh, the other is called merged.
+
+Fresh has no nix categories defined. It is best used with wrapRc = false.
+
+Merged has the categories you defined, but you can redefine 
+any category you wish or add new categories.
+
+When using either of these, unless you have wrapRc = false 
+it will recieve the flake's lua. There is a way
+to add additional lua, but it is not recommended over editing the flake.
+for more details on that, see :help `nixCats.flake.nixperts.nvimBuilder`
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
