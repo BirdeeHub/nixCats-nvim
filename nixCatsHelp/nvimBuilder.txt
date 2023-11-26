@@ -76,7 +76,7 @@ just doing this and including more comments than code.
     # see :help `nixCats`
     # here is where nixCats is generated
     # it uses some recursive stuff in utils to print a lua table to a file.
-    # That table is the categories we were including, plus RCName and wrapRc
+    # That table is the categories we were including, plus wrapRc
     # Thats it. Also it defines a user command.
 >nix
     nixCats = pkgs.stdenv.mkDerivation {
@@ -98,11 +98,13 @@ just doing this and including more comments than code.
         cp -r ${self}/nixCatsHelp/* $out/doc
       '';
     };
-
+<
     # and create our customRC to call it
-    # This makes sure our config is loaded first and our after is loaded last
-    # and it also requires the chosen directory or file in the lua directory
-    # it also removes the regular config dir from the path.
+    # This makes sure our config is loaded at the right time and our after is loaded last.
+    # It requires the root level init.lua file. 
+    # It also removes the regular config dir from the path.
+    # It only does this if config.wrapRc == true
+>nix
     configDir = if config.configDirName != null && config.configDirName != ""
       then config.configDirName else "nvim";
     customRC = if config.wrapRc then ''
