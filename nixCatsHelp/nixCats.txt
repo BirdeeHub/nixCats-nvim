@@ -108,7 +108,7 @@ Note: it also accepts other things.
 lists will become arrays
 sets will become tables
 null will become nil
-also the orders of nested things can be unpredictable 
+also the orders of things can be unpredictable 
 so arrays are bad if you care about order of them.
 How did treesitter end up last?
 
