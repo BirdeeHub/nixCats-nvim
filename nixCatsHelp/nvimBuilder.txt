@@ -109,12 +109,15 @@ just doing this and including more comments than code.
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
+
         let new_directory = '${LuaConfig}'
         let current_runtimepath = &runtimepath
         let runtimepath_list = split(current_runtimepath, ',')
         call insert(runtimepath_list, new_directory, 1)
         let &runtimepath = join(runtimepath_list, ',')
+
         set runtimepath+=${LuaConfig}/after
+
         lua package.path = package.path .. ';${LuaConfig}/init.lua'
         lua require('${builtins.baseNameOf LuaConfig}')
       '' else "";
