@@ -76,7 +76,7 @@
         let new_directory = '${LuaConfig}'
         let current_runtimepath = &runtimepath
         let runtimepath_list = split(current_runtimepath, ',')
-        call insert(runtimepath_list, new_directory, 1)
+        call insert(runtimepath_list, new_directory, 0)
         let &runtimepath = join(runtimepath_list, ',')
 
         set runtimepath+=${LuaConfig}/after
