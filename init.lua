@@ -4,5 +4,5 @@ require("GenericLua")
 require("plugins")
 require("LSPs")
 if require('nixCats').debug then
-  require('debug')
+  require('nvimDebug')
 end

@@ -278,7 +278,7 @@
           custom = true;
           neonixdev = true;
           test = true;
-          debug = false;
+          debug = true;
           # this does not have an associated category of plugins, 
           # but lua can still check for it
           lspDebugMode = false;
