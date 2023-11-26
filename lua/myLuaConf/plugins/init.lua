@@ -2,11 +2,11 @@ local categories = require('nixCats')
 
 vim.cmd.colorscheme(require('nixCats').colorscheme)
 
-require('plugins.telescope')
+require('myLuaConf.plugins.telescope')
 
-require('plugins.treesitter')
+require('myLuaConf.plugins.treesitter')
 
-require('plugins.completion')
+require('myLuaConf.plugins.completion')
 
 if(categories.markdown) then
   vim.g.mkdp_auto_close = 0
