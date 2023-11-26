@@ -12,12 +12,18 @@ Download in flake.nix and then, simply pretend the root of the flake
 is the root of your Lua config. 1 exception, when wrapRc = true, 
 `stdpath('config')` will still point to ~/.config/<configDirName>.
 But your lua config will be in the store.
+This is ok, because most of the reason for a plugin to use
+it would be to find something outside the directory. 
+Inside is mostly handled by vim.
+You can use debug.getinfo(1, "S").source:sub(2) to get 
+current script directory for your uses.
 
 *******************************************************
 One IMPORTANT note:
 When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
+Using wrapRc = true would mean this also applies to lua files.
 *******************************************************
 
 Related:
@@ -96,7 +102,7 @@ the following to overlays/default.nix, replacing the <indicated_text>:
 >nix
     <some_name> = import ./<some_overlay_file.nix> inputs;
 
-
+<pkgs>
 -- After the overlays we wish to include are all defined:
 
 We now generate the pkgs set that contains all the nixpkgs and overlay packages, 
