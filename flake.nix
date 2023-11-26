@@ -328,6 +328,8 @@
 
     # see :help nixCats.flake.outputs.packages
     {
+      # To choose settings and categories from the flake that calls this flake.
+      customPackager = nixVimBuilder;
       # These 2 will still recieve the flake's lua when wrapRc = true;
       customBuilders = {
         fresh = newPkgs: categoryDefs: settings: categories: 
@@ -337,8 +339,6 @@
           (import ./builder self 
           (pkgs // newPkgs) ((categoryDefinitions // categoryDefs) // { inherit settings categories; }));
       };
-      # To choose settings and categories from the flake that calls this flake.
-      customPackager = nixVimBuilder;
       # choose your default overlay package
       overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }
         # this will make an overlay out of each of the packageDefinitions defined above
