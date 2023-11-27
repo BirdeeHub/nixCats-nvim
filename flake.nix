@@ -352,8 +352,10 @@
         fresh = import ./builder helpPath self;
         merged = newPkgs: categoryDefs:
           (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
-        # for this one, you may specify a new path to lua that can be used with wrapRc = true
+        # for these ones, you may specify a new path to lua that can be used with wrapRc = true
         newLuaPath = import ./builder helpPath;
+        mergedNewLuaPath = path: newPkgs: categoryDefs:
+          (import ./builder helpPath path (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
       };
     }
 

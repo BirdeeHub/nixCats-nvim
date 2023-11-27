@@ -297,9 +297,10 @@ This option is called with customPackager.${system}
 It also exposes standardPluginOverlay.${system} so that you
 may use it within flakes that import this one.
 
-It also defines 3 ways to create your own builder 
+It also defines 4 ways to create your own builder 
 within another flake that calls this one for even more options.
-they are called customBuilders.${system}.fresh, merged, and newLuaPath.
+they are called:
+customBuilders.${system}.fresh, merged, newLuaPath, and mergedNewLuaPath.
 
 Fresh has no nix categories defined. It is best used with wrapRc = false.
 
@@ -311,10 +312,12 @@ it will recieve the flake's lua. There is a way
 to add additional lua, but it is not recommended over editing the flake.
 for more details on that, see :help `nixCats.flake.nixperts.nvimBuilder`
 
-The last way to create your own builder does not recieve the flake's lua.
+The last 2 ways to create your own builder does not recieve the flake's lua.
 
 Instead, you must specify an absolute or store path (including the self
 variable from another flake) to look in for when wrapRc == true.
+
+Otherwise, they are the equivalent to the two above.
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
