@@ -182,6 +182,7 @@ If you want to add it to another flake, choose one of these methods:
           # you could :lua print(vim.inspect(require('nixCats')))
           # I got carried away and it worked FIRST TRY.
           # see :help nixCats
+        };
     in
         {
             packages.default = nixCats-nvim.outputs.packages.${system}.nixCats;

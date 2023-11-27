@@ -68,12 +68,14 @@ First, we call flake utils to get system variable for all default systems.
 Then, we define our overlays. They are in the overlays directory.
 Thus, we can import that directory here,
 which runs overlays/default.nix.
+overlays/default.nix simply imports
+a list of other overlays in the directory.
 We have 2 main overlays to discuss.
 
 <1>
 -- The first is standardPluginOverlay:
 
-This overlay is defined in full in overlays/default.nix.
+This overlay is defined in full in overlays/standardPluginOverlay.nix.
 You do not need to edit it to use it.
 
 It takes all the inputs named in the format
@@ -135,16 +137,16 @@ To define this function that takes this set of categories and
 the settings as an argument, 
 we import ./builder/default.nix and supply it the following.
 
-1. A reference to self, so that it can get the path to the flake, 
-(it uses the self variable to wrap the lua when wrapRc = true)
-and a set containing the following info.
-2. The pkgs set so that it can use it for making its own derivations.
-3. our set of categoryDefinitions.
+1. The path to the help directory.
+2. The path to the lua to include (it uses the self variable to get
+     this path and wrap the lua when wrapRc = true)
+3. The pkgs set so that it can use it for making its own derivations.
+4. our set of categoryDefinitions.
 
 And it will return a function that takes the 
 settings and categories tables as arguments
 >nix
-  nixVimBuilder = import ./builder self pkgs categoryDefinitions;
+  nixVimBuilder = import ./builder helpPath self pkgs categoryDefinitions;
   # notice how we provide it with the set we define below?
 <
 
@@ -279,7 +281,7 @@ see :help `nixCats`
 Flake devShell and package definitions         *nixCats.flake.outputs.packages*
 
 This will automatically add all of the packages in the 
-packageDefinitions set defined in the section above. 
+packageDefinitions set defined in the section above.
 
 However you still must choose your default packages.
 
@@ -290,10 +292,14 @@ a package you defined within the flake itself.
 This can be quite handy when you only need some things
 from a flake you defined, 
 but dont want to define a package in the flake for it.
+This option is called with customPackager.${system}
 
-It also defines 2 ways to create your own builder 
+It also exposes standardPluginOverlay.${system} so that you
+may use it within flakes that import this one.
+
+It also defines 3 ways to create your own builder 
 within another flake that calls this one for even more options.
-One is called fresh, the other is called merged.
+they are called customBuilders.${system}.fresh, merged, and newLuaPath.
 
 Fresh has no nix categories defined. It is best used with wrapRc = false.
 
@@ -304,6 +310,11 @@ When using either of these, unless you have wrapRc = false
 it will recieve the flake's lua. There is a way
 to add additional lua, but it is not recommended over editing the flake.
 for more details on that, see :help `nixCats.flake.nixperts.nvimBuilder`
+
+The last way to create your own builder does not recieve the flake's lua.
+
+Instead, you must specify an absolute or store path (including the self
+variable from another flake) to look in for when wrapRc == true.
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

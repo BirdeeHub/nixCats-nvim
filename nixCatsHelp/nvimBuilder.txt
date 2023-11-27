@@ -11,7 +11,7 @@ just doing this and including more comments than code.
   # this function takes a set with the following items:
   # our arguments ? and their default values
 >nix
-  self: pkgs: 
+  helpPath: self: pkgs: 
   {
     , startupPlugins ? {}
     , optionalPlugins ? {}
@@ -81,7 +81,7 @@ just doing this and including more comments than code.
     # here is where nixCats is generated
     # it uses some recursive stuff in utils to print a lua table to a file.
     # That table is the categories we were including, plus wrapRc
-    # Thats it. Also it defines a user command.
+    # Thats it. Also it defines a user command and includes the help.
 >nix
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
@@ -99,7 +99,7 @@ just doing this and including more comments than code.
         mkdir -p $out/lua
         mkdir -p $out/doc
         cp ${cats} $out/lua/nixCats.lua
-        cp -r ${self}/nixCatsHelp/* $out/doc
+        cp -r ${helpPath}/* $out/doc
       '';
     };
 <

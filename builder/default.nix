@@ -1,7 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-self: pkgs:
-{ 
+helpPath: self: pkgs:
+{
   startupPlugins ? {}
   , optionalPlugins ? {}
   , lspsAndRuntimeDeps ? {}
@@ -59,7 +59,7 @@ self: pkgs:
         mkdir -p $out/lua
         mkdir -p $out/doc
         cp ${cats} $out/lua/nixCats.lua
-        cp -r ${self}/nixCatsHelp/* $out/doc
+        cp -r ${helpPath}/* $out/doc
       '';
     };
 
