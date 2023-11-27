@@ -325,17 +325,6 @@
 
     # see :help nixCats.flake.outputs.packages
     {
-      # To choose settings and categories from the flake that calls this flake.
-      customPackager = nixVimBuilder;
-      customBuilders = {
-        # These 2 will still recieve the flake's lua when wrapRc = true;
-        fresh = import ./builder helpPath self;
-        merged = newPkgs: categoryDefs:
-          (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
-        # for this one, you may specify a new path to lua that can be used with wrapRc = true
-        newLuaPath = import ./builder helpPath;
-      };
-      standardPluginOverlay = import ./overlays/standardPluginOverlay.nix;
       # choose your default overlay package
       overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }
         # this will make an overlay out of each of the packageDefinitions defined above
@@ -354,6 +343,17 @@
         inputsFrom = [ ];
         shellHook = ''
         '';
+      };
+      # To choose settings and categories from the flake that calls this flake.
+      customPackager = nixVimBuilder;
+      standardPluginOverlay = import ./overlays/standardPluginOverlay.nix;
+      customBuilders = {
+        # These 2 will still recieve the flake's lua when wrapRc = true;
+        fresh = import ./builder helpPath self;
+        merged = newPkgs: categoryDefs:
+          (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+        # for this one, you may specify a new path to lua that can be used with wrapRc = true
+        newLuaPath = import ./builder helpPath;
       };
     }
 
