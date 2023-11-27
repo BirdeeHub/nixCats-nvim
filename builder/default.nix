@@ -1,9 +1,8 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-self: pkgs: { 
-  categories ? {}
-  , settings ? {}
-  , startupPlugins ? {}
+self: pkgs:
+{ 
+  startupPlugins ? {}
   , optionalPlugins ? {}
   , lspsAndRuntimeDeps ? {}
   , propagatedBuildInputs ? {}
@@ -19,7 +18,7 @@ self: pkgs: {
   # only for use when importing flake in a flake 
   # and need to add a bit of lua for an added plugin
   , optionalLuaAdditions ? ""
-  }:
+  }: settings: categories:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
   let

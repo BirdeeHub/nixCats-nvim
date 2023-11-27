@@ -134,26 +134,24 @@ It will tell us which categories to include per package.
 To define this function that takes this set of categories and 
 the settings as an argument, 
 we import ./builder/default.nix and supply it the following.
-1. The pkgs set so that it can use it for making its own derivations.
-2. A reference to self, so that it can get the path to the flake, 
+
+1. A reference to self, so that it can get the path to the flake, 
 (it uses the self variable to wrap the lua when wrapRc = true)
 and a set containing the following info.
-3. the settings and categories from arguments
-4. our set of categoryDefinitions.
+2. The pkgs set so that it can use it for making its own derivations.
+3. our set of categoryDefinitions.
 
-ourBuilderFunction = (<categoryDefs>: 
-    <settings>: <categories>: 
-      (import ./builder self pkgs 
-      (<categoryDefs> // { inherit <settings> <categories>; }))
-
-    ) <categoryDefinitions>; 
-    # notice how we then call it with the set we provide below?
-    # this will return a function that takes our other 2 remaining arguments!
+And it will return a function that takes the 
+settings and categories tables as arguments
+>nix
+  nixVimBuilder = import ./builder self pkgs categoryDefinitions;
+  # notice how we provide it with the set we define below?
+<
 
 Then we define what is in our categories!
-
-<categoryDefinitions> = {
-
+>nix
+  categoryDefinitions = {
+<
 <-> a flexible set of categories, each containing a list of 
       internal BUILD TIME dependencies
 

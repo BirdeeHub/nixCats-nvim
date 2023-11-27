@@ -97,12 +97,9 @@
       # We define a function to facilitate package building for particular categories
       # what that function does is it intakes a set of categories 
       # with a boolean value for each, and a set of settings
-      # and then it imports ./builder/default.nix, passing it that categories set but also
-      # our other information. This allows us to define our categories and settings later.
-      nixVimBuilder = (categoryDefs: settings: categories: 
-        (import ./builder self pkgs 
-        (categoryDefs // { inherit settings categories; }))
-        ) categoryDefinitions;
+      # to do this it imports ./builder/default.nix, passing it our other information.
+      # This allows us to define our categories and settings later.
+      nixVimBuilder = import ./builder self pkgs categoryDefinitions;
 
       categoryDefinitions = {
         # see :help nixCats.flake.outputs.builder
@@ -331,12 +328,9 @@
       customPackager = nixVimBuilder;
       # These 2 will still recieve the flake's lua when wrapRc = true;
       customBuilders = {
-        fresh = newPkgs: categoryDefs: settings: categories: 
-          (import ./builder self newPkgs 
-          (categoryDefs // { inherit settings categories; }));
+        fresh = import ./builder self;
         merged = newPkgs: categoryDefs: settings: categories: 
-          (import ./builder self 
-          (pkgs // newPkgs) ((categoryDefinitions // categoryDefs) // { inherit settings categories; }));
+          (import ./builder self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
       };
       # choose your default overlay package
       overlays = { default = self: super: { inherit (packageDefinitions) nixCats; }; }

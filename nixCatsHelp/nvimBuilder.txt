@@ -11,12 +11,8 @@ just doing this and including more comments than code.
   # this function takes a set with the following items:
   # our arguments ? and their default values
 >nix
-  self: pkgs: { 
-    # defined in packaging section:
-    , categories ? {}
-    , settings ? {}
-
-    # defined in builder section:
+  self: pkgs: 
+  {
     , startupPlugins ? {}
     , optionalPlugins ? {}
     , lspsAndRuntimeDeps ? {}
@@ -44,10 +40,14 @@ just doing this and including more comments than code.
     # only for use when importing this flake in another flake 
     # and need to add a bit of lua for an added plugin >nix
     , optionalLuaAdditions ? ""
-    }:
+    }: 
+<
+    # and our last 2 arguments:
+>nix
+    settings: categories:
     let
 <
-      # when packaging, one of these is passed, 
+      # when packaging, one of these is passed as settings,
       # but we dont want to have to define all of them every time.
       # so we update the default config with whatever new options were passed
 >nix
