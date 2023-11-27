@@ -193,7 +193,7 @@ If you want to add it to another flake, choose one of these methods:
     );
 }
 ```
-There are 2 more methods not covered in this readme, but are covered in the included help files.
+There are more methods not covered in this readme, but are covered in the included help files.
 
 ---
 
