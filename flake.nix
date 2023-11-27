@@ -329,7 +329,7 @@
       # These 2 will still recieve the flake's lua when wrapRc = true;
       customBuilders = {
         fresh = import ./builder self;
-        merged = newPkgs: categoryDefs: settings: categories: 
+        merged = newPkgs: categoryDefs:
           (import ./builder self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
       };
       # choose your default overlay package
