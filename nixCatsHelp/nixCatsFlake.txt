@@ -43,6 +43,11 @@ name the plugins you import from github
 plugins-somepluginname 
 They will be processed automatically into plugins by the default overlay.
 
+If the plugin has a dot in it's name, you should name it something else.
+The name here only affects the filename of the overall plugin, and should
+only effect things like packadd. Usually I would replace it with - or _
+You will then add it to categoryDefinitions later with the NEW name.
+
 If they have a build step or are not a plugin, 
 i.e. an lsp, dont name them in that format.
 
