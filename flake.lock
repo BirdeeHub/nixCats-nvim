@@ -121,6 +121,86 @@
         "type": "github"
       }
     },
+    "plugins-catppuccin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1700667946,
+        "narHash": "sha256-TBOaD7A8/c/sg78C1hUpPDuIrrQkSUQR1KgHiDb6jxs=",
+        "owner": "catppuccin",
+        "repo": "nvim",
+        "rev": "a2107df4379d66e72a36a89792603151cebec1bf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "nvim",
+        "type": "github"
+      }
+    },
+    "plugins-chatGPT": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699967900,
+        "narHash": "sha256-euCrIrviKcVUu14pVZ4VRxDy1wEiIiabUu0xBkP+tvY=",
+        "owner": "jackMort",
+        "repo": "ChatGPT.nvim",
+        "rev": "b50fdaf7836c18e0de2f1def0c1f39d56ef8bced",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jackMort",
+        "repo": "ChatGPT.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-colorizer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1677493908,
+        "narHash": "sha256-hShQabr+UafsP+yicWkHycWLTbPhOpRpoa9oTMMVZ9o=",
+        "owner": "NvChad",
+        "repo": "nvim-colorizer.lua",
+        "rev": "dde3084106a70b9a79d48f426f6d6fec6fd203f7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NvChad",
+        "repo": "nvim-colorizer.lua",
+        "type": "github"
+      }
+    },
+    "plugins-conform": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701116864,
+        "narHash": "sha256-QshO3J67VHP6Kz8wdroAnp13FPSbYZDkYdCznNDr6j0=",
+        "owner": "stevearc",
+        "repo": "conform.nvim",
+        "rev": "eddd6431370814caacec1d1e3c7d6d95d41b133d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stevearc",
+        "repo": "conform.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-copilot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1700704900,
+        "narHash": "sha256-HDsyVHADmKSweHWg/Ny7eFoCrIV0wN2ilmiHWF+XkkU=",
+        "owner": "github",
+        "repo": "copilot.vim",
+        "rev": "2c31989063b145830d5f0bea8ab529d2aef2427b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "github",
+        "repo": "copilot.vim",
+        "type": "github"
+      }
+    },
     "plugins-fidget": {
       "flake": false,
       "locked": {
@@ -218,6 +298,70 @@
         "type": "github"
       }
     },
+    "plugins-mini-indentscope": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699035528,
+        "narHash": "sha256-TAHFx0QTL/rTKG+Y6+4zJVUWv5Dau/WAN4t8Wgsn10U=",
+        "owner": "echasnovski",
+        "repo": "mini.indentscope",
+        "rev": "c8fdafa7bf603d758986a27eb546c55a5c73b1a3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "echasnovski",
+        "repo": "mini.indentscope",
+        "type": "github"
+      }
+    },
+    "plugins-nui": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701017030,
+        "narHash": "sha256-FXxKOvLOaaAHLP0PebZeITfl0pyC+e2vt8yztTmJmJA=",
+        "owner": "MunifTanjim",
+        "repo": "nui.nvim",
+        "rev": "257dccc43b4badc735978f0791d216f7d665b75a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MunifTanjim",
+        "repo": "nui.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-nvim-dap-vscode-js": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1678071992,
+        "narHash": "sha256-8dlzaI94I8ppzLRNIfjVd92kYgqr07D1akDj4VdKQto=",
+        "owner": "mxsdev",
+        "repo": "nvim-dap-vscode-js",
+        "rev": "03bd29672d7fab5e515fc8469b7d07cc5994bbf6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mxsdev",
+        "repo": "nvim-dap-vscode-js",
+        "type": "github"
+      }
+    },
+    "plugins-oil": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1700864036,
+        "narHash": "sha256-ZG1hoSN3/p8PjL+665x5vXVby030vgbsewvPs3wAorg=",
+        "owner": "stevearc",
+        "repo": "oil.nvim",
+        "rev": "e89a8f8adeef2dfab851fd056d38ee7afc97c249",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stevearc",
+        "repo": "oil.nvim",
+        "type": "github"
+      }
+    },
     "plugins-onedark-vim": {
       "flake": false,
       "locked": {
@@ -231,6 +375,86 @@
       "original": {
         "owner": "joshdick",
         "repo": "onedark.vim",
+        "type": "github"
+      }
+    },
+    "plugins-prettier": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1686934076,
+        "narHash": "sha256-4xq+caprcQQotvBXnWWSsMwVB2hc5uyjrhT1dPBffXI=",
+        "owner": "MunifTanjim",
+        "repo": "prettier.nvim",
+        "rev": "d98e732cb73690b07c00c839c924be1d1d9ac5c2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MunifTanjim",
+        "repo": "prettier.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-rose-pine": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1698263014,
+        "narHash": "sha256-AuhVM1Hr/iTNHk8+wLc+7EGAzrd9ml2akR/9JOeWxew=",
+        "owner": "rose-pine",
+        "repo": "neovim",
+        "rev": "92762f4fa2144c05db760ea254f4c399a56a7ef5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rose-pine",
+        "repo": "neovim",
+        "type": "github"
+      }
+    },
+    "plugins-tailwindcss-colorizer-cmp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1694253898,
+        "narHash": "sha256-4wt4J6pENX7QRG7N1GzE9L6pM5E88tnHbv4NQa5JqSI=",
+        "owner": "roobert",
+        "repo": "tailwindcss-colorizer-cmp.nvim",
+        "rev": "bc25c56083939f274edcfe395c6ff7de23b67c50",
+        "type": "github"
+      },
+      "original": {
+        "owner": "roobert",
+        "repo": "tailwindcss-colorizer-cmp.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-telescope-file-browser": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1700948861,
+        "narHash": "sha256-eAzGA8s47L7J+OBhFRW1h+GngRT2hmkNUvkM+E4Tmus=",
+        "owner": "nvim-telescope",
+        "repo": "telescope-file-browser.nvim",
+        "rev": "d7c453396a043c265bef1227920628e7b811ff30",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-telescope",
+        "repo": "telescope-file-browser.nvim",
+        "type": "github"
+      }
+    },
+    "plugins-trouble": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1697626811,
+        "narHash": "sha256-8nLghiueYOtWY7OGVxow9A2G/5lgt+Kt5D8q1xeJvVg=",
+        "owner": "folke",
+        "repo": "trouble.nvim",
+        "rev": "f1168feada93c0154ede4d1fe9183bf69bac54ea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "folke",
+        "repo": "trouble.nvim",
         "type": "github"
       }
     },
@@ -256,13 +480,27 @@
         "nixd": "nixd",
         "nixpkgs": "nixpkgs_2",
         "plugins-Comment": "plugins-Comment",
+        "plugins-catppuccin": "plugins-catppuccin",
+        "plugins-chatGPT": "plugins-chatGPT",
+        "plugins-colorizer": "plugins-colorizer",
+        "plugins-conform": "plugins-conform",
+        "plugins-copilot": "plugins-copilot",
         "plugins-fidget": "plugins-fidget",
         "plugins-gitsigns": "plugins-gitsigns",
         "plugins-harpoon": "plugins-harpoon",
         "plugins-hlargs": "plugins-hlargs",
         "plugins-lspconfig": "plugins-lspconfig",
         "plugins-lualine": "plugins-lualine",
+        "plugins-mini-indentscope": "plugins-mini-indentscope",
+        "plugins-nui": "plugins-nui",
+        "plugins-nvim-dap-vscode-js": "plugins-nvim-dap-vscode-js",
+        "plugins-oil": "plugins-oil",
         "plugins-onedark-vim": "plugins-onedark-vim",
+        "plugins-prettier": "plugins-prettier",
+        "plugins-rose-pine": "plugins-rose-pine",
+        "plugins-tailwindcss-colorizer-cmp": "plugins-tailwindcss-colorizer-cmp",
+        "plugins-telescope-file-browser": "plugins-telescope-file-browser",
+        "plugins-trouble": "plugins-trouble",
         "plugins-which-key": "plugins-which-key"
       }
     },

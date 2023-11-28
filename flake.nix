@@ -24,15 +24,66 @@
     # overlay defined for custom builds in the overlays directory.
 
     # Theme
+    "plugins-trouble" = {
+      url = "github:folke/trouble.nvim";
+      flake = false;
+    };
+    "plugins-nui" = {
+      url = "github:MunifTanjim/nui.nvim";
+      flake = false;
+    };
+    "plugins-chatGPT" = {
+      url = "github:jackMort/ChatGPT.nvim";
+      flake = false;
+    };
+    "plugins-copilot" = {
+      url = "github:github/copilot.vim";
+      flake = false;
+    };
+    "plugins-oil" = {
+      url = "github:stevearc/oil.nvim";
+      flake = false;
+    };
+    "plugins-nvim-dap-vscode-js" = {
+      url = "github:mxsdev/nvim-dap-vscode-js";
+      flake = false;
+    };
+    "plugins-conform" = {
+      url = "github:stevearc/conform.nvim";
+      flake = false;
+    };
+    "plugins-prettier" = {
+      url = "github:MunifTanjim/prettier.nvim";
+      flake = false;
+    };
+    "plugins-colorizer" = {
+      url = "github:NvChad/nvim-colorizer.lua";
+      flake = false;
+    };
+    "plugins-tailwindcss-colorizer-cmp" = {
+      url = "github:roobert/tailwindcss-colorizer-cmp.nvim";
+      flake = false;
+    };
+    "plugins-mini-indentscope" = {
+      url = "github:echasnovski/mini.indentscope";
+      flake = false;
+    };
+    "plugins-telescope-file-browser" = {
+      url = "github:nvim-telescope/telescope-file-browser.nvim";
+      flake = false;
+    };
+    "plugins-rose-pine" = {
+      url = "github:rose-pine/neovim";
+      flake = false;
+    };
     "plugins-onedark-vim" = {
       url = "github:joshdick/onedark.vim";
       flake = false;
     };
-    # "plugins-catppuccin" = {
-    #   url = "github:catppuccin/nvim";
-    #   flake = false;
-    # };
-
+    "plugins-catppuccin" = {
+      url = "github:catppuccin/nvim";
+      flake = false;
+    };
     "plugins-gitsigns" = {
       url = "github:lewis6991/gitsigns.nvim";
       flake = false;
@@ -65,6 +116,7 @@
       url = "github:j-hui/fidget.nvim/legacy";
       flake = false;
     };
+
     # a flake import. We will import this one with an overlay
     # but you could also import the package itself instead.
     # overlays are just nice if they are offered.
@@ -154,8 +206,9 @@
             markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
-            # catppuccin
+            catppuccin
             onedark-vim
+            rose-pine
             gitsigns
             which-key
             harpoon
@@ -164,6 +217,16 @@
             hlargs
             Comment
             fidget
+            telescope-file-browser
+            colorizer
+            tailwindcss-colorizer-cmp
+            conform
+            oil
+            copilot
+            nui
+            chatGPT
+            trouble
+            nvim-dap-vscode-js
           ];
           general = with pkgs.vimPlugins; [
             # telescope
@@ -173,14 +236,6 @@
             # treesitter
             nvim-treesitter-textobjects
             nvim-treesitter.withAllGrammars
-            # This is for if you only want some of the grammars
-            # (nvim-treesitter.withPlugins (
-            #   plugins: with plugins; [
-            #     nix
-            #     lua
-            #   ]
-            # ))
-            # cmp stuff
             nvim-cmp
             luasnip
             friendly-snippets
@@ -246,14 +301,14 @@
       settings = {
         nixCats = {
           wrapRc = true;
-          configDirName = "nixCats-nvim";
+          configDirName = "bstar-nvim";
           viAlias = false;
           vimAlias = true;
         };
         unwrappedLua = {
           wrapRc = false;
           # will now look for nixCats-nvim within .config and .local and others
-          configDirName = "nixCats-nvim";
+          configDirName = "bstar-nvim";
           viAlias = false;
           vimAlias = true;
         };
@@ -276,12 +331,12 @@
           custom = true;
           neonixdev = true;
           test = true;
-          debug = false;
+          debug = true;
           # this does not have an associated category of plugins, 
           # but lua can still check for it
           lspDebugMode = false;
           # you could also pass something else:
-          colorscheme = "onedark";
+          colorscheme = "rose-pine";
           theWorstCat = {
             thing1 = [ "MEOW" "HISSS" ];
             thing2 = [
@@ -303,10 +358,10 @@
           general = true;
           custom = true;
           neonixdev = true;
-          debug = false;
+          debug = true;
           test = true;
           lspDebugMode = false;
-          colorscheme = "onedark";
+          colorscheme = "rose-pine";
           theWorstCat = {
             thing1 = [ "MEOW" "HISSS" ];
             thing2 = [

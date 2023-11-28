@@ -1,0 +1,3 @@
+cd ~/flakes/bstar-nvim
+git add .
+nix build ~/flakes/bstar-nvim/

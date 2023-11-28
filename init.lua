@@ -155,4 +155,4 @@ vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc =
 
 
 -- ok thats enough for 1 file. Off to lua/myLuaConf/init.lua
-require('myLuaConf')
+require('bstar')
