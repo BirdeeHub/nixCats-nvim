@@ -212,7 +212,7 @@ If you want to add it to another flake, choose one of these methods:
 ```
 There are more methods not covered in this readme, but are covered in the included help files.
 
-With them you could partially or entirely recreate this flake.nix in another flake without redefining things (unless you want to).
+With them you could partially or entirely recreate this flake.nix and/or the lua in another flake without redefining things (unless you want to).
 
 The categories and settings in these installation instructions are something created while creating your own config and automatically exported.
 That will make sense. I promise. Those are your categories you make.
