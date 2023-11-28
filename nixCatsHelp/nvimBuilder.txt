@@ -154,13 +154,13 @@ just doing this and including more comments than code.
 ---------------------------------------------------------------------------------
                              *nixCats.flake.nixperts.nvimBuilder.basicFlatmap*
 
-    # this is what allows for dynamic packaging in flake.nix
-    # It includes categories marked as true, then flattens to a single list
+    # This is what allows for dynamic packaging in flake.nix.
+    # It includes categories marked as true, then flattens to a single list.
 >nix
     filterAndFlatten = (import ./utils.nix)
           .filterAndFlattenAttrsOfLists pkgs categories;
 <
-    # we can use that function to filter many of the options.
+    # We can use that function to filter many of the options.
     # anything that has an argument in the wrapper and 
     # is a list of categories of packages, you can filter this way
 >nix
@@ -277,7 +277,6 @@ just doing this and including more comments than code.
     in
     # add all our stuff, and wrap it all up!
     # the following is just the regular pkgs.wrapNeovim
-    # except it also accepts wrapRc as an argument
   (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
     inherit extraMakeWrapperArgs;
     inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
