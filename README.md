@@ -4,6 +4,8 @@ This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](
 
 The lua is not all 1 file. The reason for that is personal preference. It is short enough that it could be.
 
+This repo is not a lua showcase. You are meant to use your own lua once you understand what is going on.
+
 It is aimed at people who know enough lua to comfortably proceed from a kickstarter level setup
 who want to swap to using nix while still using lua for configuration.
 
