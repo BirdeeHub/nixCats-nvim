@@ -245,5 +245,5 @@ I also borrowed some code from nixpkgs and included links.
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
 - [`andromeda-neovim`](https://github.com/lecoqjacob/andromeda-neovim):
-A repo which took an early version of nixCats and added many things to it such as a nix wrapper for lazy, at the cost of losing the simplistic design.
-It made me happy to see people taking inspiration from my work
+A repo which took an early version of nixCats and added many things to it such as a nix wrapper for lazy, at the cost of losing the simplistic design and the help.
+It made me happy to see people taking inspiration from my work, so I added it to the list.
