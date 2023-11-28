@@ -38,7 +38,8 @@ just doing this and including more comments than code.
     , extraLuaPackages ? {}
 <
     # only for use when importing this flake in another flake 
-    # and need to add a bit of lua for an added plugin >nix
+    # and need to add a bit of lua for an added plugin.
+    # Yes you can require nixCats in it. >nix
     , optionalLuaAdditions ? ""
     }: 
 <
@@ -147,6 +148,7 @@ just doing this and including more comments than code.
       # an added plugin using a custom builder
       # you could in theory add a directory to the runtimepath 
       # with it though from another flake that imports this flake.
+      # Yes you can require nixCats in it.
       # Again, not recommended.
 
 ---------------------------------------------------------------------------------
