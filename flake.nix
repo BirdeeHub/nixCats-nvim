@@ -7,13 +7,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      # inputs.nixpkgs.follows = "nixpkgs"; 
-        # ^^ why does this throw a warning now that 
-            # warning: 
-            # input 'flake-utils' has an override for a non-existent input 'nixpkgs'
-    };
+    flake-utils.url = "github:numtide/flake-utils";
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
@@ -33,26 +27,6 @@
     #   flake = false;
     # };
 
-    "plugins-gitsigns" = {
-      url = "github:lewis6991/gitsigns.nvim";
-      flake = false;
-    };
-    "plugins-which-key" = {
-      url = "github:folke/which-key.nvim";
-      flake = false;
-    };
-    "plugins-lualine" = {
-      url = "github:nvim-lualine/lualine.nvim";
-      flake = false;
-    };
-    "plugins-lspconfig" = {
-      url = "github:neovim/nvim-lspconfig";
-      flake = false;
-    };
-    "plugins-Comment" = {
-      url = "github:numToStr/Comment.nvim";
-      flake = false;
-    };
     "plugins-hlargs" = {
       url = "github:m-demare/hlargs.nvim";
       flake = false;
@@ -156,13 +130,8 @@
           gitPlugins = with pkgs.neovimPlugins; [
             # catppuccin
             onedark-vim
-            gitsigns
-            which-key
             harpoon
-            lspconfig
-            lualine
             hlargs
-            Comment
             fidget
           ];
           general = with pkgs.vimPlugins; [
@@ -194,6 +163,11 @@
             cmp-cmdline-history
             lspkind-nvim
             # other
+            nvim-lspconfig
+            lualine-nvim
+            gitsigns-nvim
+            which-key-nvim
+            comment-nvim
             vim-sleuth
             vim-fugitive
             vim-rhubarb
