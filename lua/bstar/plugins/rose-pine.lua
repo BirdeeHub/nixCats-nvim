@@ -44,7 +44,7 @@ require('rose-pine').setup({
                 LineNr = { fg = '#dddddd' },
                 LineNrAbove = { fg = '#403d52' },
                 LineNrBelow = { fg = '#403d52' },
-                Visual = { bg = '#000000' },
+                Visual = { bg = '#11111B' },
 
 		-- Blend colours against the "base" background
 		CursorLine = { bg = '#000000', blend = 10 },

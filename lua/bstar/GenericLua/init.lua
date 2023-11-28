@@ -1,3 +1,3 @@
-require("GenericLua.genericKeymaps")
-require("GenericLua.clippy")
-require("GenericLua.opts")
+require("bstar.GenericLua.genericKeymaps")
+require("bstar.GenericLua.clippy")
+require("bstar.GenericLua.opts")

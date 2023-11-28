@@ -175,13 +175,13 @@ ins_right {
   color = { fg = '#99999B' },
 }
 
--- Add components to right sections
-ins_right {
-  'o:encoding', -- option component same as &encoding in viml
-  fmt = string.upper, -- I'm not sure why it's upper case either ;)
-  cond = conditions.hide_in_width,
-  color = { fg = colors.green, gui = 'bold' },
-}
+-- ins_right {
+--   'o:encoding', -- option component same as &encoding in viml
+--   fmt = string.upper, -- I'm not sure why it's upper case either ;)
+--   cond = conditions.hide_in_width,
+--   color = { fg = colors.green, gui = 'bold' },
+-- }
+
 
 ins_right {
   'fileformat',
@@ -218,5 +218,6 @@ ins_right {
 
 -- Now don't forget to initialize lualine
 lualine.setup(config)
+
 
 

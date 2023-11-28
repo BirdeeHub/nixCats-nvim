@@ -227,6 +227,7 @@
             chatGPT
             trouble
             nvim-dap-vscode-js
+            mini-indentscope
           ];
           general = with pkgs.vimPlugins; [
             # telescope
