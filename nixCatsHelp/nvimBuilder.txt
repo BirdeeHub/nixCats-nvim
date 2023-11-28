@@ -11,7 +11,7 @@ just doing this and including more comments than code.
   # this function takes a set with the following items:
   # our arguments ? and their default values
 >nix
-  helpPath: self: pkgs: 
+  helpPath: path: pkgs: 
   {
     , startupPlugins ? {}
     , optionalPlugins ? {}
@@ -69,11 +69,11 @@ just doing this and including more comments than code.
     # see :help `'rtp'` for what folders can be defined
 >nix
     LuaConfig = pkgs.stdenv.mkDerivation {
-      name = builtins.baseNameOf self;
+      name = builtins.baseNameOf path;
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
-        cp -r ${self}/* $out/
+        cp -r ${path}/* $out/
       '';
     };
 <

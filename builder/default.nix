@@ -1,6 +1,6 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-helpPath: self: pkgs:
+helpPath: path: pkgs:
 {
   startupPlugins ? {}
   , optionalPlugins ? {}
@@ -35,11 +35,11 @@ helpPath: self: pkgs:
 
     # package entire flake into the store
     LuaConfig = pkgs.stdenv.mkDerivation {
-      name = builtins.baseNameOf self;
+      name = builtins.baseNameOf path;
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
-        cp -r ${self}/* $out/
+        cp -r ${path}/* $out/
       '';
     };
 

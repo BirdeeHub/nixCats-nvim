@@ -9,6 +9,8 @@ When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 Using wrapRc = true would mean this also applies to lua files.
+In fact, when wrapRc = true, even changes within a lua file
+will not be reflected unless you run git add.
 *******************************************************
 
 nixCats: returns category names included by nix for this package 
