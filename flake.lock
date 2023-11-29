@@ -154,22 +154,6 @@
         "type": "github"
       }
     },
-    "plugins-onedark-vim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1689744943,
-        "narHash": "sha256-rt/VKABAfxyFBKNerZiswWDaBrusrn7WaI1jHbn3I/s=",
-        "owner": "joshdick",
-        "repo": "onedark.vim",
-        "rev": "57b77747694ea5676c3ca0eeaf9567dc499730c0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "joshdick",
-        "repo": "onedark.vim",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -177,8 +161,7 @@
         "nixpkgs": "nixpkgs_2",
         "plugins-fidget": "plugins-fidget",
         "plugins-harpoon": "plugins-harpoon",
-        "plugins-hlargs": "plugins-hlargs",
-        "plugins-onedark-vim": "plugins-onedark-vim"
+        "plugins-hlargs": "plugins-hlargs"
       }
     },
     "systems": {

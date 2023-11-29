@@ -17,16 +17,6 @@
     # then you should name it in a different format, and deal with that in the
     # overlay defined for custom builds in the overlays directory.
 
-    # Theme
-    "plugins-onedark-vim" = {
-      url = "github:joshdick/onedark.vim";
-      flake = false;
-    };
-    # "plugins-catppuccin" = {
-    #   url = "github:catppuccin/nvim";
-    #   flake = false;
-    # };
-
     "plugins-hlargs" = {
       url = "github:m-demare/hlargs.nvim";
       flake = false;
@@ -128,13 +118,14 @@
             markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
-            # catppuccin
-            onedark-vim
             harpoon
             hlargs
             fidget
           ];
           general = with pkgs.vimPlugins; [
+            # Theme
+            onedark-vim
+            # catppuccin-nvim
             # telescope
             telescope-fzf-native-nvim
             plenary-nvim
