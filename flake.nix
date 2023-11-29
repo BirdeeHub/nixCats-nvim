@@ -332,11 +332,11 @@
         # These 2 will still recieve the flake's lua when wrapRc = true;
         fresh = import ./builder helpPath self;
         merged = newPkgs: categoryDefs:
-          (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+          (import ./builder helpPath self (pkgs.lib.recursiveUpdate pkgs newPkgs) (pkgs.lib.recursiveUpdate categoryDefinitions categoryDefs));
         # for these ones, you may specify a new path to lua that can be used with wrapRc = true
         newLuaPath = import ./builder helpPath;
         mergedNewLuaPath = path: newPkgs: categoryDefs:
-          (import ./builder helpPath path (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+          (import ./builder helpPath path (pkgs.lib.recursiveUpdate pkgs newPkgs) (pkgs.lib.recursiveUpdate categoryDefinitions categoryDefs));
       };
     }
 
