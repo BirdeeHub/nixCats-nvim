@@ -21,10 +21,6 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
-    "plugins-harpoon" = {
-      url = "github:ThePrimeagen/harpoon";
-      flake = false;
-    };
     "plugins-fidget" = {
       url = "github:j-hui/fidget.nvim/legacy";
       flake = false;
@@ -118,7 +114,6 @@
             markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
-            harpoon
             hlargs
             fidget
           ];
