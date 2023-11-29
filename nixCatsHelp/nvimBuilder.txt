@@ -43,9 +43,9 @@ just doing this and including more comments than code.
     , optionalLuaAdditions ? ""
     }: 
 <
-    # and our last 2 arguments:
+    # and our last argument, a set of 2 values:
 >nix
-    settings: categories:
+    { settings, categories }:
     let
 <
       # when packaging, one of these is passed as settings,

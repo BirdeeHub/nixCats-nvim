@@ -180,27 +180,30 @@ If you want to add it to another flake, choose one of these methods:
         };
         # this is the equivalent of the nixCats package
         customvim = nixCats-nvim.outputs.customPackager.${system} {
-          wrapRc = true;
-          configDirName = "nixCats-nvim";
-          viAlias = false;
-          vimAlias = true;
-        } {
-          generalBuildInputs = true;
-          markdown = true;
-          gitPlugins = true;
-          general = true;
-          custom = true;
-          neonixdev = true;
-          test = true;
-          debug = false;
-          # this does not have an associated category of plugins, 
-          # but lua can still check for it
-          lspDebugMode = false;
-          # you could also pass something else:
-          colorscheme = "onedark";
-          # you could :lua print(vim.inspect(require('nixCats')))
-          # I got carried away and it worked FIRST TRY.
-          # see :help nixCats
+          settings = {
+            wrapRc = true;
+            configDirName = "nixCats-nvim";
+            viAlias = false;
+            vimAlias = true;
+          };
+          categories = {
+            generalBuildInputs = true;
+            markdown = true;
+            gitPlugins = true;
+            general = true;
+            custom = true;
+            neonixdev = true;
+            test = true;
+            debug = false;
+            # this does not have an associated category of plugins, 
+            # but lua can still check for it
+            lspDebugMode = false;
+            # you could also pass something else:
+            colorscheme = "onedark";
+            # you could :lua print(vim.inspect(require('nixCats')))
+            # I got carried away and it worked FIRST TRY.
+            # see :help nixCats
+          };
         };
     in
         {

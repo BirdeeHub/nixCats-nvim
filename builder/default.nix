@@ -18,7 +18,7 @@ helpPath: path: pkgs:
   # only for use when importing flake in a flake 
   # and need to add a bit of lua for an added plugin
   , optionalLuaAdditions ? ""
-  }: settings: categories:
+  }: { settings, categories }:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
   let

@@ -150,8 +150,9 @@ we import ./builder/default.nix and supply it the following.
 3. The pkgs set so that it can use it for making its own derivations.
 4. our set of categoryDefinitions.
 
-And it will return a function that takes the 
-settings and categories tables as arguments
+And it will return a function that takes a set as an argument containing:
+1. the set of settings
+2. the set of included categories
 >nix
   nixVimBuilder = import ./builder helpPath self pkgs categoryDefinitions;
   # notice how we provide it with the set we define below?
@@ -261,21 +262,24 @@ as well as the general startupPlugins category.
 an example package definition:
 >nix
   packageDefinitions = {
-    nixCats = nixVimBuilder settings.nixCats {
-      custom = true;
-      gitPlugins = true;
-      general = true;
-      neonixdev = true;
+    nixCats = { 
+      setting = settings.nixCats 
+      categories = {
+        custom = true;
+        gitPlugins = true;
+        general = true;
+        neonixdev = true;
 
-      # this does not have an associated category of plugins, 
-      # but lua can still check for it
-      lspDebugMode = false;
+        # this does not have an associated category of plugins, 
+        # but lua can still check for it
+        lspDebugMode = false;
 
-      # you could also pass something else and it calls 
-      # builtins.toString on it and passes it in as a string
-      theBestCat = "says meow!!!";
-      # maybe you need to pass a port or path in or something idk.
-      # you could :lua print(require('nixCats').theBestCat)
+        # you could also pass something else and it calls 
+        # builtins.toString on it and passes it in as a string
+        theBestCat = "says meow!!!";
+        # maybe you need to pass a port or path in or something idk.
+        # you could :lua print(require('nixCats').theBestCat)
+      };
     };
   };
 <
@@ -290,7 +294,8 @@ Flake devShell and package definitions         *nixCats.flake.outputs.packages*
 This will automatically add all of the packages in the 
 packageDefinitions set defined in the section above.
 
-However you still must choose your default packages.
+However you still must choose your default packages
+for packages, devShell, and overlays.
 
 In addition, it defines a way for you to choose what
 categories and settings are included in 
@@ -335,7 +340,7 @@ Otherwise, they are the equivalent to the two above.
 The order of arguments for these builder functions 
 is the same as the regular one.
 
-path: pkgs: categoryDefinitions: settings: categories:
+path: pkgs: categoryDefinitions: { settings, categories }:
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
