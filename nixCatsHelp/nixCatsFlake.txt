@@ -127,7 +127,8 @@ add to a category directly.
 ---------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
-We now create a builder function that takes 2 arguments.
+We now create a builder function that takes as
+its argument a set with 2 sets in it.
 A set of categories and a set of settings.
 
 The settings set is defined in the next section. 
@@ -140,8 +141,7 @@ is a set of named boolean values like this:
 { categoryname1 = true; categoryname2 = false; etc... }
 It will tell us which categories to include per package.
 
-To define this function that takes this set of categories and 
-the settings as an argument, 
+To define this function,
 we import ./builder/default.nix and supply it the following.
 
 1. The path to the help directory so that it is always included.
