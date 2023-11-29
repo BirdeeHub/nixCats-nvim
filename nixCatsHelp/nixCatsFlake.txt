@@ -263,7 +263,7 @@ an example package definition:
 >nix
   packageDefinitions = {
     nixCats = { 
-      setting = settings.nixCats 
+      setting = settings.nixCats;
       categories = {
         custom = true;
         gitPlugins = true;
