@@ -48,7 +48,7 @@
       # or use `pkgs.customPlugins`, which is a set of our custom built plugins.
       overlays = (import ./overlays inputs) ++ [
         # add any flake overlays here.
-        inputs.nixd.outputs.overlays.default
+        inputs.nixd.overlays.default
       ];
       pkgs = import nixpkgs {
         inherit system overlays;
