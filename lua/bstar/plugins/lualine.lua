@@ -77,14 +77,6 @@ local function ins_right(component)
 end
 
 ins_left {
-  function()
-    return 'LoC'
-  end,
-  color = { fg = colors.black }, -- Sets highlighting of component
-  padding = { left = 0, right = 1 }, -- We don't need space before this
-}
-
-ins_left {
   -- mode component
   function()
     return ''
@@ -175,13 +167,14 @@ ins_right {
   color = { fg = '#99999B' },
 }
 
--- ins_right {
---   'o:encoding', -- option component same as &encoding in viml
---   fmt = string.upper, -- I'm not sure why it's upper case either ;)
---   cond = conditions.hide_in_width,
---   color = { fg = colors.green, gui = 'bold' },
--- }
-
+ins_right {
+  function()
+    return vim.o.encoding
+  end,
+  color = { fg = colors.blue, gui = 'bold' },
+  cond = conditions.hide_in_width,
+  fmt = string.upper,
+}
 
 ins_right {
   'fileformat',
@@ -198,7 +191,6 @@ ins_right {
 
 ins_right {
   'diff',
-  -- Is it me or the symbol for modified us really weird
   symbols = { added = ' ', modified = '󰝤 ', removed = ' ' },
   diff_color = {
     added = { fg = colors.green },
@@ -208,16 +200,4 @@ ins_right {
   cond = conditions.hide_in_width,
 }
 
-ins_right {
-  function()
-    return '▊'
-  end,
-  color = { fg = colors.blue },
-  padding = { left = 1 },
-}
-
--- Now don't forget to initialize lualine
 lualine.setup(config)
-
-
-
