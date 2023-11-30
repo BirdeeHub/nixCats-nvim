@@ -298,6 +298,22 @@
         "type": "github"
       }
     },
+    "plugins-mini-ai": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1699035526,
+        "narHash": "sha256-LfD7gUXW6o3jc1ro7ztxap11Zs5NNPb/IjXNQn0OoVg=",
+        "owner": "echasnovski",
+        "repo": "mini.ai",
+        "rev": "4a2e387b121352dfb478f440c9a5313a9d97006c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "echasnovski",
+        "repo": "mini.ai",
+        "type": "github"
+      }
+    },
     "plugins-mini-indentscope": {
       "flake": false,
       "locked": {
@@ -491,6 +507,7 @@
         "plugins-hlargs": "plugins-hlargs",
         "plugins-lspconfig": "plugins-lspconfig",
         "plugins-lualine": "plugins-lualine",
+        "plugins-mini-ai": "plugins-mini-ai",
         "plugins-mini-indentscope": "plugins-mini-indentscope",
         "plugins-nui": "plugins-nui",
         "plugins-nvim-dap-vscode-js": "plugins-nvim-dap-vscode-js",

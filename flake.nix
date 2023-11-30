@@ -24,6 +24,10 @@
     # overlay defined for custom builds in the overlays directory.
 
     # Theme
+    "plugins-mini-ai" = {
+      url = "github:echasnovski/mini.ai";
+      flake = false;
+    };
     "plugins-trouble" = {
       url = "github:folke/trouble.nvim";
       flake = false;
@@ -136,7 +140,7 @@
       # or use `pkgs.customPlugins`, which is a set of our custom built plugins.
       overlays = (import ./overlays inputs) ++ [
         # add any flake overlays here.
-        inputs.nixd.outputs.overlays.default
+        inputs.nixd.overlays.default
       ];
       pkgs = import nixpkgs {
         inherit system overlays;
@@ -228,6 +232,7 @@
             trouble
             nvim-dap-vscode-js
             mini-indentscope
+            mini-ai
           ];
           general = with pkgs.vimPlugins; [
             # telescope
@@ -407,11 +412,11 @@
         # These 2 will still recieve the flake's lua when wrapRc = true;
         fresh = import ./builder helpPath self;
         merged = newPkgs: categoryDefs:
-          (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+          (import ./builder helpPath self (pkgs.lib.recursiveUpdate pkgs newPkgs) (pkgs.lib.recursiveUpdate categoryDefinitions categoryDefs));
         # for these ones, you may specify a new path to lua that can be used with wrapRc = true
         newLuaPath = import ./builder helpPath;
         mergedNewLuaPath = path: newPkgs: categoryDefs:
-          (import ./builder helpPath path (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+          (import ./builder helpPath path (pkgs.lib.recursiveUpdate pkgs newPkgs) (pkgs.lib.recursiveUpdate categoryDefinitions categoryDefs));
       };
     }
 
