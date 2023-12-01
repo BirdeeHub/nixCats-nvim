@@ -91,9 +91,9 @@ This is opposed to the usual method of cloning the flake, then put your lua stuf
 
 This is designed to give you package specific config, AND nixOS integration, without ditching your lua.
 
-That being said, definitely explore first while you understand the concept. If it seems complex, you don't understand it yet. It boils down to a few concepts.
+That being said, definitely explore first while you understand the concept. It boils down to a few concepts.
 
-In total there are 2 concepts I used to create this, stated above, and then a bunch of category sorting. The rest are just natural extensions of that.
+In there are 2 general ideas I used to create this, stated above, and then a bunch of category sorting. The rest are just natural extensions of that.
 
     The idea:
     1. import flake as config file.
@@ -179,30 +179,33 @@ If you want to add it to another flake, choose one of these methods:
           ];
         };
         # this is the equivalent of the nixCats package
-        customvim = nixCats-nvim.customPackager.${system} {
-          settings = {
-            wrapRc = true;
-            configDirName = "nixCats-nvim";
-            viAlias = false;
-            vimAlias = true;
-          };
-          categories = {
-            generalBuildInputs = true;
-            markdown = true;
-            gitPlugins = true;
-            general = true;
-            custom = true;
-            neonixdev = true;
-            test = true;
-            debug = false;
-            # this does not have an associated category of plugins, 
-            # but lua can still check for it
-            lspDebugMode = false;
-            # you could also pass something else:
-            colorscheme = "onedark";
-            # you could :lua print(vim.inspect(require('nixCats')))
-            # I got carried away and it worked FIRST TRY.
-            # see :help nixCats
+        customVimPackager = nixCats-nvim.customPackager.${system} packageDefinitions;
+        packageDefinitions = {
+          customvim = {
+            settings = {
+              wrapRc = true;
+              configDirName = "nixCats-nvim";
+              viAlias = false;
+              vimAlias = true;
+            };
+            categories = {
+              generalBuildInputs = true;
+              markdown = true;
+              gitPlugins = true;
+              general = true;
+              custom = true;
+              neonixdev = true;
+              test = true;
+              debug = false;
+              # this does not have an associated category of plugins, 
+              # but lua can still check for it
+              lspDebugMode = false;
+              # you could also pass something else:
+              colorscheme = "onedark";
+              # you could :lua print(vim.inspect(require('nixCats')))
+              # I got carried away and it worked FIRST TRY.
+              # see :help nixCats
+            };
           };
         };
     in
@@ -210,7 +213,7 @@ If you want to add it to another flake, choose one of these methods:
             packages.default = nixCats-nvim.packages.${system}.nixCats;
             packages.nixCats = pkgs.nixCats;
             packages.regularCats = pkgs.regularCats;
-            packages.customvim = customvim;
+            packages.customvim = customVimPackager "customvim";
         }
     );
 }
@@ -228,7 +231,7 @@ That will make sense. I promise. Those are your categories you make.
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
-[./overlays/standardPluginOverlay.nix](./overlays/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
+[./builder/standardPluginOverlay.nix](./overlays/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
 
 Thank you!!! It taught me both about an overlay's existence and how it works.
 
