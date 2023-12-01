@@ -47,7 +47,7 @@
       standardPluginOverlay = (import ./builder/standardPluginOverlay.nix);
       # you may define more overlays in the overlays directory, and import them
       # in the default.nix file in that directory just like customBuildsOverlay.
-      # `pkgs.customBuilds` is a set of plugins defined in that directory.
+      # `pkgs.nixCatsBuilds` is a set of plugins defined in that file.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
       otherOverlays = (import ./overlays inputs) ++ [
@@ -120,7 +120,7 @@
             neodev-nvim
             neoconf-nvim
           ];
-          markdown = with pkgs.customBuilds; [
+          markdown = with pkgs.nixCatsBuilds; [
             markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
@@ -178,7 +178,7 @@
         # not loaded automatically at startup.
         # use with packadd in config to achieve something like lazy loading
         optionalPlugins = {
-          custom = with pkgs.customBuilds; [ ];
+          custom = with pkgs.nixCatsBuilds; [ ];
           gitPlugins = with pkgs.neovimPlugins; [ ];
           general = with pkgs.vimPlugins; [ ];
         };
