@@ -1,6 +1,6 @@
-inputs: let
-  customBuildsOverlay = self: super: { 
-    customPlugins = {
+importName: inputs: let
+  overlay = self: super: { 
+    ${importName} = {
 
       # reddit user bin-c found this link for me,
       # and I adapted the funtion to my overlay
@@ -38,4 +38,4 @@ inputs: let
     };
   };
 in
-customBuildsOverlay
+overlay

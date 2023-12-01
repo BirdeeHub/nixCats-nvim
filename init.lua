@@ -118,7 +118,6 @@ vim.keymap.set('n', '<C-W>', '<c-w>', { desc = '+window'})
 vim.keymap.set({"n", "v", "x"}, '"', '"', { desc = '+registers'})
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
-
 -- kickstart.nvim starts you with this. 
 -- But it constantly clobbers your system clipboard whenever you delete anything.
 

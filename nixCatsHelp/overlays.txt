@@ -1,3 +1,12 @@
+---------------------------------------------------------------------------------------
+*nixCats.flake.nixperts.overlays*
+
+# The following is the overlays/default.nix file.
+# you may copy paste it into a file then include it in your flake.nix
+# to add new overlays you should follow 
+# the directions inside the comment blocks.
+# it is done this way for convenience but you could do it another way.
+
 /*
 This file imports overlays defined in the following format.
 It imports them all under the same entry so that
@@ -30,3 +39,6 @@ in
 # then it calls the functions we imported with importName and inputs
 # and turns that into a list by getting just the values of overlaySet
 builtins.attrValues (builtins.mapAttrs (_: value: (value importName inputs)) overlaySet)
+
+---------------------------------------------------------------------------------------
+vim:tw=78:ts=8:ft=help:norl:

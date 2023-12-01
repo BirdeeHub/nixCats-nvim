@@ -174,12 +174,12 @@ If you want to add it to another flake, choose one of these methods:
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            nixCats-nvim.outputs.overlays.${system}.nixCats
-            nixCats-nvim.outputs.overlays.${system}.regularCats
+            nixCats-nvim.overlays.${system}.nixCats
+            nixCats-nvim.overlays.${system}.regularCats
           ];
         };
         # this is the equivalent of the nixCats package
-        customvim = nixCats-nvim.outputs.customPackager.${system} {
+        customvim = nixCats-nvim.customPackager.${system} {
           settings = {
             wrapRc = true;
             configDirName = "nixCats-nvim";
@@ -207,7 +207,7 @@ If you want to add it to another flake, choose one of these methods:
         };
     in
         {
-            packages.default = nixCats-nvim.outputs.packages.${system}.nixCats;
+            packages.default = nixCats-nvim.packages.${system}.nixCats;
             packages.nixCats = pkgs.nixCats;
             packages.regularCats = pkgs.regularCats;
             packages.customvim = customvim;

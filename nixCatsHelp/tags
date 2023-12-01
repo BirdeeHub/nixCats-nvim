@@ -6,12 +6,14 @@ nixCats.flake.nixperts.nvimBuilder.arguments	nvimBuilder.txt	/*nixCats.flake.nix
 nixCats.flake.nixperts.nvimBuilder.basicFlatmap	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.basicFlatmap*
 nixCats.flake.nixperts.nvimBuilder.extraPackages	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.extraPackages*
 nixCats.flake.nixperts.nvimBuilder.generatingNeovim	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.generatingNeovim*
+nixCats.flake.nixperts.nvimBuilder.luaPackaging	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.luaPackaging*
 nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
-nixCats.flake.nixperts.nvimBuilder.opener	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.opener*
 nixCats.flake.nixperts.nvimBuilder.usingWrapArgMap	nvimBuilder.txt	/*nixCats.flake.nixperts.nvimBuilder.usingWrapArgMap*
+nixCats.flake.nixperts.overlays	overlays.txt	/*nixCats.flake.nixperts.overlays*
 nixCats.flake.outputs	nixCatsFlake.txt	/*nixCats.flake.outputs*
 nixCats.flake.outputs.builder	nixCatsFlake.txt	/*nixCats.flake.outputs.builder*
+nixCats.flake.outputs.categories	nixCatsFlake.txt	/*nixCats.flake.outputs.categories*
+nixCats.flake.outputs.exports	nixCatsFlake.txt	/*nixCats.flake.outputs.exports*
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
-nixCats.flake.outputs.packages	nixCatsFlake.txt	/*nixCats.flake.outputs.packages*
-nixCats.flake.outputs.packaging	nixCatsFlake.txt	/*nixCats.flake.outputs.packaging*
+nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*

@@ -1,37 +1,52 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 helpPath: path: pkgs:
-{
-  startupPlugins ? {}
-  , optionalPlugins ? {}
-  , lspsAndRuntimeDeps ? {}
-  , propagatedBuildInputs ? {}
-  , environmentVariables ? {}
-  , extraWrapperArgs ? {}
+categoryDefFunction:
+packageDefinitons: name:
+  # for a more extensive guide to this file
+  # see :help nixCats.flake.nixperts.nvimBuilder
+let
+  inherit (
+    {
+      startupPlugins = {};
+      optionalPlugins = {};
+      lspsAndRuntimeDeps = {};
+      propagatedBuildInputs = {};
+      environmentVariables = {};
+      extraWrapperArgs = {};
   # the source says:
     /* the function you would have passed to python.withPackages */
   # So you put in a set of categories of lists of them.
-  , extraPythonPackages ? {}
-  , extraPython3Packages ? {}
-  # same thing except for lua.withPackages
-  , extraLuaPackages ? {}
-  # only for use when importing flake in a flake 
-  # and need to add a bit of lua for an added plugin
-  , optionalLuaAdditions ? ""
-  }: { settings, categories }:
-  # for a more extensive guide to this file
-  # see :help nixCats.flake.nixperts.nvimBuilder
+      extraPythonPackages = {};
+      extraPython3Packages = {};
+      # same thing except for lua.withPackages
+      extraLuaPackages = {};
+      # only for use when importing flake in a flake 
+      # and need to only add a bit of lua for an added plugin
+      optionalLuaAdditions = "";
+    } // (categoryDefFunction name)
+  )
+  startupPlugins optionalPlugins 
+  lspsAndRuntimeDeps propagatedBuildInputs
+  environmentVariables extraWrapperArgs 
+  extraPythonPackages extraPython3Packages
+  extraLuaPackages optionalLuaAdditions;
+
+  settings = {
+    wrapRc = true;
+    viAlias = false;
+    vimAlias = false;
+    withNodeJs = false;
+    withRuby = true;
+    extraName = "";
+    withPython3 = true;
+    configDirName = "nvim";
+  } // packageDefinitons.${name}.settings;
+
+  categories = packageDefinitons.${name}.categories;
+
+in
   let
-    config = {
-      wrapRc = true;
-      viAlias = false;
-      vimAlias = false;
-      withNodeJs = false;
-      withRuby = true;
-      extraName = "";
-      withPython3 = true;
-      configDirName = "nvim";
-    } // settings;
 
     # package entire flake into the store
     LuaConfig = pkgs.stdenv.mkDerivation {
@@ -47,7 +62,7 @@ helpPath: path: pkgs:
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { inherit (config) wrapRc; };
+        categoriesPlus = categories // { inherit (settings) wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
@@ -68,13 +83,13 @@ helpPath: path: pkgs:
     # it also removes the regular config dir from the path.
     # the wrapper we are using might put it in the wrong place for our uses.
     # so we add in the config directory ourselves to prevent any issues.
-    configDir = if config.configDirName != null && config.configDirName != ""
-      then config.configDirName else "nvim";
+    configDir = if settings.configDirName != null && settings.configDirName != ""
+      then settings.configDirName else "nvim";
     customRC = ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-      '' + (if config.wrapRc then ''
+      '' + (if settings.wrapRc then ''
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, "${LuaConfig}", 0)
         let &runtimepath = join(runtimepath_list, ',')
@@ -171,7 +186,7 @@ helpPath: path: pkgs:
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
   inherit extraMakeWrapperArgs;
-  inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
+  inherit (settings) vimAlias viAlias withRuby extraName withNodeJs;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
@@ -181,7 +196,7 @@ helpPath: path: pkgs:
     /* the function you would have passed to python.withPackages */
   extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
     /* the function you would have passed to python.withPackages */
-  withPython3 = config.withPython3;
+  withPython3 = settings.withPython3;
   extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
     /* the function you would have passed to lua.withPackages */
   extraLuaPackages = combineCatsOfFuncs extraLuaPackages;

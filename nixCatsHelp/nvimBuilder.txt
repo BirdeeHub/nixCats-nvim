@@ -8,67 +8,86 @@ just doing this and including more comments than code.
 --------------------------------------------------------------------------
                                 *nixCats.flake.nixperts.nvimBuilder.arguments*
 
-  # this function takes a set with the following items:
-  # our arguments ? and their default values
+We will take our arguments from flake.nix, 
+and update default values with the new ones.
 >nix
-  helpPath: path: pkgs: 
-  {
-    , startupPlugins ? {}
-    , optionalPlugins ? {}
-    , lspsAndRuntimeDeps ? {}
-    , propagatedBuildInputs ? {}
-    , environmentVariables ? {}
-    , extraWrapperArgs ? {}
-<
-    # these ones take sets of lists of FUNCTIONS,
-    # and those functions return lists of packages.
-    # i.e. (_:[]) as a default argument
-    # so now you can put categories of lists of them in
-    # and they will be sorted like everything else
-    # Idk why they work that way, 
-    # but just made a function to filter them, 
-    # call them, then combine the outputs.
-    # and I pass that in instead.
-    # the source says:
-      /* the function you would have passed to python.withPackages */
->nix
-    , extraPythonPackages ? {}
-    , extraPython3Packages ? {}
-    # same thing except for lua.withPackages
-    , extraLuaPackages ? {}
-<
-    # only for use when importing this flake in another flake 
-    # and need to add a bit of lua for an added plugin.
-    # Yes you can require nixCats in it. >nix
-    , optionalLuaAdditions ? ""
-    }: 
-<
-    # and our last argument, a set of 2 values:
->nix
-    { settings, categories }:
+
+    helpPath: path: pkgs:
+    categoryDefFunction:
+    packageDefinitons: name:
     let
+      inherit ({
 <
-      # when packaging, one of these is passed as settings,
-      # but we dont want to have to define all of them every time.
-      # so we update the default config with whatever new options were passed
+        # These are all the things your categoryDefFunction can return.
+        # see: :help `nixCats.flake.nixperts.nvimBuilder.categories`
+          startupPlugins = {};
+          optionalPlugins = {};
+          lspsAndRuntimeDeps = {};
+          propagatedBuildInputs = {};
+          environmentVariables = {};
+          extraWrapperArgs = {};
+
+          # these ones take sets of lists of FUNCTIONS,
+          # and those functions return lists of packages.
+          # i.e. (_:[]) as a default argument
+          # so now you can put categories of lists of them in
+          # and they will be sorted like everything else
+          # Idk why they work that way, 
+          # but just made a function to filter them, 
+          # call them, then combine the outputs.
+          # and I pass that in instead.
+          # the source says:
+          /* the function you would have passed to python.withPackages */
+            extraPythonPackages = {};
+            extraPython3Packages = {};
+          # same thing except for lua.withPackages
+            extraLuaPackages = {};
+      
+          # this one is only for use when importing 
+          # this flake in another flake 
+          # and need to add a bit of lua for an added plugin.
+          # Yes you can require nixCats in it.
+            optionalLuaAdditions = "";
 >nix
-      config = {
+            # notice we now call the categoryDefFunction 
+            # with name as an argument?
+        } // (categoryDefFunction name)
+      )
+      # and then we inherit them to make them easily available.
+      startupPlugins optionalPlugins 
+      lspsAndRuntimeDeps propagatedBuildInputs
+      environmentVariables extraWrapperArgs 
+      extraPythonPackages extraPython3Packages
+      extraLuaPackages optionalLuaAdditions;
+
+      Then we get our settings and categories as well.
+>nix
+      settings = {
         wrapRc = true;
-        configDirName = "nvim";
         viAlias = false;
         vimAlias = false;
         withNodeJs = false;
         withRuby = true;
         extraName = "";
         withPython3 = true;
-      } // settings;
+        configDirName = "nvim";
+      } // packageDefinitons.${name}.settings;
+
+      categories = packageDefinitons.${name}.categories;
+    in
 <
+      # when packaging, one of these is passed as settings,
+      # but we dont want to have to define all of them every time.
+      # so we update the default config with whatever new options were passed
+
 --------------------------------------------------------------------------
-                                   *nixCats.flake.nixperts.nvimBuilder.opener*
+                                   *nixCats.flake.nixperts.nvimBuilder.luaPackaging*
 
     # package entire flake into the store
     # see :help `'rtp'` for what folders can be defined
 >nix
+    let
+<>nix
     LuaConfig = pkgs.stdenv.mkDerivation {
       name = builtins.baseNameOf path;
       builder = builtins.toFile "builder.sh" ''
@@ -87,7 +106,7 @@ just doing this and including more comments than code.
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { inherit (config) wrapRc; };
+        categoriesPlus = categories // { inherit (settings) wrapRc; };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
@@ -112,13 +131,13 @@ just doing this and including more comments than code.
     # so we add in the config directory ourselves to prevent any issues.
     # even when wrapRc == false.
 >nix
-    configDir = if config.configDirName != null && config.configDirName != ""
-      then config.configDirName else "nvim";
+    configDir = if settings.configDirName != null && settings.configDirName != ""
+      then settings.configDirName else "nvim";
     customRC = ''
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-      '' + (if config.wrapRc then ''
+      '' + (if settings.wrapRc then ''
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, "${LuaConfig}", 0)
         let &runtimepath = join(runtimepath_list, ',')
@@ -279,7 +298,7 @@ just doing this and including more comments than code.
     # the following is just the regular pkgs.wrapNeovim
   (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
     inherit extraMakeWrapperArgs;
-    inherit (config) vimAlias viAlias withRuby extraName withNodeJs;
+    inherit (settings) vimAlias viAlias withRuby extraName withNodeJs;
     configure = {
       inherit customRC;
       packages.myVimPackage = {
@@ -293,7 +312,7 @@ just doing this and including more comments than code.
       /* the function you would have passed to python.withPackages */
     extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
       /* the function you would have passed to python.withPackages */
-    withPython3 = config.withPython3;
+    withPython3 = settings.withPython3;
     extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
       /* the function you would have passed to lua.withPackages */
     extraLuaPackages = combineCatsOfFuncs extraLuaPackages;

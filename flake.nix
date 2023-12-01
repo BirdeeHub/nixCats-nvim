@@ -1,5 +1,5 @@
-# Copyright (c) 2023 BirdeeHub 
-# Licensed under the MIT license 
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
 # Only 3 files are marked with this header.
 # Please leave them in.
 {
@@ -21,10 +21,6 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
-    "plugins-harpoon" = {
-      url = "github:ThePrimeagen/harpoon";
-      flake = false;
-    };
     "plugins-fidget" = {
       url = "github:j-hui/fidget.nvim/legacy";
       flake = false;
@@ -40,34 +36,44 @@
     # This line makes this package availeable for all systems
     # ("x86_64-linux", "aarch64-linux", "i686-linux", "x86_64-darwin",...)
     flake-utils.lib.eachDefaultSystem (system: let
-      # see :help nixCats.flake.outputs.overlays
 
-      # Apply the overlays and load nixpkgs as `pkgs`
-      # Once we add these overlays to our nixpkgs, we are able to
-      # use `pkgs.neovimPlugins`, which is a set of our "plugins-pluginname" plugins,
-      # or use `pkgs.customPlugins`, which is a set of our custom built plugins.
-      overlays = (import ./overlays inputs) ++ [
+      # see :help nixCats.flake.outputs.overlays
+      # This overlay grabs all the inputs named in the format
+      # `plugins-<pluginName>`
+      # Once we add this overlay to our nixpkgs, we are able to
+      # use `pkgs.neovimPlugins`, which is a set of our plugins.
+      # we will import it separaly from the others
+      # so we can export it separately from the flake.
+      standardPluginOverlay = (import ./builder/standardPluginOverlay.nix);
+      # you may define more overlays in the overlays directory, and import them
+      # in the default.nix file in that directory just like customBuildsOverlay.
+      # `pkgs.customBuilds` is a set of plugins defined in that directory.
+      # see overlays/default.nix for how to add more overlays in that directory.
+      # or see :help nixCats.flake.nixperts.overlays
+      otherOverlays = (import ./overlays inputs) ++ [
         # add any flake overlays here.
-        inputs.nixd.outputs.overlays.default
+        inputs.nixd.overlays.default
       ];
       pkgs = import nixpkgs {
-        inherit system overlays;
+        inherit system;
+        overlays = otherOverlays ++ 
+          [ (standardPluginOverlay inputs) ];
         # config.allowUnfree = true;
       };
 
-      # see :help nixCats.flake.outputs.builder
-
       # Now that our plugin inputs/overlays and pkgs have been defined,
       # We define a function to facilitate package building for particular categories
-      # what that function does is it intakes a set of categories 
-      # with a boolean value for each, and a set of settings
-      # to do this it imports ./builder/default.nix, passing it our other information.
-      # This allows us to define our categories and settings later.
-      helpPath = "${self}/nixCatsHelp";
-      nixVimBuilder = import ./builder helpPath self pkgs categoryDefinitions;
+      # to do this it imports ./builder/default.nix, passing it our information.
+      # This allows us to define categories and settings for or package later and then choose a package.
 
-      categoryDefinitions = {
-        # see :help nixCats.flake.outputs.builder
+      # see :help nixCats.flake.outputs.builder
+      baseBuilder = import ./builder "${self}/nixCatsHelp";
+      nixCatsBuilder = baseBuilder self pkgs
+        # notice how it doesn't care that these are defined lower in the file?
+        categoryDefinitions packageDefinitions;
+
+      # see :help nixCats.flake.outputs.categories
+      categoryDefinitions = name: {
         # to define and use a new category, simply add a new list to a set here, 
         # and later, you will include categoryname = true; in the set you
         # provide when you build the package using this builder function.
@@ -85,7 +91,7 @@
 
         # lspsAndRuntimeDeps:
         # this section is for dependencies that should be available
-        # at RUN TIME for plugins. Will be available to path within neovim terminal
+        # at RUN TIME for plugins. Will be available to PATH within neovim terminal
         # this includes LSPs
         lspsAndRuntimeDeps = {
           general = with pkgs; [
@@ -114,11 +120,10 @@
             neodev-nvim
             neoconf-nvim
           ];
-          markdown = with pkgs.customPlugins; [
+          markdown = with pkgs.customBuilds; [
             markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
-            harpoon
             hlargs
             fidget
           ];
@@ -173,7 +178,7 @@
         # not loaded automatically at startup.
         # use with packadd in config to achieve something like lazy loading
         optionalPlugins = {
-          custom = with pkgs.customPlugins; [ ];
+          custom = with pkgs.customBuilds; [ ];
           gitPlugins = with pkgs.neovimPlugins; [ ];
           general = with pkgs.vimPlugins; [ ];
         };
@@ -231,7 +236,7 @@
       # This entire set is also passed to nixCats for querying within the lua.
       # It is passed as a Lua table with values name = boolean. same as here.
 
-      # see :help nixCats.flake.outputs.packaging
+      # see :help nixCats.flake.outputs.packageDefinitions
       packageDefinitions = {
         nixCats = {
           settings = settings.nixCats; 
@@ -294,49 +299,53 @@
 
 
 
-    # see :help nixCats.flake.outputs.packages
-    {
-      # choose your default package
-      packages = { default = (nixVimBuilder packageDefinitions.nixCats); }
-        # this will add all packageDefinitions defined above
-        // (builtins.mapAttrs (value: nixVimBuilder value) packageDefinitions);
+    # see :help nixCats.flake.outputs.exports
+    rec {
+      # this will make a package out of each of the packageDefinitions defined above
+      # and set the default package to the one named here.
+      packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+
+      # this will make an overlay out of each of the packageDefinitions defined above
+      # and set the default overlay to the one named here.
+      overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
 
       # choose your package for devShell
-      # and whatever else you want in it.
+      # and add whatever else you want in it.
       devShell = pkgs.mkShell {
-        name = "nixCats.nvim";
-        packages = [ (nixVimBuilder packageDefinitions.nixCats) ];
+        name = "nixCats";
+        packages = [ (nixCatsBuilder "nixCats") ];
         inputsFrom = [ ];
         shellHook = ''
         '';
       };
 
-      # this will make an overlay out of each of the packageDefinitions defined above
-      overlays = let
-        # choose the name and value of your defaultOverlayPackage
-        defaultOverlayPackage = {
-          name = "nixCats";
-          value = packageDefinitions.nixCats;
-        };
-      in
-      { default = (self: super: { ${defaultOverlayPackage.name} = nixVimBuilder defaultOverlayPackage.value; }); } 
-      // (builtins.mapAttrs (name: value: (self: super: { ${name} = nixVimBuilder value; })) packageDefinitions);
-
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = nixVimBuilder;
+      customPackager = baseBuilder self pkgs categoryDefinitions;
 
-      # The overlay that allows for auto import with plugins-pluginname
-      standardPluginOverlay = import ./overlays/standardPluginOverlay.nix;
       # You may use these to modify some or all of your categoryDefinitions
       customBuilders = {
-        # These 2 will still recieve the flake's lua when wrapRc = true;
-        fresh = import ./builder helpPath self;
-        merged = newPkgs: categoryDefs:
-          (import ./builder helpPath self (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
-        # for these ones, you may specify a new path to lua that can be used with wrapRc = true
-        newLuaPath = import ./builder helpPath;
-        mergedNewLuaPath = path: newPkgs: categoryDefs:
-          (import ./builder helpPath path (pkgs // newPkgs) (categoryDefinitions // categoryDefs));
+        fresh = baseBuilder;
+        keepLua = baseBuilder self;
+      };
+
+      inherit otherOverlays;
+      inherit categoryDefinitions;
+
+      utils = {
+        mkPackages = finalBuilder: packageDefinitions: defaultName:
+          { default = finalBuilder defaultName; }
+          // (builtins.mapAttrs (name: _: finalBuilder name) packageDefinitions);
+
+        mkOverlays = finalBuilder: packageDefinitions: defaultName:
+          { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); }
+          // (builtins.mapAttrs
+            (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
+
+        # The overlay that allows for auto import with plugins-pluginname
+        inherit standardPluginOverlay;
+
+        mergeCatDefs = pkgs: oldCats: newCats: 
+          (name: pkgs.lib.recursiveUpdate (oldCats name) (newCats name));
       };
     }
 
