@@ -99,7 +99,7 @@ were not well handled by nixpkgs.
 It is passed flake inputs, and super is pkgs.
 Define the things within the file. 
 Then, access plugins defined there later 
-with 'pkgs.customBuilds.somepluginname'
+with 'pkgs.nixCatsBuilds.somepluginname'
 
 If you decide you wish to split your customBuildsOverlay up, 
 see :help `nixCats.flake.nixperts.overlays`
