@@ -24,7 +24,7 @@ rec {
       combinedOversCalled = oldOversMapped ++ newOversMapped;
       mergedOvers = super.lib.foldr super.lib.recursiveUpdate { } combinedOversCalled;
     in
-    [ mergedOvers ] ;
+    mergedOvers;
   };
 
 # NIX CATS SECTION:
