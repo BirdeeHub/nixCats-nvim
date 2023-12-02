@@ -36,6 +36,7 @@
     # This line makes this package availeable for all systems
     # ("x86_64-linux", "aarch64-linux", "i686-linux", "x86_64-darwin",...)
     flake-utils.lib.eachDefaultSystem (system: let
+      utils = (import ./builder/utils.nix).utils;
 
       # see :help nixCats.flake.outputs.overlays
       # This overlay grabs all the inputs named in the format
@@ -44,7 +45,7 @@
       # use `pkgs.neovimPlugins`, which is a set of our plugins.
       # we will import it separaly from the others
       # so we can export it separately from the flake.
-      standardPluginOverlay = (import ./builder/standardPluginOverlay.nix);
+      standardPluginOverlay = utils.standardPluginOverlay;
       # you may define more overlays in the overlays directory, and import them
       # in the default.nix file in that directory just like customBuildsOverlay.
       # `pkgs.nixCatsBuilds` is a set of plugins defined in that file.
@@ -300,7 +301,7 @@
 
 
     # see :help nixCats.flake.outputs.exports
-    rec {
+    {
       # this will make a package out of each of the packageDefinitions defined above
       # and set the default package to the one named here.
       packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
@@ -330,23 +331,8 @@
 
       inherit otherOverlays;
       inherit categoryDefinitions;
+      inherit utils;
 
-      utils = {
-        mkPackages = finalBuilder: packageDefinitions: defaultName:
-          { default = finalBuilder defaultName; }
-          // (builtins.mapAttrs (name: _: finalBuilder name) packageDefinitions);
-
-        mkOverlays = finalBuilder: packageDefinitions: defaultName:
-          { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); }
-          // (builtins.mapAttrs
-            (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
-
-        # The overlay that allows for auto import with plugins-pluginname
-        inherit standardPluginOverlay;
-
-        mergeCatDefs = pkgs: oldCats: newCats: 
-          (name: pkgs.lib.recursiveUpdate (oldCats name) (newCats name));
-      };
     }
 
 
