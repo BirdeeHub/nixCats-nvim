@@ -2,6 +2,31 @@
 # Licensed under the MIT license 
 rec {
 
+  # These are to be exported in flake outputs
+  utils = {
+    mkPackages = finalBuilder: packageDefinitions: defaultName:
+      { default = finalBuilder defaultName; }
+      // (builtins.mapAttrs (name: _: finalBuilder name) packageDefinitions);
+
+    mkOverlays = finalBuilder: packageDefinitions: defaultName:
+      { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); }
+      // (builtins.mapAttrs
+        (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
+
+    standardPluginOverlay = import ./standardPluginOverlay.nix;
+
+    mergeCatDefs = pkgs: oldCats: newCats: 
+      (name: pkgs.lib.recursiveUpdate (oldCats name) (newCats name));
+
+    mergeOverlayLists = oldOverlist: newOverlist: self: super: let
+      oldOversMapped = builtins.map (value: value self super) oldOverlist;
+      newOversMapped = builtins.map (value: value self super) newOverlist;
+      combinedOversCalled = oldOversMapped ++ newOversMapped;
+      mergedOvers = super.lib.foldr super.lib.recursiveUpdate { } combinedOversCalled;
+    in
+    [ mergedOvers ] ;
+  };
+
 # NIX CATS SECTION:
 
   # 2 recursive functions that rely on each other to

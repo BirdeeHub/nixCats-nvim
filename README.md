@@ -131,8 +131,9 @@ Fair warning, this requires knowledge of nix derivations and should be needed on
 Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
 Let me know when you figure it out I'm kinda a nix noob still. [How to contribute](./CONTRIBUTING.md)
 
-This is a general nix thing, not specific to this project.
+Mason does not work on nixOS although it does on other OS options.
 
+This is a general nix thing, not specific to this project.
 
 ---
 

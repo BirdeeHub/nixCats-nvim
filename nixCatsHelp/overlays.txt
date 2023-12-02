@@ -6,8 +6,11 @@
 # to add new overlays you should follow 
 # the directions inside the comment blocks.
 # it is done this way for convenience but you could do it another way.
-# unfortunately, you cannot define multiple overlays 
-# imported with the same name....
+
+# When importing these overlays from one nixCats into another using its otherOverlays,
+# you should use the utils.mergeOverlays function to combine them.
+# This will allow you not to worry about other nixCats overlay
+# imports from having import naming conflicts with your own.
 
 /*
 This file imports overlays defined in the following format.
@@ -25,23 +28,17 @@ importName: inputs: let
 in
 overlay
 */
-# the reason for this is that you cannot import multiple overlays under the same name.
-# This unfortunately also applies to ones inherited from previous nixCats packages.
-# So this way you at least name them all in one place.
-# And this is what it does.
 inputs: let 
   overlaySet = {
 
     # this is how you would add another overlay file
     # for if your customBuildsOverlay gets too long
-    # because this is named nixCatsBuilds, 
-    # you will import with pkgs.nixCatsBuilds.something
+    # the name here will be the name used when importing items from it in your flake.
+    # i.e. these items will be accessed as pkgs.nixCatsBuilds.thenameofthepackage
     nixCatsBuilds = import ./customBuildsOverlay.nix;
 
   };
 in
-# then it calls the functions we imported with their name here as importName
-# and turns that into a list by getting just the values of overlaySet
 builtins.attrValues (builtins.mapAttrs (name: value: (value name inputs)) overlaySet)
 
 ---------------------------------------------------------------------------------------

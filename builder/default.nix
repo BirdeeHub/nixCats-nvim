@@ -62,7 +62,10 @@ in
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { inherit (settings) wrapRc; };
+        categoriesPlus = categories // {
+            inherit (settings) wrapRc;
+            nixCats_packageName = name;
+          };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 

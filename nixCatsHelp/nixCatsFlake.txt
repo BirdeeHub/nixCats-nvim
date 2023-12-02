@@ -70,13 +70,15 @@ Flake Outputs Introduction                              *nixCats.flake.outputs*
 With our inputs to our flake taken care of:
 
 First, we call flake utils to get system variable for all default systems.
+Then we import our nixCats utils, so that we can access things
+like overlay <1>, utils.standardPluginOverlay.
 
                                                *nixCats.flake.outputs.overlays*
 Then, we define our overlays.
 We have 2 main overlays to discuss.
 
 <1>
--- The first is standardPluginOverlay:
+-- The first is utils.standardPluginOverlay:
 You do not need to edit it to use it.
 
 It takes all the inputs named in the format
@@ -312,25 +314,49 @@ After that, there are some options for flakes that import this flake.
 Using these functions, you can import this flake in your inputs,
 and then use the builder and the help in another flake.
 
-This can be quite nice. It allows you to redefine the entire flake,
-but you wouldnt need to include the builder folder or the help because you
-import that. You can also use as much or as little of the already defined
-overlays and categories as you wish.
-Unfortunately, you either use the lua from the flake you import, or you don't.
-
-I use this for my main configuration.
-I list nixCats-nvim in my flake inputs.
-I import the builder and the overlays both standard and custom.
-I then define new categories and lua and packages.
-In my outputs I inherit the utils set, 
-and then redefine the other options the same way as in
-the flake.nix file of this repository.
-
-you could also use customPackager. This would allow you to choose what
+First, customPackager. This would allow you to choose what
 settings and categories you wanted in a flake that imports this flake,
 without needing to redefine anything else.
 
-There is also a convenience function for merging category definitions.
+Then customBuilders. These are just baseBuilder, exported both with and
+without a lua path already supplied.
+
+Then otherOverlays. These are a list of all overlays 
+that you imported that are not standardPluginOverlay.
+
+Then categoryDefinitions. The function where you set up your categories in flake.nix
+
+Then last, the utils set, which we imported from ./builder/utils.nix
+
+In total, the utils set contains 5 functions
+
+First, mkPackages, mkOverlays and standardPluginOverlay, all mentioned above.
+In addition to those, there is also 2 convenience functions:
+mergeCatDefs for merging category definitions,
+and mergeOverlayLists for merging lists of overlays like those in otherOverlays in a way 
+that updates to avoid naming conflicts between overlays in different nixCats flakes imported.
+
+
+
+When making your own nixCats flake, it is highly recommended to add the same
+outputs as this flake.nix. So, to restate, here they all are.
+
+In addition to its packages, overlays, and devShell,
+and whatever other regular flake outputs you wish to export,
+every nixCats flake should include in its outputs:
+
+  The customPackager, which is a builder without a packageDefinitions set yet,
+
+  Both of the customBuilders, which are 'baseBuilder's with and without a lua path,
+
+  Its otherOverlays, which are all overlays that are not standardPluginOverlay,
+
+  Its categoryDefinitions function, 
+
+  The utils set inherited from previous nixCats flakes or the utils.nix file.
+
+That way, you can always export all of the same customization options to new
+flakes as the original one has, but for your own flake.
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

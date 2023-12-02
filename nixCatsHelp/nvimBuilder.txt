@@ -100,13 +100,17 @@ and update default values with the new ones.
     # see :help `nixCats`
     # here is where nixCats is generated
     # it uses some recursive stuff in utils to print a lua table to a file.
-    # That table is the categories we were including, plus wrapRc
-    # Thats it. Also it defines a user command and includes the help.
+    # That table is the categories we were including, 
+    # plus wrapRc and the package name.
+    # Also it defines a user command and includes the help.
 >nix
     nixCats = pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = let
-        categoriesPlus = categories // { inherit (settings) wrapRc; };
+        categoriesPlus = categories // { 
+            inherit (settings) wrapRc;
+            nixCats_packageName = name; 
+          };
         cats = builtins.toFile "nixCats.lua" ''
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
