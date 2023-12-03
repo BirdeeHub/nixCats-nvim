@@ -203,6 +203,7 @@ If you want to add it to another flake, choose one of these methods:
               # this does not have an associated category of plugins, 
               # but lua can still check for it
               lspDebugMode = false;
+              themer = true;
               # you could also pass something else:
               colorscheme = "onedark";
               # you could :lua print(vim.inspect(require('nixCats')))

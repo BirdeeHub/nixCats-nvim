@@ -74,6 +74,7 @@ using customPackager, packages and overlays:
                 # this does not have an associated category of plugins, 
                 # but lua can still check for it
                 lspDebugMode = false;
+                themer = true;
                 # you could also pass something else:
                 colorscheme = "catppuccin";
                 # you could :lua print(vim.inspect(require('nixCats')))
@@ -203,6 +204,7 @@ You could run nixBuild on a flake.nix containing only the following.
               lspDebugMode = false;
               # you could also pass something else:
               eyeliner = true;
+              themer = true;
               colorscheme = "tokyonight";
             };
           };
