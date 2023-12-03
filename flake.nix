@@ -16,6 +16,8 @@
     # If you wish to define a custom build step not handled by nixpkgs,
     # then you should name it in a different format, and deal with that in the
     # overlay defined for custom builds in the overlays directory.
+    # for specific tags, branches and commits, see:
+    # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
 
     "plugins-hlargs" = {
       url = "github:m-demare/hlargs.nvim";
@@ -129,10 +131,6 @@
             fidget
           ];
           general = with pkgs.vimPlugins; [
-            # Theme
-            onedark-vim
-            # catppuccin-nvim
-            # telescope
             telescope-fzf-native-nvim
             plenary-nvim
             telescope-nvim
@@ -173,6 +171,21 @@
             nvim-surround
             indent-blankline-nvim
             nvim-web-devicons
+          ];
+          themer = with pkgs.vimPlugins; [
+            # You can retreive information from the
+            # packageDefinitions of the package this was packaged with.
+            # you can use it to create something like subcategories
+            # that could still be set by customPackager
+            (builtins.getAttr packageDefinitions.${name}.categories.colorscheme {
+                # Theme switcher without creating a new category
+                "onedark" = onedark-vim;
+                "catppuccin" = catppuccin-nvim;
+                "catppuccin-mocha" = catppuccin-nvim;
+                "tokyonight" = tokyonight-nvim;
+                "tokyonight-day" = tokyonight-nvim;
+              }
+            )
           ];
         };
 
@@ -254,6 +267,7 @@
             # but lua can still check for it
             lspDebugMode = false;
             # you could also pass something else:
+            themer = true;
             colorscheme = "onedark";
             theWorstCat = {
               thing1 = [ "MEOW" "HISSS" ];
@@ -282,7 +296,8 @@
             debug = false;
             test = true;
             lspDebugMode = false;
-            colorscheme = "onedark";
+            themer = true;
+            colorscheme = "catppuccin";
             theWorstCat = {
               thing1 = [ "MEOW" "HISSS" ];
               thing2 = [
