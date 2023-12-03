@@ -155,6 +155,8 @@ If you use the regularCats package, you only need to edit the flake itself to in
 
 This is useful for faster iteration while editing lua config, as you then only have to restart it rather than rebuild.
 
+However that also means the regularCats package must be cloned locally.
+
 You should clone regularCats to your ~/.config/ directory and make sure the filename is ```nixCats-nvim``` so that you can still keep everything in the same place when you do this.
 
 If it is named something else, you will have to change configDirName in the settings section of flake.nix, or the name of the directory. 
@@ -220,10 +222,12 @@ If you want to add it to another flake, choose one of these methods:
 }
 ```
 There are more methods not covered in this readme, but are covered in the included help files.
+see: [nixCats.installation_options](./nixCatsHelp/installation.txt)
 
 With them you could partially or entirely recreate this flake.nix and/or the lua in another flake without redefining things (unless you want to).
 
-The categories and settings in these installation instructions are something created while creating your own config and automatically exported.
+The categories and settings in these installation instructions are something created while creating your own config and exported.
+
 That will make sense. I promise. Those are your categories you make.
 
 ---

@@ -17,3 +17,5 @@ nixCats.flake.outputs.exports	nixCatsFlake.txt	/*nixCats.flake.outputs.exports*
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*
+nixCats.installation_options	installation.txt	/*nixCats.installation_options*
+nixCats.installation_options.advanced	installation.txt	/*nixCats.installation_options.advanced*

@@ -129,7 +129,7 @@ leave us with a function that takes 1 argument.
 That argument is the name of the neovim package to be packaged.
 
 1. The path to the help directory so that it is always included in outputs of
-   this flake.
+     this flake.
 2. The path to the lua to include (in the flake, we use the self variable to get
      this path and wrap the lua when wrapRc = true)
 3. The pkgs set so that it can use it for making its own derivations.
@@ -151,11 +151,13 @@ It is now a function that takes a name, and returns your chosen neovim package.
 ---------------------------------------------------------------------------------------
                                             *nixCats.flake.outputs.categories*
 Then we define what is in our categories!
-This section takes the name of the package 
+This section is a function that takes the name of the package 
 it was packaged with as an argument. The builder will call it.
 This allows categoryDefinitions to access their packages categories and settings.
-This does not seem necessary until you really want that and can't do it.
-This function should return some or all of the following:
+You may do this by using: >nix
+    packageDefinitions.${name}
+<
+These are the things you can return:
 >nix
   categoryDefinitions = name: {
 <
@@ -323,6 +325,10 @@ without a lua path already supplied.
 
 Then otherOverlays. These are a list of all overlays 
 that you imported that are not standardPluginOverlay.
+You may use utils.mergeOverlayLists to incorporate overlays 
+from other nixCats flakes without worrying about naming conflicts.
+Should you do this you should follow the example in the advanced_installation
+branch of the repo for this secion so that others may reliably do this too.
 
 Then categoryDefinitions. The function where you set up your categories in flake.nix
 
@@ -357,6 +363,9 @@ every nixCats flake should include in its outputs:
 
 That way, you can always export all of the same customization options to new
 flakes as the original one has, but for your own flake.
+
+for information on how to use these options when importing your nixCats flake,
+see :help `nixCats.installation_options`
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
