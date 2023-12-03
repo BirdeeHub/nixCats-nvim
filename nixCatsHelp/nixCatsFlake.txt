@@ -9,7 +9,9 @@ in place of usual nvim package managers such as packer, lazy or mason.
 
 Everything else is done in a regular lua config style.
 Download in flake.nix and then, simply pretend the root of the flake 
-is the root of your Lua config. 1 exception, when wrapRc = true, 
+is the root of your Lua config. 
+
+1 exception, when wrapRc = true, 
 `stdpath('config')` will still point to ~/.config/<configDirName>.
 But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
