@@ -237,7 +237,7 @@ That will make sense. I promise. Those are your categories you make.
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
-[./builder/standardPluginOverlay.nix](./overlays/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
+[./builder/standardPluginOverlay.nix](./builder/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
 
 Thank you!!! It taught me both about an overlay's existence and how it works.
 
