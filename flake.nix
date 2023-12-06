@@ -201,7 +201,7 @@
         };
 
         # not loaded automatically at startup.
-        # use with packadd in config to achieve something like lazy loading
+        # use with packadd and an autocommand in config to achieve lazy loading
         optionalPlugins = {
           custom = with pkgs.nixCatsBuilds; [ ];
           gitPlugins = with pkgs.neovimPlugins; [ ];
