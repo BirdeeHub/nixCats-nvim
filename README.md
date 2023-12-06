@@ -157,7 +157,7 @@ Let me know when you figure it out I'm kinda a nix noob still. [How to contribut
 
 Mason does not work on nixOS although it does on other OS options.
 
-This is a general nix thing, not specific to this project.
+These are general nix things, not specific to this project.
 
 ---
 
@@ -294,6 +294,3 @@ I also borrowed some code from nixpkgs and included links.
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
-- [`andromeda-neovim`](https://github.com/lecoqjacob/andromeda-neovim):
-A repo which took an early version of nixCats and added many things to it such as a nix wrapper for lazy, at the cost of losing the simplistic design and the help.
-It made me happy to see people taking inspiration from my work, so I added it to the list.
