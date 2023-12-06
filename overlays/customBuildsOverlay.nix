@@ -2,8 +2,10 @@ importName: inputs: let
   overlay = self: super: { 
     ${importName} = {
 
-      # reddit user bin-c found this link for me,
+      # I needed to do this because the one on nixpkgs wasnt working
+      # reddit user bin-c found this link for me.
       # and I adapted the funtion to my overlay
+      # It is the entry from nixpkgs.
       # https://github.com/NixOS/nixpkgs/blob/44a691ec0cdcd229bffdea17455c833f409d274a/pkgs/applications/editors/vim/plugins/overrides.nix#L746
       markdown-preview-nvim =  let
         nodeDep = super.yarn2nix-moretea.mkYarnModules rec {
