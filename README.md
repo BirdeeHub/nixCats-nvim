@@ -40,6 +40,8 @@ Simply run ```nix shell github:BirdeeHub/nixCats-nvim``` and run nvim to read it
 
 This is because there is (reasonable) syntax highlighting for the code examples in the help when viewed within nvim.
 
+There is about as much help as there is nix code in this entire project.
+
     An important note: if you add a file,
     nix will not package it unless you add it 
     to your git staging before you build it...
