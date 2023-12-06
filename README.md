@@ -2,24 +2,31 @@
 
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
 
-The lua is not all 1 file. The reason for that is personal preference. It is short enough that it could be.
-
 This repo is not a lua showcase. You are meant to use your own lua once you understand what is going on.
 
 It is aimed at people who know enough lua to comfortably proceed from a kickstarter level setup
 who want to swap to using nix while still using lua for configuration.
 
-For 95% of plugins, you wont need to do more than add plugins to lists,
+For 95% of plugins and lsps, you won't need to do more than add plugin names to lists you make in flake.nix,
 
-then configure in lua using the regular setup or config functions provided by the plugin.
+then configure in lua using lspconfig or the regular setup or config functions provided by the plugin.
 
 The end result is it ends up being very much like using a neovim package manager,
 
 except with the bonus of being able to install and set up more than just neovim plugins.
 
-It allows for project specific packaging using nixCats.
+It also allows for project specific packaging using nixCats for all the cool direnv stuff.
 
-Simply require nixCats in your lua and it will tell you what categories you have in this package.
+You can require('nixCats') for what nix categories you created are included in the current package.
+
+The categories are the lists you created that you added plugins to.
+
+Doing so allows you to define as many different packages as you want from the same config file.
+
+nixCats can also send other info from nix to lua other than what categories are included, but that is the main use.
+
+It then also exports as much stuff as possible for when you want to add some version of your own nixCats flake 
+to a system nix config flake but maybe want to change something for that specific system without making a separate package for it if desired.
 
 You should make use of the in-editor help at:
 
@@ -29,7 +36,9 @@ You should make use of the in-editor help at:
 
 The help can be viewed here on github but it is adviseable to use a nix shell to view it from within the editor.
 
-This is because there is syntax highlighting for the code examples in the help when viewed within nvim.
+Simply run ```nix shell github:BirdeeHub/nixCats-nvim``` and run nvim to read it.
+
+This is because there is (reasonable) syntax highlighting for the code examples in the help when viewed within nvim.
 
     An important note: if you add a file,
     nix will not package it unless you add it 
@@ -38,9 +47,19 @@ This is because there is syntax highlighting for the code examples in the help w
     So, run git add before you build,
     especially when using the wrapRc option.
 
+Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim), with a couple changes. 
+
+It has some stuff for nix, regular plugin setup functions as defined by the plugin rather than lazy,
+and lspconfig instead of mason (because mason doesnt work very well on nixOS and the whole point was to replace it and lazy with nix)
+
+It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too.
+
+When you are deleting my lua dont forget about the after folder. It makes the numbers purple. 
+It does this afterwards because stuff kept overriding it and it was a good opportunity to show the utility of the after folder.
+
 #### Introduction:
  
-I originally made this for myself. I wanted to swap to NixOS.
+I originally made this just for myself. I wanted to swap to NixOS.
 
 The category scheme was good. I found it easy to use.
 
@@ -100,14 +119,19 @@ In there are 2 general ideas I used to create this, stated above, and then a bun
     2. Sort categories.
     3. Convert set that chooses the categories included verbatim to a lua table returned by nixCats.
 
-The clever part is organizing it so that doesn't suck. 
-Read the nixperts help if you are curious as to how I implemented these 3 concepts, then check ./builder/utils.nix if you are REALLY curious.
+    The clever part is organizing it so that doesn't suck. 
+    Read the nixperts help if you are curious as to how I implemented these 3 concepts,
+    then check ./builder/utils.nix if you are REALLY curious.
+
+    It is entirely possible to use this flake and barely deal with the nix, 
+    and then make better use of the nix integration options 
+    as desired later for when you go to import the flake to your system flake/flakes
 
 ---
 
 #### Basic usage:
 
-(full usage covered in included help files, accessible here and inside neovim)
+(full usage covered in included help files, accessible here and inside neovim, but much better viewed in-editor)
 
 You install the plugins/LSP/debugger/program using nix, by adding them to a category in the flake (or creating a new category for it!)
 
@@ -157,12 +181,23 @@ This is useful for faster iteration while editing lua config, as you then only h
 
 However that also means the regularCats package must be cloned locally.
 
-You should clone regularCats to your ~/.config/ directory and make sure the filename is ```nixCats-nvim``` so that you can still keep everything in the same place when you do this.
+You should clone regularCats to your ~/.config/ directory
+and make sure the filename is ```nixCats-nvim``` so that you can still keep everything in the same place when you do this.
 
-If it is named something else, you will have to change configDirName in the settings section of flake.nix, or the name of the directory. 
+To change this name, you can to change configDirName in the settings section of flake.nix, or the name of the directory. 
 This also affects .local and the like.
 
-If you want to add it to another flake, choose one of these methods:
+If you want to add it to another flake, there are many methods. Here is an illustration of a few.
+
+You could run nix build on a directory containing only the following as a flake.nix
+
+outside of having separate packages in one configuration,
+The other option shown is your main form of options you create.
+
+That being, the ablity to choose which categories you wish to include from within another flake.
+
+You can make the categories however you wish when you 
+add plugins to flake.nix and/or require('nixCats') in your lua and retrieve the value.
 
 ```nix
 {
@@ -177,12 +212,15 @@ If you want to add it to another flake, choose one of these methods:
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
+            # Importing via overlay makes them accessible
+            # via pkgs.packageName
             nixCats-nvim.overlays.${system}.nixCats
             nixCats-nvim.overlays.${system}.regularCats
           ];
         };
         # this is the equivalent of the nixCats package
-        customVimPackager = nixCats-nvim.customPackager.${system} packageDefinitions;
+        # except we can set the categories in the flake that calls it.
+        customVimBuilder = nixCats-nvim.customPackager.${system} packageDefinitions;
         packageDefinitions = {
           customvim = {
             settings = {
@@ -217,19 +255,17 @@ If you want to add it to another flake, choose one of these methods:
             packages.default = nixCats-nvim.packages.${system}.nixCats;
             packages.nixCats = pkgs.nixCats;
             packages.regularCats = pkgs.regularCats;
-            packages.customvim = customVimPackager "customvim";
+            packages.customvim = customVimBuilder "customvim";
         }
     );
 }
 ```
-There are more methods not covered in this readme, but are covered in the included help files.
+There are many more methods not covered in this readme, but are covered in the included help files.
 see: [nixCats.installation_options](./nixCatsHelp/installation.txt)
 
-With them you could partially or entirely recreate this flake.nix and/or the lua in another flake without redefining things (unless you want to).
+With them you could partially or entirely add to, change, or recreate this flake.nix and/or the lua 
 
-The categories and settings in these installation instructions are something created while creating your own config and exported.
-
-That will make sense. I promise. Those are your categories you make.
+in another flake without having to redefine things (although you can only either add new lua or recreate it).
 
 ---
 

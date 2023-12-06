@@ -70,6 +70,10 @@
       # This allows us to define categories and settings for or package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
+      # If you dont want nixCatsHelp in your root directory
+      # it is safe to simply change the relative path here.
+      # you could also just import the baseBuilder straight from nixCats github
+      # see :help nixCats.installation_options.advanced for more details on that.
       baseBuilder = import ./builder "${self}/nixCatsHelp";
       nixCatsBuilder = baseBuilder self pkgs
         # notice how it doesn't care that these are defined lower in the file?
@@ -80,7 +84,7 @@
         # to define and use a new category, simply add a new list to a set here, 
         # and later, you will include categoryname = true; in the set you
         # provide when you build the package using this builder function.
-        # see :help nixCats.flake.outputs.packaging for info on that section.
+        # see :help nixCats.flake.outputs.packageDefinitions for info on that section.
 
         # propagatedBuildInputs:
         # this section is for dependencies that should be available
@@ -123,8 +127,10 @@
             neodev-nvim
             neoconf-nvim
           ];
-          markdown = with pkgs.nixCatsBuilds; [
-            markdown-preview-nvim
+          # yes these category names are arbitrary
+          markdown = with pkgs.vimPlugins; [
+            # yes it knows this isn't with pkgs.vimPlugins
+            pkgs.nixCatsBuilds.markdown-preview-nvim
           ];
           gitPlugins = with pkgs.neovimPlugins; [
             hlargs
@@ -186,6 +192,13 @@
                 "tokyonight-day" = tokyonight-nvim;
               }
             )
+            # This is obviously a fairly basic usecase for this, but still nice.
+            # Better would be something like:
+            # language specific packaging that still keeps debuggers in the debugger category
+            # or excluding something within a category from only one or 2 packages.
+
+            # Checking packageDefinitions also has the bonus
+            # of being able to be easily set by importing flakes.
           ];
         };
 
@@ -343,10 +356,12 @@
         fresh = baseBuilder;
         keepLua = baseBuilder self;
       };
+      inherit utils;
 
+      # and you export this so people dont have to redefine stuff.
       inherit otherOverlays;
       inherit categoryDefinitions;
-      inherit utils;
+      inherit packageDefinitions;
 
     }
 

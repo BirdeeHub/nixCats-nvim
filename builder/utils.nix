@@ -4,20 +4,54 @@ rec {
 
   # These are to be exported in flake outputs
   utils = {
+    # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
       // (builtins.mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
+    # makes an overlay you can add to allow importing as pkgs.packageName
+    # and also a default overlay similarly to above but for overlays.
     mkOverlays = finalBuilder: packageDefinitions: defaultName:
-      { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); }
-      // (builtins.mapAttrs
-        (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
+      (utils.mkDefaultOverlay finalBuilder defaultName)
+      // (utils.mkExtraOverlays finalBuilder packageDefinitions);
 
+    # I may as well make these separate functions.
+    mkDefaultOverlay = finalBuilder: defaultName:
+      { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); };
+
+    mkExtraOverlays = finalBuilder: packageDefinitions:
+      builtins.mapAttrs (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions;
+
+    # maybe you want multiple nvim packages in the same system and want
+    # to add them like pkgs.MyNeovims.packageName when you install them?
+    # both to keep it organized and also to not have to worry about naming conflicts with programs?
+    mkMultiOverlay = finalBuilder: packageDefinitions: importName: namesIncList:
+      (self: super: {
+        ${importName} = builtins.listToAttrs (
+          builtins.map
+            (name:
+              {
+                inherit name;
+                value = finalBuilder name;
+              }
+            ) namesIncList
+          );
+        }
+      );
+
+    # allows for inputs named plugins-something to be turned into plugins automatically
     standardPluginOverlay = import ./standardPluginOverlay.nix;
 
-    mergeCatDefs = pkgs: oldCats: newCats: 
+    # returns a merged set of definitions, with new overriding old.
+    # updates anything it finds that isn't another set.
+    # this means it works slightly differently for environment variables
+    # because each one will be updated individually rather than at a category level.
+    mergeCatDefs = pkgs: oldCats: newCats:
       (name: pkgs.lib.recursiveUpdate (oldCats name) (newCats name));
 
+    # recursiveUpdate each overlay output to avoid issues where
+    # two overlays output a set of the same name when importing from other nixCats.
+    # Merges everything into 1 overlay
     mergeOverlayLists = oldOverlist: newOverlist: self: super: let
       oldOversMapped = builtins.map (value: value self super) oldOverlist;
       newOversMapped = builtins.map (value: value self super) newOverlist;
@@ -25,12 +59,16 @@ rec {
       mergedOvers = super.lib.foldr super.lib.recursiveUpdate { } combinedOversCalled;
     in
     mergedOvers;
+
   };
+
+# The following are part of the builder and do not need to be separately exported.
 
 # NIX CATS SECTION:
 
   # 2 recursive functions that rely on each other to
-  # convert nix attrsets and lists to Lua tables and lists of strings.
+  # convert nix attrsets and lists to Lua tables and lists of strings, 
+  # while literally translating booleans and null
   luaTablePrinter = attrSet: let
     luatableformatter = attrSet: let
       nameandstringmap = builtins.mapAttrs (name: value:
