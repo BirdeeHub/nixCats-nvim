@@ -1,7 +1,5 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
-# Only 3 files are marked with this header.
-# Please leave them in.
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 
