@@ -24,15 +24,18 @@ as you then only have to restart it rather than rebuild.
 However that also means the regularCats package must be cloned locally.
 
 You should clone regularCats to your ~/.config/ directory and 
-make sure the filename is <nixCats-nvim> so that you 
-can still keep everything in the same place when you do this.
+make sure the filename is nixCats-nvim, set via configDirName,
+so that you can still keep everything in the same place when you do this.
 
 If it is named something else, you will have to change configDirName
 in the settings section of flake.nix, or the name of the directory. 
 This also affects .local and the like.
 
-These are the basic options you export,
-using customPackager, packages and overlays:
+These are the basic options you export.
+However there are many more ways to do it. This is just a few.
+
+You could run nix build on a flake.nix containing this.
+It would produce 4 configured neovim packages.
 
 >nix
   {
@@ -53,7 +56,7 @@ using customPackager, packages and overlays:
           };
           # this is the equivalent of the nixCats package
           # but with a different colorscheme
-          customVimPackager = nixCats-nvim.customPackager.${system} packageDefinitions;
+          customVimBuilder = nixCats-nvim.customPackager.${system} packageDefinitions;
           packageDefinitions = {
             customvim = {
               settings = {
@@ -78,7 +81,6 @@ using customPackager, packages and overlays:
                 # you could also pass something else:
                 colorscheme = "catppuccin";
                 # you could :lua print(vim.inspect(require('nixCats')))
-                # I got carried away and it worked FIRST TRY.
                 # see :help nixCats
               };
             };
@@ -88,7 +90,7 @@ using customPackager, packages and overlays:
               packages.default = nixCats-nvim.packages.${system}.nixCats;
               packages.nixCats = pkgs.nixCats;
               packages.regularCats = pkgs.regularCats;
-              packages.customvim = customVimPackager "customvim";
+              packages.customvim = customVimBuilder "customvim";
           }
       );
   }
@@ -96,9 +98,15 @@ using customPackager, packages and overlays:
 
 ---------------------------------------------------------------------------------------
                                        *nixCats.installation_options.advanced*
-This is a showcase of the various utils and builders 
+
+This is a showcase of most of the various utils and builders 
 that get exported and how to use them.
-You could run nixBuild on a flake.nix containing only the following.
+You could run nix build on a standalone flake.nix file containing only the following.
+
+It would export all the same configurations and exported options as the original 
+but with an extra plugin and a new colorscheme.
+Although its wrapRc option is not useful since the lua is not locally present.
+So it does not export the regularCats package.
 
 >nix
   # Copyright (c) 2023 BirdeeHub
@@ -123,9 +131,11 @@ You could run nixBuild on a flake.nix containing only the following.
       flake-utils.lib.eachDefaultSystem (system: let
         utils = nixCats.utils.${system};
 
-        # you may use mergeOverlayLists to merge otherOverlays from other nixCats flakes
+        # Here we use mergeOverlayLists to merge otherOverlays from other nixCats flakes
+        # feel free to not do that and just include a list of overlays.
+        # you may uncomment the import statement to include an overlays directory
         otherOverlays = [ (utils.mergeOverlayLists nixCats.otherOverlays.${system}
-        ( /* (import ./overlays inputs) ++ */ # <-- you may uncomment this if desired
+        ( /* (import ./overlays inputs) ++ */ 
           [
             # add any flake overlays here.
           ]
@@ -133,27 +143,23 @@ You could run nixBuild on a flake.nix containing only the following.
         pkgs = import nixpkgs {
           inherit system;
           overlays = otherOverlays ++ [
+              # here we can also add the regular inputs from other nixCats like so
               (utils.standardPluginOverlay (nixCats.inputs // inputs))
             ];
           # config.allowUnfree = true;
         };
 
-        # Now that our plugin inputs/overlays and pkgs have been defined,
-        # We define a function to facilitate package building for particular categories
-        # to do this it imports ./builder/default.nix, passing it our information.
-        # This allows us to define categories and settings for 
-        # our package later and then choose a package.
-
         # see :help nixCats.flake.outputs.builder
         baseBuilder = nixCats.customBuilders.${system}.fresh;
 
-        # you could optionally define your own lua, but here we import it.
         # nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
+        # you could optionally define your own lua like above, but here we import it.
         nixCatsBuilder = nixCats.customBuilders.${system}.keepLua pkgs
           categoryDefinitions packageDefinitions;
 
         # see :help nixCats.flake.outputs.categories
-          # I am using the utils.mergeCatDefs option to add a new category
+          # I am using the utils.mergeCatDefs option 
+          # to add a new category without redefining the whole set.
           # if you edit an existing category name, your category will overwrite
           # the entire old category with that name.
 
@@ -176,48 +182,27 @@ You could run nixBuild on a flake.nix containing only the following.
           }
         );
 
-        # see :help nixCats.flake.outputs.settings
-        settings = {
-          nixCats = {
-            wrapRc = true;
-            configDirName = "nixCats-nvim";
-            viAlias = false;
-            vimAlias = true;
-          };
-        };
-
         # see :help nixCats.flake.outputs.packageDefinitions
         packageDefinitions = {
           nixCats = {
-            settings = settings.nixCats; 
-            categories = {
-              generalBuildInputs = true;
-              markdown = true;
-              gitPlugins = true;
-              general = true;
-              custom = true;
-              neonixdev = true;
-              test = true;
-              debug = false;
-              # this does not have an associated category of plugins, 
-              # but lua can still check for it
-              lspDebugMode = false;
-              # you could also pass something else:
-              eyeliner = true;
-              themer = true;
-              colorscheme = "tokyonight";
-            };
+            settings = nixCats.packageDefinitions.${system}.nixCats.settings;
+            categories = 
+              nixCats.packageDefinitions.${system}.nixCats.categories 
+              // {
+                eyeliner = true;
+                colorscheme = "tokyonight";
+              };
           };
         };
       in
-
-
 
       # see :help nixCats.flake.outputs.exports
       {
 
         # this will make a package out of each of the packageDefinitions defined above
         # and set the default package to the one named here.
+        # However, this flake only outputs 1 package so its not super needed.
+        # its an example, ok?
         packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
 
         # this will make an overlay out of each of the packageDefinitions defined above
@@ -241,13 +226,16 @@ You could run nixBuild on a flake.nix containing only the following.
         # You may use these to modify some or all of your categoryDefinitions
         customBuilders = {
           fresh = baseBuilder;
+          # this has no lua files to include, so instead of
           # keepLua = baseBuilder self;
+          # we instead use this to pass on the other lua we inherited
           keepLua = nixCats.customBuilders.${system}.keepLua;
         };
+        inherit utils;
 
         inherit otherOverlays;
         inherit categoryDefinitions;
-        inherit utils;
+        inherit packageDefinitions;
 
       }
 
