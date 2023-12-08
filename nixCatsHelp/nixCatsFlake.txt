@@ -50,6 +50,9 @@ The name here only affects the filename of the overall plugin, and should
 only effect things like packadd. Usually I would replace it with - or _
 You will then add it to categoryDefinitions later with the NEW name.
 
+For importing from specific tags or branchs, see here:
+https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
+
 If they have a build step or are not a plugin, 
 i.e. an lsp, dont name them in that format.
 
@@ -249,6 +252,12 @@ These are the defaults:
       withRuby = true;
       extraName = "";
       withPython3 = true;
+
+      # use this to pin a specific neovim version.
+      # import it in flake inputs with flake = false,
+      # then put inputs.neovim (or whatever you called it) here.
+      # It will be used to override the source for neovim-unwrapped.
+      nvimSRC = null;
     };
   };
 <

@@ -41,6 +41,7 @@ let
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
+    nvimSRC = null;
   } // packageDefinitons.${name}.settings;
 
   categories = packageDefinitons.${name}.categories;
@@ -182,6 +183,7 @@ in
 
     # add our propagated build dependencies
     myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+      src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
     });
 
