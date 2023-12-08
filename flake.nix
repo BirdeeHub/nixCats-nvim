@@ -25,6 +25,12 @@
       url = "github:j-hui/fidget.nvim/legacy";
       flake = false;
     };
+
+    # neovim = {
+    #   url = "github:neovim/neovim";
+    #   flake = false;
+    # };
+
     # a flake import. We will import this one with an overlay
     # but you could also import the package itself instead.
     # overlays are just nice if they are offered.
@@ -244,6 +250,7 @@
           configDirName = "nixCats-nvim";
           viAlias = false;
           vimAlias = true;
+          # nvimSRC = inputs.neovim;
         };
         unwrappedLua = {
           wrapRc = false;
