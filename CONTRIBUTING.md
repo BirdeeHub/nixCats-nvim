@@ -27,10 +27,18 @@ in nix/builder/default.nix, and all wrapping is done in nix/builder/wrapNeovim.n
 
 ---
 
-I will not be making lua changes outside of possibly adding borders to popup windows because the lua is really not the point of this repository.
+I will not be making many lua changes because the lua is really not the point of this repository.
+
+However I will fix it for breaking changes and make sure it continues to work well.
 
 I am unsure if I should add flake-compat or not.
 
 Let me know if there is anything else I am missing!
 
-I am still new to nix and do not yet know all the options available to me.
+I am still new to nix and do not yet know all the options available to me but I think I covered all the major ones.
+
+I am committed to keeping this repo up to date, as my main configuration imports this one via the same method as the default template.
+
+As such I will be running nix flake update probably around once a week. You import your own plugins, so, you don't have to worry about this breaking your plugins.
+
+If you are not ready for a neovim update and I run nix flake update, you may pin nixCats to a version, OR you may pin your neovim to any version you like, per package if desired.

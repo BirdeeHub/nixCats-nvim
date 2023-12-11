@@ -15,7 +15,7 @@
 
 # All the same options you make here will be automatically exported in a form available
 # in home manager and in nixosModules, as well as from other flakes.
-# each section is tagged with it's relevant help section.
+# each section is tagged with its relevant help section.
 
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
@@ -101,10 +101,10 @@
         # provide when you build the package using this builder function.
         # see :help nixCats.flake.outputs.packageDefinitions for info on that section.
 
-        # You may use packageDefinitions.${name} to further
+        # You may use packageDef to further
         # customize the contents of the set returned here per package,
-        # based on the info you may include in the packageDefinitions set,
-        # and the name of the package currently being built.
+        # based on the info you may include in the packageDefinitions set
+        # it contains the packageDefinitions entry for the package currently being built.
 
         # propagatedBuildInputs:
         # this section is for dependencies that should be available

@@ -15,7 +15,7 @@ The end result is it ends up being very much like using a neovim package manager
 
 except with the bonus of being able to install and set up more than just neovim plugins.
 
-It also allows for project specific packaging using nixCats for all the cool direnv stuff.
+It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
 You can require('nixCats') for what nix categories you created are included in the current package.
 
@@ -106,27 +106,22 @@ Although, it does specifically expect init.lua rather than init.vim at root leve
 It runs on linux, mac, and WSL. 
 You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste. If you're not on linux you don't need to care what those last 2 things mean.
 
-You can delete the lua and copy paste your lua into this flake, and then swap your package manager, and then define any package specific stuff you want.
-
-This is opposed to the usual method of cloning the flake, then put your lua stuff into where the flake says, possibly requiring it to be in the spots it has defined to be packaged in certain circumstances.
-
-This is designed to give you package specific config, AND nixOS integration, without ditching your lua.
+This is designed to give you package specific config, AND nixOS integration AND home manager integration, without ditching your lua. Or even leaving lua much at all.
 
 That being said, definitely explore first while you understand the concept. It boils down to a few concepts.
-
-In there are 2 general ideas I used to create this, stated above, and then a bunch of category sorting. The rest are just natural extensions of that.
 
     The idea:
     1. import flake as config file.
     2. Sort categories.
     3. Convert set that chooses the categories included verbatim to a lua table returned by nixCats.
+    4. export all the options possible
 
-    The clever part is organizing it so that doesn't suck. 
+    The clever part is organizing it so that it is not unusable.
     Read the nixperts help if you are curious as to how I implemented these 3 concepts,
     then check ./builder/utils.nix if you are REALLY curious.
 
-    It is entirely possible to use this flake and barely deal with the nix, 
-    and then make better use of the nix integration options 
+    It is entirely possible to use this flake and barely deal with the nix,
+    and then make better use of the nix integration options
     as desired later for when you go to import the flake to your system flake/flakes
 
 ---
@@ -179,7 +174,9 @@ you can access the help for nixCats by typing :help nixCats and choosing one
 of the options suggested by the auto-complete.
 
 Now that you have access to the help and a nix lsp, to get started,
-navigate to your nvim directory and run the following command:
+first exit neovim. (but not the nix shell!)
+
+In a terminal, navigate to your nvim directory and run the following command:
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim
 ```
@@ -188,9 +185,12 @@ along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the builder, utils, and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-You add plugins to the flake.nix, call the setup function for your lua,
+Re-enter the nixCats nvim version by typing nvim . and take a look!
+Reference the help and nixCats-nvim itself as a guide for importing your setup.
+
+You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
-only when that particular category is enabled in the current package.
+only when that particular category is enabled in the current package by checking ```require('nixCats')``` first.
 
 It is a similar process to migrating to a new neovim plugin manager.
 
@@ -202,14 +202,15 @@ The help will still be accessible in your version of the editor.
 
 When you have your plugins added, you can build it using nix build and it
 will build to a result directory, or nix profile install to install it to your
-profile. Make sure you run git add . first as anything not staged will not
+profile. Make sure you run ```git add .``` first as anything not staged will not
 be added to the store and thus not be findable by either nix or neovim.
 See nix documentation on how to use these commands further at:
 [the nix command reference manual](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
 
 When you have a working version, you can begin to explore the many
-options available for importing your new nix neovim
+options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
+There are many, thanks to the virtues of the category scheme of this flake.
 
 It is made to be customized into your own portable nix neovim distribution 
 with as many options as you wish, while requiring you to leave the normal
@@ -291,7 +292,9 @@ I also borrowed some code from nixpkgs and included links.
   A Neovim distribution configured using a NixOS module.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project with a similar philosophy to this one, but it has some devShell stuff for autodownloading stuff from git only within dev shell, and it does not have a category system or after folder.
+  A project with a similar philosophy to this one, but much simpler in many respects.
+  It does not have an after folder, nor does it have categories, exported options, or modules.
+  It does have a download system for downloading tester plugins only when ran as a dev shell.
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.

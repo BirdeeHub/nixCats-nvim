@@ -12,7 +12,9 @@ you can access the help for nixCats by typing :help nixCats and choosing one
 of the options suggested by the auto-complete.
 
 Now that you have access to the help and a nix lsp, to get started,
-navigate to your nvim directory and run the following command:
+first exit neovim. (but not the nix shell!)
+
+In a terminal, navigate to your nvim directory and run the following command:
 >bash
   nix flake init -t github:BirdeeHub/nixCats-nvim
 <
@@ -21,25 +23,32 @@ along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the builder, utils, and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-You add plugins to the flake.nix, call the setup function for your lua,
+Re-enter the nixCats nvim version by typing nvim . and take a look!
+Reference the help and nixCats-nvim itself as a guide for importing your setup.
+
+You add plugins to the flake.nix, call the default setup function in your lua,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
 only when that particular category is enabled in the current package.
+for how to check, see :h `nixCats`
+
+It is a similar process to migrating to a new neovim plugin manager.
 
 You are, of course, free to clone or fork nixCats-nvim instead if you prefer.
 
 Use the help and nixCats-nvim itself as an example.
 The help will still be accessible in your version of the editor.
 
-When you have your plugins added, you can build it using nix build and it
-will build to a result directory, or nix profile install to install it to your
-profile. Make sure you run git add . first as anything not staged will not
+When you have your plugins added, you can build it using 'nix build' and it
+will build to a result directory, or 'nix profile install' to install it to your
+profile. Make sure you run 'git add .' first as anything not staged will not
 be added to the store and thus not be findable by either nix or neovim.
 See nix documentation on how to use these commands further at:
 https://nixos.org/manual/nix/stable/command-ref/new-cli/nix
 
 When you have a working version, you can begin to explore the many
-options available for importing your new nix neovim
+options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
+There are many, thanks to the virtues of the category scheme of this flake.
 
 It is made to be customized into your own portable nix neovim distribution 
 with as many options as you wish, while requiring you to leave the normal

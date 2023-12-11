@@ -6,10 +6,8 @@
 
     This is a showcase of most of the various utils and builders 
     that get exported and how to use them.
-    You could run nix build on a standalone flake.nix file containing only the following.
-    Although you would need to comment out the `(import ./overlays inputs) ++` if you didn't have it.
 
-    It again does not make use of every option, but it uses most.
+    It does not make use of every option, but it uses most.
     see :help nixCats.flake.outputs.exports for the options used here as well as the rest.
 
     It would export all the same configurations and exported options as the original 
@@ -90,10 +88,10 @@
       # see :help nixCats.flake.outputs.categories
       categoryDefinitions = utils.mergeCatDefs pkgs 
         nixCats.categoryDefinitions.${system} (packageDef: {
-        # You may use packageDefinitions.${name} to further
+        # You may use packageDef to further
         # customize the contents of the set returned here per package,
-        # based on the info you may include in the packageDefinitions set,
-        # and the name of the package currently being built.
+        # based on the info you may include in the packageDefinitions set
+        # it contains the packageDefinitions entry for the package currently being built.
 
         startupPlugins = {
           eyeliner = with pkgs.vimPlugins; [
