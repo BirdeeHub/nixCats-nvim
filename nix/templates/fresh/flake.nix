@@ -1,11 +1,36 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
+
+# This is an empty nixCats config.
+# you may import this template directly into your nvim folder
+# and then add plugins to categories here,
+# and call the plugins with their default functions
+# within your lua, rather than through the nvim package manager's method.
+# Use the help, and the example repository https://github.com/BirdeeHub/nixCats-nvim
+
+# It allows for easy adoption of nix,
+# while still providing all the extra nix features immediately.
+# Configure in lua, check for a few categories, set a few settings,
+# output packages with combinations of those categories and settings.
+
+# All the same options you make here will be automatically exported in a form available
+# in home manager and in nixosModules, as well as from other flakes.
+# each section is tagged with it's relevant help section.
+
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    nixCats.url = "github:BirdeeHub/nixCats";
+
+    # for if you wish to select a particular neovim version
+    # neovim = {
+    #   url = "github:neovim/neovim";
+    #   flake = false;
+    # };
+    # add this to the settings set later in flake.nix
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
@@ -17,78 +42,69 @@
     # for specific tags, branches and commits, see:
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
 
-    "plugins-hlargs" = {
-      url = "github:m-demare/hlargs.nvim";
-      flake = false;
-    };
-    "plugins-fidget" = {
-      url = "github:j-hui/fidget.nvim/legacy";
-      flake = false;
-    };
-
-    # neovim = {
-    #   url = "github:neovim/neovim";
-    #   flake = false;
-    # };
-
-    # a flake import. We will import this one with an overlay
-    # but you could also import the package itself instead.
-    # overlays are just nice if they are offered.
-    nixd.url = "github:nix-community/nixd";
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, ... }@inputs:
+  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs:
     # This line makes this package available for all major systems
     # system is just a string like "x86_64-linux" or "aarch64-darwin"
     flake-utils.lib.eachDefaultSystem (system: let
-      utils = (import ./nix/utils).utils;
+      utils = nixCats.utils.${system};
 
       # see :help nixCats.flake.outputs.overlays
-      # This overlay grabs all the inputs named in the format
-      # `plugins-<pluginName>`
+      # This function grabs all the inputs named in the format
+      # `plugins-<pluginName>` and returns an overlay containing them.
       # Once we add this overlay to our nixpkgs, we are able to
       # use `pkgs.neovimPlugins`, which is a set of our plugins.
-      # we will import it separaly from the others
-      # so we can export it separately from the flake.
       standardPluginOverlay = utils.standardPluginOverlay;
+
       # you may define more overlays in the overlays directory, and import them
-      # in the default.nix file in that directory just like customBuildsOverlay.
-      # `pkgs.nixCatsBuilds` is a set of plugins defined in that file.
+      # in the default.nix file in that directory.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
       otherOverlays = (import ./overlays inputs) ++ [
         # add any flake overlays here.
-        inputs.nixd.overlays.default
       ];
+      # It is important otherOverlays and standardPluginOverlay
+      # are defined separately, because we will be exporting
+      # the other overlays we defined for ease of use when
+      # integrating various versions of your config with nix configs
+      # and attempting to redefine certain things for that system.
+
       pkgs = import nixpkgs {
         inherit system;
-        overlays = otherOverlays ++ 
-          [ (standardPluginOverlay inputs) ];
+        overlays = otherOverlays ++ [
+          # And here we apply standardPluginOverlay to our inputs.
+          (standardPluginOverlay inputs)
+        ];
         # config.allowUnfree = true;
       };
 
       # Now that our plugin inputs/overlays and pkgs have been defined,
       # We define a function to facilitate package building for particular categories
-      # to do this it imports ./builder/default.nix, passing it our information.
-      # This allows us to define categories and settings for our package later and then choose a package.
+      # This allows us to define categories and settings 
+      # for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      # If you dont want nixCatsHelp in your root directory
-      # it is safe to simply change the relative path here.
-      # you could also just import the baseBuilder straight from nixCats github
-      # see :help nixCats.installation_options.advanced for more details on that.
-      baseBuilder = import ./nix/builder "${self}/nix/nixCatsHelp";
+      baseBuilder = nixCats.customBuilders.${system}.fresh;
       nixCatsBuilder = baseBuilder self pkgs
         # notice how it doesn't care that these are defined lower in the file?
         categoryDefinitions packageDefinitions;
 
       # see :help nixCats.flake.outputs.categories
       categoryDefinitions = packageDef: {
-        # to define and use a new category, simply add a new list to a set here, 
+        # The top level sets are not arbitrary,
+        # they define what you can provide categories of.
+        # However, the categories within very much are arbitrary.
+        # simply add a new list to a set here,
         # and later, you will include categoryname = true; in the set you
         # provide when you build the package using this builder function.
         # see :help nixCats.flake.outputs.packageDefinitions for info on that section.
+
+        # You may use packageDefinitions.${name} to further
+        # customize the contents of the set returned here per package,
+        # based on the info you may include in the packageDefinitions set,
+        # and the name of the package currently being built.
 
         # propagatedBuildInputs:
         # this section is for dependencies that should be available
@@ -96,7 +112,10 @@
         # However, they WILL be available to the shell 
         # and neovim path when using nix develop
         propagatedBuildInputs = {
-          generalBuildInputs = with pkgs; [
+          # remember these categories are arbitrary
+          # we will include them by name per package as desired
+          # make as many lists as you want to.
+          general = with pkgs; [
           ];
         };
 
@@ -106,112 +125,40 @@
         # this includes LSPs
         lspsAndRuntimeDeps = {
           general = with pkgs; [
-            universal-ctags
-            ripgrep
-            fd
-          ];
-          neonixdev = with pkgs; [
-            # nix-doc tags will make your tags much better in nix
-            # but only if you have nil as well for some reason
-            nix-doc
-            nil
-            lua-language-server
-            nixd
           ];
         };
 
         # This is for plugins that will load at startup without using packadd:
         startupPlugins = {
-          debug = with pkgs.vimPlugins; [
-            nvim-dap
-            nvim-dap-ui
-            nvim-dap-virtual-text
-          ];
-          neonixdev = with pkgs.vimPlugins; [
-            neodev-nvim
-            neoconf-nvim
-          ];
-          # yes these category names are arbitrary
-          markdown = with pkgs.vimPlugins; [
-            # yes it knows this isn't with pkgs.vimPlugins
-            pkgs.nixCatsBuilds.markdown-preview-nvim
-          ];
-          gitPlugins = with pkgs.neovimPlugins; [
-            hlargs
-            fidget
-          ];
           general = with pkgs.vimPlugins; [
-            telescope-fzf-native-nvim
-            plenary-nvim
-            telescope-nvim
-            # treesitter
-            nvim-treesitter-textobjects
-            nvim-treesitter.withAllGrammars
-            # This is for if you only want some of the grammars
-            # (nvim-treesitter.withPlugins (
-            #   plugins: with plugins; [
-            #     nix
-            #     lua
-            #   ]
-            # ))
-            # cmp stuff
-            nvim-cmp
-            luasnip
-            friendly-snippets
-            cmp_luasnip
-            cmp-buffer
-            cmp-path
-            cmp-nvim-lua
-            cmp-nvim-lsp
-            cmp-cmdline
-            cmp-nvim-lsp-signature-help
-            cmp-cmdline-history
-            lspkind-nvim
-            # other
-            nvim-lspconfig
-            lualine-nvim
-            gitsigns-nvim
-            which-key-nvim
-            comment-nvim
-            vim-sleuth
-            vim-fugitive
-            vim-rhubarb
-            vim-repeat
-            undotree
-            nvim-surround
-            indent-blankline-nvim
-            nvim-web-devicons
           ];
-          themer = with pkgs.vimPlugins; [
-            # You can retreive information from the
-            # packageDefinitions of the package this was packaged with.
-            # you can use it to create something like subcategories
-            # that could still be set by customPackager
-            (builtins.getAttr packageDef.categories.colorscheme {
-                # Theme switcher without creating a new category
-                "onedark" = onedark-vim;
-                "catppuccin" = catppuccin-nvim;
-                "catppuccin-mocha" = catppuccin-nvim;
-                "tokyonight" = tokyonight-nvim;
-                "tokyonight-day" = tokyonight-nvim;
-              }
-            )
-            # This is obviously a fairly basic usecase for this, but still nice.
-            # Better would be something like:
-            # language specific packaging that still keeps debuggers in the debugger category
-            # or excluding something within a category from only one or 2 packages.
-
-            # Checking packageDefinitions also has the bonus
-            # of being able to be easily set by importing flakes.
-          ];
+          # themer = with pkgs.vimPlugins; [
+          #   # You can retreive information from the
+          #   # packageDefinitions of the package this was packaged with.
+          #   # you can use it to create something like subcategories
+          #   # that could still be set by customPackager
+          #   (builtins.getAttr packageDef.categories.colorscheme {
+          #       # Theme switcher without creating a new category
+          #       "onedark" = onedark-vim;
+          #       "catppuccin" = catppuccin-nvim;
+          #       "catppuccin-mocha" = catppuccin-nvim;
+          #       "tokyonight" = tokyonight-nvim;
+          #       "tokyonight-day" = tokyonight-nvim;
+          #     }
+          #   )
+          #   # This is obviously a fairly basic usecase for this, but still nice.
+          #   # Better would be something like:
+          #   # language specific packaging that still keeps debuggers in the debugger category
+          #   # or excluding something within a category from only one or 2 packages.
+          #
+          #   # Checking packageDefinitions also has the bonus
+          #   # of being able to be easily set by importing flakes.
+          # ];
         };
 
         # not loaded automatically at startup.
         # use with packadd and an autocommand in config to achieve lazy loading
         optionalPlugins = {
-          custom = with pkgs.nixCatsBuilds; [ ];
-          gitPlugins = with pkgs.neovimPlugins; [ ];
-          general = with pkgs.vimPlugins; [ ];
         };
 
         # environmentVariables:
@@ -246,18 +193,17 @@
       # see :help nixCats.flake.outputs.settings
       settings = {
         nixCats = {
-          # will check for config in the store rather than .config
+          # This folder is ran from the nix store
+          # if wrapRc = true;
           wrapRc = true;
-          configDirName = "nixCats-nvim";
           viAlias = false;
           vimAlias = true;
           # nvimSRC = inputs.neovim;
         };
         unwrappedLua = {
-          # will check for config in .config rather than the store
+          # However, wrapRc = false will make it
+          # look inside your .config directory
           wrapRc = false;
-          # will now look for nixCats-nvim within .config and .local and others
-          configDirName = "nixCats-nvim";
           viAlias = false;
           vimAlias = true;
         };
@@ -272,62 +218,37 @@
 
       # see :help nixCats.flake.outputs.packageDefinitions
       packageDefinitions = {
+        # These are the names of your packages
         nixCats = {
+          # they contain a settings set defined above
           settings = settings.nixCats; 
+          # and a set of categories that you want
+          # (and other information to pass to lua)
           categories = {
-            generalBuildInputs = true;
-            markdown = true;
-            gitPlugins = true;
             general = true;
-            custom = true;
-            neonixdev = true;
+            # themer = true;
+            # colorscheme = onedark;
             test = true;
-            debug = false;
-            # this does not have an associated category of plugins, 
-            # but lua can still check for it
-            lspDebugMode = false;
-            # you could also pass something else:
-            themer = true;
-            colorscheme = "onedark";
-            theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
-              thing2 = [
-                {
-                  thing3 = [ "give" "treat" ];
-                }
-                "I LOVE KEYBOARDS"
+            example = {
+              youCan = "add more than just booleans";
+              toThisSet = [
+                "and the contents of this categories set"
+                "will be accessible to your lua with"
+                "require('nixCats')"
+                "booleans and null will be converted"
+                "sets and lists are recursively evaluated"
+                "everything else will become a string"
               ];
-              thing4 = "couch is for scratching";
             };
-            # you could :lua print(vim.inspect(require('nixCats').theWorstCat))
-            # I got carried away and it worked FIRST TRY.
-            # see :help nixCats
           };
         };
         regularCats = { 
           settings = settings.unwrappedLua;
           categories = {
-            generalBuildInputs = true;
-            markdown = true;
-            gitPlugins = true;
+            # themer = true;
+            # colorscheme = catppuccin;
             general = true;
-            custom = true;
-            neonixdev = true;
-            debug = false;
             test = true;
-            lspDebugMode = false;
-            themer = true;
-            colorscheme = "catppuccin";
-            theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
-              thing2 = [
-                {
-                  thing3 = [ "give" "treat" ];
-                }
-                "I LOVE KEYBOARDS"
-              ];
-              thing4 = "couch is for scratching";
-            };
           };
         };
       };
@@ -386,13 +307,5 @@
       };
 
     }
-    # these get merged in at the end to the result of flake-utils.eachDefaultSystem
-    # This makes it so we dont have to type our system name to get our template.
-    # flake-utils is annoying that way. It puts everything in a system attrset
-    # even if it doesn't make sense.
-    # These will never be system dependent anyway.
-    # we dont have access to anything inside flake-utils here though.
-    # for how to use these templates see :help nixCats.installation_options
-  ) // { templates = (import ./nix/utils).utils.templates; };
-
+  ); # end of flake utils, which returns the value of outputs
 }

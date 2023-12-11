@@ -14,8 +14,9 @@ nixCats.flake.outputs	nixCatsFlake.txt	/*nixCats.flake.outputs*
 nixCats.flake.outputs.builder	nixCatsFlake.txt	/*nixCats.flake.outputs.builder*
 nixCats.flake.outputs.categories	nixCatsFlake.txt	/*nixCats.flake.outputs.categories*
 nixCats.flake.outputs.exports	nixCatsFlake.txt	/*nixCats.flake.outputs.exports*
+nixCats.flake.outputs.exports.mkHomeModules	nixCatsFlake.txt	/*nixCats.flake.outputs.exports.mkHomeModules*
+nixCats.flake.outputs.exports.mkNixosModules	nixCatsFlake.txt	/*nixCats.flake.outputs.exports.mkNixosModules*
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*
 nixCats.installation_options	installation.txt	/*nixCats.installation_options*
-nixCats.installation_options.advanced	installation.txt	/*nixCats.installation_options.advanced*

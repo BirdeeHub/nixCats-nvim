@@ -24,7 +24,7 @@ let
       # only for use when importing flake in a flake 
       # and need to only add a bit of lua for an added plugin
       optionalLuaAdditions = "";
-    } // (categoryDefFunction name)
+    } // (categoryDefFunction (packageDefinitons.${name}))
   )
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs
@@ -71,7 +71,7 @@ in
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter categoriesPlus}
+            return ${(import ../utils).luaTablePrinter categoriesPlus}
           '';
       in builtins.toFile "builder.sh" ''
         source $stdenv/setup
@@ -124,7 +124,7 @@ in
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
-    filterAndFlatten = (import ./utils.nix)
+    filterAndFlatten = (import ../utils)
           .filterAndFlattenAttrsOfLists pkgs categories;
 
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
@@ -138,13 +138,13 @@ in
     # and then maps name and value
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenWrapAttrs = (import ./utils.nix)
+    filterAndFlattenWrapAttrs = (import ../utils)
           .FilterAttrsOfAttrsFlatMapInner pkgs categories;
     # This one filters and flattens attrs of lists and then maps value
     # into a list of strings based on the function we provide it.
     # it the same as above but for a mapping function with 1 argument
     # because the inner is a list not a set.
-    filterAndFlattenWrapLists = (import ./utils.nix)
+    filterAndFlattenWrapLists = (import ../utils)
           .FilterAttrsOfListsFlatMapInner pkgs categories;
 
     # and then applied:

@@ -47,7 +47,7 @@ rec {
     # this means it works slightly differently for environment variables
     # because each one will be updated individually rather than at a category level.
     mergeCatDefs = pkgs: oldCats: newCats:
-      (name: pkgs.lib.recursiveUpdate (oldCats name) (newCats name));
+      (packageDef: pkgs.lib.recursiveUpdate (oldCats packageDef) (newCats packageDef));
 
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
@@ -59,6 +59,52 @@ rec {
       mergedOvers = super.lib.foldr super.lib.recursiveUpdate { } combinedOversCalled;
     in
     mergedOvers;
+
+
+    mkNixosModules = {
+      nixpkgs
+      , inputs
+      , otherOverlays
+      , baseBuilder
+      , luaPath ? ""
+      , keepLuaBuilder ? null
+      , pkgs
+      , categoryDefinitions
+      , packageDefinitions
+      , defaultPackageName }@exports: (import ./nixosModule.nix exports utils);
+
+    mkHomeModules = {
+      nixpkgs
+      , inputs
+      , otherOverlays
+      , baseBuilder
+      , luaPath ? ""
+      , keepLuaBuilder ? null
+      , pkgs
+      , categoryDefinitions
+      , packageDefinitions
+      , defaultPackageName }@exports: (import ./homeManagerModule.nix exports utils);
+
+    templates = {
+      fresh = {
+        path = ../templates/fresh;
+        description = "starting point template for making your neovim flake";
+      };
+      nixosModule = {
+        path = ../templates/nixosModule;
+        description = "nixOS module configuration template";
+      };
+      homeModule = {
+        path = ../templates/homeManager;
+        description = "Home Manager module configuration template";
+      };
+      mergeFlakeWithExisting = {
+        path = ../templates/touchUpExisting;
+        description = "A template showing how to merge in parts of other nixCats repos";
+      };
+
+      default = utils.templates.fresh;
+    };
 
   };
 

@@ -30,9 +30,9 @@ to a system nix config flake but maybe want to change something for that specifi
 
 You should make use of the in-editor help at:
 
-[:help nixCats](./nixCatsHelp/nixCats.txt)
+[:help nixCats](./nix/nixCatsHelp/nixCats.txt)
 
-[:help nixCats.flake](./nixCatsHelp/nixCatsFlake.txt)
+[:help nixCats.flake](./nix/nixCatsHelp/nixCatsFlake.txt)
 
 The help can be viewed here on github but it is adviseable to use a nix shell to view it from within the editor.
 
@@ -98,7 +98,7 @@ The solution:
 
 In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) or occasionally [customBuildsOverlay](./overlays/customBuildsOverlay.nix).
 
-That being said, if only for better understanding, there is a guide to going outside of those 2 files in [:help nixCats.flake.nixperts.nvimBuilder](./nixCatsHelp/nvimBuilder.txt) in case you want to.
+That being said, if only for better understanding, there is a guide to going outside of those 2 files in [:help nixCats.flake.nixperts.nvimBuilder](./nix/nixCatsHelp/nvimBuilder.txt) in case you want to.
 
 All config folders like ftplugin and after work as designed (see :h rtp), if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
 Although, it does specifically expect init.lua rather than init.vim at root level.
@@ -171,102 +171,101 @@ nix shell github:BirdeeHub/nixCats-nvim
 #or
 nix shell github:BirdeeHub/nixCats-nvim#nixCats
 # If using zsh with extra regexing, be sure to escape the #
+
+# now running nvim will open nixCats until you exit the shell.
 ```
+Now that you are within an editor outfitted to edit a flake,
+you can access the help for nixCats by typing :help nixCats and choosing one
+of the options suggested by the auto-complete.
 
-However, you should really just clone or fork the repo.
-
-It is made to be customized into your own portable nix neovim distribution with as many options as you wish.
-
-If you use the regularCats package, you only need to edit the flake itself to install new things.
-
-This is useful for faster iteration while editing lua config, as you then only have to restart it rather than rebuild.
-
-However that also means the regularCats package must be cloned locally.
-
-You should clone regularCats to your ~/.config/ directory
-and make sure the filename is ```nixCats-nvim``` so that you can still keep everything in the same place when you do this.
-
-To change this name, you can to change configDirName in the settings section of flake.nix, or the name of the directory. 
-This also affects .local and the like.
-
-If you want to add it to another flake, there are many methods. Here is an illustration of a few.
-
-You could run nix build on a directory containing only the following as a flake.nix
-
-outside of having separate packages in one configuration,
-The other option shown is your main form of options you create.
-
-That being, the ablity to choose which categories you wish to include from within another flake.
-
-You can make the categories however you wish when you 
-add plugins to flake.nix and/or require('nixCats') in your lua and retrieve the value.
-
-```nix
-{
-    description = "How to import nixCats flake in a flake. Several ways.";
-    inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-        flake-utils.url = "github:numtide/flake-utils";
-        nixCats-nvim.url = "github:BirdeeHub/nixCats-nvim";
-    };
-    outputs = { self, nixpkgs, flake-utils, nixCats-nvim }@inputs: 
-    flake-utils.lib.eachDefaultSystem (system: let 
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            # Importing via overlay makes them accessible
-            # via pkgs.packageName
-            nixCats-nvim.overlays.${system}.nixCats
-            nixCats-nvim.overlays.${system}.regularCats
-          ];
-        };
-        # this is the equivalent of the nixCats package
-        # except we can set the categories in the flake that calls it.
-        customVimBuilder = nixCats-nvim.customPackager.${system} packageDefinitions;
-        packageDefinitions = {
-          customvim = {
-            settings = {
-              wrapRc = true;
-              configDirName = "nixCats-nvim";
-              viAlias = false;
-              vimAlias = true;
-            };
-            categories = {
-              generalBuildInputs = true;
-              markdown = true;
-              gitPlugins = true;
-              general = true;
-              custom = true;
-              neonixdev = true;
-              test = true;
-              debug = false;
-              # this does not have an associated category of plugins, 
-              # but lua can still check for it
-              lspDebugMode = false;
-              themer = true;
-              # you could also pass something else:
-              colorscheme = "onedark";
-              # you could :lua print(vim.inspect(require('nixCats')))
-              # I got carried away and it worked FIRST TRY.
-              # see :help nixCats
-            };
-          };
-        };
-    in
-        {
-            packages.default = nixCats-nvim.packages.${system}.nixCats;
-            packages.nixCats = pkgs.nixCats;
-            packages.regularCats = pkgs.regularCats;
-            packages.customvim = customVimBuilder "customvim";
-        }
-    );
-}
+Now that you have access to the help and a nix lsp, to get started,
+navigate to your nvim directory and run the following command:
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim
 ```
-There are many more methods not covered in this readme, but are covered in the included help files.
-see: [nixCats.installation_options](./nixCatsHelp/installation.txt)
+This will create an empty version of flake.nix for you to fill in,
+along with an empty overlays directory for any custom builds from source
+required, if any. It will directly import the builder, utils, and
+help from nixCats-nvim itself, keeping your configuration clean.
+
+You add plugins to the flake.nix, call the setup function for your lua,
+and use lspconfig to set up lsps. You may optionally choose to set up a plugin
+only when that particular category is enabled in the current package.
+
+It is a similar process to migrating to a new neovim plugin manager.
+
+You are, of course, free to clone or fork nixCats-nvim instead
+and migrate your stuff into it if you prefer.
+
+Use the help and nixCats-nvim itself as an example.
+The help will still be accessible in your version of the editor.
+
+When you have your plugins added, you can build it using nix build and it
+will build to a result directory, or nix profile install to install it to your
+profile. Make sure you run git add . first as anything not staged will not
+be added to the store and thus not be findable by either nix or neovim.
+See nix documentation on how to use these commands further at:
+[the nix command reference manual](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
+
+When you have a working version, you can begin to explore the many
+options available for importing your new nix neovim
+into a nix system or home manager configuration.
+
+It is made to be customized into your own portable nix neovim distribution 
+with as many options as you wish, while requiring you to leave the normal
+nvim configuration scheme as little as possible.
+
+Think of it like, a build-your-own nixVim kit that doesn't
+require you to know all about nix right away to get most of the benefits.
+
+Further info:
+
+There are several other templates.
+They are designed to be used as examples for
+importing versions of your nixCats into another existing configuration.
+
+They are not particularly suited to being ran directly in your
+nvim config folder like the first one was.
+They are minimal examples of how to import nixCats in different ways.
+
+This one shows the options that get exported as a home manager module
+It also shows how to import the module.
+It is not a complete home manager flake in and of itself.
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#homeModule
+```
+This one shows the options that get exported as a nixOS module
+It also shows how to import the module.
+It is not a complete nixOS flake in and of itself.
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#nixosModule
+```
+This next one shows, within another flake, how to import 
+only some parts of other nixCats and overwrite or add others.
+You could use it, for example, to import just the overlays from another nixCats
+without having to copy paste them into your own version.
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#mergeFlakeWithExisting
+```
+When you make categories in your flake.nix,
+and then check them in lua, that creates your primary set of options.
+
+You can modify ANYTHING within a flake that imports your nixCats,
+however, usually, all you would need to do is choose a package you defined,
+or put different values in categories, because you can check the categories
+set within your lua and react to them.
+
+You could more or less build your own nixVim in your flake by choosing
+your categories carefully and referring to them within your lua.
+And then the options would get automatically exported
+for any way a nix user may want to set them.
+
+All info is covered in the included help files.
+For this section,
+see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
+and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.txt)
 
 With them you could partially or entirely add to, change, or recreate this flake.nix and/or the lua 
-
 in another flake without having to redefine things (although you can only either add new lua or recreate it).
 
 ---
@@ -275,7 +274,7 @@ in another flake without having to redefine things (although you can only either
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
-[./builder/standardPluginOverlay.nix](./builder/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
+[./builder/standardPluginOverlay.nix](./nix/utils/standardPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
 
 Thank you!!! It taught me both about an overlay's existence and how it works.
 
