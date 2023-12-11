@@ -199,7 +199,6 @@
             # This is obviously a fairly basic usecase for this, but still nice.
             # Better would be something like:
             # language specific packaging that still keeps debuggers in the debugger category
-            # or excluding something within a category from only one or 2 packages.
 
             # Checking packageDefinitions also has the bonus
             # of being able to be easily set by importing flakes.
@@ -255,6 +254,7 @@
         };
         unwrappedLua = {
           # will check for config in .config rather than the store
+          # this is mostly useful for fast iteration while editing lua.
           wrapRc = false;
           # will now look for nixCats-nvim within .config and .local and others
           configDirName = "nixCats-nvim";

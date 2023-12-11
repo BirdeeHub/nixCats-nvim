@@ -246,6 +246,8 @@ These are the defaults:
       # or would you rather it just read it in your .config/<configDirName>?
       # nixCats and this help will work either way.
       # this value will also be included in nixCats.
+      # The false setting is useful for fast iteration of lua changes.
+      # But it restricts where you may save the lua to the .config directory.
 >nix
       wrapRc = true;
 <
@@ -253,6 +255,7 @@ These are the defaults:
       # i.e. .config, .local/share, .local/state, .cache, etc... be?
       # This option is very useful when you want 
       # to clone an unwrapped config straight to the .config dir.
+      # It is also helpful to prevent other nvim packages sharing data folders.
       # see :help `$NVIM_APPNAME`
 >nix
       configDirName = "nvim";

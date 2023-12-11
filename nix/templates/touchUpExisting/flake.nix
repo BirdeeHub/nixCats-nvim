@@ -16,6 +16,8 @@
     but with an extra plugin and a new colorscheme.
     Although its wrapRc option is not useful since the lua is not locally present.
     So it does not export the regularCats package.
+    The wrapRc setting is mostly useful for fast iteration while editing lua.
+    But it restricts the locations in which you may store the flake to the .config directory.
   '';
 
   inputs = {

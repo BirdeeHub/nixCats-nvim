@@ -149,7 +149,6 @@
           #   # This is obviously a fairly basic usecase for this, but still nice.
           #   # Better would be something like:
           #   # language specific packaging that still keeps debuggers in the debugger category
-          #   # or excluding something within a category from only one or 2 packages.
           #
           #   # Checking packageDefinitions also has the bonus
           #   # of being able to be easily set by importing flakes.
@@ -203,6 +202,7 @@
         unwrappedLua = {
           # However, wrapRc = false will make it
           # look inside your .config directory
+          # this is mostly useful for fast iteration while editing lua.
           wrapRc = false;
           viAlias = false;
           vimAlias = true;
