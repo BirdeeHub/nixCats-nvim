@@ -6,41 +6,39 @@ The main drawback to using nix for nvim is when the thing is not on nixpkgs and 
 
 So, again, when you figure a derivation out, regardless of what nvim related thing it is, post it to discussions!!!
 
-Basically there are some debuggers on mason but not on nixpkgs so if you figure out how to build them in nix post it!
+Basically, there are some debuggers that are on mason and not on nixpkgs and thus do not work on nixOS.
+To build them you would need to make an overlay with a derivation for it inside. If you figure it out post the overlay to discussions.
 
 ---
 
-Outside of that, clone or fork the repo and do as you please, 
-but adding plugins and bells and whistles to main gets in the way of the kickstarter spirit.
+Please let me know about any nix options or features or improvements I should find a way to add to the scheme!
 
-There will be no major lua additions, outside of possibly adding borders to popup windows
-because I've been told people like that. The lua is not the point of this repository.
+I would especially like someone more experienced than me in the exact load order of noevim
+to help me ensure that it loads as accurately as possible.
 
----
+It loads in what I think is the correct order,
+however, I would like verification beyond my ability to read neovim documentation.
 
-My roadmap:
+If it is not accurate, this would be fixable without changing the interface for flake.nix,
+but I cannot fix what I do not know is broken.
 
-I will be adding a nixOS module that exports the same options but is configurable within
-configuration.nix for both system and user.
-
-Currently in a local branch I have system level options that work and user level options that don't,
-so this will take me at least some amount of time to make in a satisfactory manner.
-
-It will be generated in utils based on the existing scheme and exported in outputs of flake.nix, keeping impact on flake.nix as minimal as possible.
-
-I will not be adding a module for home-manager,
-because you can already import flakes in home-manager and thus use the normal scheme for configuring within importing flakes.
-
-After adding the nixOS module, I will also be adding importable templates for several scenarios to provide easier use of the project.
-
-When doing this, I will most likely be moving builder/ and nixCatsHelp/ into a single nix/ directory to keep the project root clean.
-
-I will of course be updating help to match.
+All loading of the config folder is defined
+in nix/builder/default.nix, and all wrapping is done in nix/builder/wrapNeovim.nix, called by the builder/default.nix file.
 
 ---
 
-After that this repository will simply be recieving maintenance and be kept up to date with things like:
+I will not be making many lua changes because the lua is really not the point of this repository.
 
-running nix flake update about once a week and fixing any breaking changes made to the current plugins.
+However I will fix it for breaking changes and make sure it continues to work well.
 
-My personal configuration imports the builder from this one straight from github so at the very least I am committed to running flake update every once in a while.
+I am unsure if I should add flake-compat or not.
+
+Let me know if there is anything else I am missing!
+
+I am still new to nix and do not yet know all the options available to me but I think I covered all the major ones.
+
+I am committed to keeping this repo up to date, as my main configuration imports this one via the same method as the default template.
+
+As such I will be running nix flake update probably around once a week. You import your own plugins, so, you don't have to worry about this breaking your plugins.
+
+If you are not ready for a neovim update and I run nix flake update, you may pin nixCats to a version, OR you may pin your neovim to any version you like, per package if desired.

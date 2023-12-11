@@ -50,8 +50,8 @@ and update default values with the new ones.
             optionalLuaAdditions = "";
 >nix
             # notice we now call the categoryDefFunction 
-            # with name as an argument?
-        } // (categoryDefFunction name)
+            # with this packages packageDefiniton as an argument?
+        } // (categoryDefFunction (packageDefinitons.${name}))
       )
       # and then we inherit them to make them easily available.
       startupPlugins optionalPlugins 
@@ -71,6 +71,7 @@ and update default values with the new ones.
         extraName = "";
         withPython3 = true;
         configDirName = "nvim";
+        nvimSRC = null;
       } // packageDefinitons.${name}.settings;
 
       categories = packageDefinitons.${name}.categories;
@@ -115,7 +116,7 @@ and update default values with the new ones.
             vim.api.nvim_create_user_command('NixCats', 
             [[lua print(vim.inspect(require('nixCats')))]] , 
             { desc = 'So Cute!' })
-            return ${(import ./utils.nix).luaTablePrinter categoriesPlus}
+            return ${(import ../utils.nix).luaTablePrinter categoriesPlus}
           '';
       # It installs itself and these docs to wherever it installs to.
       in builtins.toFile "builder.sh" ''
@@ -180,7 +181,7 @@ and update default values with the new ones.
     # This is what allows for dynamic packaging in flake.nix.
     # It includes categories marked as true, then flattens to a single list.
 >nix
-    filterAndFlatten = (import ./utils.nix)
+    filterAndFlatten = (import ../utils)
           .filterAndFlattenAttrsOfLists pkgs categories;
 <
     # We can use that function to filter many of the options.
@@ -205,7 +206,7 @@ and update default values with the new ones.
     # categories in the builder for wrapper arguments
     # more info on wrapper arguments below.
 >nix
-    filterAndFlattenWrapAttrs = (import ./utils.nix)
+    filterAndFlattenWrapAttrs = (import ../utils)
           .FilterAttrsOfAttrsFlatMapInner pkgs categories;
 <
     # This one filters and flattens attrs of lists and then maps value
@@ -213,7 +214,7 @@ and update default values with the new ones.
     # it the same as above but for a mapping function with 1 argument
     # because the inner thing we are mapping is a list not a set.
 >nix
-    filterAndFlattenWrapLists = (import ./utils.nix)
+    filterAndFlattenWrapLists = (import ../utils)
           .FilterAttrsOfListsFlatMapInner pkgs categories;
 <
     # Each of these 2 functions actually take 4 arguments. But actually,
@@ -293,8 +294,10 @@ and update default values with the new ones.
                          *nixCats.flake.nixperts.nvimBuilder.generatingNeovim*
 
     # here is where we add our propagated build dependencies
+    # and specify custom neovim source if any
 >nix
     myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+      src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
     });
     in
