@@ -341,7 +341,7 @@ then it also exports all of them by name to choose from separately.
 Then we define our overlays, using utils.mkOverlay to do this for the same reason.
 utils.mkOverlay also makes a default overlay, and then 1 overlay per package.
 
-Then we define our dev shell. We simply use our nixCatsBuilder for this one.
+Then we define our dev shell. We simply use our nixCatsBuilder for that one.
 >nix
   packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
 
@@ -497,7 +497,7 @@ We create the module by exporting the following in our flake outputs.
 };
 
 utils.mkNixosModules exports a nixos module with the following options,
-and utils.mkHomeModules exports a home-manager module with the same exact options
+and utils.mkHomeModules exports a home-manager module with the SAME EXACT options
 as the nixos module has for system, but for the user managed by home-manager.
 
 >nix

@@ -9,6 +9,9 @@
     You could run nix build on a standalone flake.nix file containing only the following.
     Although you would need to comment out the `(import ./overlays inputs) ++` if you didn't have it.
 
+    It again does not make use of every option, but it uses most.
+    see :help nixCats.flake.outputs.exports for the options used here as well as the rest.
+
     It would export all the same configurations and exported options as the original 
     but with an extra plugin and a new colorscheme.
     Although its wrapRc option is not useful since the lua is not locally present.

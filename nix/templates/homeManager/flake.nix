@@ -1,13 +1,13 @@
 {
   description = ''
-    My system config
-    THIS IS NOT A COMPLETE NIXOS CONFIG FILE!!!
+    THIS IS NOT A COMPLETE HOME MANAGER CONFIG FILE!!!
     THIS IS A TEMPLATE FOR JUST HOW TO IMPORT NIXCATS BASED CONFIGS INTO IT
 
-    THIS IS NOT A COMPLETE NIXOS CONFIG FILE!!!
+    THIS IS NOT A COMPLETE HOME MANAGER CONFIG FILE!!!
     THIS IS A TEMPLATE FOR JUST HOW TO IMPORT NIXCATS BASED CONFIGS INTO IT
 
     This is also not the only way to import flakes into configuration.nix
+
     For other nixCats options not included in this template
     see :help nixCats.flake.outputs.exports.mkHomeModules
   '';
