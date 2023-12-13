@@ -1,6 +1,5 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-print("TESTING")
 
 -- [[ Setting options ]]
 -- See `:help vim.o`

@@ -27,15 +27,11 @@ and update default values with the new ones.
           environmentVariables = {};
           extraWrapperArgs = {};
 
-          # these ones take sets of lists of FUNCTIONS,
+          # these ones take FUNCTIONS,
           # and those functions return lists of packages.
           # i.e. (_:[]) as a default argument
-          # so now you can put categories of lists of them in
+          # so now you can put categories of them in
           # and they will be sorted like everything else
-          # Idk why they work that way, 
-          # but just made a function to filter them, 
-          # call them, then combine the outputs.
-          # and I pass that in instead.
           # the source says:
           /* the function you would have passed to python.withPackages */
             extraPythonPackages = {};
@@ -148,18 +144,14 @@ and update default values with the new ones.
         let &runtimepath = join(runtimepath_list, ',')
 
         set runtimepath+=${LuaConfig}/after
-
-        lua package.path = package.path .. ';${LuaConfig}/init.lua'
-        lua require('${builtins.baseNameOf LuaConfig}')
+        source ${LuaConfig}/init.lua
       '' else ''
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
 
         execute "set runtimepath+=" . configdir . "/after"
-
-        lua package.path = package.path .. ';' .. vim.api.nvim_get_var('configdir') .. '/init.lua'
-        lua require('${configDir}')
+        execute "source " . configdir . "/init.lua"
       '') + ''
         lua << EOF
         ${optionalLuaAdditions}
@@ -198,9 +190,9 @@ and update default values with the new ones.
 ---------------------------------------------------------------------------------
                            *nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
 
-    # This one filters and flattens like above but for attrs of attrs 
-    # and then maps name and value
-    # into a list based on the function we provide it.
+    # This one filters and flattens like above
+    # but for if you need to map over the names and values of the
+    # innermost attribute sets, based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
     # you may use this to create entirely new 
     # categories in the builder for wrapper arguments
@@ -209,17 +201,15 @@ and update default values with the new ones.
     filterAndFlattenWrapAttrs = (import ../utils)
           .filterAndFlattenMapInnerAttrs categories;
 <
-    # This one filters and flattens attrs of lists and then maps value
-    # into a list based on the function we provide it.
-    # it the same as above but for a mapping function with 1 argument
-    # because the inner thing we are mapping is a list not a set.
+    # This one filters and flattens to a list like the first,
+    # but it also maps the result based on a function we give it.
 >nix
     filterAndFlattenWrapLists = (import ../utils)
           .filterAndFlattenMapInner categories;
 <
-    # Each of these 2 functions actually take 4 arguments. But actually,
-    # they are 4 separate functions inside one another.
-    # therefore we can supply it with the first 2 arguments, then supply it
+    # Each of these 2 functions actually take 3 arguments. But actually,
+    # they are 3 separate functions inside one another.
+    # therefore we can supply it with the first argument, then supply it
     # with a function to map, then later supply it with the final argument.
     # currently, it now works very much like a regular flatmap function.
     # it now takes a function, and a set of categories of stuff.

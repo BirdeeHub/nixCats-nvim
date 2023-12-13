@@ -182,21 +182,21 @@ These are the things you can return:
   categoryDefinitions = packageDef: {
 <
 <propagatedBuildInputs> 
-  a flexible set of categories, each containing a list of 
-  internal BUILD TIME dependencies. Will also be available to the devShell.
+  a flexible set of categories, each containing internal
+  BUILD TIME dependencies. Will also be available to the devShell.
 
 <lspsAndRuntimeDeps>
-  a flexible set of categories, each containing a list of LSP's or 
+  a flexible set of categories, each containing LSP's or 
   other internal runtime dependencies such as ctags or debuggers
   these are available to the PATH while within the neovim program.
   this includes the neovim terminal.
 
 <startupPlugins>
-  a flexible set of categories, each containing a list of startup plugins.
+  a flexible set of categories, each containing startup plugins.
   Startup plugins are loaded and can be required. 
 
 <optionalPlugins>
-  a flexible set of categories, each containing a list of optional plugins.
+  a flexible set of categories, each containing optional plugins.
   Optional plugins need to be added with packadd before being required.
 
 <environmentVariables>
@@ -204,19 +204,18 @@ These are the things you can return:
   EnvironmentVariableName = "EnvironmentVariableValue";
 
 <extraWrapperArgs>
-  a flexible set of categories, each containing a list of 
-  extra wrapper arguments.
+  a flexible set of categories, each containing extra wrapper arguments.
   If you don't know what that is, see here:
 github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
 
 <extraLuaPackages>
-  a flexible set of categories, each containing a list of FUNCTIONS 
+  a flexible set of categories, each containing FUNCTIONS 
   that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
 
 <extraPythonPackages> <extraPython3Packages> 
   TWO flexible sets of categories, one for python and the other for python3,
-  each containing a list of FUNCTIONS that return lists of python packages.
+  each containing FUNCTIONS that return lists of python packages.
   These functions are the same thing that you would pass to python.withPackages.
 
   <optionalLuaAdditions>* It can also take a lua string that can be run.
@@ -227,12 +226,103 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
     Therefore, I have included this option.
 }
 
-how this function actually works is covered in 
+how this function actually works is covered in more depth in
 :help `nixCats.flake.nixperts.nvimBuilder`
 In essence, the contents of each set listed here are filtered
 based on the packageDefinitions set you provide, 
 where by including categoryname = true; you enable that category.
 :help `nixCats.flake.outputs.packageDefinitions`
+
+It does this recursively.
+                            *nixCats.flake.outputs.categoryDefinitions.scheme*
+
+If, inside one of these main sets, you had another set,
+it would consider that a subcategory, and you could enable it
+just like you do with a normal category, by setting a value with the
+corresponding attribute path to true in the category
+set of `nixCats.flake.outputs.packageDefinitions`.
+You can nest them as much as you like, or just have a category that is a
+single derivation.
+
+There is a behavior to keep in mind.
+
+If in your categoryDefinitions you had the following:
+>nix
+    environmentVariables = {
+      test = {
+        subtest1 = {
+          CATTESTVAR = "It worked!";
+        };
+        subtest2 = {
+          CATTESTVAR3 = "It didn't work!";
+        };
+      };
+    };
+    extraWrapperArgs = {
+      test = [
+        '' --set CATTESTVAR2 "It worked again!"''
+      ];
+    };
+<
+And in your packageDefinitions set, under categories, you had the following:
+>nix
+    test = {
+      subtest1 = true;
+    };
+<
+you could echo $CATTESTVAR and $CATTESTVAR2 in your terminal to see them.
+However you could not echo $CATTESTVAR3.
+
+All items that are not attributes of the parent set will be included
+when you enable a subcategory. This includes lists, strings, functions, etc...
+
+However, attributes will not and you must explicitly enable all attributes of
+a subcategory if you set even 1 explicitly.
+
+Thus to include CATTESTVAR3, you would have to enable it like so: >nix
+    test = {
+      subtest1 = true;
+      subtest2 = true;
+    };
+< However, those are all the items in the test category.
+So instead we can do this to enable all the subcategories in test. >nix
+    test = true;
+<
+This applies in many situations. Take this one for example.
+>nix
+    lspsAndRuntimeDeps = {
+      neonixdev = {
+        inherit (pkgs)
+<          nix-doc nil lua-language-server nixd; >nix
+      };
+    };
+    startupPlugins = {
+      neonixdev = with pkgs.vimPlugins; [
+        neodev-nvim
+        neoconf-nvim
+      ];
+    };
+
+< If you were to put the following in your packageDefinitions: >nix
+    neonixdev.nix-doc = true;
+
+< neodev-nvim and neoconf-nvim would still be included.
+ However, nil, lua-language-server, and nixd would not be!
+ You would need to pick which of those you wanted separately.
+ Sometimes this is the desired behavior.
+ Sometimes it is not and a list of packages would be better suited.
+
+ You may also use the packageDef variable within categoryDefinitions
+ to get access to the set of categories and settings that are being
+ used to define the current package being built!
+>nix
+    themer = with pkgs.vimPlugins;
+      (builtins.getAttr packageDef.categories.colorscheme {
+          # Theme switcher without creating a new category
+          "onedark" = onedark-vim;
+          "catppuccin" = catppuccin-nvim;
+        }
+      );
 
 ---------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
@@ -332,6 +422,9 @@ You can require('nixCats') for the set you define here in your lua
 It returns a lua table of the same format.
 
 see :help `nixCats`
+
+For more nuances on enabling categories and subcategories, see above at
+:help `nixCats.flake.outputs.categoryDefinitions.scheme`
 
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
@@ -465,7 +558,8 @@ In addition to those, there is also 5 convenience functions:
 
 <mergeCatDefs> oldCats: newCats:
 for merging category definitions,
-will recursively update up to the first thing not an attrset
+will recursively update up to the first thing not an attrset.
+For our purposes, we do not consider derivations to be attrsets.
 
 <mergeOverlayLists> oldOverlist: newOverlist: self: super: let
 for merging lists of overlays like those in otherOverlays in a way 

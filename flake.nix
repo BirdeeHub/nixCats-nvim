@@ -84,6 +84,8 @@
         categoryDefinitions packageDefinitions;
 
       # see :help nixCats.flake.outputs.categories
+      # and
+      # :help nixCats.flake.outputs.categoryDefinitions.scheme
       categoryDefinitions = packageDef: {
         # to define and use a new category, simply add a new list to a set here, 
         # and later, you will include categoryname = true; in the set you
@@ -235,11 +237,13 @@
           ];
         };
 
+        # lists of the functions you would have passed to
+        # python.withPackages or lua.withPackages
         extraPythonPackages = {
-          test = [ (_:[]) ];
+          test = (_:[]);
         };
         extraPython3Packages = {
-          test = [ (_:[]) ];
+          test = (_:[]);
         };
         extraLuaPackages = {
           test = [ (_:[]) ];

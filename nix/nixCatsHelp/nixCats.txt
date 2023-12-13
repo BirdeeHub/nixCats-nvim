@@ -116,6 +116,8 @@ Note: it also accepts other things.
 lists will become arrays
 sets will become tables
 null will become nil
+If your attribute had a name illegal in lua,
+you may access your attribute with require('nixCats')["attr-name!"] syntax
 
 everything that isnt true, false, null, 
 a list, or a set becomes a lua string.
