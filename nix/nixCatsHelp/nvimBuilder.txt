@@ -182,15 +182,15 @@ and update default values with the new ones.
     # It includes categories marked as true, then flattens to a single list.
 >nix
     filterAndFlatten = (import ../utils)
-          .filterAndFlattenAttrsOfLists pkgs categories;
+          .filterAndFlatten categories;
 <
     # We can use that function to filter many of the options.
     # anything that has an argument in the wrapper and 
     # is a list of categories of packages, you can filter this way
 >nix
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ filterAndFlatten propagatedBuildInputs;
-    start = [ nixCats ] ++ filterAndFlatten startupPlugins;
-    opt = filterAndFlatten optionalPlugins;
+    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    start = [ nixCats ] ++ pkgs.lib.unique (filterAndFlatten startupPlugins);
+    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
 
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
     # It has cmake in it among other things.
@@ -207,7 +207,7 @@ and update default values with the new ones.
     # more info on wrapper arguments below.
 >nix
     filterAndFlattenWrapAttrs = (import ../utils)
-          .FilterAttrsOfAttrsFlatMapInner pkgs categories;
+          .filterAndFlattenMapInnerAttrs categories;
 <
     # This one filters and flattens attrs of lists and then maps value
     # into a list based on the function we provide it.
@@ -215,7 +215,7 @@ and update default values with the new ones.
     # because the inner thing we are mapping is a list not a set.
 >nix
     filterAndFlattenWrapLists = (import ../utils)
-          .FilterAttrsOfListsFlatMapInner pkgs categories;
+          .filterAndFlattenMapInner categories;
 <
     # Each of these 2 functions actually take 4 arguments. But actually,
     # they are 4 separate functions inside one another.
@@ -268,9 +268,9 @@ and update default values with the new ones.
       # this sets the name of the folder to look for nvim stuff in
       (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
       # and these are our now sorted args
-      ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
-      ++ (FandF_envVarSet environmentVariables)
-      ++ (FandF_passWrapperArgs extraWrapperArgs)
+      ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
+      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
+      ++ (pkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
     );
 <
 ---------------------------------------------------------------------------------

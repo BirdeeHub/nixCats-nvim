@@ -46,8 +46,8 @@ rec {
     # updates anything it finds that isn't another set.
     # this means it works slightly differently for environment variables
     # because each one will be updated individually rather than at a category level.
-    mergeCatDefs = pkgs: oldCats: newCats:
-      (packageDef: pkgs.lib.recursiveUpdate (oldCats packageDef) (newCats packageDef));
+    mergeCatDefs = oldCats: newCats:
+      (packageDef: lib.recursiveUpdateCatDefs (oldCats packageDef) (newCats packageDef));
 
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
@@ -115,18 +115,20 @@ rec {
   # 2 recursive functions that rely on each other to
   # convert nix attrsets and lists to Lua tables and lists of strings, 
   # while literally translating booleans and null
-  luaTablePrinter = attrSet: let
+  luaTablePrinter = with builtins; attrSet: let
     luatableformatter = attrSet: let
-      nameandstringmap = builtins.mapAttrs (name: value:
+      nameandstringmap = mapAttrs (n: value: let
+          name = ''["${n}"]'';
+        in
         if value == true then "${name} = true"
         else if value == false then "${name} = false"
         else if value == null then "${name} = nil"
-        else if builtins.isList value then "${name} = ${luaListPrinter value}"
-        else if builtins.isAttrs value then "${name} = ${luaTablePrinter value}"
-        else "${name} = [[${builtins.toString value}]]"
+        else if isList value then "${name} = ${luaListPrinter value}"
+        else if isAttrs value then "${name} = ${luaTablePrinter value}"
+        else "${name} = [[${toString value}]]"
       ) attrSet;
-      resultList = builtins.attrValues nameandstringmap;
-      resultString = builtins.concatStringsSep ", " resultList;
+      resultList = attrValues nameandstringmap;
+      resultString = concatStringsSep ", " resultList;
     in
     resultString;
     catset = luatableformatter attrSet;
@@ -134,17 +136,17 @@ rec {
   in
   LuaTable;
 
-  luaListPrinter = theList: let
+  luaListPrinter = with builtins; theList: let
     lualistformatter = theList: let
-      stringlist = builtins.map (value:
+      stringlist = map (value:
         if value == true then "true"
         else if value == false then "false"
         else if value == null then "nil"
-        else if builtins.isList value then "${luaListPrinter value}"
-        else if builtins.isAttrs value then "${luaTablePrinter value}"
-        else "[[${builtins.toString value}]]"
+        else if isList value then "${luaListPrinter value}"
+        else if isAttrs value then "${luaTablePrinter value}"
+        else "[[${toString value}]]"
       ) theList;
-      resultString = builtins.concatStringsSep ", " stringlist;
+      resultString = concatStringsSep ", " stringlist;
     in
     resultString;
     catlist = lualistformatter theList;
@@ -155,48 +157,93 @@ rec {
 
 # NEOVIM BUILDER SECTION:
 
-  # takes an attrset of lists and an attrset of booleans,
-  # and returns a flattened list with only those lists 
+  # returns a flattened list with only those lists 
   # whose name was associated with a true value within the categories set
-  filterAndFlattenAttrsOfLists = pkgs: categories: SetOfCategoryLists: let
-    inputsToCheck = builtins.intersectAttrs SetOfCategoryLists categories;
-    thingsIncluded = builtins.mapAttrs (name: value:
-        if value == true then builtins.getAttr name SetOfCategoryLists else []
-      ) inputsToCheck;
-    listOfLists = builtins.attrValues thingsIncluded;
-    flattenedList = builtins.concatLists listOfLists;
-    flattenedUniqueList = pkgs.lib.unique flattenedList;
-  in
-  flattenedUniqueList;
+  filterAndFlatten = categories: categoryDefs:
+    flattenToList (RecFilterCats categories categoryDefs);
 
-  # takes an attrset of attrsets and an attrset of booleans,
-  # and returns a flattened list with only those sets 
-  # whose name was associated with a true value within the categories set
-  # and each of the items in the inner attrset that were included are mapped to
-  # a string based on the function action which takes 2 arguments
-  FilterAttrsOfAttrsFlatMapInner = pkgs: categories: twoArgFunc: SetOfCategoryAttrs: let
-    inputsToCheck = builtins.intersectAttrs SetOfCategoryAttrs categories;
-    thingsIncluded = builtins.mapAttrs (name: value:
-        if value == true then builtins.getAttr name SetOfCategoryAttrs else []
-      ) inputsToCheck;
-    listOfAttrs = builtins.attrValues thingsIncluded;
-    listOfListOfStrings = builtins.map (setOfVars: let
-        mappedAttrs = builtins.mapAttrs twoArgFunc setOfVars;
-        listOfStrings = builtins.attrValues mappedAttrs;
-      in
-      listOfStrings
-    ) listOfAttrs;
-    flattenedList = builtins.concatLists listOfListOfStrings;
-    flattenedUniqueList = pkgs.lib.unique flattenedList;
+  filterAndFlattenMapInnerAttrs = categories: twoArgFunc: categoryDefs:
+    flattenAttrMapLeaves twoArgFunc (RecFilterCats categories categoryDefs);
+
+  filterAndFlattenMapInner = categories: oneArgFunc: SetOfCategoryLists:
+    builtins.map oneArgFunc (filterAndFlatten categories SetOfCategoryLists);
+
+  RecFilterForTrue = with builtins; categories: let 
+    filterIt = attr: (lib.filterAttrs (name: value:
+        if isBool value
+        then value
+        else if isAttrs value && !lib.isDerivation value
+        then true
+        else false
+      ) attr);
+    mapper = cats: mapAttrs (name: value:
+        if isBool value then value else mapper (filterIt value)
+      ) (filterIt cats);
   in
-  flattenedUniqueList;
-  
-  #same as above but action can only take 1 argument, and the inner thing is lists
-  # as opposed to above where the inner thing is an attribute set.
-  # since we already wrote a function for sets of lists, we use that.
-  FilterAttrsOfListsFlatMapInner = pkgs: categories: oneArgFunc: SetOfCategoryLists: let
-    FandFed = filterAndFlattenAttrsOfLists pkgs categories SetOfCategoryLists;
-    mapped = builtins.map oneArgFunc FandFed;
+  mapper categories;
+
+  RecFilterCats = with builtins; categories: categoryDefs: let
+    mapper = subCats: defAttrs: mapAttrs 
+        (name: value: let
+          newDefAttr = getAttr name defAttrs;
+        in
+        if !(isAttrs value && isAttrs newDefAttr) || lib.isDerivation newDefAttr
+        then newDefAttr
+        else mapper value newDefAttr)
+      (intersectAttrs defAttrs subCats);
   in
-  mapped;
+  mapper (RecFilterForTrue categories) categoryDefs;
+
+  flattenToList = with builtins; attrset: concatMap
+    (v:
+      if isAttrs v && !lib.isDerivation v then flattenToList v else
+      (if isList v then v else [v])
+    ) (attrValues attrset);
+
+  flattenAttrMapLeaves = with builtins; twoArgFunc: attrset: let
+    mapAttrValues = attr: attrValues (mapAttrs (name: value:
+        if (isList value || isAttrs value)
+        then value
+        else (twoArgFunc name value)
+      ) attr);
+    flatten = attr: concatMap (v:
+        if isAttrs v && !lib.isDerivation v then flatten v else
+        (if isList v then v else [v])
+      ) (mapAttrValues attr);
+  in
+  flatten attrset;
+
+  # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
+  lib = with builtins; {
+    isDerivation = value: value.type or null == "derivation";
+
+    recursiveUpdateUntil = pred: lhs: rhs:
+      let f = attrPath:
+        zipAttrsWith (n: values:
+          let here = attrPath ++ [n]; in
+          if length values == 1
+          || pred here (elemAt values 1) (head values) then
+            head values
+          else
+            f here values
+        );
+      in f [] [rhs lhs];
+
+    recursiveUpdateCatDefs = lhs: rhs:
+      lib.recursiveUpdateUntil (path: lhs: rhs:
+            # I added this check for derivation because a category can be just a derivation.
+            # otherwise it would squish our single derivation category rather than update.
+          (!(isAttrs lhs && isAttrs rhs) && !(lib.isDerivation lhs && lib.isDerivation rhs))
+        ) lhs rhs;
+
+    filterAttrs = pred: set:
+      listToAttrs (concatMap 
+        (name: let value = set.${name}; in
+          if pred name value then
+          [({ inherit name value; })]
+          else []
+        ) (attrNames set));
+
+  };
 }
+

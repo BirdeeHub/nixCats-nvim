@@ -463,8 +463,9 @@ turned into an overlay containing them as plugins automatically
 
 In addition to those, there is also 5 convenience functions:
 
-<mergeCatDefs> pkgs: oldCats: newCats:
+<mergeCatDefs> oldCats: newCats:
 for merging category definitions,
+will recursively update up to the first thing not an attrset
 
 <mergeOverlayLists> oldOverlist: newOverlist: self: super: let
 for merging lists of overlays like those in otherOverlays in a way 

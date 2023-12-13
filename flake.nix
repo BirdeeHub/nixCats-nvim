@@ -74,7 +74,7 @@
       # This allows us to define categories and settings for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      # If you dont want nixCatsHelp in your root directory
+      # If you dont want nixCatsHelp in that directory
       # it is safe to simply change the relative path here.
       # you could also just import the baseBuilder straight from nixCats github
       # see :help nixCats.installation_options.advanced for more details on that.
@@ -110,14 +110,12 @@
             ripgrep
             fd
           ];
-          neonixdev = with pkgs; [
+          neonixdev = {
+            # also you can do this.
+            inherit (pkgs) nix-doc nil lua-language-server nixd;
             # nix-doc tags will make your tags much better in nix
             # but only if you have nil as well for some reason
-            nix-doc
-            nil
-            lua-language-server
-            nixd
-          ];
+          };
         };
 
         # This is for plugins that will load at startup without using packadd:
@@ -136,57 +134,62 @@
             # yes it knows this isn't with pkgs.vimPlugins
             pkgs.nixCatsBuilds.markdown-preview-nvim
           ];
-          gitPlugins = with pkgs.neovimPlugins; [
-            hlargs
-            fidget
-          ];
-          general = with pkgs.vimPlugins; [
-            telescope-fzf-native-nvim
-            plenary-nvim
-            telescope-nvim
-            # treesitter
-            nvim-treesitter-textobjects
-            nvim-treesitter.withAllGrammars
-            # This is for if you only want some of the grammars
-            # (nvim-treesitter.withPlugins (
-            #   plugins: with plugins; [
-            #     nix
-            #     lua
-            #   ]
-            # ))
-            # cmp stuff
-            nvim-cmp
-            luasnip
-            friendly-snippets
-            cmp_luasnip
-            cmp-buffer
-            cmp-path
-            cmp-nvim-lua
-            cmp-nvim-lsp
-            cmp-cmdline
-            cmp-nvim-lsp-signature-help
-            cmp-cmdline-history
-            lspkind-nvim
-            # other
-            nvim-lspconfig
-            lualine-nvim
-            gitsigns-nvim
-            which-key-nvim
-            comment-nvim
-            vim-sleuth
-            vim-fugitive
-            vim-rhubarb
-            vim-repeat
-            undotree
-            nvim-surround
-            indent-blankline-nvim
-            nvim-web-devicons
-          ];
-          themer = with pkgs.vimPlugins; [
-            # You can retreive information from the
-            # packageDefinitions of the package this was packaged with.
-            # you can use it to create something like subcategories
-            # that could still be set by customPackager
+          general = {
+            gitPlugins = with pkgs.neovimPlugins; [
+              hlargs
+              fidget
+            ];
+            vimPlugins = {
+              # now you can actually subcategory
+              cmp = with pkgs.vimPlugins; [
+                # cmp stuff
+                nvim-cmp
+                luasnip
+                friendly-snippets
+                cmp_luasnip
+                cmp-buffer
+                cmp-path
+                cmp-nvim-lua
+                cmp-nvim-lsp
+                cmp-cmdline
+                cmp-nvim-lsp-signature-help
+                cmp-cmdline-history
+                lspkind-nvim
+              ];
+              general = with pkgs.vimPlugins; [
+                telescope-fzf-native-nvim
+                plenary-nvim
+                telescope-nvim
+                # treesitter
+                nvim-treesitter-textobjects
+                nvim-treesitter.withAllGrammars
+                # This is for if you only want some of the grammars
+                # (nvim-treesitter.withPlugins (
+                #   plugins: with plugins; [
+                #     nix
+                #     lua
+                #   ]
+                # ))
+                # other
+                nvim-lspconfig
+                lualine-nvim
+                gitsigns-nvim
+                which-key-nvim
+                comment-nvim
+                vim-sleuth
+                vim-fugitive
+                vim-rhubarb
+                vim-repeat
+                undotree
+                nvim-surround
+                indent-blankline-nvim
+                nvim-web-devicons
+              ];
+            };
+          };
+          # You can retreive information from the
+          # packageDefinitions of the package this was packaged with.
+          themer = with pkgs.vimPlugins;
             (builtins.getAttr packageDef.categories.colorscheme {
                 # Theme switcher without creating a new category
                 "onedark" = onedark-vim;
@@ -195,14 +198,10 @@
                 "tokyonight" = tokyonight-nvim;
                 "tokyonight-day" = tokyonight-nvim;
               }
-            )
+            );
             # This is obviously a fairly basic usecase for this, but still nice.
-            # Better would be something like:
-            # language specific packaging that still keeps debuggers in the debugger category
-
             # Checking packageDefinitions also has the bonus
             # of being able to be easily set by importing flakes.
-          ];
         };
 
         # not loaded automatically at startup.
@@ -218,7 +217,12 @@
         # at RUN TIME for plugins. Will be available to path within neovim terminal
         environmentVariables = {
           test = {
-            CATTESTVAR = "It worked!";
+            subtest1 = {
+              CATTESTVAR = "It worked!";
+            };
+            subtest2 = {
+              CATTESTVAR3 = "It didn't work!";
+            };
           };
         };
 
@@ -277,11 +281,13 @@
           categories = {
             generalBuildInputs = true;
             markdown = true;
-            gitPlugins = true;
-            general = true;
+            general.vimPlugins = true;
+            general.gitPlugins = true;
             custom = true;
             neonixdev = true;
-            test = true;
+            test = {
+              subtest1 = true;
+            };
             debug = false;
             # this does not have an associated category of plugins, 
             # but lua can still check for it
@@ -309,7 +315,6 @@
           categories = {
             generalBuildInputs = true;
             markdown = true;
-            gitPlugins = true;
             general = true;
             custom = true;
             neonixdev = true;

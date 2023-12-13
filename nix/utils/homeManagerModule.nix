@@ -147,7 +147,7 @@
       then options_set.categoryDefinitions.replace
       else (
         if options_set.categoryDefinitions.merge != null then
-        (utils.mergeCatDefs newPkgs categoryDefinitions options_set.categoryDefinitions.merge)
+        (utils.mergeCatDefs categoryDefinitions options_set.categoryDefinitions.merge)
         else categoryDefinitions
       );
     newSystemPackageDefinition = {
