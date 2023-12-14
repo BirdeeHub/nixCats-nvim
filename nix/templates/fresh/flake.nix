@@ -23,7 +23,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    nixCats.url = "github:BirdeeHub/nixCats";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
     # for if you wish to select a particular neovim version
     # neovim = {

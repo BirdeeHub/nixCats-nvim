@@ -21,7 +21,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    nixCats.url = "github:BirdeeHub/nixCats";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
