@@ -92,11 +92,13 @@
         categoryDefinitions packageDefinitions;
 
       # see :help nixCats.flake.outputs.categories
+      # and
+      # :help nixCats.flake.outputs.categoryDefinitions.scheme
       categoryDefinitions = packageDef: {
         # The top level sets are not arbitrary,
         # they define what you can provide categories of.
         # However, the categories within very much are arbitrary.
-        # simply add a new list to a set here,
+        # simply add a new list, set or item to a set here,
         # and later, you will include categoryname = true; in the set you
         # provide when you build the package using this builder function.
         # see :help nixCats.flake.outputs.packageDefinitions for info on that section.
@@ -112,11 +114,6 @@
         # However, they WILL be available to the shell 
         # and neovim path when using nix develop
         propagatedBuildInputs = {
-          # remember these categories are arbitrary
-          # we will include them by name per package as desired
-          # make as many lists as you want to.
-          general = with pkgs; [
-          ];
         };
 
         # lspsAndRuntimeDeps:
@@ -124,35 +121,10 @@
         # at RUN TIME for plugins. Will be available to PATH within neovim terminal
         # this includes LSPs
         lspsAndRuntimeDeps = {
-          general = with pkgs; [
-          ];
         };
 
         # This is for plugins that will load at startup without using packadd:
         startupPlugins = {
-          general = with pkgs.vimPlugins; [
-          ];
-          # themer = with pkgs.vimPlugins; [
-          #   # You can retreive information from the
-          #   # packageDefinitions of the package this was packaged with.
-          #   # you can use it to create something like subcategories
-          #   # that could still be set by customPackager
-          #   (builtins.getAttr packageDef.categories.colorscheme {
-          #       # Theme switcher without creating a new category
-          #       "onedark" = onedark-vim;
-          #       "catppuccin" = catppuccin-nvim;
-          #       "catppuccin-mocha" = catppuccin-nvim;
-          #       "tokyonight" = tokyonight-nvim;
-          #       "tokyonight-day" = tokyonight-nvim;
-          #     }
-          #   )
-          #   # This is obviously a fairly basic usecase for this, but still nice.
-          #   # Better would be something like:
-          #   # language specific packaging that still keeps debuggers in the debugger category
-          #
-          #   # Checking packageDefinitions also has the bonus
-          #   # of being able to be easily set by importing flakes.
-          # ];
         };
 
         # not loaded automatically at startup.
@@ -164,28 +136,21 @@
         # this section is for environmentVariables that should be available
         # at RUN TIME for plugins. Will be available to path within neovim terminal
         environmentVariables = {
-          test = {
-            CATTESTVAR = "It worked!";
-          };
         };
 
         # If you know what these are, you can provide custom ones by category here.
         # If you dont, check this link out:
         # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
         extraWrapperArgs = {
-          test = [
-            '' --set CATTESTVAR2 "It worked again!"''
-          ];
         };
 
+        # lists of the functions you would have passed to
+        # python.withPackages or lua.withPackages
         extraPythonPackages = {
-          test = [ (_:[]) ];
         };
         extraPython3Packages = {
-          test = [ (_:[]) ];
         };
         extraLuaPackages = {
-          test = [ (_:[]) ];
         };
       };
 
@@ -225,9 +190,6 @@
           # and a set of categories that you want
           # (and other information to pass to lua)
           categories = {
-            general = true;
-            # themer = true;
-            # colorscheme = onedark;
             test = true;
             example = {
               youCan = "add more than just booleans";
@@ -245,10 +207,6 @@
         regularCats = { 
           settings = settings.unwrappedLua;
           categories = {
-            # themer = true;
-            # colorscheme = catppuccin;
-            general = true;
-            test = true;
           };
         };
       };

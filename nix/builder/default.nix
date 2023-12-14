@@ -99,18 +99,14 @@ in
         let &runtimepath = join(runtimepath_list, ',')
 
         set runtimepath+=${LuaConfig}/after
-
-        lua package.path = package.path .. ';${LuaConfig}/init.lua'
-        lua require('${builtins.baseNameOf LuaConfig}')
+        source ${LuaConfig}/init.lua
       '' else ''
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
 
         execute "set runtimepath+=" . configdir . "/after"
-
-        lua package.path = package.path .. ';' .. vim.api.nvim_get_var('configdir') .. '/init.lua'
-        lua require('${configDir}')
+        execute "source " . configdir . "/init.lua"
       '') + ''
         lua << EOF
         ${optionalLuaAdditions}
@@ -125,13 +121,13 @@ in
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
     filterAndFlatten = (import ../utils)
-          .filterAndFlattenAttrsOfLists pkgs categories;
+          .filterAndFlatten categories;
 
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
     # It has cmake in it I think among other things?
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ filterAndFlatten propagatedBuildInputs;
-    start = [ nixCats ] ++ filterAndFlatten startupPlugins;
-    opt = filterAndFlatten optionalPlugins;
+    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    start = [ nixCats ] ++ pkgs.lib.unique (filterAndFlatten startupPlugins);
+    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
 
     # For wrapperArgs:
     # This one filters and flattens like above but for attrs of attrs 
@@ -139,13 +135,13 @@ in
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
     filterAndFlattenWrapAttrs = (import ../utils)
-          .FilterAttrsOfAttrsFlatMapInner pkgs categories;
+          .filterAndFlattenMapInnerAttrs categories;
     # This one filters and flattens attrs of lists and then maps value
     # into a list of strings based on the function we provide it.
     # it the same as above but for a mapping function with 1 argument
     # because the inner is a list not a set.
     filterAndFlattenWrapLists = (import ../utils)
-          .FilterAttrsOfListsFlatMapInner pkgs categories;
+          .filterAndFlattenMapInner categories;
 
     # and then applied:
 
@@ -175,9 +171,9 @@ in
       # this sets the name of the folder to look for nvim stuff in
       (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
       # and these are our other now sorted args
-      ++ (FandF_WrapRuntimeDeps lspsAndRuntimeDeps)
-      ++ (FandF_envVarSet environmentVariables)
-      ++ (FandF_passWrapperArgs extraWrapperArgs)
+      ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
+      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
+      ++ (pkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     );
 
