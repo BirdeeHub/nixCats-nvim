@@ -52,11 +52,11 @@ rec {
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
     # Merges everything into 1 overlay
-    mergeOverlayLists = oldOverlist: newOverlist: self: super: let
-      oldOversMapped = builtins.map (value: value self super) oldOverlist;
-      newOversMapped = builtins.map (value: value self super) newOverlist;
+    mergeOverlayLists = with builtins; oldOverlist: newOverlist: self: super: let
+      oldOversMapped = map (value: value self super) oldOverlist;
+      newOversMapped = map (value: value self super) newOverlist;
       combinedOversCalled = oldOversMapped ++ newOversMapped;
-      mergedOvers = super.lib.foldr super.lib.recursiveUpdate { } combinedOversCalled;
+      mergedOvers = foldl' lib.recursiveUpdateCatDefs { } combinedOversCalled;
     in
     mergedOvers;
 
@@ -233,7 +233,7 @@ rec {
       lib.recursiveUpdateUntil (path: lhs: rhs:
             # I added this check for derivation because a category can be just a derivation.
             # otherwise it would squish our single derivation category rather than update.
-          (!(isAttrs lhs && isAttrs rhs) && !(lib.isDerivation lhs && lib.isDerivation rhs))
+          (!(isAttrs lhs && isAttrs rhs) || (lib.isDerivation lhs || lib.isDerivation rhs))
         ) lhs rhs;
 
     filterAttrs = pred: set:
