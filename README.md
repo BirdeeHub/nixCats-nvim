@@ -7,7 +7,7 @@ This repo is not a lua showcase. You are meant to use your own lua once you unde
 It is aimed at people who know enough lua to comfortably proceed from a kickstarter level setup
 who want to swap to using nix while still using lua for configuration.
 
-For 95% of plugins and lsps, you won't need to do more than add plugin names to lists you make in flake.nix,
+For 95% of plugins and lsps, you won't need to do more than add plugin names to categories you make in flake.nix,
 
 then configure in lua using lspconfig or the regular setup or config functions provided by the plugin.
 
@@ -18,8 +18,6 @@ except with the bonus of being able to install and set up more than just neovim 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
 You can require('nixCats') for what nix categories you created are included in the current package.
-
-The categories are the lists you created that you added plugins to.
 
 Doing so allows you to define as many different packages as you want from the same config file.
 
