@@ -86,6 +86,8 @@
         categoryDefinitions packageDefinitions;
 
       # see :help nixCats.flake.outputs.categories
+      # and
+      # :help nixCats.flake.outputs.categoryDefinitions.scheme
       categoryDefinitions = utils.mergeCatDefs
         nixCats.categoryDefinitions.${system} (packageDef: {
         # You may use packageDef to further
