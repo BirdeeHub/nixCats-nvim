@@ -233,7 +233,7 @@ rec {
       lib.recursiveUpdateUntil (path: lhs: rhs:
             # I added this check for derivation because a category can be just a derivation.
             # otherwise it would squish our single derivation category rather than update.
-          (!(isAttrs lhs && isAttrs rhs) || (lib.isDerivation lhs || lib.isDerivation rhs))
+          (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
         ) lhs rhs;
 
     filterAttrs = pred: set:
