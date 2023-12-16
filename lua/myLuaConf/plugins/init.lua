@@ -1,5 +1,3 @@
-local nixCats = require('nixCats').get
-
 vim.cmd.colorscheme(require('nixCats').get('colorscheme'))
 
 require('myLuaConf.plugins.telescope')

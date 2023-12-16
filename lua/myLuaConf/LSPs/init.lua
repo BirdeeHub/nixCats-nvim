@@ -1,6 +1,5 @@
-local categories = require('nixCats')
 local servers = {}
-if (categories.neonixdev) then
+if nixCats('neonixdev') then
   require('neodev').setup({})
   -- this allows our thing to have plugin library detection
   -- despite not being in our .config/nvim folder
@@ -31,7 +30,7 @@ if (categories.neonixdev) then
   servers.nil_ls = {}
 
 end
-if (categories.lspDebugMode) then
+if nixCats('lspDebugMode') then
   vim.lsp.set_log_level("debug")
 end
 

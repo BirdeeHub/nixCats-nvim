@@ -97,6 +97,7 @@ in
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
+        lua require('_G').nixCats = require('nixCats').get
         lua << EOF
         vim.api.nvim_create_user_command('NixCats', 
         [[lua print(vim.inspect(require('nixCats')))]] , 
