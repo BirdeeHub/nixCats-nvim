@@ -272,7 +272,8 @@
       # All categories you wish to include must be marked true,
       # but false may be omitted.
       # This entire set is also passed to nixCats for querying within the lua.
-      # It is passed as a Lua table with values name = boolean. same as here.
+      # It is directly translated to a Lua table, and a get function is defined.
+      # The get function is to prevent errors when querying subcategories.
 
       # see :help nixCats.flake.outputs.packageDefinitions
       packageDefinitions = {
