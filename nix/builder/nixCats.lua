@@ -17,7 +17,7 @@ function M.get(input)
 
     local cats = require('nixCats.cats')
     for _, key in ipairs(strtable) do
-        if type(cats) == "table" and cats[key] ~= nil then
+        if type(cats) == "table" then
             cats = cats[key]
         else
             return cats
