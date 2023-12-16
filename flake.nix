@@ -70,7 +70,7 @@
 
       # Now that our plugin inputs/overlays and pkgs have been defined,
       # We define a function to facilitate package building for particular categories
-      # to do this it imports ./builder/default.nix, passing it our information.
+      # to do this it imports ./nix/builder/default.nix, passing it our information.
       # This allows us to define categories and settings for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
