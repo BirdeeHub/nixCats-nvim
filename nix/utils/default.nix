@@ -118,7 +118,7 @@ rec {
   luaTablePrinter = with builtins; attrSet: let
     luatableformatter = attrSet: let
       nameandstringmap = mapAttrs (n: value: let
-          name = ''["" .. [[${n}]] .. ""]'';
+          name = ''[ [[${n}]] ]'';
         in
         if value == true then "${name} = true"
         else if value == false then "${name} = false"
