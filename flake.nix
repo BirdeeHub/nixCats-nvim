@@ -284,7 +284,6 @@
             general.vimPlugins = true;
             general.gitPlugins = true;
             custom = true;
-            c''u''sstom = true;
             neonixdev = true;
             test = {
               subtest1 = true;
