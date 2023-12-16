@@ -65,25 +65,25 @@ rec {
       nixpkgs
       , inputs
       , otherOverlays
-      , baseBuilder
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , pkgs
+      , system
       , categoryDefinitions
       , packageDefinitions
-      , defaultPackageName }@exports: (import ./nixosModule.nix exports utils);
+      , defaultPackageName
+      , ... }@exports: (import ./nixosModule.nix exports utils);
 
     mkHomeModules = {
       nixpkgs
       , inputs
       , otherOverlays
-      , baseBuilder
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , pkgs
+      , system
       , categoryDefinitions
       , packageDefinitions
-      , defaultPackageName }@exports: (import ./homeManagerModule.nix exports utils);
+      , defaultPackageName
+      , ... }@exports: (import ./homeManagerModule.nix exports utils);
 
     templates = {
       fresh = {
@@ -118,11 +118,12 @@ rec {
   luaTablePrinter = with builtins; attrSet: let
     luatableformatter = attrSet: let
       nameandstringmap = mapAttrs (n: value: let
-          name = ''["${n}"]'';
+          name = ''["" .. [[${n}]] .. ""]'';
         in
         if value == true then "${name} = true"
         else if value == false then "${name} = false"
         else if value == null then "${name} = nil"
+        else if lib.isDerivation value then "${name} = [[${value}]]"
         else if isList value then "${name} = ${luaListPrinter value}"
         else if isAttrs value then "${name} = ${luaTablePrinter value}"
         else "${name} = [[${toString value}]]"
@@ -142,6 +143,7 @@ rec {
         if value == true then "true"
         else if value == false then "false"
         else if value == null then "nil"
+        else if lib.isDerivation value then "[[${value}]]"
         else if isList value then "${luaListPrinter value}"
         else if isAttrs value then "${luaTablePrinter value}"
         else "[[${toString value}]]"
@@ -182,6 +184,7 @@ rec {
   in
   mapper categories;
 
+  # Overlays values in place of filtered true values from above
   RecFilterCats = with builtins; categories: categoryDefs: let
     mapper = subCats: defAttrs: mapAttrs 
         (name: value: let

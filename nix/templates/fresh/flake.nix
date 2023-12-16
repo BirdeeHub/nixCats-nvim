@@ -87,9 +87,8 @@
 
       # see :help nixCats.flake.outputs.builder
       baseBuilder = nixCats.customBuilders.${system}.fresh;
-      nixCatsBuilder = baseBuilder self pkgs
-        # notice how it doesn't care that these are defined lower in the file?
-        categoryDefinitions packageDefinitions;
+      nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
+        # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
       # and
@@ -200,6 +199,7 @@
                 "booleans and null will be converted"
                 "sets and lists are recursively evaluated"
                 "everything else will become a string"
+                "Yes you can pass derivation paths in here"
               ];
             };
           };
@@ -253,17 +253,17 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
 
     }
-  ); # end of flake utils, which returns the value of outputs
+  ) // { templates = nixCats.templates; }; # end of flake utils, which returns the value of outputs
 }

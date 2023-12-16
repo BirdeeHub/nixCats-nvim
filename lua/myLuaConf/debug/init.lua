@@ -75,5 +75,5 @@ require("nvim-dap-virtual-text").setup {
 }
 
 -- Install lang specific config
-local categories = require('nixCats')
+local cats = require('nixCats').get
 -- check language categories, require file with debugger setup in it.

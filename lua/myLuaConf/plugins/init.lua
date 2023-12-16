@@ -1,6 +1,6 @@
-local categories = require('nixCats')
+local nixCats = require('nixCats').get
 
-vim.cmd.colorscheme(require('nixCats').colorscheme)
+vim.cmd.colorscheme(require('nixCats').get('colorscheme'))
 
 require('myLuaConf.plugins.telescope')
 
@@ -8,7 +8,7 @@ require('myLuaConf.plugins.treesitter')
 
 require('myLuaConf.plugins.completion')
 
-if(categories.markdown) then
+if nixCats('markdown') then
   vim.g.mkdp_auto_close = 0
   vim.keymap.set('n','<leader>mp','<cmd>MarkdownPreview <CR>',{ noremap = true, desc = 'markdown preview' })
   vim.keymap.set('n','<leader>ms','<cmd>MarkdownPreviewStop <CR>',{ noremap = true, desc = 'markdown preview stop' })
@@ -27,7 +27,7 @@ require('fidget').setup()
 require('lualine').setup({
   options = {
     icons_enabled = false,
-    theme = require('nixCats').colorscheme,
+    theme = nixCats('colorscheme'),
     component_separators = '|',
     section_separators = '',
   },
@@ -36,7 +36,6 @@ require('lualine').setup({
       {
         'filename', path = 1, status = true,
       },
-      -- 'lsp_progress', -- replaced by fidget
     },
   },
 })

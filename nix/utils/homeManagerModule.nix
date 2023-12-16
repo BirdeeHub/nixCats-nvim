@@ -2,13 +2,13 @@
   nixpkgs
   , inputs
   , otherOverlays
-  , baseBuilder
   , luaPath ? ""
   , keepLuaBuilder ? null
-  , pkgs
+  , system
   , categoryDefinitions
   , packageDefinitions
   , defaultPackageName
+  , ...
 }: utils:
 
 { config, ... }@misc: {
@@ -137,7 +137,7 @@
     options_set = config.${defaultPackageName};
     newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
     newPkgs = import nixpkgs ({
-      inherit (pkgs) system;
+      inherit system;
       overlays = newOtherOverlays ++ [
           # here we can also add the regular inputs from other nixCats like so
           (utils.standardPluginOverlay (inputs // options_set.addInputs))
@@ -161,7 +161,7 @@
     home.packages = nixpkgs.lib.mkIf options_set.enable
       [ (
           (
-            if options_set.luaPath != "" then (baseBuilder options_set.luaPath)
+            if options_set.luaPath != "" then (import ../builder options_set.luaPath)
             else (
               if keepLuaBuilder != null then 
               keepLuaBuilder else 

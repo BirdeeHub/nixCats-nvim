@@ -74,14 +74,10 @@
       # This allows us to define categories and settings for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      # If you dont want nixCatsHelp in that directory
-      # it is safe to simply change the relative path here.
       # you could also just import the baseBuilder straight from nixCats github
-      # see :help nixCats.installation_options.advanced for more details on that.
-      baseBuilder = import ./nix/builder "${self}/nix/nixCatsHelp";
-      nixCatsBuilder = baseBuilder self pkgs
-        # notice how it doesn't care that these are defined lower in the file?
-        categoryDefinitions packageDefinitions;
+      baseBuilder = import ./nix/builder;
+      nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
+        # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
       # and
@@ -383,15 +379,15 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
 
     }
