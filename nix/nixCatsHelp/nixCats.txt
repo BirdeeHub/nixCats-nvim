@@ -135,6 +135,7 @@ everything that isnt true, false, null,
 a list, or a set becomes a lua string.
 it uses "[[${builtins.toString value}]]"
 in order to achieve this.
+It will throw an error if you pass an uncalled function.
 
 If theBestCat says meow, and you use this syntax,
 >lua
