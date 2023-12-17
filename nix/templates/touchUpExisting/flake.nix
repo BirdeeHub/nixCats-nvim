@@ -101,7 +101,7 @@
           ];
         };
         optionalLuaAdditions = ''
-          if require('nixCats').eyeliner then
+          if nixCats('eyeliner') then
             require'eyeliner'.setup {
               highlight_on_key = true,
               dim = true
