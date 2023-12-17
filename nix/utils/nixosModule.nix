@@ -1,14 +1,16 @@
-{ 
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
+{
   nixpkgs
   , inputs
   , otherOverlays
-  , baseBuilder
   , luaPath ? ""
   , keepLuaBuilder ? null
-  , pkgs
+  , system
   , categoryDefinitions
   , packageDefinitions
   , defaultPackageName
+  , ...
 }: utils:
 
 { config, ... }@misc: {
@@ -254,7 +256,7 @@
       user_options_set = config.${defaultPackageName}.users.${uname};
       newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays user_options_set.addOverlays) ];
       newPkgs = import nixpkgs ({
-        inherit (pkgs) system;
+        inherit system;
         overlays = newOtherOverlays ++ [
             # here we can also add the regular inputs from other nixCats like so
             (utils.standardPluginOverlay (inputs // user_options_set.addInputs))
@@ -281,14 +283,14 @@
         packages = nixpkgs.lib.mkIf user_options_set.enable
           [ (
               (
-                if user_options_set.luaPath != "" then (baseBuilder user_options_set.luaPath)
+                if user_options_set.luaPath != "" then (import ../builder user_options_set.luaPath)
                 else (
                   if keepLuaBuilder != null then 
                   keepLuaBuilder else 
                   builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
                 )
               )
-              pkgs newCategoryDefinitions
+              newPkgs newCategoryDefinitions
               newUserPackageDefinition user_options_set.packageName
             )
           ];
@@ -298,7 +300,7 @@
     options_set = config.${defaultPackageName};
     newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
     newPkgs = import nixpkgs ({
-      inherit (pkgs) system;
+      inherit system;
       overlays = newOtherOverlays ++ [
           # here we can also add the regular inputs from other nixCats like so
           (utils.standardPluginOverlay (inputs // options_set.addInputs))
@@ -323,7 +325,7 @@
     environment.systemPackages = nixpkgs.lib.mkIf options_set.enable
       [ (
           (
-            if options_set.luaPath != "" then (baseBuilder options_set.luaPath)
+            if options_set.luaPath != "" then (import ../builder options_set.luaPath)
             else (
               if keepLuaBuilder != null then 
               keepLuaBuilder else 

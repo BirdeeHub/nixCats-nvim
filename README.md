@@ -17,7 +17,7 @@ except with the bonus of being able to install and set up more than just neovim 
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
-You can require('nixCats') for what nix categories you created are included in the current package.
+You can nixCats('attr.path.to.value") for what nix categories you created are included in the current package.
 
 Doing so allows you to define as many different packages as you want from the same config file.
 
@@ -138,7 +138,7 @@ You then choose what categories to include in the package.
 
 You then set them up in your lua, using the default methods to do so. No more translating to your package manager! (If you were using lazy, the opt section goes into the setup function in the lua)
 
-You can optionally ask what categories you have in this package, whenever you require nixCats
+You can optionally ask what categories you have in this package, whenever you use nixCats('attr.path.to.value")
 
 If you encounter any build steps that are not well handled by nixpkgs, 
 or you need to import a plugin straight from git that has a non-standard build step and no flake,

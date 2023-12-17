@@ -69,7 +69,7 @@
         inherit system;
         overlays = otherOverlays ++ [
           # And here we apply standardPluginOverlay to our inputs.
-          (utils.standardPluginOverlay (nixCats.inputs // inputs))
+          (standardPluginOverlay (nixCats.inputs // inputs))
         ];
         # config.allowUnfree = true;
       };
@@ -172,8 +172,8 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
 
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
@@ -182,9 +182,9 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
 
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
     }
-  ); # end of flake utils, which returns the value of outputs
+  ) // { templates = nixCats.templates; }; # end of flake utils, which returns the value of outputs
 }

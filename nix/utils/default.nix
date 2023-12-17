@@ -47,7 +47,7 @@ rec {
     # this means it works slightly differently for environment variables
     # because each one will be updated individually rather than at a category level.
     mergeCatDefs = oldCats: newCats:
-      (packageDef: lib.recursiveUpdateCatDefs (oldCats packageDef) (newCats packageDef));
+      (packageDef: lib.recursiveUpdateUntilDRV (oldCats packageDef) (newCats packageDef));
 
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
@@ -56,7 +56,7 @@ rec {
       oldOversMapped = map (value: value self super) oldOverlist;
       newOversMapped = map (value: value self super) newOverlist;
       combinedOversCalled = oldOversMapped ++ newOversMapped;
-      mergedOvers = foldl' lib.recursiveUpdateCatDefs { } combinedOversCalled;
+      mergedOvers = foldl' lib.recursiveUpdateUntilDRV { } combinedOversCalled;
     in
     mergedOvers;
 
@@ -65,25 +65,25 @@ rec {
       nixpkgs
       , inputs
       , otherOverlays
-      , baseBuilder
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , pkgs
+      , system
       , categoryDefinitions
       , packageDefinitions
-      , defaultPackageName }@exports: (import ./nixosModule.nix exports utils);
+      , defaultPackageName
+      , ... }@exports: (import ./nixosModule.nix exports utils);
 
     mkHomeModules = {
       nixpkgs
       , inputs
       , otherOverlays
-      , baseBuilder
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , pkgs
+      , system
       , categoryDefinitions
       , packageDefinitions
-      , defaultPackageName }@exports: (import ./homeManagerModule.nix exports utils);
+      , defaultPackageName
+      , ... }@exports: (import ./homeManagerModule.nix exports utils);
 
     templates = {
       fresh = {
@@ -118,11 +118,12 @@ rec {
   luaTablePrinter = with builtins; attrSet: let
     luatableformatter = attrSet: let
       nameandstringmap = mapAttrs (n: value: let
-          name = ''["${n}"]'';
+          name = ''[ [[${n}]] ]'';
         in
         if value == true then "${name} = true"
         else if value == false then "${name} = false"
         else if value == null then "${name} = nil"
+        else if lib.isDerivation value then "${name} = [[${value}]]"
         else if isList value then "${name} = ${luaListPrinter value}"
         else if isAttrs value then "${name} = ${luaTablePrinter value}"
         else "${name} = [[${toString value}]]"
@@ -142,6 +143,7 @@ rec {
         if value == true then "true"
         else if value == false then "false"
         else if value == null then "nil"
+        else if lib.isDerivation value then "[[${value}]]"
         else if isList value then "${luaListPrinter value}"
         else if isAttrs value then "${luaTablePrinter value}"
         else "[[${toString value}]]"
@@ -182,6 +184,7 @@ rec {
   in
   mapper categories;
 
+  # Overlays values in place of filtered true values from above
   RecFilterCats = with builtins; categories: categoryDefs: let
     mapper = subCats: defAttrs: mapAttrs 
         (name: value: let
@@ -229,7 +232,7 @@ rec {
         );
       in f [] [rhs lhs];
 
-    recursiveUpdateCatDefs = lhs: rhs:
+    recursiveUpdateUntilDRV = lhs: rhs:
       lib.recursiveUpdateUntil (path: lhs: rhs:
             # I added this check for derivation because a category can be just a derivation.
             # otherwise it would squish our single derivation category rather than update.

@@ -70,18 +70,14 @@
 
       # Now that our plugin inputs/overlays and pkgs have been defined,
       # We define a function to facilitate package building for particular categories
-      # to do this it imports ./builder/default.nix, passing it our information.
+      # to do this it imports ./nix/builder/default.nix, passing it our information.
       # This allows us to define categories and settings for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      # If you dont want nixCatsHelp in that directory
-      # it is safe to simply change the relative path here.
       # you could also just import the baseBuilder straight from nixCats github
-      # see :help nixCats.installation_options.advanced for more details on that.
-      baseBuilder = import ./nix/builder "${self}/nix/nixCatsHelp";
-      nixCatsBuilder = baseBuilder self pkgs
-        # notice how it doesn't care that these are defined lower in the file?
-        categoryDefinitions packageDefinitions;
+      baseBuilder = import ./nix/builder;
+      nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
+        # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
       # and
@@ -142,7 +138,7 @@
               fidget
             ];
             vimPlugins = {
-              # now you can actually subcategory
+              # you can make a subcategory
               cmp = with pkgs.vimPlugins; [
                 # cmp stuff
                 nvim-cmp
@@ -191,6 +187,7 @@
           };
           # You can retreive information from the
           # packageDefinitions of the package this was packaged with.
+          # :help nixCats.flake.outputs.categoryDefinitions.scheme
           themer = with pkgs.vimPlugins;
             (builtins.getAttr packageDef.categories.colorscheme {
                 # Theme switcher without creating a new category
@@ -276,7 +273,8 @@
       # All categories you wish to include must be marked true,
       # but false may be omitted.
       # This entire set is also passed to nixCats for querying within the lua.
-      # It is passed as a Lua table with values name = boolean. same as here.
+      # It is directly translated to a Lua table, and a get function is defined.
+      # The get function is to prevent errors when querying subcategories.
 
       # see :help nixCats.flake.outputs.packageDefinitions
       packageDefinitions = {
@@ -299,8 +297,9 @@
             # you could also pass something else:
             themer = true;
             colorscheme = "onedark";
+            theBestCat = "says meow!!";
             theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
+              thing'1 = [ "MEOW" "HISSS" ];
               thing2 = [
                 {
                   thing3 = [ "give" "treat" ];
@@ -309,8 +308,6 @@
               ];
               thing4 = "couch is for scratching";
             };
-            # you could :lua print(vim.inspect(require('nixCats').theWorstCat))
-            # I got carried away and it worked FIRST TRY.
             # see :help nixCats
           };
         };
@@ -327,8 +324,9 @@
             lspDebugMode = false;
             themer = true;
             colorscheme = "catppuccin";
+            theBestCat = "says meow!!";
             theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
+              thing'1 = [ "MEOW" "HISSS" ];
               thing2 = [
                 {
                   thing3 = [ "give" "treat" ];
@@ -383,15 +381,15 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs baseBuilder otherOverlays 
-          pkgs categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays 
+          system categoryDefinitions packageDefinitions;
       };
 
     }

@@ -1,31 +1,30 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-helpPath: path: pkgs:
+path: pkgs:
 categoryDefFunction:
 packageDefinitons: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
-  inherit (
-    {
-      startupPlugins = {};
-      optionalPlugins = {};
-      lspsAndRuntimeDeps = {};
-      propagatedBuildInputs = {};
-      environmentVariables = {};
-      extraWrapperArgs = {};
+  catDefs = {
+    startupPlugins = {};
+    optionalPlugins = {};
+    lspsAndRuntimeDeps = {};
+    propagatedBuildInputs = {};
+    environmentVariables = {};
+    extraWrapperArgs = {};
   # the source says:
     /* the function you would have passed to python.withPackages */
   # So you put in a set of categories of lists of them.
-      extraPythonPackages = {};
-      extraPython3Packages = {};
-      # same thing except for lua.withPackages
-      extraLuaPackages = {};
-      # only for use when importing flake in a flake 
-      # and need to only add a bit of lua for an added plugin
-      optionalLuaAdditions = "";
-    } // (categoryDefFunction (packageDefinitons.${name}))
-  )
+    extraPythonPackages = {};
+    extraPython3Packages = {};
+  # same thing except for lua.withPackages
+    extraLuaPackages = {};
+  # only for use when importing flake in a flake 
+  # and need to only add a bit of lua for an added plugin
+    optionalLuaAdditions = "";
+  } // (categoryDefFunction (packageDefinitons.${name}));
+  inherit (catDefs)
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs
   environmentVariables extraWrapperArgs 
@@ -60,27 +59,32 @@ in
     };
 
     # see :help nixCats
-    nixCats = pkgs.stdenv.mkDerivation {
+    nixCats = pkgs.stdenv.mkDerivation (let
+      categoriesPlus = categories // {
+          inherit (settings) wrapRc;
+          nixCats_packageName = name;
+        };
+      init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
+      # we import as a string because you cannot pass derivation paths when using toFile
+      cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+      # nix attr names can have ' characters....
+      # Yes they show up unaltered now in lua....................
+      cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
+    in {
       name = "nixCats";
-      builder = let
-        categoriesPlus = categories // {
-            inherit (settings) wrapRc;
-            nixCats_packageName = name;
-          };
-        cats = builtins.toFile "nixCats.lua" ''
-            vim.api.nvim_create_user_command('NixCats', 
-            [[lua print(vim.inspect(require('nixCats')))]] , 
-            { desc = 'So Cute!' })
-            return ${(import ../utils).luaTablePrinter categoriesPlus}
-          '';
-      in builtins.toFile "builder.sh" ''
+      src = ../nixCatsHelp;
+      phases = [ "buildPhase" "installPhase" ];
+      buildPhase = ''
         source $stdenv/setup
-        mkdir -p $out/lua
+        mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
-        cp ${cats} $out/lua/nixCats.lua
-        cp -r ${helpPath}/* $out/doc
+        cp ${init} $out/lua/nixCats/init.lua
+        echo '${cleanCats}' > $out/lua/nixCats/cats.lua
       '';
-    };
+      installPhase = ''
+        cp -r $src/* $out/doc/
+      '';
+    });
 
     # create our customRC to call it
     # This makes sure our config is loaded first and our after is loaded last
@@ -93,21 +97,24 @@ in
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-      '' + (if settings.wrapRc then ''
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, "${LuaConfig}", 0)
-        let &runtimepath = join(runtimepath_list, ',')
 
-        set runtimepath+=${LuaConfig}/after
-        source ${LuaConfig}/init.lua
-      '' else ''
+      '' + (if settings.wrapRc then ''
+        let configdir = "${LuaConfig}"
+      '' else "") + ''
+
+        lua require('_G').nixCats = require('nixCats').get
+        lua << EOF
+        vim.api.nvim_create_user_command('NixCats',
+        [[lua print(vim.inspect(require('nixCats')))]] ,
+        { desc = 'So Cute!' })
+        EOF
+
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
-
         execute "set runtimepath+=" . configdir . "/after"
         execute "source " . configdir . "/init.lua"
-      '') + ''
+
         lua << EOF
         ${optionalLuaAdditions}
         EOF
@@ -134,33 +141,33 @@ in
     # and then maps name and value
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenWrapAttrs = (import ../utils)
+    filterAndFlattenMapInnerAttrs = (import ../utils)
           .filterAndFlattenMapInnerAttrs categories;
     # This one filters and flattens attrs of lists and then maps value
     # into a list of strings based on the function we provide it.
     # it the same as above but for a mapping function with 1 argument
     # because the inner is a list not a set.
-    filterAndFlattenWrapLists = (import ../utils)
+    filterAndFlattenMapInner = (import ../utils)
           .filterAndFlattenMapInner categories;
 
-    # and then applied:
+    # and then applied to give us a 1 argument function:
 
-    FandF_envVarSet = filterAndFlattenWrapAttrs 
+    FandF_envVarSet = filterAndFlattenMapInnerAttrs 
           (name: value: ''--set ${name} "${value}"'');
 
-    FandF_passWrapperArgs = filterAndFlattenWrapLists (value: value);
+    FandF_passWrapperArgs = filterAndFlattenMapInner (value: value);
 
     # add any dependencies/lsps/whatever we need available at runtime
-    FandF_WrapRuntimeDeps = filterAndFlattenWrapLists (value:
+    FandF_WrapRuntimeDeps = filterAndFlattenMapInner (value:
       ''--prefix PATH : "${pkgs.lib.makeBinPath [ value ] }"''
     );
 
     # extraPythonPackages and the like require FUNCTIONS that return lists.
     # so we make a function that returns a function that returns lists.
     # this is used for the fields in the wrapper where the default value is (_: [])
-    combineCatsOfFuncs = sect:
+    combineCatsOfFuncs = section:
       (x: let
-        appliedfunctions = builtins.map (value: (value) x ) (filterAndFlatten sect);
+        appliedfunctions = filterAndFlattenMapInner (value: (value) x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
         uniquifiedList = pkgs.lib.unique combinedFuncRes;
       in
