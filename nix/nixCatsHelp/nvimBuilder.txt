@@ -99,7 +99,7 @@ and update default values with the new ones.
     # it uses some recursive stuff in utils to print a lua table to a file.
     # That table is the categories we were including, 
     # plus wrapRc and the package name.
-    # Also it defines a user command and includes the help.
+    # Also it includes the help and an init file with a get function.
 >nix
     nixCats = pkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
@@ -131,9 +131,9 @@ and update default values with the new ones.
 <
     # and create our customRC to call it
     # This makes sure our config is loaded at the right time and our after is loaded last.
-    # It requires the root level init.lua file. 
+    # It sources the root level init.lua file.
     # It also removes the regular config dir from the path.
-    # The wrapper we are using might put it in the wrong place for our uses.
+    # The wrapper we are using might put it in the wrong place for our uses,
     # so we add in the config directory ourselves to prevent any issues.
     # even when wrapRc == false.
     # It also defines nixCats lua function, and NixCats user command.
@@ -170,8 +170,8 @@ and update default values with the new ones.
       # optionalLuaAdditions is not the suggested way to add lua to this flake
       # It is only for use when importing this flake in another flake 
       # and need to add a bit of lua for 
-      # an added plugin using a custom builder
-      # you could in theory add a directory to the runtimepath 
+      # an added plugin using a custom builder.
+      # You could in theory add a directory to the runtimepath 
       # with it though from another flake that imports this flake.
       # Yes you can require nixCats in it.
       # Again, not recommended.
@@ -210,8 +210,7 @@ and update default values with the new ones.
     filterAndFlattenMapInnerAttrs = (import ../utils)
           .filterAndFlattenMapInnerAttrs categories;
 <
-    # This one filters and flattens to a list like the first,
-    # but it also maps the result based on a function we give it.
+    # and this one just does filterAndFlatten and maps the resulting list
 >nix
     filterAndFlattenMapInner = (import ../utils)
           .filterAndFlattenMapInner categories;
