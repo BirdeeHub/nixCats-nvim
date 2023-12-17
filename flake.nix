@@ -138,7 +138,7 @@
               fidget
             ];
             vimPlugins = {
-              # now you can actually subcategory
+              # you can make a subcategory
               cmp = with pkgs.vimPlugins; [
                 # cmp stuff
                 nvim-cmp
@@ -187,6 +187,7 @@
           };
           # You can retreive information from the
           # packageDefinitions of the package this was packaged with.
+          # :help nixCats.flake.outputs.categoryDefinitions.scheme
           themer = with pkgs.vimPlugins;
             (builtins.getAttr packageDef.categories.colorscheme {
                 # Theme switcher without creating a new category
@@ -296,8 +297,9 @@
             # you could also pass something else:
             themer = true;
             colorscheme = "onedark";
+            theBestCat = "says meow!!";
             theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
+              thing'1 = [ "MEOW" "HISSS" ];
               thing2 = [
                 {
                   thing3 = [ "give" "treat" ];
@@ -306,8 +308,6 @@
               ];
               thing4 = "couch is for scratching";
             };
-            # you could :lua print(vim.inspect(require('nixCats').theWorstCat))
-            # I got carried away and it worked FIRST TRY.
             # see :help nixCats
           };
         };
@@ -324,8 +324,9 @@
             lspDebugMode = false;
             themer = true;
             colorscheme = "catppuccin";
+            theBestCat = "says meow!!";
             theWorstCat = {
-              thing1 = [ "MEOW" "HISSS" ];
+              thing'1 = [ "MEOW" "HISSS" ];
               thing2 = [
                 {
                   thing3 = [ "give" "treat" ];

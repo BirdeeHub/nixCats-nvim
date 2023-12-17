@@ -1,5 +1,8 @@
 local M = require('nixCats.cats')
 
+-- will return the nearest parent category value, unless the nearest
+-- parent is a table, in which case that means a different subcategory
+-- was enabled but this one was not. In that case it returns nil.
 function M.get(input)
     local strtable
     if type(input) == "table" then

@@ -12,11 +12,11 @@ We will take our arguments from flake.nix,
 and update default values with the new ones.
 >nix
 
-    helpPath: path: pkgs:
+    path: pkgs:
     categoryDefFunction:
     packageDefinitons: name:
     let
-      inherit ({
+      catDefs = {
 <
         # These are all the things your categoryDefFunction can return.
         # see: :help `nixCats.flake.nixperts.nvimBuilder.categories`
@@ -47,15 +47,15 @@ and update default values with the new ones.
 >nix
             # notice we now call the categoryDefFunction 
             # with this packages packageDefiniton as an argument?
-        } // (categoryDefFunction (packageDefinitons.${name}))
-      )
+        } // (categoryDefFunction (packageDefinitons.${name}));
       # and then we inherit them to make them easily available.
+      inherit (catDefs)
       startupPlugins optionalPlugins 
       lspsAndRuntimeDeps propagatedBuildInputs
       environmentVariables extraWrapperArgs 
       extraPythonPackages extraPython3Packages
       extraLuaPackages optionalLuaAdditions;
-
+<
       Then we get our settings and categories as well.
 >nix
       settings = {
@@ -101,28 +101,33 @@ and update default values with the new ones.
     # plus wrapRc and the package name.
     # Also it defines a user command and includes the help.
 >nix
-    nixCats = pkgs.stdenv.mkDerivation {
+    nixCats = pkgs.stdenv.mkDerivation (let
+      categoriesPlus = categories // {
+          inherit (settings) wrapRc;
+          nixCats_packageName = name;
+        };
+      init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
+      # we import as a string because you cannot pass derivation paths when using toFile
+      cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+      # nix attr names can have ' characters....
+      # Yes they show up unaltered now in lua....................
+      cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
+    in {
       name = "nixCats";
-      builder = let
-        categoriesPlus = categories // { 
-            inherit (settings) wrapRc;
-            nixCats_packageName = name; 
-          };
-        cats = builtins.toFile "nixCats.lua" ''
-            vim.api.nvim_create_user_command('NixCats', 
-            [[lua print(vim.inspect(require('nixCats')))]] , 
-            { desc = 'So Cute!' })
-            return ${(import ../utils.nix).luaTablePrinter categoriesPlus}
-          '';
-      # It installs itself and these docs to wherever it installs to.
-      in builtins.toFile "builder.sh" ''
+      src = ../nixCatsHelp;
+      phases = [ "buildPhase" "installPhase" ];
+      buildPhase = ''
         source $stdenv/setup
-        mkdir -p $out/lua
+        mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
-        cp ${cats} $out/lua/nixCats.lua
-        cp -r ${helpPath}/* $out/doc
+        cp ${init} $out/lua/nixCats/init.lua
+        echo '${cleanCats}' > $out/lua/nixCats/cats.lua
       '';
-    };
+      installPhase = ''
+        cp -r $src/* $out/doc/
+      '';
+    });
+
 <
     # and create our customRC to call it
     # This makes sure our config is loaded at the right time and our after is loaded last.
@@ -131,6 +136,7 @@ and update default values with the new ones.
     # The wrapper we are using might put it in the wrong place for our uses.
     # so we add in the config directory ourselves to prevent any issues.
     # even when wrapRc == false.
+    # It also defines nixCats lua function, and NixCats user command.
 >nix
     configDir = if settings.configDirName != null && settings.configDirName != ""
       then settings.configDirName else "nvim";
@@ -138,21 +144,24 @@ and update default values with the new ones.
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
-      '' + (if settings.wrapRc then ''
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, "${LuaConfig}", 0)
-        let &runtimepath = join(runtimepath_list, ',')
 
-        set runtimepath+=${LuaConfig}/after
-        source ${LuaConfig}/init.lua
-      '' else ''
+      '' + (if settings.wrapRc then ''
+        let configdir = "${LuaConfig}"
+      '' else "") + ''
+
+        lua require('_G').nixCats = require('nixCats').get
+        lua << EOF
+        vim.api.nvim_create_user_command('NixCats',
+        [[lua print(vim.inspect(require('nixCats')))]] ,
+        { desc = 'So Cute!' })
+        EOF
+
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
-
         execute "set runtimepath+=" . configdir . "/after"
         execute "source " . configdir . "/init.lua"
-      '') + ''
+
         lua << EOF
         ${optionalLuaAdditions}
         EOF
@@ -198,13 +207,13 @@ and update default values with the new ones.
     # categories in the builder for wrapper arguments
     # more info on wrapper arguments below.
 >nix
-    filterAndFlattenWrapAttrs = (import ../utils)
+    filterAndFlattenMapInnerAttrs = (import ../utils)
           .filterAndFlattenMapInnerAttrs categories;
 <
     # This one filters and flattens to a list like the first,
     # but it also maps the result based on a function we give it.
 >nix
-    filterAndFlattenWrapLists = (import ../utils)
+    filterAndFlattenMapInner = (import ../utils)
           .filterAndFlattenMapInner categories;
 <
     # Each of these 2 functions actually take 3 arguments. But actually,
@@ -221,13 +230,13 @@ and update default values with the new ones.
     # we are going to provide a function to map name and value
     # into a wrapper argument that sets an environment variable
 >nix
-    FandF_envVarSet = filterAndFlattenWrapAttrs 
+    FandF_envVarSet = filterAndFlattenMapInnerAttrs 
           (name: value: ''--set ${name} "${value}"'');
 <
     # and this one we define a function that just passes an arg through.
     # this one takes in a set of lists rather than a set of sets
 >nix
-    FandF_passWrapperArgs = filterAndFlattenWrapLists (value: value);
+    FandF_passWrapperArgs = filterAndFlattenMapInner (value: value);
 <
 
     # you can use filterAndFlattenWrapLists and its attr set counterpart in order
@@ -240,7 +249,7 @@ and update default values with the new ones.
 
     # and this is how we add our lsps/runtime dependencies/whatever we need available at runtime
 >nix
-    FandF_WrapRuntimeDeps = filterAndFlattenWrapLists (value:
+    FandF_WrapRuntimeDeps = filterAndFlattenMapInner (value:
       ''--prefix PATH : "${pkgs.lib.makeBinPath [ value ] }"''
     );
 <
@@ -272,9 +281,9 @@ and update default values with the new ones.
     # This just makes a function that calls all the functions we want, 
     # then combines the results into 1 list.
 >nix
-    combineCatsOfFuncs = sect:
+    combineCatsOfFuncs = section:
       (x: let
-        appliedfunctions = builtins.map (value: (value) x ) (filterAndFlatten sect);
+        appliedfunctions = filterAndFlattenMapInner (value: (value) x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
         uniquifiedList = pkgs.lib.unique combinedFuncRes;
       in

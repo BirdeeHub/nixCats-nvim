@@ -97,27 +97,24 @@ in
         let configdir = expand('~') . "/.config/${configDir}"
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
+
+      '' + (if settings.wrapRc then ''
+        let configdir = "${LuaConfig}"
+      '' else "") + ''
+
         lua require('_G').nixCats = require('nixCats').get
         lua << EOF
-        vim.api.nvim_create_user_command('NixCats', 
-        [[lua print(vim.inspect(require('nixCats')))]] , 
+        vim.api.nvim_create_user_command('NixCats',
+        [[lua print(vim.inspect(require('nixCats')))]] ,
         { desc = 'So Cute!' })
         EOF
-      '' + (if settings.wrapRc then ''
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, "${LuaConfig}", 0)
-        let &runtimepath = join(runtimepath_list, ',')
 
-        set runtimepath+=${LuaConfig}/after
-        source ${LuaConfig}/init.lua
-      '' else ''
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
-
         execute "set runtimepath+=" . configdir . "/after"
         execute "source " . configdir . "/init.lua"
-      '') + ''
+
         lua << EOF
         ${optionalLuaAdditions}
         EOF

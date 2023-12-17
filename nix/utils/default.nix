@@ -47,7 +47,7 @@ rec {
     # this means it works slightly differently for environment variables
     # because each one will be updated individually rather than at a category level.
     mergeCatDefs = oldCats: newCats:
-      (packageDef: lib.recursiveUpdateCatDefs (oldCats packageDef) (newCats packageDef));
+      (packageDef: lib.recursiveUpdateUntilDRV (oldCats packageDef) (newCats packageDef));
 
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
@@ -56,7 +56,7 @@ rec {
       oldOversMapped = map (value: value self super) oldOverlist;
       newOversMapped = map (value: value self super) newOverlist;
       combinedOversCalled = oldOversMapped ++ newOversMapped;
-      mergedOvers = foldl' lib.recursiveUpdateCatDefs { } combinedOversCalled;
+      mergedOvers = foldl' lib.recursiveUpdateUntilDRV { } combinedOversCalled;
     in
     mergedOvers;
 
@@ -232,7 +232,7 @@ rec {
         );
       in f [] [rhs lhs];
 
-    recursiveUpdateCatDefs = lhs: rhs:
+    recursiveUpdateUntilDRV = lhs: rhs:
       lib.recursiveUpdateUntil (path: lhs: rhs:
             # I added this check for derivation because a category can be just a derivation.
             # otherwise it would squish our single derivation category rather than update.
