@@ -15,15 +15,15 @@ will not be reflected unless you run git add.
 
 nixCats: returns category names included by nix for this package 
 
-Use this to check if this neovim was packaged with 
+Use a dot-separated string to check if this neovim was packaged with 
 a particular category included:
 >lua
-    if nixCats('nix') then
+    if nixCats('lua.someSubcategory') then
         -- some stuff here
     end
 <
 Checking a category that is not present rather than false,
-will still return false from this if statement. nils in lua are "falsey"
+will still return false from this if statement because nil in lua is "falsey"
 I.e. if nix was not a category you included a value true or false for,
 it would evaluate as if it was false.
 if your category has an illegal lua name you may instead use this syntax
