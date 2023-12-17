@@ -6,14 +6,13 @@
   , otherOverlays
   , luaPath ? ""
   , keepLuaBuilder ? null
-  , system
   , categoryDefinitions
   , packageDefinitions
   , defaultPackageName
   , ...
 }: utils:
 
-{ config, ... }@misc: {
+{ config, pkgs, ... }@misc: {
 
   options = with nixpkgs.lib; {
 
@@ -256,7 +255,7 @@
       user_options_set = config.${defaultPackageName}.users.${uname};
       newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays user_options_set.addOverlays) ];
       newPkgs = import nixpkgs ({
-        inherit system;
+        inherit (pkgs) system;
         overlays = newOtherOverlays ++ [
             # here we can also add the regular inputs from other nixCats like so
             (utils.standardPluginOverlay (inputs // user_options_set.addInputs))
@@ -300,7 +299,7 @@
     options_set = config.${defaultPackageName};
     newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
     newPkgs = import nixpkgs ({
-      inherit system;
+      inherit (pkgs) system;
       overlays = newOtherOverlays ++ [
           # here we can also add the regular inputs from other nixCats like so
           (utils.standardPluginOverlay (inputs // options_set.addInputs))

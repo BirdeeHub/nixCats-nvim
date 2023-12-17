@@ -173,7 +173,7 @@
         keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
 
         inherit nixpkgs inputs otherOverlays 
-          system categoryDefinitions packageDefinitions;
+          categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
@@ -183,7 +183,7 @@
         keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
 
         inherit nixpkgs inputs otherOverlays 
-          system categoryDefinitions packageDefinitions;
+          categoryDefinitions packageDefinitions;
       };
     }
   ) // { templates = nixCats.templates; }; # end of flake utils, which returns the value of outputs

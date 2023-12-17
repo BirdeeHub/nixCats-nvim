@@ -381,15 +381,15 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs otherOverlays 
-          system categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays
+          categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${self}";
-        inherit nixpkgs inputs otherOverlays 
-          system categoryDefinitions packageDefinitions;
+        inherit nixpkgs inputs otherOverlays
+          categoryDefinitions packageDefinitions;
       };
 
     }

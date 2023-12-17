@@ -67,7 +67,6 @@ rec {
       , otherOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , system
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
@@ -79,7 +78,6 @@ rec {
       , otherOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , system
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName

@@ -478,7 +478,7 @@ They look like this:
     defaultPackageName = "nixCats";
     luaPath = "${self}";
     inherit nixpkgs inputs otherOverlays
-      system categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions;
   };
 
   # and the same for home manager
@@ -486,7 +486,7 @@ They look like this:
     defaultPackageName = "nixCats";
     luaPath = "${self}";
     inherit nixpkgs inputs otherOverlays
-      system categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions;
   };
 <
 First, <customPackager>. This would allow you to choose what
@@ -525,13 +525,14 @@ This allows importing flakes to do a lot less copy pasting.
 <mkNixosModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit nixpkgs inputs baseBuilder otherOverlays 
-      pkgs categoryDefinitions packageDefinitions;
+    inherit nixpkgs inputs otherOverlays 
+      categoryDefinitions packageDefinitions;
 };
 Pass this set into utils.mkNixosModules and choose a defaultPackageName.
 It will create a nixos module that you can import in configuration.nix
 and will provide all the same import options as the usual flake import would
-provide. See :help `nixCats.flake.outputs.exports.mkNixosModules`
+provide. If you do not have a luaPath, you may pass it a keepLua builder
+See :help `nixCats.flake.outputs.exports.mkNixosModules`
 
 <mkHomeModules>
 The same as mkNixosModules above, but for home manager.
@@ -583,16 +584,17 @@ We create the module by exporting the following in our flake outputs.
     defaultPackageName = "nixCats";
     luaPath = "${self}";
     inherit nixpkgs inputs otherOverlays 
-      system categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions;
 };
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
     inherit nixpkgs inputs otherOverlays 
-      system categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions;
 };
 
+If you do not have a luaPath, you may pass it a keepLua builder.
 utils.mkNixosModules exports a nixos module with the following options,
 and utils.mkHomeModules exports a home-manager module with the SAME EXACT options
 as the nixos module has for system, but for the user managed by home-manager.
