@@ -188,7 +188,7 @@ Reference the help and nixCats-nvim itself as a guide for importing your setup.
 
 You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
-only when that particular category is enabled in the current package by checking ```require('nixCats')``` first.
+only when that particular category is enabled in the current package by checking ```nixCats('your.cats.name')``` first.
 
 It is a similar process to migrating to a new neovim plugin manager.
 
