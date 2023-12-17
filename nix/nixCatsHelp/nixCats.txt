@@ -37,7 +37,7 @@ was enabled but this one was not.
 In that case it will try to find the next value, fail, and return nil.
 If the item you are checking is a table,
 if nixCats('the.table') then print("true") end
-will print true.
+will print true, and nixCats('the.table') will return the table.
 
 The nixCats command is an alias for require('nixCats').get()
 
