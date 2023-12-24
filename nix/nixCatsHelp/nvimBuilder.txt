@@ -79,90 +79,8 @@ and update default values with the new ones.
 
 --------------------------------------------------------------------------
                                    *nixCats.flake.nixperts.nvimBuilder.luaPackaging*
-
-    # package entire flake into the store
-    # see :help `'rtp'` for what folders can be defined
 >nix
     let
-<>nix
-    LuaConfig = pkgs.stdenv.mkDerivation {
-      name = builtins.baseNameOf path;
-      builder = builtins.toFile "builder.sh" ''
-        source $stdenv/setup
-        mkdir -p $out
-        cp -r ${path}/* $out/
-      '';
-    };
-<
-    # see :help `nixCats`
-    # here is where nixCats is generated
-    # it uses some recursive stuff in utils to print a lua table to a file.
-    # That table is the categories we were including, 
-    # plus wrapRc and the package name.
-    # Also it includes the help and an init file with a get function.
->nix
-    nixCats = {
-        plugin = pkgs.stdenv.mkDerivation (let
-        categoriesPlus = categories // {
-            inherit (settings) wrapRc;
-            nixCats_packageName = name;
-          };
-        init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-        plugin = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
-        # we import as a string because you cannot pass derivation paths when using toFile
-        cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-        # nix attr names can have ' characters....
-        # Yes they show up unaltered now in lua....................
-        cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
-      in {
-        name = "nixCats";
-        src = ../nixCatsHelp;
-        phases = [ "buildPhase" "installPhase" ];
-        buildPhase = ''
-          source $stdenv/setup
-          mkdir -p $out/lua/nixCats
-          mkdir -p $out/doc
-          mkdir -p $out/plugin
-          cp ${init} $out/lua/nixCats/init.lua
-          cp ${plugin} $out/plugin/globalCats.lua
-          echo '${cleanCats}' > $out/lua/nixCats/cats.lua
-        '';
-        installPhase = ''
-          cp -r $src/* $out/doc/
-        '';
-      });
-      config.vim = "packadd nixCats";
-    };
-
-<
-    # and create our customRC to call it
-    # This makes sure our config is loaded at the right time and our after is loaded last.
-    # It sources the root level init.lua file.
-    # It also removes the regular config dir from the path.
-    # The wrapper we are using might put it in the wrong place for our uses,
-    # so we add in the config directory ourselves to prevent any issues.
-    # even when wrapRc == false.
-    # It also defines nixCats lua function, and NixCats user command.
->nix
-    customRC = ''
-        let configdir = stdpath('config')
-        execute "set runtimepath-=" . configdir
-        execute "set runtimepath-=" . configdir . "/after"
-
-      '' + (if settings.wrapRc then ''
-        let configdir = "${LuaConfig}"
-      '' else "") + ''
-
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, configdir, 0)
-        let &runtimepath = join(runtimepath_list, ',')
-        execute "set runtimepath+=" . configdir . "/after"
-        execute "source " . configdir . "/init.lua"
-
-        lua << EOF
-        ${LuaAdditions}
-        EOF
-      '';
 <
       # optionalLuaAdditions is not the suggested way to add lua to this flake
       # It is only for use when importing this flake in another flake 
@@ -172,6 +90,16 @@ and update default values with the new ones.
       # with it though from another flake that imports this flake.
       # Yes you can require nixCats in it.
       # Again, not recommended.
+
+        # loading not shown here:
+        # but on that topic:
+
+      # optionalLuaAdditions are sourced after config,
+      # plugins with new syntax that allows config to be included with them
+      # { plugin = derivation; config.vim = ""; config.lua = ""; }
+      # are sourced before config.
+      # any plugins defined via this syntax must be declared within a list,
+      # as otherwise they will not be properly sorted.
 
 ---------------------------------------------------------------------------------
                              *nixCats.flake.nixperts.nvimBuilder.basicFlatmap*
