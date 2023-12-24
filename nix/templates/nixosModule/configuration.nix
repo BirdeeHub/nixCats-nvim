@@ -134,14 +134,16 @@
             eyeliner-nvim
           ];
         };
-        optionalLuaAdditions = ''
-          if nixCats('eyeliner') then
-            require'eyeliner'.setup {
-              highlight_on_key = true,
-              dim = true
-            }
-          end
-        '';
+        optionalLuaAdditions = {
+          eyeliner = ''
+            if nixCats('eyeliner') then
+              require'eyeliner'.setup {
+                highlight_on_key = true,
+                dim = true
+              }
+            end
+          '';
+        };
       });
       # here we get the previous categories for nixCats package, and update it with
       # our new category with a new plugin. and also a new colorscheme.

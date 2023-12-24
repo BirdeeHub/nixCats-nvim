@@ -22,7 +22,7 @@ let
     extraLuaPackages = {};
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
-    optionalLuaAdditions = "";
+    optionalLuaAdditions = {};
   } // (categoryDefFunction (packageDefinitons.${name}));
   inherit (catDefs)
   startupPlugins optionalPlugins 
@@ -91,10 +91,8 @@ in
     # it also removes the regular config dir from the path.
     # the wrapper we are using might put it in the wrong place for our uses.
     # so we add in the config directory ourselves to prevent any issues.
-    configDir = if settings.configDirName != null && settings.configDirName != ""
-      then settings.configDirName else "nvim";
     customRC = ''
-        let configdir = expand('~') . "/.config/${configDir}"
+        let configdir = stdpath('config')
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
 
@@ -116,7 +114,7 @@ in
         execute "source " . configdir . "/init.lua"
 
         lua << EOF
-        ${optionalLuaAdditions}
+        ${LuaAdditions}
         EOF
       '';
       # optionalLuaAdditions is not the suggested way to add lua to this flake
@@ -136,6 +134,8 @@ in
     start = [ nixCats ] ++ pkgs.lib.unique (filterAndFlatten startupPlugins);
     opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
 
+    LuaAdditions = if builtins.isString optionalLuaAdditions then optionalLuaAdditions
+      else builtins.concatStringsSep "\n" (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     # For wrapperArgs:
     # This one filters and flattens like above but for attrs of attrs 
     # and then maps name and value
@@ -176,7 +176,10 @@ in
     # cat our args
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       # this sets the name of the folder to look for nvim stuff in
-      (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
+      (if settings.configDirName != null
+        && settings.configDirName != ""
+        || settings.configDirName != "nvim"
+        then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
       ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
       ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))

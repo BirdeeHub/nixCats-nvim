@@ -43,7 +43,7 @@ and update default values with the new ones.
           # this flake in another flake 
           # and need to add a bit of lua for an added plugin.
           # Yes you can require nixCats in it.
-            optionalLuaAdditions = "";
+            optionalLuaAdditions = {};
 >nix
             # notice we now call the categoryDefFunction 
             # with this packages packageDefiniton as an argument?
@@ -163,7 +163,7 @@ and update default values with the new ones.
         execute "source " . configdir . "/init.lua"
 
         lua << EOF
-        ${optionalLuaAdditions}
+        ${LuaAdditions}
         EOF
       '';
 <
@@ -195,6 +195,10 @@ and update default values with the new ones.
 
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
     # It has cmake in it among other things.
+
+    # and this is how we sort the optionalLuaAdditions
+    LuaAdditions = if builtins.isString optionalLuaAdditions then optionalLuaAdditions
+      else builtins.concatStringsSep "\n" (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
 <
 ---------------------------------------------------------------------------------
                            *nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
