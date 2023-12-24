@@ -101,32 +101,38 @@ and update default values with the new ones.
     # plus wrapRc and the package name.
     # Also it includes the help and an init file with a get function.
 >nix
-    nixCats = pkgs.stdenv.mkDerivation (let
-      categoriesPlus = categories // {
-          inherit (settings) wrapRc;
-          nixCats_packageName = name;
-        };
-      init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-      # we import as a string because you cannot pass derivation paths when using toFile
-      cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-      # nix attr names can have ' characters....
-      # Yes they show up unaltered now in lua....................
-      cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
-    in {
-      name = "nixCats";
-      src = ../nixCatsHelp;
-      phases = [ "buildPhase" "installPhase" ];
-      buildPhase = ''
-        source $stdenv/setup
-        mkdir -p $out/lua/nixCats
-        mkdir -p $out/doc
-        cp ${init} $out/lua/nixCats/init.lua
-        echo '${cleanCats}' > $out/lua/nixCats/cats.lua
-      '';
-      installPhase = ''
-        cp -r $src/* $out/doc/
-      '';
-    });
+    nixCats = {
+        plugin = pkgs.stdenv.mkDerivation (let
+        categoriesPlus = categories // {
+            inherit (settings) wrapRc;
+            nixCats_packageName = name;
+          };
+        init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
+        plugin = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
+        # we import as a string because you cannot pass derivation paths when using toFile
+        cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+        # nix attr names can have ' characters....
+        # Yes they show up unaltered now in lua....................
+        cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
+      in {
+        name = "nixCats";
+        src = ../nixCatsHelp;
+        phases = [ "buildPhase" "installPhase" ];
+        buildPhase = ''
+          source $stdenv/setup
+          mkdir -p $out/lua/nixCats
+          mkdir -p $out/doc
+          mkdir -p $out/plugin
+          cp ${init} $out/lua/nixCats/init.lua
+          cp ${plugin} $out/plugin/globalCats.lua
+          echo '${cleanCats}' > $out/lua/nixCats/cats.lua
+        '';
+        installPhase = ''
+          cp -r $src/* $out/doc/
+        '';
+      });
+      config.vim = "packadd nixCats";
+    };
 
 <
     # and create our customRC to call it
@@ -146,13 +152,6 @@ and update default values with the new ones.
       '' + (if settings.wrapRc then ''
         let configdir = "${LuaConfig}"
       '' else "") + ''
-
-        lua require('_G').nixCats = require('nixCats').get
-        lua << EOF
-        vim.api.nvim_create_user_command('NixCats',
-        [[lua print(vim.inspect(require('nixCats')))]] ,
-        { desc = 'So Cute!' })
-        EOF
 
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
@@ -195,8 +194,10 @@ and update default values with the new ones.
     # It has cmake in it among other things.
 
     # and this is how we sort the optionalLuaAdditions
-    LuaAdditions = if builtins.isString optionalLuaAdditions then optionalLuaAdditions
-      else builtins.concatStringsSep "\n" (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+    LuaAdditions = if builtins.isString optionalLuaAdditions
+      then optionalLuaAdditions
+      else builtins.concatStringsSep "\n"
+      (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
 <
 ---------------------------------------------------------------------------------
                            *nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
