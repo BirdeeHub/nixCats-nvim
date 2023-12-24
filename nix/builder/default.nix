@@ -65,7 +65,7 @@ in
             nixCats_packageName = name;
           };
         init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-        plugin = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
+        globalCats = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
         # we import as a string because you cannot pass derivation paths when using toFile
         cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
         # nix attr names can have ' characters....
@@ -79,9 +79,8 @@ in
           source $stdenv/setup
           mkdir -p $out/lua/nixCats
           mkdir -p $out/doc
-          mkdir -p $out/plugin
           cp ${init} $out/lua/nixCats/init.lua
-          cp ${plugin} $out/plugin/globalCats.lua
+          cp ${globalCats} $out/lua/nixCats/globalCats.lua
           echo '${cleanCats}' > $out/lua/nixCats/cats.lua
         '';
         installPhase = ''
@@ -91,7 +90,7 @@ in
       # doing it this way makes nixCats command and
       # configdir variable available even with new plugin scheme
       config.vim = ''
-        packadd nixCats
+        lua require('nixCats.globalCats')
         let configdir = stdpath('config')
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
