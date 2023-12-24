@@ -138,10 +138,8 @@ and update default values with the new ones.
     # even when wrapRc == false.
     # It also defines nixCats lua function, and NixCats user command.
 >nix
-    configDir = if settings.configDirName != null && settings.configDirName != ""
-      then settings.configDirName else "nvim";
     customRC = ''
-        let configdir = expand('~') . "/.config/${configDir}"
+        let configdir = stdpath('config')
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
 
@@ -268,7 +266,10 @@ and update default values with the new ones.
     # which we then call concatStringsSep " " on
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       # this sets the name of the folder to look for nvim stuff in
-      (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
+      (if settings.configDirName != null
+        && settings.configDirName != ""
+        || settings.configDirName != "nvim"
+        then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our now sorted args
       ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
       ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
