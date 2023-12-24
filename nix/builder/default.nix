@@ -89,6 +89,7 @@ in
       });
       # doing it this way makes nixCats command and
       # configdir variable available even with new plugin scheme
+      # as well as any local pack dir
       config.vim = ''
         let configdir = stdpath('config')
         execute "set runtimepath-=" . configdir
