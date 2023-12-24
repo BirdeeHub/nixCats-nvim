@@ -22,8 +22,33 @@ rec {
     let
       # although I removed an error that doesnt make sense for my flake.
       plugins = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPlugin (configure.packages or {}));
+      # and made it be able to include configs to be ran BEFORE customRC is loaded.
       genPlugin = packageName: {start ? [], opt ? []}:
-        start ++ (map (p: { plugin = p; optional = true; }) opt);
+        (map (p:
+          if builtins.isAttrs p && (p ? config.lua || p ? config.vim) && p ? plugin
+          then (p // { config = let 
+            lua = if p ? config.lua then ''
+              lua << EOF
+              ${p.config.lua}
+              EOF
+            '' else "";
+            vim = if p ? config.vim then p.config.vim else "";
+          in
+          (vim + "\n" + lua); })
+          else p) start)
+          ++
+          (map (p:
+          if builtins.isAttrs p && (p ? config.lua || p ? config.vim) && p ? plugin
+          then (p // { config = let 
+            lua = if p ? config.lua then ''
+              lua << EOF
+              ${p.config.lua}
+              EOF
+            '' else "";
+            vim = if p ? config.vim then p.config.vim else "";
+          in
+          (vim + "\n" + lua); optional = true; })
+          else (if p ? plugin then p else { plugin = p; optional = true; })) opt);
 
       res = pkgs.neovimUtils.makeNeovimConfig {
         customRC = configure.customRC or "";

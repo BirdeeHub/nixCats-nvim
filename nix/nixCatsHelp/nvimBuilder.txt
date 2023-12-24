@@ -43,7 +43,7 @@ and update default values with the new ones.
           # this flake in another flake 
           # and need to add a bit of lua for an added plugin.
           # Yes you can require nixCats in it.
-            optionalLuaAdditions = "";
+            optionalLuaAdditions = {};
 >nix
             # notice we now call the categoryDefFunction 
             # with this packages packageDefiniton as an argument?
@@ -79,93 +79,8 @@ and update default values with the new ones.
 
 --------------------------------------------------------------------------
                                    *nixCats.flake.nixperts.nvimBuilder.luaPackaging*
-
-    # package entire flake into the store
-    # see :help `'rtp'` for what folders can be defined
 >nix
     let
-<>nix
-    LuaConfig = pkgs.stdenv.mkDerivation {
-      name = builtins.baseNameOf path;
-      builder = builtins.toFile "builder.sh" ''
-        source $stdenv/setup
-        mkdir -p $out
-        cp -r ${path}/* $out/
-      '';
-    };
-<
-    # see :help `nixCats`
-    # here is where nixCats is generated
-    # it uses some recursive stuff in utils to print a lua table to a file.
-    # That table is the categories we were including, 
-    # plus wrapRc and the package name.
-    # Also it includes the help and an init file with a get function.
->nix
-    nixCats = pkgs.stdenv.mkDerivation (let
-      categoriesPlus = categories // {
-          inherit (settings) wrapRc;
-          nixCats_packageName = name;
-        };
-      init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-      # we import as a string because you cannot pass derivation paths when using toFile
-      cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-      # nix attr names can have ' characters....
-      # Yes they show up unaltered now in lua....................
-      cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
-    in {
-      name = "nixCats";
-      src = ../nixCatsHelp;
-      phases = [ "buildPhase" "installPhase" ];
-      buildPhase = ''
-        source $stdenv/setup
-        mkdir -p $out/lua/nixCats
-        mkdir -p $out/doc
-        cp ${init} $out/lua/nixCats/init.lua
-        echo '${cleanCats}' > $out/lua/nixCats/cats.lua
-      '';
-      installPhase = ''
-        cp -r $src/* $out/doc/
-      '';
-    });
-
-<
-    # and create our customRC to call it
-    # This makes sure our config is loaded at the right time and our after is loaded last.
-    # It sources the root level init.lua file.
-    # It also removes the regular config dir from the path.
-    # The wrapper we are using might put it in the wrong place for our uses,
-    # so we add in the config directory ourselves to prevent any issues.
-    # even when wrapRc == false.
-    # It also defines nixCats lua function, and NixCats user command.
->nix
-    configDir = if settings.configDirName != null && settings.configDirName != ""
-      then settings.configDirName else "nvim";
-    customRC = ''
-        let configdir = expand('~') . "/.config/${configDir}"
-        execute "set runtimepath-=" . configdir
-        execute "set runtimepath-=" . configdir . "/after"
-
-      '' + (if settings.wrapRc then ''
-        let configdir = "${LuaConfig}"
-      '' else "") + ''
-
-        lua require('_G').nixCats = require('nixCats').get
-        lua << EOF
-        vim.api.nvim_create_user_command('NixCats',
-        [[lua print(vim.inspect(require('nixCats')))]] ,
-        { desc = 'So Cute!' })
-        EOF
-
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, configdir, 0)
-        let &runtimepath = join(runtimepath_list, ',')
-        execute "set runtimepath+=" . configdir . "/after"
-        execute "source " . configdir . "/init.lua"
-
-        lua << EOF
-        ${optionalLuaAdditions}
-        EOF
-      '';
 <
       # optionalLuaAdditions is not the suggested way to add lua to this flake
       # It is only for use when importing this flake in another flake 
@@ -175,6 +90,16 @@ and update default values with the new ones.
       # with it though from another flake that imports this flake.
       # Yes you can require nixCats in it.
       # Again, not recommended.
+
+        # loading not shown here:
+        # but on that topic:
+
+      # optionalLuaAdditions are sourced after config,
+      # plugins with new syntax that allows config to be included with them
+      # { plugin = derivation; config.vim = ""; config.lua = ""; }
+      # are sourced before config.
+      # any plugins defined via this syntax must be declared within a list,
+      # as otherwise they will not be properly sorted.
 
 ---------------------------------------------------------------------------------
                              *nixCats.flake.nixperts.nvimBuilder.basicFlatmap*
@@ -195,6 +120,12 @@ and update default values with the new ones.
 
     # I didnt add stdenv.cc.cc.lib, so I would suggest not removing it.
     # It has cmake in it among other things.
+
+    # and this is how we sort the optionalLuaAdditions
+    LuaAdditions = if builtins.isString optionalLuaAdditions
+      then optionalLuaAdditions
+      else builtins.concatStringsSep "\n"
+      (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
 <
 ---------------------------------------------------------------------------------
                            *nixCats.flake.nixperts.nvimBuilder.mapWrapArgCats*
@@ -264,7 +195,10 @@ and update default values with the new ones.
     # which we then call concatStringsSep " " on
     extraMakeWrapperArgs = builtins.concatStringsSep " " (
       # this sets the name of the folder to look for nvim stuff in
-      (if configDir != "nvim" then [ ''--set NVIM_APPNAME "${configDir}"'' ] else [])
+      (if settings.configDirName != null
+        && settings.configDirName != ""
+        || settings.configDirName != "nvim"
+        then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our now sorted args
       ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
       ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))

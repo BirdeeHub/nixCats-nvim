@@ -217,7 +217,9 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   each containing FUNCTIONS that return lists of python packages.
   These functions are the same thing that you would pass to python.withPackages.
 
-  <optionalLuaAdditions>* It can also take a lua string that can be run.
+  <optionalLuaAdditions>* It can also take 
+    a flexible set of categories, each containing a lua string
+    that will be ran after sourcing your init.lua
     Yes it can access nixCats.
     It is not the recommended way to create lua for this flake, 
     but it may be useful in some edge cases of editing flake imports 
@@ -322,7 +324,13 @@ This applies in many situations. Take this one for example.
           "catppuccin" = catppuccin-nvim;
         }
       );
-
+<
+  In addition to all this, if a plugin is defined within a list, it may
+  instead be defined within an attribute set that also contains config
+  to be ran before sourcing init.lua (nixCats, however is still accessible)
+  to do this, you may use the following syntax in opt or start sections: >nix
+    { plugin = derivation; config.vim = ""; config.lua = ""; }
+<
 ---------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
 
