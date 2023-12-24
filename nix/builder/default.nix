@@ -90,13 +90,13 @@ in
       # doing it this way makes nixCats command and
       # configdir variable available even with new plugin scheme
       config.vim = ''
-        lua require('nixCats.globalCats')
         let configdir = stdpath('config')
         execute "set runtimepath-=" . configdir
         execute "set runtimepath-=" . configdir . "/after"
       '' + (if settings.wrapRc then ''
         let configdir = "${LuaConfig}"
       '' else "") + ''
+        lua require('nixCats.globalCats')
         let runtimepath_list = split(&runtimepath, ',')
         call insert(runtimepath_list, configdir, 0)
         let &runtimepath = join(runtimepath_list, ',')
