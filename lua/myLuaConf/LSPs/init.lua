@@ -20,6 +20,9 @@ if nixCats('neonixdev') then
         ignoreComments = true,
       },
       signatureHelp = { enabled = true },
+      diagnostics = {
+        globals = { "nixCats" },
+      },
     },
     workspace = { checkThirdParty = true },
     telemetry = { enabled = false },
