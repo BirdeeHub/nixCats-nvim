@@ -105,23 +105,6 @@
         "type": "github"
       }
     },
-    "plugins-fidget": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1699509702,
-        "narHash": "sha256-8Gl2Ck4YJGReSEq1Xeh1dpdRq4eImmrxvIHrfxdem3Q=",
-        "owner": "j-hui",
-        "repo": "fidget.nvim",
-        "rev": "2f7c08f45639a64a5c0abcf67321d52c3f499ae6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "j-hui",
-        "ref": "legacy",
-        "repo": "fidget.nvim",
-        "type": "github"
-      }
-    },
     "plugins-hlargs": {
       "flake": false,
       "locked": {
@@ -143,7 +126,6 @@
         "flake-utils": "flake-utils",
         "nixd": "nixd",
         "nixpkgs": "nixpkgs_2",
-        "plugins-fidget": "plugins-fidget",
         "plugins-hlargs": "plugins-hlargs"
       }
     },

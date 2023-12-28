@@ -21,10 +21,6 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
-    "plugins-fidget" = {
-      url = "github:j-hui/fidget.nvim/legacy";
-      flake = false;
-    };
 
     # neovim = {
     #   url = "github:neovim/neovim";
@@ -135,7 +131,6 @@
           general = {
             gitPlugins = with pkgs.neovimPlugins; [
               hlargs
-              fidget
             ];
             vimPlugins = {
               # you can make a subcategory
@@ -170,6 +165,7 @@
                 # ))
                 # other
                 nvim-lspconfig
+                fidget-nvim
                 lualine-nvim
                 gitsigns-nvim
                 which-key-nvim
