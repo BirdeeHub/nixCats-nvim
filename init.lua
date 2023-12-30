@@ -1,4 +1,9 @@
--- when using this as a normal config folder
+
+-- THIS SETUP AND catPacker ARE FOR
+-- pckr THE NEOVIM PLUGIN MANAGER
+-- They do nothing if your config is loaded via nix.
+
+-- when using this as a normal nvim config folder
 -- default_cat_value is what nixCats('anything')
 -- will return.
 -- you may also require myLuaConf.isNixCats
@@ -11,7 +16,14 @@ require('nixCatsUtils').setup {
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- load the plugins via pckr
+-- YOU are in charge of putting the plugin
+-- urls and build steps in there,
+-- and you should keep any setup functions
+-- OUT of this file, as they are ONLY loaded when this
+-- is NOT loaded via nix.
 require('nixCatsUtils.catPacker')
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
