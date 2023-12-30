@@ -1,4 +1,4 @@
-local isNixInstalled, _ = pcall(function() require("nixCats") end )
+local isNixInstalled, _ = pcall(function() require("nixCats") end)
 if not isNixInstalled then
 
   local ensure_packer = function()
