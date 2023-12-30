@@ -1,4 +1,4 @@
-local isNixInstalled, _ = pcall(function() require("nixCats") end)
+local isNixInstalled = require('myLuaConf.isNixCats')
 if not isNixInstalled then
   -- mason-lspconfig requires that these setup functions are called in this order
   -- before setting up the servers.

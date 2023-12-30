@@ -1,4 +1,4 @@
-local isNixInstalled, _ = pcall(function() require("nixCats") end)
+local isNixInstalled = require('myLuaConf.isNixCats')
 if not isNixInstalled then
 
   local ensure_packer = function()
