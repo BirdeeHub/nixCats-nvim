@@ -1,3 +1,4 @@
+vim.g.nixCats_pckr_default = true
 require('myLuaConf.isNixCats')
 
 vim.g.mapleader = ' '
