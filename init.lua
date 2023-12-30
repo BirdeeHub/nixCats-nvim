@@ -1,5 +1,5 @@
 vim.g.nixCats_pckr_default = true
-require('myLuaConf.isNixCats')
+local isNixInstall = require('myLuaConf.isNixCats')
 
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
