@@ -10,15 +10,8 @@
   -- now you see why nix is so great. You dont have to do that every time.
 
   -- so, now for the stuff we can still auto install without nix:
-  -- list your plugins here,
-
-  -- ### DONT USE CONFIG VARIABLE ###
-  -- unless you are ok with that instruction 
-  -- not being ran when used via nix,
-  -- this file will not be ran when using nix
-  -- because of the following line:
+  -- first check if we should be loading pckr:
 if not require('nixCatsUtils').isNixCats then
-
   -- you can use this same method
   -- if you want to install via mason when not in nix
   -- or just, anything you want to do only when not using nix
@@ -40,6 +33,11 @@ if not require('nixCatsUtils').isNixCats then
   end
 
   bootstrap_pckr()
+
+  -- ### DONT USE CONFIG VARIABLE ###
+  -- unless you are ok with that instruction 
+  -- not being ran when used via nix,
+  -- this file will not be ran when using nix
 
   require('pckr').add{
 
