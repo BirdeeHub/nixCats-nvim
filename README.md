@@ -77,13 +77,15 @@ The solution:
     Create nixCats so the lua may know what categories are packaged
     You may optionally have your config in your normal directory as well.
         (You will still be able to reference nixCats and the help should you do this.)
+        
+    I ended up including a way to download via pckr because people seem to want
+        a way to load their config without nix as an option.
 ```
 
 #### These are the reasons I wanted to do it this way: 
 
     The setup instructions for new plugins are all in Lua so translating them is effort.
-        I don't even want to translate instructions 
-        into lazy or packer or the others, let alone nix.
+        instead of lazy, use pckr for emergency downloads without nix.
 
     I didn't want to be forced into creating a new lua file, 
         writing lua within nix, or creating hooks for a DSL for every new plugin.
