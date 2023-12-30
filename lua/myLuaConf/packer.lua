@@ -63,6 +63,7 @@ if not isNixInstalled then
       requires = {
         { 'rcarriga/nvim-dap-ui', },
         { 'theHamsta/nvim-dap-virtual-text', },
+        { 'jay-babu/mason-nvim-dap.nvim', },
       },
     }
 
@@ -79,12 +80,12 @@ if not isNixInstalled then
     use { 'kylechui/nvim-surround',
       requires = { 'tpope/vim-repeat', },
     }
-    -- use({
-    --   "iamcco/markdown-preview.nvim",
-    --   run = function() vim.fn["mkdp#util#install"]() end,
-    -- })
+    use({
+      "iamcco/markdown-preview.nvim",
+      run = function() vim.fn["mkdp#util#install"]() end,
+    })
 
-    use({ "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, })
+    -- use({ "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, })
 
 
     -----------------------------
