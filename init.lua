@@ -20,8 +20,8 @@ vim.g.maplocalleader = ' '
 -- YOU are in charge of putting the plugin
 -- urls and build steps in there,
 -- and you should keep any setup functions
--- OUT of this file, as they are ONLY loaded when this
--- is NOT loaded via nix.
+-- OUT of that file, as they are ONLY loaded when this
+-- configuration is NOT loaded via nix.
 require('nixCatsUtils.catPacker')
 
 -- [[ Setting options ]]
