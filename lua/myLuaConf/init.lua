@@ -1,4 +1,4 @@
-require("myLuaConf.packer")
+require("myLuaConf.catPacker")
 require("myLuaConf.plugins")
 require("myLuaConf.LSPs")
 require('myLuaConf.format')
