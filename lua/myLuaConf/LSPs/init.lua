@@ -41,7 +41,7 @@ if nixCats('neonixdev') then
   servers.nil_ls = {}
 
 end
-if nixCats('lspDebugMode') then
+if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
   vim.lsp.set_log_level("debug")
 end
 
