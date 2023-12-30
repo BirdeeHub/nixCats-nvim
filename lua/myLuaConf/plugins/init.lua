@@ -1,4 +1,4 @@
-vim.cmd.colorscheme(require('nixCats').get('colorscheme'))
+vim.cmd.colorscheme('onedark')
 
 require('myLuaConf.plugins.telescope')
 
@@ -25,7 +25,7 @@ require('fidget').setup()
 require('lualine').setup({
   options = {
     icons_enabled = false,
-    theme = nixCats('colorscheme'),
+    theme = 'onedark',
     component_separators = '|',
     section_separators = '',
   },

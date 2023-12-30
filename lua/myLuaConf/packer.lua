@@ -1,4 +1,4 @@
-local isNixInstalled, _ = pcall(require, "nixCats")
+local isNixInstalled, _ = pcall(function() require("nixCats") end )
 if not isNixInstalled then
 
   local ensure_packer = function()
@@ -79,8 +79,10 @@ if not isNixInstalled then
     use { 'kylechui/nvim-surround',
       requires = { 'tpope/vim-repeat', },
     }
-    use {'iamcco/markdown-preview.nvim', run = 'cd app && yarn install', cmd = 'MarkdownPreview', }
-
+    use({
+      "iamcco/markdown-preview.nvim",
+      run = function() vim.fn["mkdp#util#install"]() end,
+    })
     -----------------------------
     -- Automatically set up your configuration after cloning packer.nvim
     -- Put this at the end after all plugins

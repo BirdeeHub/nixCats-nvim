@@ -1,4 +1,5 @@
-local isNixInstalled, _ = pcall(require, "nixCats")
+
+local isNixInstalled, _ = pcall(function() require("nixCats") end )
 if not isNixInstalled then
   -- mason-lspconfig requires that these setup functions are called in this order
   -- before setting up the servers.
@@ -36,8 +37,9 @@ if nixCats('neonixdev') then
     telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
-
-  servers.nixd = {}
+  if isNixInstalled then servers.nixd = {}
+  else servers.rnix = {}
+  end
   servers.nil_ls = {}
 
 end
