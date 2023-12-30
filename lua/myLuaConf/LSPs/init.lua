@@ -1,5 +1,4 @@
-local isNixInstalled = require('myLuaConf.isNixCats')
-if not isNixInstalled then
+if not require('nixCatsUtils').isNixCats then
   -- mason-lspconfig requires that these setup functions are called in this order
   -- before setting up the servers.
   require('mason').setup()
@@ -36,7 +35,7 @@ if nixCats('neonixdev') then
     telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
-  if isNixInstalled then servers.nixd = {}
+  if require('nixCatsUtils').isNixCats then servers.nixd = {}
   else servers.rnix = {}
   end
   servers.nil_ls = {}
@@ -66,7 +65,7 @@ end
 -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
 
 
-if not isNixInstalled then
+if not require('nixCatsUtils').isNixCats then
   -- Ensure the servers above are installed
   local mason_lspconfig = require 'mason-lspconfig'
 

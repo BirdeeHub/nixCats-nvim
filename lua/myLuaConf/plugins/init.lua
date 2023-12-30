@@ -1,5 +1,5 @@
 local colorschemeName = nixCats('colorscheme')
-if colorschemeName == true then
+if require('nixCatsUtils').isNixCats then
   colorschemeName = 'onedark'
 end
 vim.cmd.colorscheme(colorschemeName)

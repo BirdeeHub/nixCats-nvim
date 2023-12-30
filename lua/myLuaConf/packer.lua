@@ -1,5 +1,27 @@
-local isNixInstalled = require('myLuaConf.isNixCats')
-if not isNixInstalled then
+  -- first you should go ahead and install your dependencies
+  -- you arent using nix if you are using this.
+  -- this means you will have to install some stuff manually.
+
+  -- so, you will need cmake, gcc, npm, nodejs,
+  -- ripgrep, fd, <curl or wget>, and git,
+  -- you will also need rustup and to run rustup toolchain install stable
+
+  -- now you see why nix is so great. You dont have to do that every time.
+
+  -- so, now for the stuff we can still auto install without nix:
+  -- list your plugins here,
+
+  -- ### DONT USE CONFIG VARIABLE ###
+  -- unless you are ok with that instruction 
+  -- not being ran when used via nix,
+
+if not require('nixCatsUtils').isNixCats then
+
+  -- you can use this same method
+  -- local isNixInstalled = require('myLuaConf.isNixCats')
+  -- "if not isNixInstalled then"
+  -- if you want to install via mason when not in nix
+  -- or just, anything you want to do only when not using nix
 
 local function bootstrap_pckr()
   local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
@@ -89,6 +111,9 @@ require('pckr').add{
     },
 
     -- { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, },
+
+    -- all the rest of the setup will be done within the normal scheme, thus working regardless of what method loads the plugins.
+    -- only stuff pertaining to downloading should be added to pckr.
 
   }
 end

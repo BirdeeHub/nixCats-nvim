@@ -3,8 +3,10 @@
 -- will return.
 -- you may also require myLuaConf.isNixCats
 -- to determine if this was loaded as a nix config
-vim.g.nixCats_pckr_default = true
-local isNixInstall = require('myLuaConf.isNixCats')
+-- you must set this here at the start
+require('nixCatsUtils').setup {
+  default_cat_value = true,
+}
 
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
