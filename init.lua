@@ -1,5 +1,5 @@
 -- when using this as a normal config folder
--- nixCats_pckr_default is what nixCats('anything')
+-- default_cat_value is what nixCats('anything')
 -- will return.
 -- you may also require myLuaConf.isNixCats
 -- to determine if this was loaded as a nix config

@@ -1,3 +1,4 @@
+
   -- first you should go ahead and install your dependencies
   -- you arent using nix if you are using this.
   -- this means you will have to install some stuff manually.
@@ -14,12 +15,11 @@
   -- ### DONT USE CONFIG VARIABLE ###
   -- unless you are ok with that instruction 
   -- not being ran when used via nix,
-
+  -- this file will not be ran when using nix
+  -- because of the following line:
 if not require('nixCatsUtils').isNixCats then
 
   -- you can use this same method
-  -- local isNixInstalled = require('myLuaConf.isNixCats')
-  -- "if not isNixInstalled then"
   -- if you want to install via mason when not in nix
   -- or just, anything you want to do only when not using nix
 
