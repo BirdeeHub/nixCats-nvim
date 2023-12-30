@@ -23,25 +23,25 @@ if not require('nixCatsUtils').isNixCats then
   -- if you want to install via mason when not in nix
   -- or just, anything you want to do only when not using nix
 
-local function bootstrap_pckr()
-  local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
+  local function bootstrap_pckr()
+    local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
 
-  if not vim.loop.fs_stat(pckr_path) then
-    vim.fn.system({
-      'git',
-      'clone',
-      "--filter=blob:none",
-      'https://github.com/lewis6991/pckr.nvim',
-      pckr_path
-    })
+    if not vim.loop.fs_stat(pckr_path) then
+      vim.fn.system({
+        'git',
+        'clone',
+        "--filter=blob:none",
+        'https://github.com/lewis6991/pckr.nvim',
+        pckr_path
+      })
+    end
+
+    vim.opt.rtp:prepend(pckr_path)
   end
 
-  vim.opt.rtp:prepend(pckr_path)
-end
+  bootstrap_pckr()
 
-bootstrap_pckr()
-
-require('pckr').add{
+  require('pckr').add{
 
     { 'joshdick/onedark.vim', },
     { 'nvim-tree/nvim-web-devicons', },
