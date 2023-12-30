@@ -1,0 +1,211 @@
+=================================================================================
+                                                *nixCats.neovimPluginManagers*
+---------------------------------------------------------------------------------
+INIT.LUA FILE ALTERATIONS                              *nixCats.pckr_init.lua*
+nixCats has good integration with pckr and other similar neovim package
+managers. However it has a bad time with lazy.nvim
+
+This is because nixCats adds your config folder to the runtime path.
+And then lazy.nvim removes it.
+
+However, since pckr also uses start and opt to manage lazy loading,
+it actually fits better with our nix scheme, as we do the same thing there.
+
+I have provided a nixCatsUtils directory within the lua directory of the
+flake. It contains a require("nixCatsUtils").setup
+function, and a require("nixCatsUtils").isNixCats function.
+
+You run the setup function in your init.lua file at the start, and tell it
+what nixCats global command should default to if isNixCats is false.
+The default is true.
+>lua
+  -- THIS SETUP CALL IS REQUIRED (for true you may leave out the argument)
+  require('nixCatsUtils').setup {
+    default_cat_value = true,
+  }
+<
+Then you can set leader keys, and require your secondary pckr download method
+>lua
+  vim.g.mapleader = ' '
+  vim.g.maplocalleader = ' '
+  -- load the plugins via pckr
+  -- YOU are in charge of putting the plugin
+  -- urls and build steps in there,
+  -- and you should keep any setup functions
+  -- OUT of that file, as they are ONLY loaded when this
+  -- configuration is NOT loaded via nix.
+  require('nixCatsUtils.catPacker')
+<
+You may use a similar method for mason, both outlined below.
+
+Keep in mind they may not work so well on nixos,
+so when you are on nixOS you should load neovim via nix
+(not sure if that part needs stating)
+
+---------------------------------------------------------------------------------
+require('nixCatsUtils.catPacker')                               *nixCats.pckr*
+
+First you should go ahead and install your dependencies.
+You arent using nix if you are using this file.
+This means you will have to install some stuff manually.
+
+so, you will need cmake, gcc, npm, nodejs,
+ripgrep, fd, <curl or wget>, and git,
+you will also need rustup and to run rustup toolchain install stable
+
+now you see why nix is so great. You dont have to do that every time.
+
+so, now for the stuff we can still auto install without nix:
+first check if we should be loading pckr:
+>lua
+  if not require('nixCatsUtils').isNixCats then
+    -- you can use this same method
+    -- if you want to install via mason when not in nix
+    -- or just, anything you want to do only when not using nix
+
+    local function bootstrap_pckr()
+      local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
+
+      if not vim.loop.fs_stat(pckr_path) then
+        vim.fn.system({
+          'git',
+          'clone',
+          "--filter=blob:none",
+          'https://github.com/lewis6991/pckr.nvim',
+          pckr_path
+        })
+      end
+
+      vim.opt.rtp:prepend(pckr_path)
+    end
+
+    bootstrap_pckr()
+<
+    -- ### DONT USE CONFIG VARIABLE ###
+    -- unless you are ok with that instruction 
+    -- not being ran when used via nix,
+    -- this file will not be ran when using nix
+>lua
+    require('pckr').add{
+      -- My plugins here
+      'foo1/bar1.nvim';
+      'foo2/bar2.nvim';
+    }
+  end
+<
+---------------------------------------------------------------------------------
+MASON AND LSPCONFIG                                            *nixCats.mason*
+
+This is a method you may use to make sure mason only tries to download stuff
+when you did not install neovim via nixCats
+
+It functions the same as what kickstart.nvim does for its mason setup.
+However, when loaded via nix,
+it skips mason and passes them straight to nvim-lspconfig
+
+When installing via pckr, install mason via pckr. Then wherever you set up
+mason, do this.
+The stuff added to servers table is what is passed to lspconfig/mason
+>lua
+  if not require('nixCatsUtils').isNixCats then
+    -- mason-lspconfig requires that these setup functions are called in this order
+    -- before setting up the servers.
+    require('mason').setup()
+    require('mason-lspconfig').setup()
+  end
+
+  local servers = {}
+  if nixCats('neonixdev') then
+    require('neodev').setup({})
+    -- this allows our thing to have plugin library detection
+    -- despite not being in our .config/nvim folder
+    -- I learned about it here:
+    -- https://github.com/lecoqjacob/nixCats-nvim/blob/main/.neoconf.json
+    require("neoconf").setup({
+      plugins = {
+        lua_ls = {
+          enabled = true,
+          enabled_for_neovim_config = true,
+        },
+      },
+    })
+
+    servers.lua_ls = {
+      Lua = {
+        formatters = {
+          ignoreComments = true,
+        },
+        signatureHelp = { enabled = true },
+        diagnostics = {
+          globals = { "nixCats" },
+        },
+      },
+      workspace = { checkThirdParty = true },
+      telemetry = { enabled = false },
+      filetypes = { 'lua' },
+    }
+    if require('nixCatsUtils').isNixCats then servers.nixd = {}
+    else servers.rnix = {}
+    end
+    servers.nil_ls = {}
+
+  end
+<
+
+  -- This is this flake's version of what kickstarter has set up for mason handlers.
+  -- This is a convenience function that calls lspconfig on the lsps we downloaded via nix
+  -- This will not download your lsp. Nix does that.
+
+  --  Add any additional override configuration in the following tables. They will be passed to
+  --  the `settings` field of the server config. You must look up that documentation yourself.
+  --  All of them are listed in
+  -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+
+  --  If you want to override the default filetypes that your language server will attach to you can
+  --  define the property 'filetypes' to the map in question.
+  --  You may do the same thing with cmd
+
+  -- servers.clangd = {},
+  -- servers.gopls = {},
+  -- servers.pyright = {},
+  -- servers.rust_analyzer = {},
+  -- servers.tsserver = {},
+  -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
+
+>lua
+  if not require('nixCatsUtils').isNixCats then
+    -- Ensure the servers above are installed
+    local mason_lspconfig = require 'mason-lspconfig'
+
+    mason_lspconfig.setup {
+      ensure_installed = vim.tbl_keys(servers),
+    }
+
+    mason_lspconfig.setup_handlers {
+      function(server_name)
+        require('lspconfig')[server_name].setup {
+                                  -- you will need to supply on_attach and
+                                  -- capabilities and require them here
+          capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+          on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+          settings = servers[server_name],
+          filetypes = (servers[server_name] or {}).filetypes,
+        }
+      end,
+    }
+  else
+    for server_name,_ in pairs(servers) do
+      require('lspconfig')[server_name].setup({
+                                  -- here too.
+        capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+        on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+        cmd = (servers[server_name] or {}).cmd,
+        root_pattern = (servers[server_name] or {}).root_pattern,
+      })
+    end
+  end
+<
+=================================================================================
+vim:tw=78:ts=8:ft=help:norl:

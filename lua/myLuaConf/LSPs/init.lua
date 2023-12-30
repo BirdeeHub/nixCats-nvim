@@ -1,3 +1,10 @@
+if not require('nixCatsUtils').isNixCats then
+  -- mason-lspconfig requires that these setup functions are called in this order
+  -- before setting up the servers.
+  require('mason').setup()
+  require('mason-lspconfig').setup()
+end
+
 local servers = {}
 if nixCats('neonixdev') then
   require('neodev').setup({})
@@ -28,12 +35,13 @@ if nixCats('neonixdev') then
     telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
-
-  servers.nixd = {}
+  if require('nixCatsUtils').isNixCats then servers.nixd = {}
+  else servers.rnix = {}
+  end
   servers.nil_ls = {}
 
 end
-if nixCats('lspDebugMode') then
+if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
   vim.lsp.set_log_level("debug")
 end
 
@@ -56,13 +64,34 @@ end
 -- servers.tsserver = {},
 -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
 
-for server_name,_ in pairs(servers) do
-  require('lspconfig')[server_name].setup({
-    capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
-    on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
-    settings = servers[server_name],
-    filetypes = (servers[server_name] or {}).filetypes,
-    cmd = (servers[server_name] or {}).cmd,
-    root_pattern = (servers[server_name] or {}).root_pattern,
-  })
+
+if not require('nixCatsUtils').isNixCats then
+  -- Ensure the servers above are installed
+  local mason_lspconfig = require 'mason-lspconfig'
+
+  mason_lspconfig.setup {
+    ensure_installed = vim.tbl_keys(servers),
+  }
+
+  mason_lspconfig.setup_handlers {
+    function(server_name)
+      require('lspconfig')[server_name].setup {
+        capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+        on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+      }
+    end,
+  }
+else
+  for server_name,_ in pairs(servers) do
+    require('lspconfig')[server_name].setup({
+      capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+      on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+      settings = servers[server_name],
+      filetypes = (servers[server_name] or {}).filetypes,
+      cmd = (servers[server_name] or {}).cmd,
+      root_pattern = (servers[server_name] or {}).root_pattern,
+    })
+  end
 end
