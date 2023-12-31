@@ -1,7 +1,7 @@
 
-  -- first you should go ahead and install your dependencies
-  -- you arent using nix if you are using this.
-  -- this means you will have to install some stuff manually.
+  -- first you should go ahead and install your dependencies.
+  -- You arent using nix if you are using this.
+  -- This means you will have to install some stuff manually.
 
   -- so, you will need cmake, gcc, npm, nodejs,
   -- ripgrep, fd, <curl or wget>, and git,
