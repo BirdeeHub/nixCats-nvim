@@ -59,15 +59,15 @@ in
     };
 
     # see :help nixCats
-    nixCats = { allPlugins, ... }@allDeps:
+    nixCats = { ... }@allDeps:
     pkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
           inherit (settings) wrapRc;
           nixCats_packageName = name;
           nixCats_store_config_location = "${LuaConfig}";
         };
-      init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-      globalCats = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
+      init = pkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
+      globalCats = pkgs.writeText "globalCats.lua" (builtins.readFile ./globalCats.lua);
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = pkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
       depsTable = pkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
