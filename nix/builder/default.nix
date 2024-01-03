@@ -50,7 +50,7 @@ in
   let
     # copy entire flake to store directory
     LuaConfig = pkgs.stdenv.mkDerivation {
-      name = "nixCats-special-rtp-entry-" + (builtins.baseNameOf path);
+      name = "nixCats-special-rtp-entry-LuaConfig";
       builder = builtins.toFile "builder.sh" ''
         source $stdenv/setup
         mkdir -p $out
