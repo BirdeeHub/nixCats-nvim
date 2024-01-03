@@ -34,11 +34,12 @@
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, ... }@inputs:
+  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
+      utils = (import ./nix/utils).utils;
+      inherit (utils) baseBuilder;
     # This line makes this package available for all major systems
     # system is just a string like "x86_64-linux" or "aarch64-darwin"
-    flake-utils.lib.eachDefaultSystem (system: let
-      utils = (import ./nix/utils).utils;
+    in flake-utils.lib.eachDefaultSystem (system: let
 
       # see :help nixCats.flake.outputs.overlays
       # This overlay grabs all the inputs named in the format
@@ -71,7 +72,6 @@
 
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
-      inherit (utils) baseBuilder;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
@@ -361,13 +361,6 @@
       # To choose settings and categories from the flake that calls this flake.
       customPackager = baseBuilder self pkgs categoryDefinitions;
 
-      # You may use these to modify some or all of your categoryDefinitions
-      customBuilders = {
-        fresh = baseBuilder;
-        keepLua = baseBuilder self;
-      };
-      inherit utils;
-
       # and you export this so people dont have to redefine stuff.
       inherit otherOverlays;
       inherit categoryDefinitions;
@@ -396,6 +389,10 @@
     # These will never be system dependent anyway.
     # we dont have access to anything inside flake-utils here though.
     # for how to use these templates see :help nixCats.installation_options
-  ) // { templates = (import ./nix/utils).utils.templates; };
+  ) // {
+    inherit utils;
+    inherit (utils) templates;
+    keepLuaBuilder = baseBuilder self;
+  };
 
 }

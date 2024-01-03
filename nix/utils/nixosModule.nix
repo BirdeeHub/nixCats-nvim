@@ -282,7 +282,7 @@
         packages = nixpkgs.lib.mkIf user_options_set.enable
           [ (
               (
-                if user_options_set.luaPath != "" then (import ../builder user_options_set.luaPath)
+                if user_options_set.luaPath != "" then (utils.baseBuilder user_options_set.luaPath)
                 else (
                   if keepLuaBuilder != null then 
                   keepLuaBuilder else 
@@ -324,7 +324,7 @@
     environment.systemPackages = nixpkgs.lib.mkIf options_set.enable
       [ (
           (
-            if options_set.luaPath != "" then (import ../builder options_set.luaPath)
+            if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
             else (
               if keepLuaBuilder != null then 
               keepLuaBuilder else 

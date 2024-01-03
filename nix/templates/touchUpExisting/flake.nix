@@ -36,11 +36,11 @@
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs:
+  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let
+      utils = nixCats.utils;
     # This line makes this package availeable for all systems
     # ("x86_64-linux", "aarch64-linux", "i686-linux", "x86_64-darwin",...)
-    flake-utils.lib.eachDefaultSystem (system: let
-      utils = nixCats.utils.${system};
+    in flake-utils.lib.eachDefaultSystem (system: let
 
       # see :help nixCats.flake.outputs.overlays
       # This function grabs all the inputs named in the format
@@ -80,8 +80,7 @@
       # for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      baseBuilder = nixCats.customBuilders.${system}.fresh;
-      nixCatsBuilder = nixCats.customBuilders.${system}.keepLua pkgs
+      nixCatsBuilder = nixCats.keepLuaBuilder pkgs
         # notice how it doesn't care that these are defined lower in the file?
         categoryDefinitions packageDefinitions;
 
@@ -148,17 +147,7 @@
       };
 
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = nixCats.customBuilders.${system}.keepLua pkgs categoryDefinitions;
-
-      # You may use these to modify some or all of your categoryDefinitions
-      customBuilders = {
-        fresh = baseBuilder;
-        # this has no lua files to include, so instead of
-        # keepLua = baseBuilder self;
-        # we instead use this to pass on the other lua we inherited
-        keepLua = nixCats.customBuilders.${system}.keepLua;
-      };
-      inherit utils;
+      customPackager = nixCats.keepLuaBuilder pkgs categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
       inherit otherOverlays;
@@ -170,7 +159,7 @@
         defaultPackageName = "nixCats";
         # unfortunately, we do not have a lua path to provide.
         # so instead we provide our keepLuaBuilder
-        keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
+        keepLuaBuilder = nixCats.keepLuaBuilder;
 
         inherit nixpkgs inputs otherOverlays 
           categoryDefinitions packageDefinitions;
@@ -180,11 +169,11 @@
         defaultPackageName = "nixCats";
         # unfortunately, we do not have a lua path to provide.
         # so instead we provide our keepLuaBuilder
-        keepLuaBuilder = nixCats.customBuilders.${system}.keepLua;
+        keepLuaBuilder = nixCats.keepLuaBuilder;
 
         inherit nixpkgs inputs otherOverlays 
           categoryDefinitions packageDefinitions;
       };
     }
-  ) // { templates = nixCats.templates; }; # end of flake utils, which returns the value of outputs
+  ) // { inherit (nixCats) utils templates keepLuaBuilder; };
 }

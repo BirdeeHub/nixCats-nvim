@@ -45,11 +45,12 @@
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs:
+  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let
+      utils = nixCats.utils;
+      inherit (utils) baseBuilder;
     # This line makes this package available for all major systems
     # system is just a string like "x86_64-linux" or "aarch64-darwin"
-    flake-utils.lib.eachDefaultSystem (system: let
-      utils = nixCats.utils.${system};
+    in flake-utils.lib.eachDefaultSystem (system: let
 
       # see :help nixCats.flake.outputs.overlays
       # This function grabs all the inputs named in the format
@@ -86,7 +87,6 @@
       # for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      baseBuilder = nixCats.customBuilders.${system}.fresh;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
@@ -238,7 +238,6 @@
         fresh = baseBuilder;
         keepLua = baseBuilder self;
       };
-      inherit utils;
 
       # and you export this so people dont have to redefine stuff.
       inherit otherOverlays;
@@ -261,5 +260,8 @@
       };
 
     }
-  ) // { templates = nixCats.templates; }; # end of flake utils, which returns the value of outputs
+  ) // {
+    inherit (nixCats) utils templates;
+    keepLuaBuilder = baseBuilder self;
+  };
 }
