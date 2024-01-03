@@ -100,6 +100,18 @@ rec {
         path = ../templates/touchUpExisting;
         description = "A template showing how to merge in parts of other nixCats repos";
       };
+      LSPs = {
+        path = ../templates/LSPs;
+      };
+      luaUtils = {
+        path = ../templates/luaUtils;
+      };
+      overlayfile = {
+        path = ../templates/overlayfile;
+      };
+      pckrInitLua = {
+        path = ../templates/pckrInitLua;
+      };
 
       default = utils.templates.fresh;
     };

@@ -38,7 +38,7 @@ let
     # entry to load in packpath
     , packpathDirs
     , nixCats
-    , customAliases
+    , customAliases ? null
     , ...
   }:
   assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
