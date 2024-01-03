@@ -17,7 +17,7 @@ function M.get(input)
         print("get function requires a table of strings or a dot separated string")
         return
     end
-
+    package.loaded.nixCats.cats = nil
     local cats = require('nixCats.cats')
     for _, key in ipairs(strtable) do
         if type(cats) == "table" then

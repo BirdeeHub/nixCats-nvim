@@ -18,12 +18,26 @@ rec {
     , viAlias ? false
     , configure ? {}
     , extraName ? ""
+    , nixCats
+    , runB4Config
+    , customAliases
   }:
     let
       # although I removed an error that doesnt make sense for my flake.
       plugins = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPlugin (configure.packages or {}));
       # and made it be able to include configs to be ran BEFORE customRC is loaded.
       genPlugin = packageName: {start ? [], opt ? []}:
+        [ {
+          plugin = pkgs.stdenv.mkDerivation {
+            name = "empty-derivation";
+            builder = builtins.toFile "builder.sh" ''
+              source $stdenv/setup
+              mkdir -p $out
+            '';
+          };
+          config = runB4Config;
+          optional = false;
+        } ] ++
         (map (p:
           if builtins.isAttrs p && (p ? config.lua || p ? config.vim) && p ? plugin
           then (p // { config = let 
@@ -60,10 +74,11 @@ rec {
       };
     in
     # it uses the new wrapper!!!
-    pkgs.wrapNeovimUnstable neovim (res // {
+    (pkgs.callPackage ./wrapper.nix {}) neovim (res // {
       wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
       # I handle this with customRC 
       # otherwise it will get loaded in at the wrong time after startup plugins.
       wrapRc = true;
+      inherit nixCats customAliases;
   });
 }

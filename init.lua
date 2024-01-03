@@ -16,6 +16,8 @@ require('nixCatsUtils').setup {
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- this does nothing if config
+-- is loaded via nix
 -- load the plugins via pckr
 -- YOU are in charge of putting the plugin
 -- urls and build steps in there,
