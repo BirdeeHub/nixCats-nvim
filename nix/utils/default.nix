@@ -4,6 +4,10 @@ rec {
 
   # These are to be exported in flake outputs
   utils = {
+
+    # The big function that does everything
+    baseBuilder = import ../builder;
+
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }

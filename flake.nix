@@ -71,7 +71,7 @@
 
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
-      baseBuilder = import ./nix/builder;
+      inherit (utils) baseBuilder;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
