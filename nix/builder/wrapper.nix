@@ -46,6 +46,7 @@ let
   stdenv.mkDerivation (finalAttrs:
   let
 
+    packDir = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
     rcContent = ''
       ${luaRcContent}
     '' + lib.optionalString (!isNull neovimRcContent) ''
@@ -60,11 +61,10 @@ let
             "--add-flags" ''--cmd "lua ${providerLuaRc}"''
             # (lib.intersperse "|" hostProviderViml)
           ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
-          (let
-            packDir = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
-          in [
+          ([
             "--add-flags" ''--cmd "set packpath^=${packDir}"''
             "--add-flags" ''--cmd "set rtp^=${packDir}"''
+            "--add-flags" ''--cmd "lua vim.g.nixCats_vimPackDir = [[${packDir}]]"''
           ])
           ;
 
