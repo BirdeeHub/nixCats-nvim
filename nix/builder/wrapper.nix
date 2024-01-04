@@ -64,7 +64,7 @@ let
           ([
             "--add-flags" ''--cmd "set packpath^=${packDir}"''
             "--add-flags" ''--cmd "set rtp^=${packDir}"''
-            "--add-flags" ''--cmd "lua vim.g.nixCats_vimPackDir = [[${packDir}]]"''
+            "--add-flags" ''--cmd "let nixCats_vimPackDir = [[${packDir}]]"''
           ])
           ;
 
