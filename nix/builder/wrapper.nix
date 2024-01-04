@@ -46,7 +46,8 @@ let
   stdenv.mkDerivation (finalAttrs:
   let
 
-    packDir = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
+    packDirs = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
+    grammarPackDir = packDirs.vim-grammar-dir;
     rcContent = ''
       ${luaRcContent}
     '' + lib.optionalString (!isNull neovimRcContent) ''
@@ -62,9 +63,10 @@ let
             # (lib.intersperse "|" hostProviderViml)
           ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
           ([
-            "--add-flags" ''--cmd "set packpath^=${packDir}"''
-            "--add-flags" ''--cmd "set rtp^=${packDir}"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]]"''
+            "--add-flags" ''--cmd "set packpath^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "set rtp^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDirs.vim-pack-dir}]]"''
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${packDirs.vim-grammar-dir}]]"''
           ])
           ;
 

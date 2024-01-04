@@ -40,16 +40,10 @@ function M.getPrefixed(table, prefix)
 end
 
 function M.restoreGrammars()
-    local grammars = require("nixCats.included").allPlugins.treesitter_grammars
-    local rtpAdditions = ""
-    if type(grammars) == "table" then
-        for _, v in pairs(grammars) do
-            rtpAdditions = rtpAdditions .. "," .. v
-        end
-    end
+    local rtpAdditions = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
     vim.cmd([[
       let runtimepath_list = split(&runtimepath, ',')
-      call insert(runtimepath_list, ]] .. rtpAdditions .. [[, 2)
+      call insert(runtimepath_list, ]] .. rtpAdditions .. [[, 0)
       let &runtimepath = join(runtimepath_list, ',')
     ]])
 end
