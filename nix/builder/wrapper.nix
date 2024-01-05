@@ -47,7 +47,6 @@ let
   let
 
     packDirs = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
-    grammarPackDir = packDirs.vim-grammar-dir;
     rcContent = ''
       ${luaRcContent}
     '' + lib.optionalString (!isNull neovimRcContent) ''
