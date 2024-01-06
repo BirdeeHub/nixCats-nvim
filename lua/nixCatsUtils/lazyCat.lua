@@ -1,13 +1,22 @@
 local M = {}
 
+-- function M.restoreGrammars()
+--   local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
+--   vim.cmd([[
+--       let runtimepath_list = split(&runtimepath, ',')
+--       call insert(runtimepath_list, ']] .. grammarDir .. [[', 0)
+--       let &runtimepath = join(runtimepath_list, ',')
+--   ]])
+-- end
+
 function M.mergePluginTables(table1, table2)
   return vim.tbl_extend('keep', table1, table2)
 end
 
 -- for conditionally disabling build steps on nix, as they are done via nix
-function M.lazyAdd(v)
+function M.lazyAdd(v, o)
   if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
-    return nil
+    return o
   else
     return v
   end
@@ -15,7 +24,7 @@ end
 
 function M.getTableNamesOrListValues(pluginTable)
   for key, _ in pairs(pluginTable) do
-    if type(key) == 'number' or key < 1 or key > #pluginTable then
+    if type(key) ~= 'string' then
       return pluginTable
     end
     break
@@ -83,6 +92,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
 
     if lazyCFG.performance.rtp.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
       lazyCFG.performance.rtp.paths = { nixCatsPath, grammarDir }
+      -- lazyCFG.performance.rtp.paths = { nixCatsPath }
     else
       local pathsToInclude
       pathsToInclude = lazyCFG.performance.rtp.paths

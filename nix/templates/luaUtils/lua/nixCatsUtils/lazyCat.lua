@@ -15,7 +15,7 @@ end
 
 function M.getTableNamesOrListValues(pluginTable)
   for key, _ in pairs(pluginTable) do
-    if type(key) == 'number' or key < 1 or key > #pluginTable then
+    if type(key) ~= 'string' then
       return pluginTable
     end
     break

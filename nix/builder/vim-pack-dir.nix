@@ -89,7 +89,7 @@
 
       packdirStart = vimFarm "pack/${packageName}/start" "packdir-start"
             ( (builtins.attrValues startPlugins) ++ [ resolvedCats (nixCatsDir resolvedCats) ]);
-      grammarDirStart = vimFarm "pack/GrammarsFor${packageName}/start" "packdir-start"
+      grammarDirStart = vimFarm "pack/${packageName}/start" "packdir-start"
             (builtins.attrValues treesitter_grammars);
       packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
       # Assemble all python3 dependencies into a single `site-packages` to avoid doing recursive dependency collection
