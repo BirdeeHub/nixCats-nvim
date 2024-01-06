@@ -1,32 +1,31 @@
 local M = {}
 
-  function M.lazyBuild(v)
-    if require('nixCatsUtils').isNixCats() then
-      return nil
-    else
-      return v
-    end
+function M.lazyAdd(v)
+  if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
+    return nil
+  else
+    return v
   end
+end
 
-  function M.getPluginPatterns(pluginTable)
-    for key, _ in pairs(pluginTable) do
-      if type(key) == 'number' or key < 1 or key > #pluginTable then
-        return pluginTable
-      end
-      break
+function M.getTableNamesOrListValues(pluginTable)
+  for key, _ in pairs(pluginTable) do
+    if type(key) == 'number' or key < 1 or key > #pluginTable then
+      return pluginTable
     end
-    local patterns = {}
-    for key, _ in pairs(pluginTable) do
-      table.insert(patterns, key)
-    end
-    return patterns
+    break
   end
+  local patterns = {}
+  for key, _ in pairs(pluginTable) do
+    table.insert(patterns, key)
+  end
+  return patterns
+end
 
-function M.setup(pluginTable, lazySpecs, lazyCFG)
+function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
 
   local function regularLazyDownload()
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-    -- get the lazypath from Lazy-Nix-Helper
     if not vim.loop.fs_stat(lazypath) then
       vim.fn.system {
         'git',
@@ -40,12 +39,35 @@ function M.setup(pluginTable, lazySpecs, lazyCFG)
     return lazypath
   end
 
-  local lazypath
-  local pathsToInclude
+  local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
+
+  local lazypath
   if nixCatsPath == nil then
     lazypath = regularLazyDownload()
   else
+
+    local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
+    local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
+
+    -- the final options we want to add
+    -- if loaded from nix
+
+    -- local ourOptions = {
+    --   performance = {
+    --     rtp = {
+    --       paths = {
+    --         nixCatsPath,
+    --         grammarDir,
+    --       },
+    --       custom_config_dir = nixCatsConfigDir,
+    --     },
+    --   },
+    --   dev = {
+    --     path = myNeovimPackages .. "/start",
+    --     patterns = M.getTableNamesOrListValues(pluginTable),
+    --   }
+    -- }
 
     if lazyCFG.performance == nil then
       lazyCFG.performance = {}
@@ -53,39 +75,55 @@ function M.setup(pluginTable, lazySpecs, lazyCFG)
     if lazyCFG.performance.rtp == nil then
       lazyCFG.performance.rtp = {}
     end
+
+    if lazyCFG.performance.rtp.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
+      lazyCFG.performance.rtp.paths = { nixCatsPath, grammarDir }
+    else
+      local pathsToInclude
+      pathsToInclude = lazyCFG.performance.rtp.paths
+      table.insert(pathsToInclude, #pathsToInclude + 1, nixCatsPath)
+      table.insert(pathsToInclude, #pathsToInclude + 1, grammarDir)
+      lazyCFG.performance.rtp.paths = pathsToInclude
+    end
+
+    -- this custom_config_dir option has not yet been added to lazy, but pr pending. Required to make this work.
+    lazyCFG.performance.rtp.custom_config_dir = nixCatsConfigDir
+
     if lazyCFG.dev == nil then
       lazyCFG.dev = {}
     end
-    if lazyCFG.performance.rtp.paths ~= nil
-      and type(lazyCFG.performance.rtp.paths) == 'table' then
-      pathsToInclude = lazyCFG.performance.rtp.paths
-      table.insert(pathsToInclude, #pathsToInclude + 1, vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ])
-    end
-    -- this custom_config_dir option has not yet been added to lazy, but pr pending. Required to make this work.
-    lazyCFG.performance.rtp.custom_config_dir = require('nixCats').get([[nixCats_store_config_location]])
+
+    lazyCFG.dev.path = myNeovimPackages .. "/start"
 
     -- I would also love to add lazyCFG.dev.paths so that I can also include opt directory
-    lazyCFG.dev.path = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages/start"
+    -- if lazyCFG.dev.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
+    --   lazyCFG.dev.paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
+    -- else
+    --   local pathsToInclude
+    --   pathsToInclude = lazyCFG.dev.paths
+    --   table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/start")
+    --   table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/opt")
+    --   lazyCFG.dev.paths = pathsToInclude
+    -- end
 
-    lazyCFG.dev.patterns = M.getPluginPatterns(pluginTable)
-    lazypath = pluginTable[ [[lazy.nvim]] ]
+    if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then
+      lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
+    else
+      local toInclude
+      toInclude = lazyCFG.dev.patterns
+      vim.list_extend(toInclude, M.getTableNamesOrListValues(pluginTable))
+      lazyCFG.dev.patterns = toInclude
+    end
+
+    lazypath = nixLazyPath
     if lazypath == nil then
       lazypath = regularLazyDownload()
     end
 
   end
 
-  -- TODO add nixCats to lazySpecs before sending it on
-  -- require('nixCats.globalCats')
-
   vim.opt.rtp:prepend(lazypath)
 
-  -- [[ Configure plugins ]]
-  -- NOTE: Here is where you install your plugins.
-  --  You can configure plugins using the `config` key.
-  --
-  --  You can also configure plugins after the setup call,
-  --    as they will be available in your neovim runtime.
   require('lazy').setup(lazySpecs, lazyCFG)
 end
 

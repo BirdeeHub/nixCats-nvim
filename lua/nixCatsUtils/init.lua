@@ -21,19 +21,4 @@ function M.setup(v)
     end
 end
 
-function M.getPrefixed(table, prefix)
-    -- "^vimplugin%-treesitter%-grammar%-"
-    if type(table) ~= "table" then
-        return
-    end
-    local grammarTable = {}
-    for k, v in pairs(table) do
-        if string.match(k, "^" .. prefix) then
-            grammarTable[k] = v
-        end
-    end
-    return grammarTable
-end
-
-
 return M
