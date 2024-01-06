@@ -1,3 +1,6 @@
+-- These 2 need to be set up before plugins are loaded.
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
 -- THIS SETUP AND catPacker ARE FOR
 -- pckr THE NEOVIM PLUGIN MANAGER
@@ -12,13 +15,7 @@
 require('nixCatsUtils').setup {
   default_cat_value = true,
 }
-
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
--- this does nothing if config
--- is loaded via nix
--- load the plugins via pckr
+-- then load the plugins via pckr
 -- YOU are in charge of putting the plugin
 -- urls and build steps in there,
 -- and you should keep any setup functions
