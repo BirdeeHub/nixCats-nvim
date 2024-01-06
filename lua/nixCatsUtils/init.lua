@@ -1,12 +1,6 @@
 local M = {}
 
-M.isNixCats = function()
-    if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] == nil then
-        return false
-    else
-        return true
-    end
-end
+M.isNixCats = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil
 
 function M.setup(v)
     if not M.isNixCats then

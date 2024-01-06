@@ -1,5 +1,9 @@
 local M = {}
 
+function M.mergePluginTables(table1, table2)
+  return vim.tbl_extend('keep', table1, table2)
+end
+
 -- for conditionally disabling build steps on nix, as they are done via nix
 function M.lazyAdd(v)
   if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
@@ -94,19 +98,19 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
-    -- will be traded out for the following portion if PR is accepted
+    -- will be removed if lazy upstream PR is accepted
     lazyCFG.dev.path = myNeovimPackages .. "/start"
 
     -- I would also love to add lazyCFG.dev.paths so that I can also include opt directory
-    -- if lazyCFG.dev.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
-    --   lazyCFG.dev.paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
-    -- else
-    --   local pathsToInclude
-    --   pathsToInclude = lazyCFG.dev.paths
-    --   table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/start")
-    --   table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/opt")
-    --   lazyCFG.dev.paths = pathsToInclude
-    -- end
+    if lazyCFG.dev.extra_paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
+      lazyCFG.dev.extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
+    else
+      local pathsToInclude
+      pathsToInclude = lazyCFG.dev.paths
+      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/start")
+      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/opt")
+      lazyCFG.dev.extra_paths = pathsToInclude
+    end
 
     if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then
       lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
