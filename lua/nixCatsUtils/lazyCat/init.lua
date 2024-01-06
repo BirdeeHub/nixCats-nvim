@@ -1,12 +1,13 @@
 local M = {}
-  function M.restoreGrammars()
-      local rtpAdditions = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
-      vim.cmd([[
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, ]] .. rtpAdditions .. [[, 0)
-        let &runtimepath = join(runtimepath_list, ',')
-      ]])
+
+  function M.lazyBuild(v)
+    if require('nixCatsUtils').isNixCats() then
+      return nil
+    else
+      return v
+    end
   end
+
   function M.getPluginPatterns(pluginTable)
     for key, _ in pairs(pluginTable) do
       if type(key) == 'number' or key < 1 or key > #pluginTable then
@@ -40,6 +41,7 @@ function M.setup(pluginTable, lazySpecs, lazyCFG)
   end
 
   local lazypath
+  local pathsToInclude
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
   if nixCatsPath == nil then
     lazypath = regularLazyDownload()
@@ -54,10 +56,17 @@ function M.setup(pluginTable, lazySpecs, lazyCFG)
     if lazyCFG.dev == nil then
       lazyCFG.dev = {}
     end
+    if lazyCFG.performance.rtp.paths ~= nil
+      and type(lazyCFG.performance.rtp.paths) == 'table' then
+      pathsToInclude = lazyCFG.performance.rtp.paths
+      table.insert(pathsToInclude, #pathsToInclude + 1, vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ])
+    end
     -- this custom_config_dir option has not yet been added to lazy, but pr pending. Required to make this work.
     lazyCFG.performance.rtp.custom_config_dir = require('nixCats').get([[nixCats_store_config_location]])
+
     -- I would also love to add lazyCFG.dev.paths so that I can also include opt directory
     lazyCFG.dev.path = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages/start"
+
     lazyCFG.dev.patterns = M.getPluginPatterns(pluginTable)
     lazypath = pluginTable[ [[lazy.nvim]] ]
     if lazypath == nil then
