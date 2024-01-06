@@ -1,5 +1,6 @@
 local M = {}
 
+-- for conditionally disabling build steps on nix, as they are done via nix
 function M.lazyAdd(v)
   if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
     return nil
@@ -64,7 +65,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     --     },
     --   },
     --   dev = {
-    --     path = myNeovimPackages .. "/start",
+    --     paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
     --     patterns = M.getTableNamesOrListValues(pluginTable),
     --   }
     -- }
@@ -93,6 +94,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
+    -- will be traded out for the following portion if PR is accepted
     lazyCFG.dev.path = myNeovimPackages .. "/start"
 
     -- I would also love to add lazyCFG.dev.paths so that I can also include opt directory
