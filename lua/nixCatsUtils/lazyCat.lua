@@ -1,13 +1,13 @@
 local M = {}
 
--- function M.restoreGrammars()
---   local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
---   vim.cmd([[
---       let runtimepath_list = split(&runtimepath, ',')
---       call insert(runtimepath_list, ']] .. grammarDir .. [[', 0)
---       let &runtimepath = join(runtimepath_list, ',')
---   ]])
--- end
+function M.restoreGrammars()
+  local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
+  vim.cmd([[
+      let runtimepath_list = split(&runtimepath, ',')
+      call insert(runtimepath_list, ']] .. grammarDir .. [[', 0)
+      let &runtimepath = join(runtimepath_list, ',')
+  ]])
+end
 
 function M.mergePluginTables(table1, table2)
   return vim.tbl_extend('keep', table1, table2)
