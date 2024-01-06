@@ -21,7 +21,88 @@ require('nixCatsUtils').setup {
 -- and you should keep any setup functions
 -- OUT of that file, as they are ONLY loaded when this
 -- configuration is NOT loaded via nix.
-require('nixCatsUtils.catPacker')
+require('nixCatsUtils.catPacker').setup({
+    -- ### DONT USE CONFIG VARIABLE ###
+    -- unless you are ok with that instruction 
+    -- not being ran when used via nix,
+    -- pckr will not be ran when using nix
+  { 'joshdick/onedark.vim', },
+  { 'nvim-tree/nvim-web-devicons', },
+
+  { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate',
+    requires = {
+      'nvim-treesitter/nvim-treesitter-textobjects',
+    },
+  },
+  {'nvim-telescope/telescope.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', run = 'which make && make', }
+    },
+  },
+
+  { 'neovim/nvim-lspconfig',
+    requires = {
+      { 'williamboman/mason.nvim', },
+      { 'williamboman/mason-lspconfig.nvim', },
+      { 'j-hui/fidget.nvim', },
+      { 'folke/neodev.nvim', },
+      { 'folke/neoconf.nvim', },
+    },
+  },
+
+  { 'hrsh7th/nvim-cmp',
+    requires = {
+      { 'onsails/lspkind.nvim', },
+      { 'L3MON4D3/LuaSnip', },
+      { 'saadparwaiz1/cmp_luasnip', },
+      { 'hrsh7th/cmp-nvim-lsp', },
+      { 'hrsh7th/cmp-nvim-lua', },
+      { 'hrsh7th/cmp-nvim-lsp-signature-help', },
+      { 'hrsh7th/cmp-path', },
+      { 'rafamadriz/friendly-snippets', },
+      { 'hrsh7th/cmp-buffer', },
+      { 'hrsh7th/cmp-cmdline', },
+      { 'dmitmel/cmp-cmdline-history', },
+    },
+  },
+
+  { 'mfussenegger/nvim-dap',
+    requires = {
+      { 'rcarriga/nvim-dap-ui', },
+      { 'theHamsta/nvim-dap-virtual-text', },
+      { 'jay-babu/mason-nvim-dap.nvim', },
+    },
+  },
+
+  { 'm-demare/hlargs.nvim', },
+  { 'mbbill/undotree', },
+  { 'tpope/vim-fugitive', },
+  { 'tpope/vim-rhubarb', },
+  { 'tpope/vim-sleuth', },
+  { 'folke/which-key.nvim', },
+  { 'lewis6991/gitsigns.nvim', },
+  { 'nvim-lualine/lualine.nvim', },
+  { 'lukas-reineke/indent-blankline.nvim', },
+  { 'numToStr/Comment.nvim', },
+  { 'kylechui/nvim-surround',
+    requires = { 'tpope/vim-repeat', },
+  },
+  {
+    "iamcco/markdown-preview.nvim",
+    run = function() vim.fn["mkdp#util#install"]() end,
+  },
+
+  -- { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, },
+
+  -- all the rest of the setup will be done within the normal scheme, thus working regardless of what method loads the plugins.
+  -- only stuff pertaining to downloading should be added to pckr.
+
+})
+
+-- OK, again, that isnt needed if you load this setup via nix, but it is an option.
+
+
 
 -- [[ Setting options ]]
 -- See `:help vim.o`

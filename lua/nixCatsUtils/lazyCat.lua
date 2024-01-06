@@ -69,7 +69,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     --     },
     --   },
     --   dev = {
-    --     paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
+    --     extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
     --     patterns = M.getTableNamesOrListValues(pluginTable),
     --   }
     -- }
