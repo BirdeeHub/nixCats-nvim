@@ -26,7 +26,8 @@
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {
       allPlugins = {
-        inherit startPlugins treesitter_grammars;
+        start = startPlugins;
+        inherit treesitter_grammars;
         opt = builtins.listToAttrs (map mkEntryFromDrv opt);
       };
       python3Path = if (allPython3Dependencies python3.pkgs == [])
