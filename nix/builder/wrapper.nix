@@ -53,6 +53,22 @@ let
       vim.cmd.source "${writeText "init.vim" neovimRcContent}"
     '';
 
+    grammarsConsolidated = stdenv.mkDerivation {
+      name = "nixCats-special-rtp-entry-grammars-together";
+      builder = writeText "builder.sh" (''
+        #!/usr/bin/env bash
+        source $stdenv/setup
+        mkdir -p $out/parser
+        cp -r ${packDirs.vim-grammar-dir}/pack/myNeovimPackages/start/*/parser/* $out/parser
+        # mkdir -p $out/
+        # readarray -t grammarorigin <<< "$(dirname $(readlink ${packDirs.vim-grammar-dir}/pack/myNeovimPackages/start/*/parser/*))"
+        # items=()
+        # for origin in "$'' + ''{grammarorigin[@]}"; do
+        #   cp -rn $origin/* $out/
+        # done
+      '');
+    };
+
     wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
 
     generatedWrapperArgs =
@@ -65,7 +81,8 @@ let
             "--add-flags" ''--cmd "set packpath^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
             "--add-flags" ''--cmd "set rtp^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDirs.vim-pack-dir}]]"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${packDirs.vim-grammar-dir}]]"''
+            # "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${packDirs.vim-grammar-dir}]]"''
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${grammarsConsolidated}]]"''
           ])
           ;
 

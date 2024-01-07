@@ -92,7 +92,6 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
 
     if lazyCFG.performance.rtp.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
       lazyCFG.performance.rtp.paths = { nixCatsPath, grammarDir }
-      -- lazyCFG.performance.rtp.paths = { nixCatsPath }
     else
       local pathsToInclude
       pathsToInclude = lazyCFG.performance.rtp.paths

@@ -21,7 +21,7 @@ The default is true.
 >lua
   -- THIS SETUP CALL IS REQUIRED (for true you may leave out the argument)
   require('nixCatsUtils').setup {
-    default_cat_value = true,
+    non_nix_value = true,
   }
 <
 Then you can set leader keys, and require your secondary pckr download method

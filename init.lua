@@ -13,7 +13,7 @@ vim.g.maplocalleader = ' '
 -- to determine if this was loaded as a nix config
 -- you must set this here at the start
 require('nixCatsUtils').setup {
-  default_cat_value = true,
+  non_nix_value = true,
 }
 -- then load the plugins via pckr
 -- YOU are in charge of putting the plugin
