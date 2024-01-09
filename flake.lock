@@ -121,12 +121,29 @@
         "type": "github"
       }
     },
+    "plugins-lazy-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704806170,
+        "narHash": "sha256-NZ94THu07jnV+K7LkNnNNt9h8PkoLT/tXMbqzqZlU+8=",
+        "owner": "BirdeeHub",
+        "repo": "lazy.nvim",
+        "rev": "5f41e57c5efa2e201dbaa98595d52efe8ec37e51",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "lazy.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixd": "nixd",
         "nixpkgs": "nixpkgs_2",
-        "plugins-hlargs": "plugins-hlargs"
+        "plugins-hlargs": "plugins-hlargs",
+        "plugins-lazy-nvim": "plugins-lazy-nvim"
       }
     },
     "systems": {

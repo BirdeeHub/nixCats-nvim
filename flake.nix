@@ -22,6 +22,12 @@
       flake = false;
     };
 
+    # https://github.com/folke/lazy.nvim/pull/1259
+    "plugins-lazy-nvim" = {
+      url = "github:BirdeeHub/lazy.nvim";
+      flake = false;
+    };
+
     # neovim = {
     #   url = "github:neovim/neovim";
     #   flake = false;
@@ -127,6 +133,9 @@
           markdown = with pkgs.vimPlugins; [
             # yes it knows this isn't with pkgs.vimPlugins
             pkgs.nixCatsBuilds.markdown-preview-nvim
+          ];
+          lazy = with pkgs.neovimPlugins; [
+            lazy-nvim
           ];
           general = {
             gitPlugins = with pkgs.neovimPlugins; [
@@ -277,6 +286,7 @@
         nixCats = {
           settings = settings.nixCats; 
           categories = {
+            lazy = false;
             generalBuildInputs = true;
             markdown = true;
             general.vimPlugins = true;
@@ -310,6 +320,7 @@
         regularCats = { 
           settings = settings.unwrappedLua;
           categories = {
+            lazy = false;
             generalBuildInputs = true;
             markdown = true;
             general = true;
