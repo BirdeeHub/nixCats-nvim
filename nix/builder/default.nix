@@ -59,6 +59,8 @@ in
     };
 
     # see :help nixCats
+    # this function gets passed all the way into the wrapper so that we can also add
+    # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = { ... }@allDeps:
     pkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {

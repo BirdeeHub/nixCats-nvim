@@ -60,11 +60,19 @@ let
         source $stdenv/setup
         mkdir -p $out/parser
         cp -r ${packDirs.vim-grammar-dir}/pack/myNeovimPackages/start/*/parser/* $out/parser
-        # mkdir -p $out/
+
+        # attempting to make a queries directory with queries in language directories in it
+        # in a possibly futile attempt to stop lazy from throwing an error.
+        # This is probably not the correct way to do this even
+        # if I do manage to find the language name....
+
+        # mkdir -p $out/queries
         # readarray -t grammarorigin <<< "$(dirname $(readlink ${packDirs.vim-grammar-dir}/pack/myNeovimPackages/start/*/parser/*))"
         # items=()
         # for origin in "$'' + ''{grammarorigin[@]}"; do
-        #   cp -rn $origin/* $out/
+        #   if [ -e $origin/queries ]; then
+        #     cp -rn $origin/queries/* $out/queries/
+        #   fi
         # done
       '');
     };
@@ -78,8 +86,8 @@ let
             # (lib.intersperse "|" hostProviderViml)
           ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
           ([
-            "--add-flags" ''--cmd "set packpath^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
-            "--add-flags" ''--cmd "set rtp^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "set packpath^=${grammarsConsolidated},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "set rtp^=${grammarsConsolidated},${packDirs.vim-pack-dir}"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDirs.vim-pack-dir}]]"''
             # "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${packDirs.vim-grammar-dir}]]"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${grammarsConsolidated}]]"''

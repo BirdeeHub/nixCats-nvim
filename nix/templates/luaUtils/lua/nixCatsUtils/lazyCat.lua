@@ -5,9 +5,9 @@ function M.mergePluginTables(table1, table2)
 end
 
 -- for conditionally disabling build steps on nix, as they are done via nix
-function M.lazyAdd(v)
+function M.lazyAdd(v, o)
   if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
-    return nil
+    return o
   else
     return v
   end
@@ -55,25 +55,6 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
 
-    -- the final options we want to add
-    -- if loaded from nix
-
-    -- local ourOptions = {
-    --   performance = {
-    --     rtp = {
-    --       paths = {
-    --         nixCatsPath,
-    --         grammarDir,
-    --       },
-    --       custom_config_dir = nixCatsConfigDir,
-    --     },
-    --   },
-    --   dev = {
-    --     extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
-    --     patterns = M.getTableNamesOrListValues(pluginTable),
-    --   }
-    -- }
-
     if lazyCFG.performance == nil then
       lazyCFG.performance = {}
     end
@@ -81,27 +62,23 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.performance.rtp = {}
     end
 
-    if lazyCFG.performance.rtp.paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
-      lazyCFG.performance.rtp.paths = { nixCatsPath, grammarDir }
-    else
-      local pathsToInclude
-      pathsToInclude = lazyCFG.performance.rtp.paths
-      table.insert(pathsToInclude, #pathsToInclude + 1, nixCatsPath)
-      table.insert(pathsToInclude, #pathsToInclude + 1, grammarDir)
-      lazyCFG.performance.rtp.paths = pathsToInclude
+    lazyCFG.performance.rtp.override_base_rtp = function(_, ME, VIMRUNTIME, NVIM_LIB)
+      return {
+        nixCatsConfigDir,
+        nixCatsPath,
+        grammarDir,
+        vim.fn.stdpath("data") .. "/site",
+        ME,
+        VIMRUNTIME,
+        NVIM_LIB,
+        nixCatsConfigDir .. "/after",
+      }
     end
-
-    -- this custom_config_dir option has not yet been added to lazy, but pr pending. Required to make this work.
-    lazyCFG.performance.rtp.custom_config_dir = nixCatsConfigDir
 
     if lazyCFG.dev == nil then
       lazyCFG.dev = {}
     end
 
-    -- will be removed if lazy upstream PR is accepted
-    lazyCFG.dev.path = myNeovimPackages .. "/start"
-
-    -- I would also love to add lazyCFG.dev.paths so that I can also include opt directory
     if lazyCFG.dev.extra_paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
       lazyCFG.dev.extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
     else

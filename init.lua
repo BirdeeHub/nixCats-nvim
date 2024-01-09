@@ -7,7 +7,7 @@ vim.g.maplocalleader = ' '
 -- They do nothing if your config is loaded via nix.
 
 -- when using this as a normal nvim config folder
--- default_cat_value is what nixCats('anything')
+-- non_nix_value is what nixCats('anything')
 -- will return.
 -- you may also require myLuaConf.isNixCats
 -- to determine if this was loaded as a nix config
@@ -23,7 +23,7 @@ require('nixCatsUtils').setup {
 -- configuration is NOT loaded via nix.
 require('nixCatsUtils.catPacker').setup({
     -- ### DONT USE CONFIG VARIABLE ###
-    -- unless you are ok with that instruction 
+    -- unless you are ok with that instruction
     -- not being ran when used via nix,
     -- pckr will not be ran when using nix
   { 'joshdick/onedark.vim', },
@@ -88,14 +88,14 @@ require('nixCatsUtils.catPacker').setup({
   { 'kylechui/nvim-surround',
     requires = { 'tpope/vim-repeat', },
   },
+
   {
     "iamcco/markdown-preview.nvim",
     run = function() vim.fn["mkdp#util#install"]() end,
   },
 
-  -- { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, },
-
-  -- all the rest of the setup will be done within the normal scheme, thus working regardless of what method loads the plugins.
+  -- all the rest of the setup will be done using the normal setup functions later,
+  -- thus working regardless of what method loads the plugins.
   -- only stuff pertaining to downloading should be added to pckr.
 
 })
