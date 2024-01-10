@@ -17,7 +17,7 @@ except with the bonus of being able to install and set up more than just neovim 
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
-You can nixCats('attr.path.to.value") for what nix categories you created are included in the current package.
+You can nixCats('attr.path.to.value") to discover what nix categories you created are included in the current package.
 
 Doing so allows you to define as many different packages as you want from the same config file.
 
@@ -40,12 +40,12 @@ This is because there is (reasonable) syntax highlighting for the code examples 
 
 There is about as much help as there is nix code in this entire project.
 
-    An important note: if you add a file,
-    nix will not package it unless you add it 
-    to your git staging before you build it...
-    So nvim wont be able to find it...
-    So, run git add before you build,
-    especially when using the wrapRc option.
+> An important note: if you add a file,
+> nix will not package it unless you add it 
+> to your git staging before you build it...
+> So nvim wont be able to find it...
+> So, run git add before you build,
+> especially when using the wrapRc option.
 
 Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim), with a couple changes. 
 
@@ -100,8 +100,8 @@ In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) 
 
 That being said, if only for better understanding, there is a guide to going outside of those 2 files in [:help nixCats.flake.nixperts.nvimBuilder](./nix/nixCatsHelp/nvimBuilder.txt) in case you want to.
 
-All config folders like ftplugin and after work as designed (see :h rtp), if you want lazy loading put it in optionalPlugins in a category in the flake and call packadd when you want it.
-Although, it does specifically expect init.lua rather than init.vim at root level.
+All config folders like `ftplugin/` and `after/` work as designed (see :h rtp), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
+Although, it does specifically expect `init.lua` rather than `init.vim` at root level.
 
 It runs on linux, mac, and WSL. 
 You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste. If you're not on linux you don't need to care what those last 2 things mean.
@@ -140,7 +140,7 @@ You then choose what categories to include in the package.
 
 You then set them up in your lua, using the default methods to do so. No more translating to your package manager! (If you were using lazy, the opt section goes into the setup function in the lua)
 
-You can optionally ask what categories you have in this package, whenever you use nixCats('attr.path.to.value")
+You can optionally ask what categories you have in this package, whenever you use `nixCats('attr.path.to.value")`
 
 If you encounter any build steps that are not well handled by nixpkgs, 
 or you need to import a plugin straight from git that has a non-standard build step and no flake,
@@ -202,7 +202,7 @@ The help will still be accessible in your version of the editor.
 
 When you have your plugins added, you can build it using nix build and it
 will build to a result directory, or nix profile install to install it to your
-profile. Make sure you run ```git add .``` first as anything not staged will not
+profile. Make sure you run `git add .` first as anything not staged will not
 be added to the store and thus not be findable by either nix or neovim.
 See nix documentation on how to use these commands further at:
 [the nix command reference manual](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
