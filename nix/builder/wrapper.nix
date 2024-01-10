@@ -47,6 +47,7 @@ let
   let
 
     packDirs = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
+
     rcContent = ''
       ${luaRcContent}
     '' + lib.optionalString (!isNull neovimRcContent) ''
@@ -55,7 +56,7 @@ let
 
     grammarsConsolidated = stdenv.mkDerivation {
       name = "nixCats-special-rtp-entry-grammars-together";
-      builder = writeText "builder.sh" (''
+      builder = writeText "builder.sh" (/* bash */ ''
         #!/usr/bin/env bash
         source $stdenv/setup
         mkdir -p $out/parser
@@ -141,7 +142,7 @@ let
       + lib.optionalString (manifestRc != null) (let
         manifestWrapperArgs =
           [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ finalAttrs.generatedWrapperArgs;
-      in ''
+      in /* bash */ ''
         echo "Generating remote plugin manifest"
         export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim
         makeWrapper ${lib.escapeShellArgs manifestWrapperArgs} ${wrapperArgsStr}
@@ -172,7 +173,7 @@ let
         fi
         rm "${placeholder "out"}/bin/nvim-wrapper"
       '')
-      + ''
+      + /* bash */ ''
         rm $out/bin/nvim
         touch $out/rplugin.vim
         makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr}

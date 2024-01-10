@@ -51,7 +51,7 @@ in
     # copy entire flake to store directory
     LuaConfig = pkgs.stdenv.mkDerivation {
       name = "nixCats-special-rtp-entry-LuaConfig";
-      builder = builtins.toFile "builder.sh" ''
+      builder = builtins.toFile "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out
         cp -r ${path}/* $out/
@@ -93,13 +93,13 @@ in
     # doing it this way makes nixCats command and
     # configdir variable available even with new plugin scheme
     # as well as any local pack dir
-    runB4Config = ''
+    runB4Config = /* vim */ ''
       let configdir = stdpath('config')
       execute "set runtimepath-=" . configdir
       execute "set runtimepath-=" . configdir . "/after"
     '' + (if settings.wrapRc then ''
       let configdir = "${LuaConfig}"
-    '' else "") + ''
+    '' else "") + /* vim */ ''
       lua require('nixCats.globalCats')
       lua require('nixCats.saveTheCats')
       let runtimepath_list = split(&runtimepath, ',')
