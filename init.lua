@@ -6,10 +6,10 @@ vim.g.maplocalleader = ' '
 -- pckr THE NEOVIM PLUGIN MANAGER
 -- They do nothing if your config is loaded via nix.
 
--- when using this as a normal nvim config folder
+-- when using this repo without nix,
 -- non_nix_value is what nixCats('anything')
 -- will return.
--- you may also require myLuaConf.isNixCats
+-- you may also require('nixCatsUtils').isNixCats
 -- to determine if this was loaded as a nix config
 -- you must set this here at the start
 require('nixCatsUtils').setup {
