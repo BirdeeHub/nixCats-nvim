@@ -261,7 +261,8 @@
 
     }
   ) // {
-    inherit (nixCats) utils templates;
+    inherit (nixCats) utils;
+    inherit (utils) templates baseBuilder;
     keepLuaBuilder = baseBuilder self;
   };
 }

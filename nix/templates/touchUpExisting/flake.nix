@@ -175,5 +175,8 @@
           categoryDefinitions packageDefinitions;
       };
     }
-  ) // { inherit (nixCats) utils templates keepLuaBuilder; };
+  ) // {
+    inherit (nixCats) utils keepLuaBuilder;
+    inherit (utils) templates baseBuilder;
+  };
 }
