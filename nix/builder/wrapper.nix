@@ -73,8 +73,8 @@ let
             # (lib.intersperse "|" hostProviderViml)
           ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
           ([
-            "--add-flags" ''--cmd "set packpath^=${grammarsConsolidated},${packDirs.vim-pack-dir}"''
-            "--add-flags" ''--cmd "set rtp^=${grammarsConsolidated},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "set packpath^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
+            "--add-flags" ''--cmd "set rtp^=${packDirs.vim-grammar-dir},${packDirs.vim-pack-dir}"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDirs.vim-pack-dir}]]"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ] = [[${grammarsConsolidated}]]"''
           ])
