@@ -44,14 +44,13 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     return lazypath
   end
 
-  local grammarDir = require('nixCats.included').ts_grammar_plugin
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
-
   local lazypath
   if nixCatsPath == nil then
     lazypath = regularLazyDownload()
   else
 
+    local grammarDir = require('nixCats.included').ts_grammar_plugin
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
 

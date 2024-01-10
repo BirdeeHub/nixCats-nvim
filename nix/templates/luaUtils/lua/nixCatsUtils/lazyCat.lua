@@ -44,14 +44,13 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     return lazypath
   end
 
-  local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
-
   local lazypath
   if nixCatsPath == nil then
     lazypath = regularLazyDownload()
   else
 
+    local grammarDir = require('nixCats.included').ts_grammar_plugin
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
 
@@ -62,6 +61,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.performance.rtp = {}
     end
 
+    -- https://github.com/folke/lazy.nvim/pull/1259
     lazyCFG.performance.rtp.override_base_rtp = function(_, ME, VIMRUNTIME, NVIM_LIB)
       return {
         nixCatsConfigDir,
@@ -79,6 +79,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
+    -- https://github.com/folke/lazy.nvim/pull/1259
     if lazyCFG.dev.extra_paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
       lazyCFG.dev.extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
     else
