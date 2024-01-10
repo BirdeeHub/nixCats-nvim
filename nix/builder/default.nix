@@ -93,11 +93,11 @@ in
     # doing it this way makes nixCats command and
     # configdir variable available even with new plugin scheme
     # as well as any local pack dir
-    runB4Config = /* vim */ ''
+    runB4Config = (/* vim */ ''
       let configdir = stdpath('config')
       execute "set runtimepath-=" . configdir
       execute "set runtimepath-=" . configdir . "/after"
-    '' + (if settings.wrapRc then ''
+    '') + (if settings.wrapRc then /* vim */''
       let configdir = "${LuaConfig}"
     '' else "") + /* vim */ ''
       lua require('nixCats.globalCats')
@@ -114,11 +114,11 @@ in
           else builtins.concatStringsSep "\n"
           (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in # just in case someone overwrites it.
-    (if settings.wrapRc then ''
+    (if settings.wrapRc then /* vim */ ''
       let configdir = "${LuaConfig}"
-    '' else ''
+    '' else /* vim */ ''
       let configdir = stdpath('config')
-    '') + ''
+    '') + /* vim */ ''
       execute "source " . configdir . "/init.lua"
 
       lua << EOF

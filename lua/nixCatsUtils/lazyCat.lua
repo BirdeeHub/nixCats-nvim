@@ -44,7 +44,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     return lazypath
   end
 
-  local grammarDir = vim.g[ [[nixCats-special-rtp-entry-vimGrammarDir]] ]
+  local grammarDir = require('nixCats.included').ts_grammar_plugin
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
 
   local lazypath
