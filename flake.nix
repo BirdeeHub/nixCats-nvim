@@ -402,7 +402,7 @@
     # for how to use these templates see :help nixCats.installation_options
   ) // {
     inherit utils;
-    inherit (utils) templates;
+    inherit (utils) templates baseBuilder;
     keepLuaBuilder = baseBuilder self;
   };
 
