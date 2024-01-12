@@ -78,7 +78,7 @@ have it separate while you work with it, and then either
 leave it separate as a flake, or copy your configuration
 into the module version.
 
-In fact, you could even copy the inputs into your
+In fact, you could even copy the nixCats into your
 main configuration's flake inputs, then, wherever you want,
 recreate the entire outputs set of the flake from just the utils set.
 
