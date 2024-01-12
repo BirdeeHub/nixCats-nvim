@@ -53,9 +53,11 @@
       # in the default.nix file in that directory.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
-      otherOverlays = [ (utils.mergeOverlayLists nixCats.otherOverlays.${system}
+      dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system}
         ( (import ./overlays inputs) ++ 
           [
+          # And here we apply standardPluginOverlay to our inputs.
+          (standardPluginOverlay inputs)
             # add any flake overlays here.
           ]
         )) ];
@@ -67,10 +69,7 @@
 
       pkgs = import nixpkgs {
         inherit system;
-        overlays = otherOverlays ++ [
-          # And here we apply standardPluginOverlay to our inputs.
-          (standardPluginOverlay (nixCats.inputs // inputs))
-        ];
+        overlays = dependencyOverlays;
         # config.allowUnfree = true;
       };
 
@@ -80,7 +79,7 @@
       # for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
-      nixCatsBuilder = nixCats.keepLuaBuilder pkgs
+      nixCatsBuilder = nixCats.keepLuaBuilder { inherit pkgs dependencyOverlays; }
         # notice how it doesn't care that these are defined lower in the file?
         categoryDefinitions packageDefinitions;
 
@@ -150,7 +149,7 @@
       customPackager = nixCats.keepLuaBuilder pkgs categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
-      inherit otherOverlays;
+      inherit dependencyOverlays;
       inherit categoryDefinitions;
       inherit packageDefinitions;
 
@@ -161,7 +160,7 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.keepLuaBuilder;
 
-        inherit inputs otherOverlays 
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
@@ -171,7 +170,7 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.keepLuaBuilder;
 
-        inherit inputs otherOverlays 
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
     }

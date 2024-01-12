@@ -62,21 +62,20 @@
       # in the default.nix file in that directory.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
-      otherOverlays = (import ./overlays inputs) ++ [
-        # add any flake overlays here.
-      ];
-      # It is important otherOverlays and standardPluginOverlay
-      # are defined separately, because we will be exporting
-      # the other overlays we defined for ease of use when
+
+      # We will be exporting
+      # the overlays we defined for ease of use when
       # integrating various versions of your config with nix configs
       # and attempting to redefine certain things for that system.
 
+      dependencyOverlays = (import ./overlays inputs) ++ [
+        (standardPluginOverlay inputs)
+        # add any flake overlays here.
+        inputs.nixd.overlays.default
+      ];
       pkgs = import nixpkgs {
         inherit system;
-        overlays = otherOverlays ++ [
-          # And here we apply standardPluginOverlay to our inputs.
-          (standardPluginOverlay inputs)
-        ];
+        overlays = dependencyOverlays;
         # config.allowUnfree = true;
       };
 
@@ -87,7 +86,7 @@
 
       # see :help nixCats.flake.outputs.builder
       inherit (utils) baseBuilder;
-      nixCatsBuilder = baseBuilder "${./.}" pkgs categoryDefinitions packageDefinitions;
+      nixCatsBuilder = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
@@ -231,10 +230,10 @@
       };
 
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = baseBuilder "${./.}" pkgs categoryDefinitions;
+      customPackager = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
-      inherit otherOverlays;
+      inherit dependencyOverlays;
       inherit categoryDefinitions;
       inherit packageDefinitions;
 
@@ -242,14 +241,14 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${./.}";
-        inherit inputs otherOverlays 
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${./.}";
-        inherit inputs otherOverlays 
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
 
