@@ -70,7 +70,8 @@ If you already have a system flake, you probably want to configure
 your neovim as a module. There are some templates below that you should
 not import directly into your flake, but should instead take a look at
 and use as an example of what to do.
-They have the same configuration options as the flake version.
+
+Modules have the same configuration options as the flake version.
 
 Therefore, it is VERY easy to begin with the flake version,
 have it separate while you work with it, and then either
