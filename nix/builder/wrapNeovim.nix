@@ -21,6 +21,7 @@ rec {
     , nixCats
     , runB4Config
     , customAliases
+    , nixCats_passthru ? {}
   }:
     let
       # although I removed an error that doesnt make sense for my flake.
@@ -79,6 +80,6 @@ rec {
       # I handle this with customRC 
       # otherwise it will get loaded in at the wrong time after startup plugins.
       wrapRc = true;
-      inherit nixCats customAliases;
+      inherit nixCats customAliases nixCats_passthru;
   });
 }

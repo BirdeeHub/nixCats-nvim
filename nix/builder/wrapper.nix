@@ -39,6 +39,7 @@ let
     , packpathDirs
     , nixCats
     , customAliases ? null
+    , nixCats_passthru ? {}
     , ...
   }:
   assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
@@ -179,11 +180,7 @@ let
     preferLocalBuild = true;
 
     nativeBuildInputs = [ makeWrapper lndir ];
-    passthru = {
-      inherit providerLuaRc packpathDirs;
-      unwrapped = neovim-unwrapped;
-      initRc = neovimRcContent;
-    };
+    passthru = nixCats_passthru;
 
     meta = neovim-unwrapped.meta // {
       # To prevent builds on hydra

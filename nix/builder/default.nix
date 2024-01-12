@@ -1,6 +1,6 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-path: pkgs:
+path: { pkgs, dependencyOverlays, nixCats_passthru ? {}, ... }:
 categoryDefFunction:
 packageDefinitons: name:
   # for a more extensive guide to this file
@@ -190,9 +190,33 @@ in
       propagatedBuildInputs = buildInputs;
     });
 
+  idkWhyINeedThisButItMadeTheDiagnosticGoAway = packageDefinitons;
+
   in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
+  nixCats_passthru = nixCats_passthru // {
+    keepLuaBuilder = (import ../utils).utils.baseBuilder path;
+    nixCats_packageName = name;
+    utils = (import ../utils).utils;
+    categoryDefinitions = categoryDefFunction;
+    inherit dependencyOverlays packageDefinitons;
+    nixosModule = (import ../utils).utils.mkNixosModules {
+      defaultPackageName = name;
+      luaPath = path;
+      packageDefinitons = idkWhyINeedThisButItMadeTheDiagnosticGoAway;
+      categoryDefinitions = categoryDefFunction;
+      inherit dependencyOverlays;
+    };
+    homeModule = (import ../utils).utils.mkHomeModules {
+      defaultPackageName = name;
+      luaPath = path;
+      packageDefinitons = idkWhyINeedThisButItMadeTheDiagnosticGoAway;
+      categoryDefinitions = categoryDefFunction;
+      inherit dependencyOverlays;
+    };
+  };
+
   inherit extraMakeWrapperArgs nixCats runB4Config;
   inherit (settings) vimAlias viAlias withRuby extraName withNodeJs customAliases;
   configure = {

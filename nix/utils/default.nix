@@ -66,24 +66,30 @@ rec {
 
 
     mkNixosModules = {
-      inputs
-      , otherOverlays
+      dependencyOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }@exports: (import ./nixosModule.nix exports utils);
+      , ... }: (import ./nixosModule.nix {
+          oldDependencyOverlays = dependencyOverlays;
+          inherit luaPath keepLuaBuilder categoryDefinitions
+            packageDefinitions defaultPackageName;
+        } utils);
 
     mkHomeModules = {
-      inputs
-      , otherOverlays
+      dependencyOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }@exports: (import ./homeManagerModule.nix exports utils);
+      , ... }: (import ./homeManagerModule.nix {
+          oldDependencyOverlays = dependencyOverlays;
+          inherit luaPath keepLuaBuilder categoryDefinitions
+            packageDefinitions defaultPackageName;
+        } utils);
 
     templates = {
       fresh = {

@@ -1,8 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 { 
-  inputs
-  , otherOverlays
+  oldDependencyOverlays
   , luaPath ? ""
   , keepLuaBuilder ? null
   , categoryDefinitions
@@ -131,7 +130,7 @@
 
   config = let
     options_set = config.${defaultPackageName};
-    newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
+    dependencyOverlays = [ (utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays) ];
     newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
       then options_set.categoryDefinitions.replace
       else (
@@ -147,8 +146,7 @@
     };
   in
   {
-    nixpkgs.overlays = newOtherOverlays
-      ++ [ (utils.standardPluginOverlay (inputs // options_set.addInputs)) ];
+    nixpkgs.overlays = dependencyOverlays;
     home.packages = lib.mkIf options_set.enable
       [ (
           (
@@ -158,7 +156,7 @@
               keepLuaBuilder else 
               builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ) pkgs newCategoryDefinitions newSystemPackageDefinition options_set.packageName
+          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
       ];
   };

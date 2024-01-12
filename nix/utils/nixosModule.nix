@@ -1,8 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 {
-  inputs
-  , otherOverlays
+  oldDependencyOverlays
   , luaPath ? ""
   , keepLuaBuilder ? null
   , categoryDefinitions
@@ -146,9 +145,9 @@
               default = luaPath;
               type = types.str;
               description = ''
-                The path to your nvim config directory in the store. In the base nixCats flake, this is "''${self}".
+                The path to your nvim config directory in the store. In the base nixCats flake, this is "''${./.}".
               '';
-              example = ''"''${self}/systemNvimConfig"'';
+              example = ''"''${./.}"'';
             };
             settings = mkOption {
               default = null;
@@ -238,6 +237,7 @@
   };
 
   config = let
+    dependencyOverlays = [ (utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays) ];
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       newCategoryDefinitions = if user_options_set.categoryDefinitions.replace != null
@@ -268,7 +268,7 @@
                   builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
                 )
               )
-              pkgs newCategoryDefinitions
+              { inherit pkgs dependencyOverlays; } newCategoryDefinitions
               newUserPackageDefinition user_options_set.packageName
             )
           ];
@@ -276,7 +276,6 @@
     ) config.${defaultPackageName}.users;
 
     options_set = config.${defaultPackageName};
-    newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
     newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
       then options_set.categoryDefinitions.replace
       else (
@@ -292,8 +291,7 @@
     };
   in
   {
-    nixpkgs.overlays = newOtherOverlays
-      ++ [ (utils.standardPluginOverlay (inputs // options_set.addInputs)) ];
+    nixpkgs.overlays = dependencyOverlays;
     users.users = newUserPackageDefinitions;
     environment.systemPackages = lib.mkIf options_set.enable
       [ (
@@ -304,7 +302,7 @@
               keepLuaBuilder else 
               builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ) pkgs newCategoryDefinitions newSystemPackageDefinition options_set.packageName
+          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
       ];
   };

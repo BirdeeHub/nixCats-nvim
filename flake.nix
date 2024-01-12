@@ -66,14 +66,14 @@
       # `pkgs.nixCatsBuilds` is a set of plugins defined in that file.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
-      otherOverlays = (import ./overlays inputs) ++ [
+      dependencyOverlays = (import ./overlays inputs) ++ [
+        (standardPluginOverlay inputs)
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
       pkgs = import nixpkgs {
         inherit system;
-        overlays = otherOverlays ++ 
-          [ (standardPluginOverlay inputs) ];
+        overlays = dependencyOverlays;
         # config.allowUnfree = true;
       };
 
@@ -85,7 +85,7 @@
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
       inherit (utils) baseBuilder;
-      nixCatsBuilder = baseBuilder "${./.}" pkgs categoryDefinitions packageDefinitions;
+      nixCatsBuilder = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
@@ -386,7 +386,7 @@
       customPackager = baseBuilder "${./.}" pkgs categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
-      inherit otherOverlays;
+      inherit dependencyOverlays;
       inherit categoryDefinitions;
       inherit packageDefinitions;
 
@@ -394,14 +394,14 @@
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
         luaPath = "${./.}";
-        inherit inputs otherOverlays
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
         luaPath = "${./.}";
-        inherit inputs otherOverlays
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
     # remember how the entire thing was inside the
