@@ -85,7 +85,7 @@
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
       inherit (utils) baseBuilder;
-      nixCatsBuilder = baseBuilder "${self}" pkgs categoryDefinitions packageDefinitions;
+      nixCatsBuilder = baseBuilder "${./.}" pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
@@ -383,7 +383,7 @@
       };
 
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = baseBuilder "${self}" pkgs categoryDefinitions;
+      customPackager = baseBuilder "${./.}" pkgs categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
       inherit otherOverlays;
@@ -393,14 +393,14 @@
       # we also export a nixos module to allow configuration from configuration.nix
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
-        luaPath = "${self}";
+        luaPath = "${./.}";
         inherit inputs otherOverlays
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
-        luaPath = "${self}";
+        luaPath = "${./.}";
         inherit inputs otherOverlays
           categoryDefinitions packageDefinitions;
       };
@@ -414,7 +414,7 @@
     # eachDefaultSystem function.
     inherit utils;
     inherit (utils) templates baseBuilder;
-    keepLuaBuilder = utils.baseBuilder "${self}";
+    keepLuaBuilder = utils.baseBuilder "${./.}";
   };
 
 

@@ -27,11 +27,8 @@
     enable = true;
     packageName = "myHomeModuleNvim";
 
-    # say for example, in your nix system config,
-    # you wanted your lua in myNeovimConfig directory at root level
-    # and then activate nixCats and download stuff from here,
-    luaPath = "${self}/myNeovimConfig";
-    # you could also import it from the flake though,
+    luaPath = "${./.}";
+    # you could also import the lua from the flake though,
     # which we do for user config after this config for root
     # I HAVE NOT CREATED THIS DIRECTORY FOR YOU, thus this will find no config
     # make your own directory if you want to put it there.
