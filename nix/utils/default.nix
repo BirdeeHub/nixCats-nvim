@@ -66,8 +66,7 @@ rec {
 
 
     mkNixosModules = {
-      nixpkgs
-      , inputs
+      inputs
       , otherOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
@@ -77,8 +76,7 @@ rec {
       , ... }@exports: (import ./nixosModule.nix exports utils);
 
     mkHomeModules = {
-      nixpkgs
-      , inputs
+      inputs
       , otherOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null

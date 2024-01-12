@@ -495,7 +495,7 @@ They look like this:
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
       luaPath = "${self}";
-      inherit nixpkgs inputs otherOverlays
+      inherit inputs otherOverlays
         categoryDefinitions packageDefinitions;
     };
     # remember how the entire thing was inside the
@@ -541,7 +541,7 @@ This allows importing flakes to do a lot less copy pasting.
 <mkNixosModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    inherit inputs otherOverlays 
       categoryDefinitions packageDefinitions;
 };
 Pass this set into utils.mkNixosModules and choose a defaultPackageName.
@@ -604,14 +604,14 @@ We create the module by exporting the following in our flake outputs.
 <mkNixosModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    inherit inputs otherOverlays 
       categoryDefinitions packageDefinitions;
 };
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    inherit inputs otherOverlays 
       categoryDefinitions packageDefinitions;
 };
 
@@ -686,7 +686,7 @@ as the nixos module has for system, but for the user managed by home-manager.
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions'';
+        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
         example = ''
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
@@ -699,12 +699,6 @@ as the nixos module has for system, but for the user managed by home-manager.
           standardPluginOverlay and categoryDefinitions
         '';
         example = ''the inputs set of a flake'';
-      };
-      pkgsAdditions = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''things to add to pkgs outside of system and overlays'';
-        example = ''{ config.allowUnfree = true; }'';
       };
       categoryDefinitions = {
         replace = mkOption {

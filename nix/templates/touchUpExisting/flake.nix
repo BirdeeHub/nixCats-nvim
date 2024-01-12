@@ -161,7 +161,7 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.keepLuaBuilder;
 
-        inherit nixpkgs inputs otherOverlays 
+        inherit inputs otherOverlays 
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
@@ -171,7 +171,7 @@
         # so instead we provide our keepLuaBuilder
         keepLuaBuilder = nixCats.keepLuaBuilder;
 
-        inherit nixpkgs inputs otherOverlays 
+        inherit inputs otherOverlays 
           categoryDefinitions packageDefinitions;
       };
     }

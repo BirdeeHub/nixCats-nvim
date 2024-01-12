@@ -1,8 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 {
-  nixpkgs
-  , inputs
+  inputs
   , otherOverlays
   , luaPath ? ""
   , keepLuaBuilder ? null
@@ -12,9 +11,9 @@
   , ...
 }: utils:
 
-{ config, pkgs, ... }@misc: {
+{ config, pkgs, lib, ... }@misc: {
 
-  options = with nixpkgs.lib; {
+  options = with lib; {
 
     ${defaultPackageName} = {
 
@@ -78,7 +77,7 @@
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions'';
+        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
         example = ''
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
@@ -91,12 +90,6 @@
           standardPluginOverlay and categoryDefinitions
         '';
         example = ''the inputs set of a flake'';
-      };
-      pkgsAdditions = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''things to add to pkgs outside of system and overlays'';
-        example = ''{ config.allowUnfree = true; }'';
       };
       categoryDefinitions = {
         replace = mkOption {
@@ -194,7 +187,7 @@
             addOverlays = mkOption {
               default = [];
               type = (types.listOf types.anything);
-              description = ''A list of overlays to make available to categoryDefinitions'';
+              description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
               example = ''
                 [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
               '';
@@ -204,12 +197,6 @@
               type = (types.attrsOf types.anything);
               description = ''A set of flake inputs to make available to standardPluginOverlay and categoryDefinitions'';
               example = ''the inputs set of a flake'';
-            };
-            pkgsAdditions = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = ''things to add to pkgs outside of system and overlays'';
-              example = ''{ config.allowUnfree = true; }'';
             };
             categoryDefinitions = {
               replace = mkOption {
@@ -253,14 +240,6 @@
   config = let
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
-      newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays user_options_set.addOverlays) ];
-      newPkgs = import nixpkgs ({
-        inherit (pkgs) system;
-        overlays = newOtherOverlays ++ [
-            # here we can also add the regular inputs from other nixCats like so
-            (utils.standardPluginOverlay (inputs // user_options_set.addInputs))
-          ];
-      } // user_options_set.pkgsAdditions);
       newCategoryDefinitions = if user_options_set.categoryDefinitions.replace != null
         then user_options_set.categoryDefinitions.replace
         else (
@@ -279,7 +258,7 @@
         };
       };
       in {
-        packages = nixpkgs.lib.mkIf user_options_set.enable
+        packages = lib.mkIf user_options_set.enable
           [ (
               (
                 if user_options_set.luaPath != "" then (utils.baseBuilder user_options_set.luaPath)
@@ -289,7 +268,7 @@
                   builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
                 )
               )
-              newPkgs newCategoryDefinitions
+              pkgs newCategoryDefinitions
               newUserPackageDefinition user_options_set.packageName
             )
           ];
@@ -298,13 +277,6 @@
 
     options_set = config.${defaultPackageName};
     newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
-    newPkgs = import nixpkgs ({
-      inherit (pkgs) system;
-      overlays = newOtherOverlays ++ [
-          # here we can also add the regular inputs from other nixCats like so
-          (utils.standardPluginOverlay (inputs // options_set.addInputs))
-        ];
-    } // options_set.pkgsAdditions);
     newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
       then options_set.categoryDefinitions.replace
       else (
@@ -320,8 +292,10 @@
     };
   in
   {
+    nixpkgs.overlays = newOtherOverlays
+      ++ [ (utils.standardPluginOverlay (inputs // options_set.addInputs)) ];
     users.users = newUserPackageDefinitions;
-    environment.systemPackages = nixpkgs.lib.mkIf options_set.enable
+    environment.systemPackages = lib.mkIf options_set.enable
       [ (
           (
             if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
@@ -330,7 +304,7 @@
               keepLuaBuilder else 
               builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ) newPkgs newCategoryDefinitions newSystemPackageDefinition options_set.packageName
+          ) pkgs newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
       ];
   };
