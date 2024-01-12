@@ -190,8 +190,6 @@ in
       propagatedBuildInputs = buildInputs;
     });
 
-  idkWhyINeedThisButItMadeTheDiagnosticGoAway = packageDefinitons;
-
   in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
@@ -204,14 +202,14 @@ in
     nixosModule = (import ../utils).utils.mkNixosModules {
       defaultPackageName = name;
       luaPath = path;
-      packageDefinitons = idkWhyINeedThisButItMadeTheDiagnosticGoAway;
+      packageDefinitons = packageDefinitons;
       categoryDefinitions = categoryDefFunction;
       inherit dependencyOverlays;
     };
     homeModule = (import ../utils).utils.mkHomeModules {
       defaultPackageName = name;
       luaPath = path;
-      packageDefinitons = idkWhyINeedThisButItMadeTheDiagnosticGoAway;
+      packageDefinitons = packageDefinitons;
       categoryDefinitions = categoryDefFunction;
       inherit dependencyOverlays;
     };
