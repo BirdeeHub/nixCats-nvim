@@ -374,6 +374,9 @@ These are the defaults:
       # then put inputs.neovim (or whatever you called it) here.
       # It will be used to override the source for neovim-unwrapped.
       nvimSRC = null;
+
+      # [ "takes" "a" "list" "of" "strings" "and" "makes" "an" "alias" "for" "each" ];
+      customAliases = null;
     };
   };
 <
