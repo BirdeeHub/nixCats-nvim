@@ -63,15 +63,31 @@ There are several other templates.
 They are designed to be used as examples for
 importing versions of your nixCats into another existing configuration.
 
+---------------------------------------------------------------------------------------
+                                            *nixCats.installation_nixOS_users*
+<attention>
 If you already have a system flake, you probably want to configure
 your neovim as a module. There are some templates below that you should
 not import directly into your flake, but should instead take a look at
 and use as an example of what to do.
 They have the same configuration options as the flake version.
 
+Therefore, it is VERY easy to begin with the flake version,
+have it separate while you work with it, and then either
+leave it separate as a flake, or copy your configuration
+into the module version.
+
+In fact, you could even copy the inputs into your
+main configuration's flake inputs, then, wherever you want,
+recreate the entire outputs set of the flake from just the utils set.
+
 These templates not suited to being initialized directly in your
 nvim config folder like the first one was.
 They are minimal examples of how to import nixCats in different ways.
+
+<->
+A short introduction to the main templates
+and examples of some auto-exported options:
 
 This one shows the options that get exported as a home manager module
 It also shows how to import the module.
@@ -157,7 +173,6 @@ It could produce any of 4 configured neovim packages.
                 themer = true;
                 # you could also pass something else:
                 colorscheme = "catppuccin";
-                # you could :lua print(vim.inspect(require('nixCats')))
                 # see :help nixCats
               };
             };

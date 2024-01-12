@@ -233,8 +233,6 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
     Therefore, I have included this option.
 }
 
-how this function actually works is covered in more depth in
-:help `nixCats.flake.nixperts.nvimBuilder`
 In essence, the contents of each set listed here are filtered
 based on the packageDefinitions set you provide, 
 where by including categoryname = true; you enable that category.

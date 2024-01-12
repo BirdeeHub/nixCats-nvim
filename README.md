@@ -98,8 +98,6 @@ The solution:
 
 In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) or occasionally [customBuildsOverlay](./overlays/customBuildsOverlay.nix).
 
-That being said, if only for better understanding, there is a guide to going outside of those 2 files in [:help nixCats.flake.nixperts.nvimBuilder](./nix/nixCatsHelp/nvimBuilder.txt) in case you want to.
-
 All config folders like `ftplugin/` and `after/` work as designed (see :h rtp), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
 Although, it does specifically expect `init.lua` rather than `init.vim` at root level.
 
@@ -117,8 +115,6 @@ That being said, definitely explore first while you understand the concept. It b
     4. export all the options possible
 
     The clever part is organizing it so that it is not unusable.
-    Read the nixperts help if you are curious as to how I implemented these 3 concepts,
-    then check ./builder/utils.nix if you are REALLY curious.
 
     It is entirely possible to use this flake and barely deal with the nix,
     and then make better use of the nix integration options
