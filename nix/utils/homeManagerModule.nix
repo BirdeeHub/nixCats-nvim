@@ -73,6 +73,54 @@
           }
         '';
       };
+      extraPackageDefs = mkOption {
+        default = {};
+        description = ''
+          Same as nixCats settings and categories except, you are in charge of making sure
+          that the aliases don't collide with any other packageDefinitions
+        '';
+        type = with types; attrsOf (submodule {
+          options = {
+            settings = mkOption {
+              default = packageDefinitions.${config.${defaultPackageName}.packageName}.settings or {};
+              type = (types.attrsOf types.anything);
+              description = ''
+                Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
+              '';
+              example = ''
+                {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  viAlias = false;
+                  vimAlias = true;
+                  customAliases = [ "xtravim" ];
+                  # nvimSRC = inputs.neovim;
+                }
+              '';
+            };
+            categories = mkOption {
+              default = packageDefinitions.${config.${defaultPackageName}.packageName}.categories or {};
+              type = (types.attrsOf types.anything);
+              description = "same as nixCats.categories, but for the extra package";
+              example = ''
+                {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                }
+              '';
+            };
+          };
+        });
+      };
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
@@ -80,17 +128,6 @@
         example = ''
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
-      };
-      addInputs = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''
-          A set of flake inputs to make available to
-          standardPluginOverlay for processing
-          and categoryDefinitions as plugin overlays.
-          Will make overlays of anything named "plugins-pluginName"
-        '';
-        example = ''the inputs set of a flake'';
       };
       categoryDefinitions = {
         replace = mkOption {
@@ -144,11 +181,13 @@
         categories = options_set.categories;
       };
     };
+    xtraPkgDef = options_set.extraPackageDefs;
   in
   {
     nixpkgs.overlays = dependencyOverlays;
     home.packages = lib.mkIf options_set.enable
-      [ (
+      [
+        (
           (
             if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
             else (
@@ -158,7 +197,18 @@
             )
           ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
-      ];
+      ] ++ (builtins.attrValues (builtins.mapAttrs (catName: _:
+        (
+          if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
+          else (
+            if keepLuaBuilder != null then 
+            keepLuaBuilder else 
+            builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
+          )
+        )
+        { inherit pkgs dependencyOverlays; } newCategoryDefinitions
+        xtraPkgDef catName
+      ) xtraPkgDef));
   };
 
 }

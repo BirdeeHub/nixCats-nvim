@@ -61,9 +61,8 @@
             # add any flake overlays here.
           ]
         )) ];
-      # It is important otherOverlays and standardPluginOverlay
-      # are defined separately, because we will be exporting
-      # the other overlays we defined for ease of use when
+      # we will be exporting
+      # the overlays we defined for ease of use when
       # integrating various versions of your config with nix configs
       # and attempting to redefine certain things for that system.
 
