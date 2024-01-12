@@ -35,7 +35,7 @@
         type = types.str;
         description = ''
           The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${self}".
+          In the base nixCats flake, this is "''${./.}".
         '';
         example = ''"''${self}/systemLuaConfig"'';
       };
@@ -92,8 +92,6 @@
                 {
                   wrapRc = true;
                   configDirName = "nixCats-nvim";
-                  viAlias = false;
-                  vimAlias = true;
                   customAliases = [ "xtravim" ];
                   # nvimSRC = inputs.neovim;
                 }

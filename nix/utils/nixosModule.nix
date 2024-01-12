@@ -115,8 +115,6 @@
                   {
                     wrapRc = true;
                     configDirName = "nixCats-nvim";
-                    viAlias = false;
-                    vimAlias = true;
                     customAliases = [ "xtravim" ];
                     # nvimSRC = inputs.neovim;
                   }
@@ -242,8 +240,6 @@
                       {
                         wrapRc = true;
                         configDirName = "nixCats-nvim";
-                        viAlias = false;
-                        vimAlias = true;
                         customAliases = [ "xtravim" ];
                         # nvimSRC = inputs.neovim;
                       }

@@ -706,8 +706,6 @@ as the nixos module has for system, but for the user managed by home-manager.
                 {
                   wrapRc = true;
                   configDirName = "nixCats-nvim";
-                  viAlias = false;
-                  vimAlias = true;
                   customAliases = [ "xtravim" ];
                   # nvimSRC = inputs.neovim;
                 }
