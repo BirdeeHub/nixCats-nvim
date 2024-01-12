@@ -1,0 +1,275 @@
+=================================================================================
+                                                            *nixCats.luaUtils*
+---------------------------------------------------------------------------------
+                                                      *nixCats.luaUtils.intro*
+nixCats has good integration with pckr and other similar neovim package
+managers.
+
+Keep in mind they may not work so well on nixos,
+so when you are on nixOS you should load neovim via nix
+(not sure if that part needs stating)
+
+ALSO keep in mind, if you are not using nix, you will have to download
+all your non-plugin, non-lsp dependencies manually, and this may suck.
+Therefore, all this stuff about package managers may be of limited utility.
+
+LAZY:
+It has a bad time with lazy.nvim
+This is because nixCats adds your config folder to the runtime path.
+And then lazy.nvim removes it.
+For most package managers, this would be fine, as you would simply only
+use it when not using nix. But lazy does many things besides just downloading.
+Therefore, we may want to use lazy, EVEN when using nix to download stuff.
+I have made a wrapper for it, but it requires small upstream changes.
+See: https://github.com/folke/lazy.nvim/pull/1259
+
+However, since pckr also uses start and opt to manage lazy loading,
+it actually fits better with our nix scheme, as we do the same thing there.
+
+I have written some lua utilities to enable this.
+There is a template for them, and you can use the flake init -t
+variable to import the luaUtils template in the root directory of your config
+to add it to your project in the correct place.
+
+They are located within the lua/nixCatsUtils directory of the
+flake. The main init.lua in it contains a require("nixCatsUtils").setup
+function, and a require("nixCatsUtils").isNixCats variable.
+
+The require("nixCatsUtils").isNixCats variable is true if
+you installed neovim via nix, and otherwise it is false.
+This is used to enable package managers only when not loaded via nix.
+
+You run the setup function in your init.lua file at the start, and tell it
+what nixCats global command should default to if isNixCats is false.
+The default is true.
+
+IF YOU DO NOT DO THIS SETUP CALL:
+the result will be that, when you load this folder without using nix,
+the global nixCats function which you use everywhere
+to check for categories will throw an error.
+This setup function will give it a default value.
+Of course, if you only ever download nvim with nix, this isnt needed.
+But it cant hurt to include anyway.
+>lua
+  -- first thing in your init.lua file
+  require('nixCatsUtils').setup {
+    non_nix_value = true,
+  }
+<
+---------------------------------------------------------------------------------
+                                                       *nixCats.luaUtils.pckr*
+Then you can set leader keys, before any plugins are downloaded via pckr
+>lua
+  vim.g.mapleader = ' '
+  vim.g.maplocalleader = ' '
+  -- load the plugins via pckr
+  -- YOU are in charge of putting the plugin
+  -- urls and build steps in there,
+  -- and you should keep any setup functions and config
+  -- OUT of this table, as pckr is ONLY loaded when this
+  -- configuration is NOT loaded via nix.
+
+  -- TL;DR:
+  -- ### DONT USE CONFIG VARIABLE ###
+  -- unless you are ok with that instruction 
+  -- not being ran when used via nix,
+  -- this file will not be ran when using nix
+  require('nixCatsUtils.catPacker').setup({
+    -- My plugins here, an example for you.
+    { 'joshdick/onedark.vim', },
+    { 'nvim-tree/nvim-web-devicons', },
+
+    { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate',
+      requires = {
+        'nvim-treesitter/nvim-treesitter-textobjects',
+      },
+    },
+    {'nvim-telescope/telescope.nvim',
+      requires = {
+        'nvim-lua/plenary.nvim',
+        { 'nvim-telescope/telescope-fzf-native.nvim', run = 'which make && make', }
+      },
+    },
+
+    { 'neovim/nvim-lspconfig',
+      requires = {
+        { 'williamboman/mason.nvim', },
+        { 'williamboman/mason-lspconfig.nvim', },
+        { 'j-hui/fidget.nvim', },
+        { 'folke/neodev.nvim', },
+        { 'folke/neoconf.nvim', },
+      },
+    },
+
+    { 'hrsh7th/nvim-cmp',
+      requires = {
+        { 'onsails/lspkind.nvim', },
+        { 'L3MON4D3/LuaSnip', },
+        { 'saadparwaiz1/cmp_luasnip', },
+        { 'hrsh7th/cmp-nvim-lsp', },
+        { 'hrsh7th/cmp-nvim-lua', },
+        { 'hrsh7th/cmp-nvim-lsp-signature-help', },
+        { 'hrsh7th/cmp-path', },
+        { 'rafamadriz/friendly-snippets', },
+        { 'hrsh7th/cmp-buffer', },
+        { 'hrsh7th/cmp-cmdline', },
+        { 'dmitmel/cmp-cmdline-history', },
+      },
+    },
+
+    { 'mfussenegger/nvim-dap',
+      requires = {
+        { 'rcarriga/nvim-dap-ui', },
+        { 'theHamsta/nvim-dap-virtual-text', },
+        { 'jay-babu/mason-nvim-dap.nvim', },
+      },
+    },
+
+    { 'm-demare/hlargs.nvim', },
+    { 'mbbill/undotree', },
+    { 'tpope/vim-fugitive', },
+    { 'tpope/vim-rhubarb', },
+    { 'tpope/vim-sleuth', },
+    { 'folke/which-key.nvim', },
+    { 'lewis6991/gitsigns.nvim', },
+    { 'nvim-lualine/lualine.nvim', },
+    { 'lukas-reineke/indent-blankline.nvim', },
+    { 'numToStr/Comment.nvim', },
+    { 'kylechui/nvim-surround',
+      requires = { 'tpope/vim-repeat', },
+    },
+
+    {
+      "iamcco/markdown-preview.nvim",
+      run = function() vim.fn["mkdp#util#install"]() end,
+    },
+  })
+<
+  -- all the rest of the setup will be done using the normal setup functions later,
+  -- thus working regardless of what method loads the plugins.
+  -- only stuff pertaining to downloading should be added to pckr's table.
+
+---------------------------------------------------------------------------------
+MASON AND LSPCONFIG                                   *nixCats.luaUtils.mason*
+
+This is a method you may use to make sure mason only tries to download stuff
+when you did not install neovim via nixCats
+
+It functions the same as what kickstart.nvim does for its mason setup.
+However, when loaded via nix,
+it skips mason and passes them straight to nvim-lspconfig
+
+When installing via pckr, install mason via pckr. Then wherever you set up
+mason, do this.
+The stuff added to servers table is what is passed to lspconfig/mason
+>lua
+  if not require('nixCatsUtils').isNixCats then
+    -- mason-lspconfig requires that these setup functions are called in this order
+    -- before setting up the servers.
+    require('mason').setup()
+    require('mason-lspconfig').setup()
+  end
+
+  local servers = {}
+  if nixCats('neonixdev') then
+    require('neodev').setup({})
+    -- this allows our thing to have plugin library detection
+    -- despite not being in our .config/nvim folder
+    -- I learned about it here:
+    -- https://github.com/lecoqjacob/nixCats-nvim/blob/main/.neoconf.json
+    require("neoconf").setup({
+      plugins = {
+        lua_ls = {
+          enabled = true,
+          enabled_for_neovim_config = true,
+        },
+      },
+    })
+
+    servers.lua_ls = {
+      Lua = {
+        formatters = {
+          ignoreComments = true,
+        },
+        signatureHelp = { enabled = true },
+        diagnostics = {
+          globals = { "nixCats" },
+        },
+      },
+      workspace = { checkThirdParty = true },
+      telemetry = { enabled = false },
+      filetypes = { 'lua' },
+    }
+    if require('nixCatsUtils').isNixCats then servers.nixd = {}
+    else servers.rnix = {}
+    end
+    servers.nil_ls = {}
+
+  end
+<
+
+  -- This is this flake's version of what kickstart.nvim has set up for mason handlers.
+  -- This is a convenience function that calls lspconfig on the lsps we downloaded via nix
+  -- This will not download your lsp when using nix. Nix does that.
+
+  --  Add any additional override configuration in the following tables. They will be passed to
+  --  the `settings` field of the server config. You must look up that documentation yourself.
+  --  All of them are listed in
+  -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+
+  --  If you want to override the default filetypes that your language server will attach to you can
+  --  define the property 'filetypes' to the map in question.
+  --  You may do the same thing with cmd
+
+  -- servers.clangd = {},
+  -- servers.gopls = {},
+  -- servers.pyright = {},
+  -- servers.rust_analyzer = {},
+  -- servers.tsserver = {},
+  -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
+
+>lua
+  if not require('nixCatsUtils').isNixCats then
+    -- Ensure the servers above are installed
+    local mason_lspconfig = require 'mason-lspconfig'
+
+    mason_lspconfig.setup {
+      ensure_installed = vim.tbl_keys(servers),
+    }
+
+    mason_lspconfig.setup_handlers {
+      function(server_name)
+        require('lspconfig')[server_name].setup {
+                                  -- you will need to supply on_attach and
+                                  -- capabilities and require them here
+          capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+          on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+          settings = servers[server_name],
+          filetypes = (servers[server_name] or {}).filetypes,
+        }
+      end,
+    }
+  else
+    for server_name,_ in pairs(servers) do
+      require('lspconfig')[server_name].setup({
+                                  -- here too.
+        capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
+        on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+        cmd = (servers[server_name] or {}).cmd,
+        root_pattern = (servers[server_name] or {}).root_pattern,
+      })
+    end
+  end
+<
+---------------------------------------------------------------------------------
+                                                       *nixCats.luaUtils.lazy*
+AWAITING UPSTREAM
+See: https://github.com/folke/lazy.nvim/pull/1259
+The wrapper exists in the luaUtils folder, but it only works if you
+use my fork of lazy.nvim until the changes go through.
+Some changes may occur in the meantime to it so I would not suggest this.
+
+=================================================================================
+vim:tw=78:ts=8:ft=help:norl:

@@ -47,7 +47,6 @@
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let
       utils = nixCats.utils;
-      inherit (utils) baseBuilder;
     # This line makes this package available for all major systems
     # system is just a string like "x86_64-linux" or "aarch64-darwin"
     in flake-utils.lib.eachDefaultSystem (system: let
@@ -87,6 +86,7 @@
       # for our package later and then choose a package.
 
       # see :help nixCats.flake.outputs.builder
+      inherit (utils) baseBuilder;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
@@ -263,6 +263,6 @@
   ) // {
     inherit (nixCats) utils;
     inherit (utils) templates baseBuilder;
-    keepLuaBuilder = baseBuilder self;
+    keepLuaBuilder = utils.baseBuilder self;
   };
 }

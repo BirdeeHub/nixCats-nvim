@@ -21,7 +21,8 @@ nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays
 nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*
 nixCats.installation_options	installation.txt	/*nixCats.installation_options*
-nixCats.mason	pckr.txt	/*nixCats.mason*
-nixCats.neovimPluginManagers	pckr.txt	/*nixCats.neovimPluginManagers*
-nixCats.pckr	pckr.txt	/*nixCats.pckr*
-nixCats.pckr_init.lua	pckr.txt	/*nixCats.pckr_init.lua*
+nixCats.luaUtils	luaUtils.txt	/*nixCats.luaUtils*
+nixCats.luaUtils.intro	luaUtils.txt	/*nixCats.luaUtils.intro*
+nixCats.luaUtils.lazy	luaUtils.txt	/*nixCats.luaUtils.lazy*
+nixCats.luaUtils.mason	luaUtils.txt	/*nixCats.luaUtils.mason*
+nixCats.luaUtils.pckr	luaUtils.txt	/*nixCats.luaUtils.pckr*

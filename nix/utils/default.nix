@@ -94,27 +94,41 @@ rec {
       };
       nixosModule = {
         path = ../templates/nixosModule;
-        description = "nixOS module configuration template";
+        description = ''
+          An EXAMPLE nixOS module configuration template
+        '';
       };
       homeModule = {
         path = ../templates/homeManager;
-        description = "Home Manager module configuration template";
+        description = ''
+          An EXAMPLE Home Manager module configuration template
+        '';
       };
       mergeFlakeWithExisting = {
         path = ../templates/touchUpExisting;
-        description = "A template showing how to merge in parts of other nixCats repos";
+        description = ''
+          An EXAMPLE template showing how to merge in parts of other nixCats repos.
+        '';
       };
       LSPs = {
         path = ../templates/LSPs;
+        description = ''
+          An EXAMPLE template showing how to merge in parts of other nixCats repos.
+        '';
       };
       luaUtils = {
         path = ../templates/luaUtils;
+        description = ''
+          A template that includes lua utils for using neovim package managers
+          when your config file is not loaded via nix.
+        '';
       };
       overlayfile = {
         path = ../templates/overlayfile;
-      };
-      pckrInitLua = {
-        path = ../templates/pckrInitLua;
+        description = ''
+          A template for an empty overlay file defined as described in
+          :help nixCats.flake.nixperts.overlays and overlays/default.nix
+        '';
       };
 
       default = utils.templates.fresh;

@@ -1,4 +1,4 @@
--- These 2 need to be set up before plugins are loaded.
+-- These 2 need to be set up before any plugins are loaded.
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -6,12 +6,16 @@ vim.g.maplocalleader = ' '
 -- pckr THE NEOVIM PLUGIN MANAGER
 -- They do nothing if your config is loaded via nix.
 
--- when using this repo without nix,
--- non_nix_value is what nixCats('anything')
--- will return.
--- you may also require('nixCatsUtils').isNixCats
--- to determine if this was loaded as a nix config
--- you must set this here at the start
+-- if you plan to always load your nixCats via nix,
+-- you can safely ignore this setup call,
+-- and the require('nixCatsUtils.catPacker').setup call below it.
+
+-- IF YOU DO NOT DO THIS SETUP CALL:
+-- the result will be that, when you load this folder without using nix,
+-- the global nixCats function which you use everywhere
+-- to check for categories will throw an error.
+-- This setup function will give it a default value.
+-- Of course, if you only ever download nvim with nix, this isnt needed.
 require('nixCatsUtils').setup {
   non_nix_value = true,
 }

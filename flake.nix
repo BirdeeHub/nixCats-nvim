@@ -42,10 +42,9 @@
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
       utils = (import ./nix/utils).utils;
-      inherit (utils) baseBuilder;
-    # This line makes this package available for all major systems
-    # system is just a string like "x86_64-linux" or "aarch64-darwin"
     in flake-utils.lib.eachDefaultSystem (system: let
+    # The above line makes this package available for all major systems
+    # system is just a string like "x86_64-linux" or "aarch64-darwin"
 
       # see :help nixCats.flake.outputs.overlays
       # This overlay grabs all the inputs named in the format
@@ -78,6 +77,7 @@
 
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
+      inherit (utils) baseBuilder;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
@@ -391,19 +391,18 @@
         inherit nixpkgs inputs otherOverlays
           categoryDefinitions packageDefinitions;
       };
-
-    }
-    # these get merged in at the end to the result of flake-utils.eachDefaultSystem
-    # This makes it so we dont have to type our system name to get our template.
-    # flake-utils is annoying that way. It puts everything in a system attrset
-    # even if it doesn't make sense.
-    # These will never be system dependent anyway.
-    # we dont have access to anything inside flake-utils here though.
-    # for how to use these templates see :help nixCats.installation_options
-  ) // {
+    # remember how the entire thing was inside the
+    # flake-utils.lib.eachDefaultSystem function?
+    # well here is the end of it.
+  }) // {
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
     inherit utils;
     inherit (utils) templates baseBuilder;
-    keepLuaBuilder = baseBuilder self;
+    keepLuaBuilder = utils.baseBuilder self;
   };
+
 
 }

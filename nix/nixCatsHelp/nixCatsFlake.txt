@@ -83,13 +83,21 @@ unless they are for build time, then put them under propagatedBuildInputs
 Flake Outputs Introduction                              *nixCats.flake.outputs*
 
 With our inputs to our flake taken care of:
-
-First, we call flake utils to get system variable for all default systems.
-Then we import our nixCats utils, so that we can access things
-like overlay <1>, utils.standardPluginOverlay.
+First, we take care of importing our utils set.
+The reason we are doing this now, is so that it can be defined outside of
+the flake-utils.lib.eachDefaultSystem function, and thus we can export it
+without having to include a system variable when we import it somewhere else.
+>nix
+  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
+      utils = (import ./nix/utils).utils;
+    in flake-utils.lib.eachDefaultSystem (system: let
+<
+We call flake utils to get system variable for all default systems.
+We can now have access to it for overlays and defining our builder.
+our pkgs variable from our nixpkgs import.
 
                                                *nixCats.flake.outputs.overlays*
-Then, we define our overlays.
+We now define our overlays.
 We have 2 main overlays to discuss.
 
 <1>
@@ -143,8 +151,8 @@ add to a category directly.
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
 Now we define our builder function.
-We do this by importing ./nix/builder/default.nix which is
-a function that takes 5 arguments.
+We inherit utils.baseBuilder which is
+a function that takes 5 arguments. It is defined in ./nix/builder
 Right now we are going to call it with just the first 4 of them. This will
 leave us with a function that takes 1 argument.
 That argument is the name of the neovim package to be packaged.
@@ -158,14 +166,12 @@ That argument is the name of the neovim package to be packaged.
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
-      baseBuilder = import ./nix/builder;
+      inherit (utils) baseBuilder;
       nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
         # notice how it doesn't care the last 2 are defined lower in the file?
 <
-      # We defined baseBuilder separately
-      # so that we can easily export it later.
-      # this will ensure that other flakes that import
-      # only this function from our flake may still access the help.
+      # Flakes that import only this function from our flake may still access the help.
+      # The minimum you need to define a complete nixCats flake is the utils set.
 
 ---------------------------------------------------------------------------------------
                                             *nixCats.flake.outputs.categories*
@@ -446,17 +452,18 @@ utils.mkOverlay also makes a default overlay, and then 1 overlay per package.
 
 Then we define our dev shell. We simply use our nixCatsBuilder for that one.
 >nix
-  packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+  {
+    packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
 
-  overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
+    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
 
-  devShell = pkgs.mkShell {
-    name = "nixCats-devShell";
-    packages = [ (nixCatsBuilder "nixCats") ];
-    inputsFrom = [ ];
-    shellHook = ''
-    '';
-  };
+    devShell = pkgs.mkShell {
+      name = "nixCats-devShell";
+      packages = [ (nixCatsBuilder "nixCats") ];
+      inputsFrom = [ ];
+      shellHook = ''
+      '';
+    };
 <
 Now for the required exports for nix integration options.
 
@@ -468,44 +475,44 @@ see :help `nixCats.installation_options`
 
 They look like this:
 >nix
-  # To choose settings and categories from the flake that calls this flake.
-  customPackager = baseBuilder self pkgs categoryDefinitions;
+    # To choose settings and categories from the flake that calls this flake.
+    customPackager = baseBuilder self pkgs categoryDefinitions;
 
-  # You may use these to modify some or all of your categoryDefinitions
-  customBuilders = {
-    fresh = baseBuilder;
-    keepLua = baseBuilder self;
-  };
-  inherit utils;
+    # and you export this so people dont have to redefine stuff.
+    inherit otherOverlays;
+    inherit categoryDefinitions;
+    inherit packageDefinitions;
 
-  inherit otherOverlays;
-  inherit categoryDefinitions;
-  inherit packageDefinitions;
+    nixosModules.default = utils.mkNixosModules {
+      defaultPackageName = "nixCats";
+      luaPath = "${self}";
+      inherit nixpkgs inputs otherOverlays
+        categoryDefinitions packageDefinitions;
+    };
 
-  nixosModules.default = utils.mkNixosModules {
-    defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays
-      categoryDefinitions packageDefinitions;
-  };
-
-  # and the same for home manager
-  homeModule = utils.mkHomeModules {
-    defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays
-      categoryDefinitions packageDefinitions;
+    # and the same for home manager
+    homeModule = utils.mkHomeModules {
+      defaultPackageName = "nixCats";
+      luaPath = "${self}";
+      inherit nixpkgs inputs otherOverlays
+        categoryDefinitions packageDefinitions;
+    };
+    # remember how the entire thing was inside the
+    # flake-utils.lib.eachDefaultSystem function?
+    # well here is the end of it.
+  }) // {
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
+    inherit utils;
+    inherit (utils) templates baseBuilder;
+    keepLuaBuilder = utils.baseBuilder self;
   };
 <
 First, <customPackager>. This would allow you to choose what
 settings and categories you wanted in a flake that imports this flake,
 without needing to redefine anything else.
-
-Then <customBuilders>. These are just baseBuilder, exported both with and
-without a lua path already supplied.
-You could import the fresh builder and utils straight from nixCats, 
-alowing you to be free of personally including the builder and nixCatsHelp directories,
-allowing you to use those but otherwise have a fresh start.
 
 Then <otherOverlays>. These are a list of all overlays 
 that you imported that are not standardPluginOverlay.
@@ -547,10 +554,15 @@ The same as mkNixosModules above, but for home manager.
 
 
 Then last, the <utils> set, which we imported from ./builder/utils.nix
+We export the <utils> set, along with some items inside it.
+Those are <templates> and <baseBuilder>
+Then we also define a <keepLuaBuilder>, which is a <baseBuilder> with our config path
+passed into it.
 
-In total, the <utils> set contains 8 functions
+In total, the <utils> set contains 11 functions and then the templates set.
 
 First, the ones mentioned above.
+Then, we also have:
 
 <mkPackages> finalBuilder: packageDefinitions: defaultName:
 makes each package and also a default one
