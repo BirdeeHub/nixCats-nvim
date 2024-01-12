@@ -12,9 +12,6 @@ REPLACE_ME	nix/templates/nixosModule/flake.nix	/^      REPLACE_ME = nixpkgs.lib.
 RecFilterCats	nix/utils/default.nix	/^  RecFilterCats = with builtins; categories: categoryDefs: let$/;"	m
 RecFilterForTrue	nix/utils/default.nix	/^  RecFilterForTrue = with builtins; categories: let $/;"	m
 __structuredAttrs	nix/builder/wrapper.nix	/^      __structuredAttrs = true;$/;"	m
-addInputs	nix/utils/homeManagerModule.nix	/^      addInputs = mkOption {$/;"	m
-addInputs	nix/utils/nixosModule.nix	/^            addInputs = mkOption {$/;"	m
-addInputs	nix/utils/nixosModule.nix	/^      addInputs = mkOption {$/;"	m
 addOverlays	nix/utils/homeManagerModule.nix	/^      addOverlays = mkOption {$/;"	m
 addOverlays	nix/utils/nixosModule.nix	/^            addOverlays = mkOption {$/;"	m
 addOverlays	nix/utils/nixosModule.nix	/^      addOverlays = mkOption {$/;"	m
@@ -41,12 +38,18 @@ categories	nix/templates/homeManager/home.nix	/^    categories = {$/;"	m
 categories	nix/templates/nixosModule/configuration.nix	/^      categories = inputs.nixCats.packageDefinitions.\${pkgs.system}.nixCats.categories$/;"	m
 categories	nix/templates/nixosModule/configuration.nix	/^    categories = {$/;"	m
 categories	nix/templates/touchUpExisting/flake.nix	/^          categories = $/;"	m
+categories	nix/utils/homeManagerModule.nix	/^            categories = mkOption {$/;"	m
 categories	nix/utils/homeManagerModule.nix	/^        categories = options_set.categories;$/;"	m
 categories	nix/utils/homeManagerModule.nix	/^      categories = mkOption {$/;"	m
+categories	nix/utils/nixosModule.nix	/^                  categories = mkOption {$/;"	m
+categories	nix/utils/nixosModule.nix	/^              categories = mkOption {$/;"	m
 categories	nix/utils/nixosModule.nix	/^            categories = mkOption {$/;"	m
 categories	nix/utils/nixosModule.nix	/^          categories = if user_options_set.categories != null$/;"	m
 categories	nix/utils/nixosModule.nix	/^        categories = options_set.categories;$/;"	m
 categories	nix/utils/nixosModule.nix	/^      categories = mkOption {$/;"	m
+categoryDefinitions	nix/builder/default.nix	/^      categoryDefinitions = categoryDefFunction;$/;"	m
+categoryDefinitions	nix/builder/default.nix	/^      categoryDefinitions = categoryDefFunction;$/;"	m
+categoryDefinitions	nix/builder/default.nix	/^    categoryDefinitions = categoryDefFunction;$/;"	m
 categoryDefinitions	nix/utils/homeManagerModule.nix	/^      categoryDefinitions = {$/;"	m
 categoryDefinitions	nix/utils/nixosModule.nix	/^            categoryDefinitions = {$/;"	m
 categoryDefinitions	nix/utils/nixosModule.nix	/^      categoryDefinitions = {$/;"	m
@@ -59,6 +62,8 @@ categoryDefinitions	nix/templates/fresh/flake.nix	/^      inherit categoryDefini
 categoryDefinitions	nix/templates/touchUpExisting/flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
 categoryDefinitions	nix/templates/touchUpExisting/flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
 categoryDefinitions	nix/templates/touchUpExisting/flake.nix	/^      inherit categoryDefinitions;$/;"	m
+categoryDefinitions	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
+categoryDefinitions	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
 cmp	flake.nix	/^              cmp = with pkgs.vimPlugins; [$/;"	m
 colorscheme	flake.nix	/^            colorscheme = "catppuccin";$/;"	m
 colorscheme	flake.nix	/^            colorscheme = "onedark";$/;"	m
@@ -80,9 +85,9 @@ custom	flake.nix	/^            custom = true;$/;"	m
 custom	flake.nix	/^          custom = with pkgs.nixCatsBuilds; [ ];$/;"	m
 customAliases	nix/builder/default.nix	/^    customAliases = null;$/;"	m
 customAliases	nix/builder/default.nix	/^  inherit (settings) vimAlias viAlias withRuby extraName withNodeJs customAliases;$/;"	m
-customAliases	nix/builder/wrapNeovim.nix	/^      inherit nixCats customAliases;$/;"	m
-customPackager	flake.nix	/^      customPackager = baseBuilder "\${self}" pkgs categoryDefinitions;$/;"	m
-customPackager	nix/templates/fresh/flake.nix	/^      customPackager = baseBuilder "\${self}" pkgs categoryDefinitions;$/;"	m
+customAliases	nix/builder/wrapNeovim.nix	/^      inherit nixCats customAliases nixCats_passthru;$/;"	m
+customPackager	flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
+customPackager	nix/templates/fresh/flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
 customPackager	nix/templates/touchUpExisting/flake.nix	/^      customPackager = nixCats.keepLuaBuilder pkgs categoryDefinitions;$/;"	m
 customRC	nix/builder/wrapNeovim.nix	/^        customRC = configure.customRC or "";$/;"	m
 customRC	nix/builder/default.nix	/^    inherit customRC;$/;"	m
@@ -95,6 +100,8 @@ default	nix/templates/touchUpExisting/flake.nix	/^      nixosModules.default = u
 default	nix/utils/default.nix	/^      default = utils.templates.fresh;$/;"	m
 default	nix/utils/default.nix	/^      { default = (self: super: { \${defaultName} = finalBuilder defaultName; }); };$/;"	m
 default	nix/utils/default.nix	/^      { default = finalBuilder defaultName; }$/;"	m
+default	nix/utils/homeManagerModule.nix	/^              default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.categories or {};$/;"	m
+default	nix/utils/homeManagerModule.nix	/^              default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.settings or {};$/;"	m
 default	nix/utils/homeManagerModule.nix	/^          default = null;$/;"	m
 default	nix/utils/homeManagerModule.nix	/^          default = null;$/;"	m
 default	nix/utils/homeManagerModule.nix	/^        default = "\${defaultPackageName}";$/;"	m
@@ -104,8 +111,12 @@ default	nix/utils/homeManagerModule.nix	/^        default = luaPath;$/;"	m
 default	nix/utils/homeManagerModule.nix	/^        default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.categories or {};$/;"	m
 default	nix/utils/homeManagerModule.nix	/^        default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.settings or {};$/;"	m
 default	nix/utils/homeManagerModule.nix	/^        default = {};$/;"	m
+default	nix/utils/nixosModule.nix	/^                    default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.categories or {};$/;"	m
+default	nix/utils/nixosModule.nix	/^                    default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.settings or {};$/;"	m
 default	nix/utils/nixosModule.nix	/^                default = null;$/;"	m
 default	nix/utils/nixosModule.nix	/^                default = null;$/;"	m
+default	nix/utils/nixosModule.nix	/^                default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.categories or {};$/;"	m
+default	nix/utils/nixosModule.nix	/^                default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.settings or {};$/;"	m
 default	nix/utils/nixosModule.nix	/^              default = "\${defaultPackageName}";$/;"	m
 default	nix/utils/nixosModule.nix	/^              default = [];$/;"	m
 default	nix/utils/nixosModule.nix	/^              default = false;$/;"	m
@@ -115,6 +126,7 @@ default	nix/utils/nixosModule.nix	/^              default = null;$/;"	m
 default	nix/utils/nixosModule.nix	/^              default = {};$/;"	m
 default	nix/utils/nixosModule.nix	/^          default = null;$/;"	m
 default	nix/utils/nixosModule.nix	/^          default = null;$/;"	m
+default	nix/utils/nixosModule.nix	/^          default = {};$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = "\${defaultPackageName}";$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = [];$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = false;$/;"	m
@@ -122,13 +134,39 @@ default	nix/utils/nixosModule.nix	/^        default = luaPath;$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.categories or {};$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = packageDefinitions.\${config.\${defaultPackageName}.packageName}.settings or {};$/;"	m
 default	nix/utils/nixosModule.nix	/^        default = {};$/;"	m
-default	nix/utils/nixosModule.nix	/^        default = {};$/;"	m
 defaultPackageName	flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
 defaultPackageName	flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
+defaultPackageName	nix/builder/default.nix	/^      defaultPackageName = name;$/;"	m
+defaultPackageName	nix/builder/default.nix	/^      defaultPackageName = name;$/;"	m
 defaultPackageName	nix/templates/fresh/flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
 defaultPackageName	nix/templates/fresh/flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
 defaultPackageName	nix/templates/touchUpExisting/flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
 defaultPackageName	nix/templates/touchUpExisting/flake.nix	/^        defaultPackageName = "nixCats";$/;"	m
+defaultPackageName	nix/utils/default.nix	/^            packageDefinitions defaultPackageName;$/;"	m
+defaultPackageName	nix/utils/default.nix	/^            packageDefinitions defaultPackageName;$/;"	m
+dependencyOverlays	flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
+dependencyOverlays	flake.nix	/^      inherit dependencyOverlays;$/;"	m
+dependencyOverlays	flake.nix	/^      nixCatsBuilder = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;$/;"	m
+dependencyOverlays	nix/builder/default.nix	/^      inherit dependencyOverlays;$/;"	m
+dependencyOverlays	nix/builder/default.nix	/^      inherit dependencyOverlays;$/;"	m
+dependencyOverlays	nix/builder/default.nix	/^    inherit dependencyOverlays packageDefinitons;$/;"	m
+dependencyOverlays	nix/templates/fresh/flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	nix/templates/fresh/flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	nix/templates/fresh/flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
+dependencyOverlays	nix/templates/fresh/flake.nix	/^      inherit dependencyOverlays;$/;"	m
+dependencyOverlays	nix/templates/fresh/flake.nix	/^      nixCatsBuilder = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;$/;"	m
+dependencyOverlays	nix/templates/touchUpExisting/flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	nix/templates/touchUpExisting/flake.nix	/^        inherit dependencyOverlays$/;"	m
+dependencyOverlays	nix/templates/touchUpExisting/flake.nix	/^      inherit dependencyOverlays;$/;"	m
+dependencyOverlays	nix/templates/touchUpExisting/flake.nix	/^      nixCatsBuilder = nixCats.keepLuaBuilder { inherit pkgs dependencyOverlays; }$/;"	m
+dependencyOverlays	nix/utils/homeManagerModule.nix	/^          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newHomePackageDefinition options_set.packageName$/;"	m
+dependencyOverlays	nix/utils/homeManagerModule.nix	/^        { inherit pkgs dependencyOverlays; } newCategoryDefinitions xtraPkgDef catName$/;"	m
+dependencyOverlays	nix/utils/nixosModule.nix	/^            ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newUserPackageDefinition user_options_set.packageName$/;"	m
+dependencyOverlays	nix/utils/nixosModule.nix	/^          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName$/;"	m
+dependencyOverlays	nix/utils/nixosModule.nix	/^          { inherit pkgs dependencyOverlays; } newCategoryDefinitions$/;"	m
+dependencyOverlays	nix/utils/nixosModule.nix	/^        { inherit pkgs dependencyOverlays; } newCategoryDefinitions$/;"	m
 description	flake.nix	/^  description = "A Lua-natic's neovim flake, with extra cats! nixCats!";$/;"	m
 description	nix/templates/fresh/flake.nix	/^  description = "A Lua-natic's neovim flake, with extra cats! nixCats!";$/;"	m
 description	nix/templates/homeManager/flake.nix	/^  description = ''$/;"	m
@@ -141,6 +179,8 @@ description	nix/utils/default.nix	/^        description = ''$/;"	m
 description	nix/utils/default.nix	/^        description = ''$/;"	m
 description	nix/utils/default.nix	/^        description = ''$/;"	m
 description	nix/utils/default.nix	/^        description = ''$/;"	m
+description	nix/utils/homeManagerModule.nix	/^              description = "same as nixCats.categories, but for the extra package";$/;"	m
+description	nix/utils/homeManagerModule.nix	/^              description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^          description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^          description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^        description = "Enable \${defaultPackageName}";$/;"	m
@@ -150,6 +190,10 @@ description	nix/utils/homeManagerModule.nix	/^        description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^        description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^        description = ''$/;"	m
 description	nix/utils/homeManagerModule.nix	/^        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';$/;"	m
+description	nix/utils/nixosModule.nix	/^                    description = "same as nixCats.categories, but for the extra package";$/;"	m
+description	nix/utils/nixosModule.nix	/^                    description = ''$/;"	m
+description	nix/utils/nixosModule.nix	/^                description = "same as nixCats.categories, but for the extra package";$/;"	m
+description	nix/utils/nixosModule.nix	/^                description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^                description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^                description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^              description = "Enable \${defaultPackageName}";$/;"	m
@@ -157,15 +201,15 @@ description	nix/utils/nixosModule.nix	/^              description = "You may opt
 description	nix/utils/nixosModule.nix	/^              description = "You may optionally provide your own settings set";$/;"	m
 description	nix/utils/nixosModule.nix	/^              description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^              description = ''$/;"	m
+description	nix/utils/nixosModule.nix	/^              description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^              description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';$/;"	m
-description	nix/utils/nixosModule.nix	/^              description = ''A set of flake inputs to make available to standardPluginOverlay and categoryDefinitions'';$/;"	m
+description	nix/utils/nixosModule.nix	/^          description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^          description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^          description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = "Enable \${defaultPackageName}";$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = "You may optionally provide your own category set for packageDefinitions";$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = "You may optionally provide your own settings set for packageDefinitions";$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = "same as system config but per user instead";$/;"	m
-description	nix/utils/nixosModule.nix	/^        description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = ''$/;"	m
 description	nix/utils/nixosModule.nix	/^        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';$/;"	m
@@ -188,6 +232,8 @@ environmentVariables	nix/templates/homeManager/home.nix	/^      environmentVaria
 environmentVariables	nix/templates/nixosModule/configuration.nix	/^      environmentVariables = {$/;"	m
 environmentVariables	nix/builder/default.nix	/^  environmentVariables extraWrapperArgs $/;"	m
 example	nix/templates/fresh/flake.nix	/^            example = {$/;"	m
+example	nix/utils/homeManagerModule.nix	/^              example = ''$/;"	m
+example	nix/utils/homeManagerModule.nix	/^              example = ''$/;"	m
 example	nix/utils/homeManagerModule.nix	/^          example = ''$/;"	m
 example	nix/utils/homeManagerModule.nix	/^          example = ''$/;"	m
 example	nix/utils/homeManagerModule.nix	/^        example = ''$/;"	m
@@ -195,15 +241,17 @@ example	nix/utils/homeManagerModule.nix	/^        example = ''$/;"	m
 example	nix/utils/homeManagerModule.nix	/^        example = ''$/;"	m
 example	nix/utils/homeManagerModule.nix	/^        example = ''"''\${self}\/systemLuaConfig"'';$/;"	m
 example	nix/utils/homeManagerModule.nix	/^        example = ''\${defaultPackageName}'';$/;"	m
-example	nix/utils/homeManagerModule.nix	/^        example = ''the inputs set of a flake'';$/;"	m
+example	nix/utils/nixosModule.nix	/^                    example = ''$/;"	m
+example	nix/utils/nixosModule.nix	/^                    example = ''$/;"	m
+example	nix/utils/nixosModule.nix	/^                example = ''$/;"	m
+example	nix/utils/nixosModule.nix	/^                example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^                example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^                example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^              example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^              example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^              example = ''$/;"	m
-example	nix/utils/nixosModule.nix	/^              example = ''"''\${self}\/systemNvimConfig"'';$/;"	m
+example	nix/utils/nixosModule.nix	/^              example = ''"''\${.\/.}"'';$/;"	m
 example	nix/utils/nixosModule.nix	/^              example = ''\${defaultPackageName}'';$/;"	m
-example	nix/utils/nixosModule.nix	/^              example = ''the inputs set of a flake'';$/;"	m
 example	nix/utils/nixosModule.nix	/^          example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^          example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^        example = ''$/;"	m
@@ -211,7 +259,6 @@ example	nix/utils/nixosModule.nix	/^        example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^        example = ''$/;"	m
 example	nix/utils/nixosModule.nix	/^        example = ''"''\${self}\/systemLuaConfig"'';$/;"	m
 example	nix/utils/nixosModule.nix	/^        example = ''\${defaultPackageName}'';$/;"	m
-example	nix/utils/nixosModule.nix	/^        example = ''the inputs set of a flake'';$/;"	m
 executable	nix/builder/vim-pack-dir.nix	/^      executable = false;$/;"	m
 extraLuaPackages	flake.nix	/^        extraLuaPackages = {$/;"	m
 extraLuaPackages	nix/builder/default.nix	/^    extraLuaPackages = {};$/;"	m
@@ -225,6 +272,9 @@ extraMakeWrapperArgs	nix/builder/default.nix	/^  inherit extraMakeWrapperArgs ni
 extraName	nix/builder/default.nix	/^    extraName = "";$/;"	m
 extraName	nix/builder/default.nix	/^  inherit (settings) vimAlias viAlias withRuby extraName withNodeJs customAliases;$/;"	m
 extraName	nix/builder/wrapNeovim.nix	/^        inherit extraName;$/;"	m
+extraPackageDefs	nix/utils/homeManagerModule.nix	/^      extraPackageDefs = mkOption {$/;"	m
+extraPackageDefs	nix/utils/nixosModule.nix	/^            extraPackageDefs = mkOption {$/;"	m
+extraPackageDefs	nix/utils/nixosModule.nix	/^        extraPackageDefs = mkOption {$/;"	m
 extraPython3Packages	flake.nix	/^        extraPython3Packages = {$/;"	m
 extraPython3Packages	nix/builder/default.nix	/^    extraPython3Packages = {};$/;"	m
 extraPython3Packages	nix/builder/default.nix	/^  extraPython3Packages = combineCatsOfFuncs extraPython3Packages;$/;"	m
@@ -288,35 +338,32 @@ hash	overlays/customBuildsOverlay.nix	/^            hash = "sha256-kzc9jm6d9PJ07
 home-manager	nix/templates/homeManager/flake.nix	/^    home-manager = {$/;"	m
 homeConfigurations	nix/templates/homeManager/flake.nix	/^    homeConfigurations = {$/;"	m
 homeModule	flake.nix	/^      homeModule = utils.mkHomeModules {$/;"	m
+homeModule	nix/builder/default.nix	/^    homeModule = (import ..\/utils).utils.mkHomeModules {$/;"	m
 homeModule	nix/templates/fresh/flake.nix	/^      homeModule = utils.mkHomeModules {$/;"	m
 homeModule	nix/templates/touchUpExisting/flake.nix	/^      homeModule = utils.mkHomeModules {$/;"	m
 homeModule	nix/utils/default.nix	/^      homeModule = {$/;"	m
 hydraPlatforms	nix/builder/wrapper.nix	/^      hydraPlatforms = [];$/;"	m
-initRc	nix/builder/wrapper.nix	/^      initRc = neovimRcContent;$/;"	m
 inputs	flake.nix	/^  inputs = {$/;"	m
 inputs	nix/templates/fresh/flake.nix	/^  inputs = {$/;"	m
 inputs	nix/templates/homeManager/flake.nix	/^  inputs = {$/;"	m
 inputs	nix/templates/nixosModule/flake.nix	/^  inputs = {$/;"	m
 inputs	nix/templates/touchUpExisting/flake.nix	/^  inputs = {$/;"	m
-inputs	flake.nix	/^        inherit inputs otherOverlays$/;"	m
-inputs	flake.nix	/^        inherit inputs otherOverlays$/;"	m
-inputs	nix/templates/fresh/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-inputs	nix/templates/fresh/flake.nix	/^        inherit inputs otherOverlays $/;"	m
 inputs	nix/templates/homeManager/flake.nix	/^          inherit self inputs;$/;"	m
 inputs	nix/templates/nixosModule/flake.nix	/^          inherit inputs;$/;"	m
-inputs	nix/templates/touchUpExisting/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-inputs	nix/templates/touchUpExisting/flake.nix	/^        inherit inputs otherOverlays $/;"	m
 inputsFrom	flake.nix	/^        inputsFrom = [ ];$/;"	m
 inputsFrom	nix/templates/fresh/flake.nix	/^        inputsFrom = [ ];$/;"	m
 inputsFrom	nix/templates/touchUpExisting/flake.nix	/^        inputsFrom = [ ];$/;"	m
 installCheckPhase	overlays/customBuildsOverlay.nix	/^        installCheckPhase = ''$/;"	m
 installPhase	nix/builder/default.nix	/^      installPhase = ''$/;"	m
 isDerivation	nix/utils/default.nix	/^    isDerivation = value: value.type or null == "derivation";$/;"	f
-keepLuaBuilder	flake.nix	/^    keepLuaBuilder = utils.baseBuilder "\${self}";$/;"	m
-keepLuaBuilder	nix/templates/fresh/flake.nix	/^    keepLuaBuilder = utils.baseBuilder "\${self}";$/;"	m
+keepLuaBuilder	flake.nix	/^    keepLuaBuilder = utils.baseBuilder "\${.\/.}";$/;"	m
+keepLuaBuilder	nix/builder/default.nix	/^    keepLuaBuilder = (import ..\/utils).utils.baseBuilder path;$/;"	m
+keepLuaBuilder	nix/templates/fresh/flake.nix	/^    keepLuaBuilder = utils.baseBuilder "\${.\/.}";$/;"	m
 keepLuaBuilder	nix/templates/touchUpExisting/flake.nix	/^        keepLuaBuilder = nixCats.keepLuaBuilder;$/;"	m
 keepLuaBuilder	nix/templates/touchUpExisting/flake.nix	/^        keepLuaBuilder = nixCats.keepLuaBuilder;$/;"	m
 keepLuaBuilder	nix/templates/touchUpExisting/flake.nix	/^    inherit (nixCats) utils keepLuaBuilder;$/;"	m
+keepLuaBuilder	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
+keepLuaBuilder	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
 lazy	flake.nix	/^            lazy = false;$/;"	m
 lazy	flake.nix	/^            lazy = false;$/;"	m
 lazy	flake.nix	/^          lazy = with pkgs.neovimPlugins; [$/;"	m
@@ -332,15 +379,19 @@ lspsAndRuntimeDeps	nix/templates/nixosModule/configuration.nix	/^      lspsAndRu
 lspsAndRuntimeDeps	nix/builder/default.nix	/^  lspsAndRuntimeDeps propagatedBuildInputs$/;"	m
 lua-language-server	flake.nix	/^            inherit (pkgs) nix-doc nil lua-language-server nixd;$/;"	m
 luaListPrinter	nix/utils/default.nix	/^  luaListPrinter = with builtins; theList: let$/;"	m
-luaPath	flake.nix	/^        luaPath = "\${self}";$/;"	m
-luaPath	flake.nix	/^        luaPath = "\${self}";$/;"	m
-luaPath	nix/templates/fresh/flake.nix	/^        luaPath = "\${self}";$/;"	m
-luaPath	nix/templates/fresh/flake.nix	/^        luaPath = "\${self}";$/;"	m
-luaPath	nix/templates/homeManager/home.nix	/^    luaPath = "\${self}\/myNeovimConfig";$/;"	m
-luaPath	nix/templates/nixosModule/configuration.nix	/^    luaPath = "\${self}\/myNeovimConfig";$/;"	m
+luaPath	flake.nix	/^        luaPath = "\${.\/.}";$/;"	m
+luaPath	flake.nix	/^        luaPath = "\${.\/.}";$/;"	m
+luaPath	nix/builder/default.nix	/^      luaPath = path;$/;"	m
+luaPath	nix/builder/default.nix	/^      luaPath = path;$/;"	m
+luaPath	nix/templates/fresh/flake.nix	/^        luaPath = "\${.\/.}";$/;"	m
+luaPath	nix/templates/fresh/flake.nix	/^        luaPath = "\${.\/.}";$/;"	m
+luaPath	nix/templates/homeManager/home.nix	/^    luaPath = "\${.\/.}";$/;"	m
+luaPath	nix/templates/nixosModule/configuration.nix	/^    luaPath = "\${.\/.}";$/;"	m
 luaPath	nix/utils/homeManagerModule.nix	/^      luaPath = mkOption {$/;"	m
 luaPath	nix/utils/nixosModule.nix	/^            luaPath = mkOption {$/;"	m
 luaPath	nix/utils/nixosModule.nix	/^      luaPath = mkOption {$/;"	m
+luaPath	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
+luaPath	nix/utils/default.nix	/^          inherit luaPath keepLuaBuilder categoryDefinitions$/;"	m
 luaRcContent	nix/builder/wrapper.nix	/^      luaRcContent = rcContent;$/;"	m
 luaTablePrinter	nix/utils/default.nix	/^  luaTablePrinter = with builtins; attrSet: let$/;"	m
 luaUtils	nix/utils/default.nix	/^      luaUtils = {$/;"	m
@@ -399,16 +450,22 @@ nixCats	nix/templates/homeManager/home.nix	/^  nixCats = {$/;"	m
 nixCats	nix/templates/nixosModule/configuration.nix	/^  nixCats = {$/;"	m
 nixCats	nix/templates/touchUpExisting/flake.nix	/^        nixCats = {$/;"	m
 nixCats	nix/builder/default.nix	/^  inherit extraMakeWrapperArgs nixCats runB4Config;$/;"	m
-nixCats	nix/builder/wrapNeovim.nix	/^      inherit nixCats customAliases;$/;"	m
+nixCats	nix/builder/wrapNeovim.nix	/^      inherit nixCats customAliases nixCats_passthru;$/;"	m
 nixCatsBuilds	overlays/default.nix	/^    nixCatsBuilds = import .\/customBuildsOverlay.nix;$/;"	m
 nixCats_packageName	nix/builder/default.nix	/^          nixCats_packageName = name;$/;"	m
+nixCats_packageName	nix/builder/default.nix	/^    nixCats_packageName = name;$/;"	m
+nixCats_passthru	nix/builder/default.nix	/^  nixCats_passthru = nixCats_passthru \/\/ {$/;"	m
+nixCats_passthru	nix/builder/wrapNeovim.nix	/^      inherit nixCats customAliases nixCats_passthru;$/;"	m
 nixCats_store_config_location	nix/builder/default.nix	/^          nixCats_store_config_location = "\${LuaConfig}";$/;"	m
 nixCats_wrapRc	nix/builder/default.nix	/^          nixCats_wrapRc = settings.wrapRc;$/;"	m
 nixd	flake.nix	/^            inherit (pkgs) nix-doc nil lua-language-server nixd;$/;"	m
 nixosConfigurations	nix/templates/nixosModule/flake.nix	/^    nixosConfigurations = {$/;"	m
+nixosModule	nix/builder/default.nix	/^    nixosModule = (import ..\/utils).utils.mkNixosModules {$/;"	m
 nixosModule	nix/utils/default.nix	/^      nixosModule = {$/;"	m
 nvimSRC	nix/builder/default.nix	/^    nvimSRC = null;$/;"	m
 offlineCache	overlays/customBuildsOverlay.nix	/^          offlineCache = super.fetchYarnDeps {$/;"	m
+oldDependencyOverlays	nix/utils/default.nix	/^          oldDependencyOverlays = dependencyOverlays;$/;"	m
+oldDependencyOverlays	nix/utils/default.nix	/^          oldDependencyOverlays = dependencyOverlays;$/;"	m
 opt	nix/builder/vim-pack-dir.nix	/^        opt = builtins.listToAttrs (map mkEntryFromDrv opt);$/;"	m
 opt	nix/builder/default.nix	/^      inherit opt;$/;"	m
 opt	nix/builder/vim-pack-dir.nix	/^        inherit ts_grammar_plugin startPlugins opt$/;"	m
@@ -425,32 +482,26 @@ optionalPlugins	nix/templates/fresh/flake.nix	/^        optionalPlugins = {$/;"	
 optionalPlugins	nix/templates/homeManager/home.nix	/^      optionalPlugins = {$/;"	m
 optionalPlugins	nix/templates/nixosModule/configuration.nix	/^      optionalPlugins = {$/;"	m
 optionalPlugins	nix/builder/default.nix	/^  startupPlugins optionalPlugins $/;"	m
+options	nix/utils/homeManagerModule.nix	/^          options = {$/;"	m
 options	nix/utils/homeManagerModule.nix	/^  options = with lib; {$/;"	m
+options	nix/utils/nixosModule.nix	/^                options = {$/;"	m
+options	nix/utils/nixosModule.nix	/^            options = {$/;"	m
 options	nix/utils/nixosModule.nix	/^          options = {$/;"	m
 options	nix/utils/nixosModule.nix	/^  options = with lib; {$/;"	m
-otherOverlays	flake.nix	/^        inherit inputs otherOverlays$/;"	m
-otherOverlays	flake.nix	/^        inherit inputs otherOverlays$/;"	m
-otherOverlays	flake.nix	/^      inherit otherOverlays;$/;"	m
-otherOverlays	nix/templates/fresh/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-otherOverlays	nix/templates/fresh/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-otherOverlays	nix/templates/fresh/flake.nix	/^      inherit otherOverlays;$/;"	m
-otherOverlays	nix/templates/touchUpExisting/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-otherOverlays	nix/templates/touchUpExisting/flake.nix	/^        inherit inputs otherOverlays $/;"	m
-otherOverlays	nix/templates/touchUpExisting/flake.nix	/^      inherit otherOverlays;$/;"	m
 outputs	flake.nix	/^  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let$/;"	f
 outputs	nix/templates/fresh/flake.nix	/^  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let$/;"	f
 outputs	nix/templates/homeManager/flake.nix	/^  outputs = { self, nixpkgs, home-manager, ... }@inputs: let$/;"	f
 outputs	nix/templates/nixosModule/flake.nix	/^  outputs = { self, nixpkgs, ... }@inputs: let$/;"	f
 outputs	nix/templates/touchUpExisting/flake.nix	/^  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let$/;"	f
 overlayfile	nix/utils/default.nix	/^      overlayfile = {$/;"	m
-overlays	flake.nix	/^        overlays = otherOverlays ++ $/;"	m
+overlays	flake.nix	/^        overlays = dependencyOverlays;$/;"	m
 overlays	flake.nix	/^      overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";$/;"	m
-overlays	nix/templates/fresh/flake.nix	/^        overlays = otherOverlays ++ [$/;"	m
+overlays	nix/templates/fresh/flake.nix	/^        overlays = dependencyOverlays;$/;"	m
 overlays	nix/templates/fresh/flake.nix	/^      overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";$/;"	m
-overlays	nix/templates/touchUpExisting/flake.nix	/^        overlays = otherOverlays ++ [$/;"	m
+overlays	nix/templates/touchUpExisting/flake.nix	/^        overlays = dependencyOverlays;$/;"	m
 overlays	nix/templates/touchUpExisting/flake.nix	/^      overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";$/;"	m
-overlays	nix/utils/homeManagerModule.nix	/^    nixpkgs.overlays = newOtherOverlays$/;"	m
-overlays	nix/utils/nixosModule.nix	/^    nixpkgs.overlays = newOtherOverlays$/;"	m
+overlays	nix/utils/homeManagerModule.nix	/^    nixpkgs.overlays = dependencyOverlays;$/;"	m
+overlays	nix/utils/nixosModule.nix	/^    nixpkgs.overlays = dependencyOverlays;$/;"	m
 packDir	nix/builder/vim-pack-dir.nix	/^  inherit packDir;$/;"	m
 packageDefinitions	flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
 packageDefinitions	flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
@@ -461,6 +512,11 @@ packageDefinitions	nix/templates/fresh/flake.nix	/^      inherit packageDefiniti
 packageDefinitions	nix/templates/touchUpExisting/flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
 packageDefinitions	nix/templates/touchUpExisting/flake.nix	/^          categoryDefinitions packageDefinitions;$/;"	m
 packageDefinitions	nix/templates/touchUpExisting/flake.nix	/^      inherit packageDefinitions;$/;"	m
+packageDefinitions	nix/utils/default.nix	/^            packageDefinitions defaultPackageName;$/;"	m
+packageDefinitions	nix/utils/default.nix	/^            packageDefinitions defaultPackageName;$/;"	m
+packageDefinitons	nix/builder/default.nix	/^      packageDefinitons = packageDefinitons;$/;"	m
+packageDefinitons	nix/builder/default.nix	/^      packageDefinitons = packageDefinitons;$/;"	m
+packageDefinitons	nix/builder/default.nix	/^    inherit dependencyOverlays packageDefinitons;$/;"	m
 packageJSON	overlays/customBuildsOverlay.nix	/^          packageJSON = "\${super.vimPlugins.markdown-preview-nvim.src}\/package.json";$/;"	m
 packageName	nix/templates/homeManager/home.nix	/^    packageName = "myHomeModuleNvim";$/;"	m
 packageName	nix/templates/nixosModule/configuration.nix	/^      packageName = "nixCats";$/;"	m
@@ -475,11 +531,10 @@ packages	nix/templates/fresh/flake.nix	/^        packages = [ (nixCatsBuilder "n
 packages	nix/templates/fresh/flake.nix	/^      packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";$/;"	m
 packages	nix/templates/touchUpExisting/flake.nix	/^        packages = [ (nixCatsBuilder "nixCats") ];$/;"	m
 packages	nix/templates/touchUpExisting/flake.nix	/^      packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";$/;"	m
-packages	nix/utils/homeManagerModule.nix	/^    home.packages = lib.mkIf options_set.enable$/;"	m
-packages	nix/utils/nixosModule.nix	/^        packages = lib.mkIf user_options_set.enable$/;"	m
-packpathDirs	nix/builder/wrapper.nix	/^      inherit providerLuaRc packpathDirs;$/;"	m
+packages	nix/utils/homeManagerModule.nix	/^    home.packages = lib.mkIf options_set.enable finalHomePkgs;$/;"	m
+packages	nix/utils/nixosModule.nix	/^        packages = lib.mkIf user_options_set.enable finalUserPkgs;$/;"	m
 packpathDirs	nix/builder/wrapper.nix	/^      inherit wrapRc providerLuaRc packpathDirs;$/;"	m
-passthru	nix/builder/wrapper.nix	/^    passthru = {$/;"	m
+passthru	nix/builder/wrapper.nix	/^    passthru = nixCats_passthru;$/;"	m
 path	nix/builder/vim-pack-dir.nix	/^    let mkEntryFromDrv = drv: { name = "\${prefix}\/\${lib.getName drv}"; path = drv; };$/;"	m
 path	nix/utils/default.nix	/^        path = ..\/templates\/LSPs;$/;"	m
 path	nix/utils/default.nix	/^        path = ..\/templates\/fresh;$/;"	m
@@ -490,7 +545,18 @@ path	nix/utils/default.nix	/^        path = ..\/templates\/overlayfile;$/;"	m
 path	nix/utils/default.nix	/^        path = ..\/templates\/touchUpExisting;$/;"	m
 paths	nix/builder/vim-pack-dir.nix	/^    paths = (lib.flatten (lib.mapAttrsToList packageLinks packages));$/;"	m
 phases	nix/builder/default.nix	/^      phases = [ "buildPhase" "installPhase" ];$/;"	m
+pkgs	flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
+pkgs	flake.nix	/^      nixCatsBuilder = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;$/;"	m
+pkgs	nix/templates/fresh/flake.nix	/^      customPackager = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;$/;"	m
+pkgs	nix/templates/fresh/flake.nix	/^      nixCatsBuilder = baseBuilder "\${.\/.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;$/;"	m
 pkgs	nix/templates/homeManager/flake.nix	/^        inherit pkgs;$/;"	m
+pkgs	nix/templates/touchUpExisting/flake.nix	/^      nixCatsBuilder = nixCats.keepLuaBuilder { inherit pkgs dependencyOverlays; }$/;"	m
+pkgs	nix/utils/homeManagerModule.nix	/^          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newHomePackageDefinition options_set.packageName$/;"	m
+pkgs	nix/utils/homeManagerModule.nix	/^        { inherit pkgs dependencyOverlays; } newCategoryDefinitions xtraPkgDef catName$/;"	m
+pkgs	nix/utils/nixosModule.nix	/^            ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newUserPackageDefinition user_options_set.packageName$/;"	m
+pkgs	nix/utils/nixosModule.nix	/^          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName$/;"	m
+pkgs	nix/utils/nixosModule.nix	/^          { inherit pkgs dependencyOverlays; } newCategoryDefinitions$/;"	m
+pkgs	nix/utils/nixosModule.nix	/^        { inherit pkgs dependencyOverlays; } newCategoryDefinitions$/;"	m
 plugin	nix/builder/wrapNeovim.nix	/^          else (if p ? plugin then p else { plugin = p; optional = true; })) opt);$/;"	m
 plugin	nix/builder/wrapNeovim.nix	/^          plugin = pkgs.stdenv.mkDerivation {$/;"	m
 plugins	nix/builder/wrapNeovim.nix	/^        inherit plugins;$/;"	m
@@ -507,7 +573,6 @@ propagatedBuildInputs	nix/templates/fresh/flake.nix	/^        propagatedBuildInp
 propagatedBuildInputs	nix/templates/homeManager/home.nix	/^      propagatedBuildInputs = {$/;"	m
 propagatedBuildInputs	nix/templates/nixosModule/configuration.nix	/^      propagatedBuildInputs = {$/;"	m
 propagatedBuildInputs	nix/builder/default.nix	/^  lspsAndRuntimeDeps propagatedBuildInputs$/;"	m
-providerLuaRc	nix/builder/wrapper.nix	/^      inherit providerLuaRc packpathDirs;$/;"	m
 providerLuaRc	nix/builder/wrapper.nix	/^      inherit wrapRc providerLuaRc packpathDirs;$/;"	m
 python3Env	nix/builder/wrapper.nix	/^      inherit python3Env rubyEnv;$/;"	m
 python3Path	nix/builder/vim-pack-dir.nix	/^      python3Path = if (allPython3Dependencies python3.pkgs == [])$/;"	m
@@ -532,8 +597,11 @@ settings	nix/templates/fresh/flake.nix	/^          settings = settings.unwrapped
 settings	nix/templates/homeManager/home.nix	/^    settings = {$/;"	m
 settings	nix/templates/nixosModule/configuration.nix	/^    settings = {$/;"	m
 settings	nix/templates/touchUpExisting/flake.nix	/^          settings = nixCats.packageDefinitions.\${system}.nixCats.settings;$/;"	m
+settings	nix/utils/homeManagerModule.nix	/^            settings = mkOption {$/;"	m
 settings	nix/utils/homeManagerModule.nix	/^        settings = options_set.settings;$/;"	m
 settings	nix/utils/homeManagerModule.nix	/^      settings = mkOption {$/;"	m
+settings	nix/utils/nixosModule.nix	/^                  settings = mkOption {$/;"	m
+settings	nix/utils/nixosModule.nix	/^              settings = mkOption {$/;"	m
 settings	nix/utils/nixosModule.nix	/^            settings = mkOption {$/;"	m
 settings	nix/utils/nixosModule.nix	/^          settings = if user_options_set.settings != null $/;"	m
 settings	nix/utils/nixosModule.nix	/^        settings = options_set.settings;$/;"	m
@@ -565,7 +633,7 @@ system	nix/templates/fresh/flake.nix	/^        inherit system;$/;"	m
 system	nix/templates/homeManager/flake.nix	/^      inherit system;$/;"	m
 system	nix/templates/nixosModule/flake.nix	/^        inherit system;$/;"	m
 system	nix/templates/touchUpExisting/flake.nix	/^        inherit system;$/;"	m
-systemPackages	nix/utils/nixosModule.nix	/^    environment.systemPackages = lib.mkIf options_set.enable$/;"	m
+systemPackages	nix/utils/nixosModule.nix	/^    environment.systemPackages = lib.mkIf options_set.enable finalSystemPkgs;$/;"	m
 templates	nix/utils/default.nix	/^    templates = {$/;"	m
 templates	flake.nix	/^    inherit (utils) templates baseBuilder;$/;"	m
 templates	nix/templates/fresh/flake.nix	/^    inherit (utils) templates baseBuilder;$/;"	m
@@ -609,27 +677,33 @@ thing4	flake.nix	/^              thing4 = "couch is for scratching";$/;"	m
 toThisSet	nix/templates/fresh/flake.nix	/^              toThisSet = [$/;"	m
 ts_grammar_plugin	nix/builder/vim-pack-dir.nix	/^        inherit ts_grammar_plugin startPlugins opt$/;"	m
 ts_grammar_plugin	nix/builder/vim-pack-dir.nix	/^        inherit ts_grammar_plugin;$/;"	m
+type	nix/utils/homeManagerModule.nix	/^              type = (types.attrsOf types.anything);$/;"	m
+type	nix/utils/homeManagerModule.nix	/^              type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/homeManagerModule.nix	/^          type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
 type	nix/utils/homeManagerModule.nix	/^          type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
-type	nix/utils/homeManagerModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = (types.listOf types.anything);$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = types.bool;$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = types.str;$/;"	m
 type	nix/utils/homeManagerModule.nix	/^        type = types.str;$/;"	m
+type	nix/utils/homeManagerModule.nix	/^        type = with types; attrsOf (submodule {$/;"	m
+type	nix/utils/nixosModule.nix	/^                    type = (types.attrsOf types.anything);$/;"	m
+type	nix/utils/nixosModule.nix	/^                    type = (types.attrsOf types.anything);$/;"	m
+type	nix/utils/nixosModule.nix	/^                type = (types.attrsOf types.anything);$/;"	m
+type	nix/utils/nixosModule.nix	/^                type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^                type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
 type	nix/utils/nixosModule.nix	/^                type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
-type	nix/utils/nixosModule.nix	/^              type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = (types.listOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = types.bool;$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = types.nullOr (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = types.nullOr (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = types.str;$/;"	m
 type	nix/utils/nixosModule.nix	/^              type = types.str;$/;"	m
+type	nix/utils/nixosModule.nix	/^              type = with types; attrsOf (submodule {$/;"	m
 type	nix/utils/nixosModule.nix	/^          type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
 type	nix/utils/nixosModule.nix	/^          type = types.nullOr (types.functionTo (types.attrsOf types.anything));$/;"	m
-type	nix/utils/nixosModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
+type	nix/utils/nixosModule.nix	/^          type = with types; attrsOf (submodule {$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = (types.attrsOf types.anything);$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = (types.listOf types.anything);$/;"	m
@@ -637,7 +711,6 @@ type	nix/utils/nixosModule.nix	/^        type = types.bool;$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = types.str;$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = types.str;$/;"	m
 type	nix/utils/nixosModule.nix	/^        type = with types; attrsOf (submodule {$/;"	m
-unwrapped	nix/builder/wrapper.nix	/^      unwrapped = neovim-unwrapped;$/;"	m
 unwrappedLua	flake.nix	/^        unwrappedLua = {$/;"	m
 unwrappedLua	nix/templates/fresh/flake.nix	/^        unwrappedLua = {$/;"	m
 url	flake.nix	/^      url = "github:BirdeeHub\/lazy.nvim";$/;"	m
@@ -658,6 +731,7 @@ url	nix/templates/touchUpExisting/flake.nix	/^    nixCats.url = "github:BirdeeHu
 url	nix/templates/touchUpExisting/flake.nix	/^    nixpkgs.url = "github:nixos\/nixpkgs\/nixpkgs-unstable";$/;"	m
 users	nix/utils/nixosModule.nix	/^      users = mkOption {$/;"	m
 users	nix/utils/nixosModule.nix	/^    users.users = newUserPackageDefinitions;$/;"	m
+utils	nix/builder/default.nix	/^    utils = (import ..\/utils).utils;$/;"	m
 utils	nix/utils/default.nix	/^  utils = {$/;"	m
 utils	flake.nix	/^    inherit utils;$/;"	m
 utils	nix/templates/fresh/flake.nix	/^    inherit (nixCats) utils;$/;"	m
