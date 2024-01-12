@@ -383,7 +383,7 @@
       };
 
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = baseBuilder "${./.}" pkgs categoryDefinitions;
+      customPackager = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
       inherit dependencyOverlays;
