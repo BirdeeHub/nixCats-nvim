@@ -50,7 +50,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     lazypath = regularLazyDownload()
   else
 
-    local grammarDir = require('nixCats.included').allPlugins.ts_grammar_plugin
+    local grammarDir = require('nixCats').pawsible.allPlugins.ts_grammar_plugin
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
 

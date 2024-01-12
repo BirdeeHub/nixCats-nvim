@@ -64,12 +64,11 @@ in
     nixCats = { ... }@allDeps:
     pkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
-          inherit (settings) wrapRc;
+          nixCats_wrapRc = settings.wrapRc;
           nixCats_packageName = name;
           nixCats_store_config_location = "${LuaConfig}";
         };
       init = pkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
-      globalCats = pkgs.writeText "globalCats.lua" (builtins.readFile ./globalCats.lua);
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = pkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
       depsTable = pkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
@@ -82,7 +81,6 @@ in
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
         cp ${init} $out/lua/nixCats/init.lua
-        cp ${globalCats} $out/lua/nixCats/globalCats.lua
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${depsTable} $out/lua/nixCats/included.lua
       '';
@@ -100,7 +98,7 @@ in
     '') + (if settings.wrapRc then /* vim */''
       let configdir = "${LuaConfig}"
     '' else "") + /* vim */ ''
-      lua require('nixCats.globalCats')
+      lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
       let runtimepath_list = split(&runtimepath, ',')
       call insert(runtimepath_list, configdir, 0)
