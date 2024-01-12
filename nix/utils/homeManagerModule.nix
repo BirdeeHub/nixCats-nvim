@@ -176,18 +176,14 @@
         (utils.mergeCatDefs categoryDefinitions options_set.categoryDefinitions.merge)
         else categoryDefinitions
       );
-    newSystemPackageDefinition = {
+    newHomePackageDefinition = {
       ${options_set.packageName} = {
         settings = options_set.settings;
         categories = options_set.categories;
       };
     };
-    xtraPkgDef = options_set.extraPackageDefs;
-  in
-  {
-    nixpkgs.overlays = dependencyOverlays;
-    home.packages = lib.mkIf options_set.enable
-      [
+    xtraPkgDef = lib.mkIf (options_set.extraPackageDefs != {}) options_set.extraPackageDefs;
+    finalPrim = lib.mkIf options_set.enable [
         (
           (
             if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
@@ -196,9 +192,10 @@
               keepLuaBuilder else 
               builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
+          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newHomePackageDefinition options_set.packageName
         )
-      ] ++ (builtins.attrValues (builtins.mapAttrs (catName: _:
+      ];
+    finalXtra = lib.mkIf (options_set.enable && (options_set.extraPackageDefs != {}) ) (builtins.attrValues (builtins.mapAttrs (catName: _:
         (
           if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
           else (
@@ -207,9 +204,17 @@
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
           )
         )
-        { inherit pkgs dependencyOverlays; } newCategoryDefinitions
-        xtraPkgDef catName
+        { inherit pkgs dependencyOverlays; } newCategoryDefinitions xtraPkgDef catName
       ) xtraPkgDef));
+      finalHomePkgs = lib.mkIf ( options_set.enable || (options_set.enable && (options_set.extraPackageDefs != {}) )) (
+        if (options_set.enable && (options_set.extraPackageDefs != {}) )
+        then finalPrim ++ finalXtra
+        else finalPrim
+      );
+  in
+  {
+    nixpkgs.overlays = dependencyOverlays;
+    home.packages = lib.mkIf options_set.enable finalHomePkgs;
   };
 
 }

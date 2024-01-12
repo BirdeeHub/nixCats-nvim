@@ -340,34 +340,38 @@
               else packageDefinitions.${user_options_set.packageName}.categories;
         };
       };
-      xtraUserPkgDef = user_options_set.extraPackageDefs;
-      in {
-        packages = lib.mkIf user_options_set.enable
-          [ 
+      xtraPkgDef = lib.mkIf (user_options_set.extraPackageDefs !={}) options_set.extraPackageDefs;
+      finalPrim = lib.mkIf user_options_set.enable [
+          (
             (
-              (
-                if user_options_set.luaPath != "" then (utils.baseBuilder user_options_set.luaPath)
-                else (
-                  if keepLuaBuilder != null then 
-                  keepLuaBuilder else 
-                  builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
-                )
-              )
-              { inherit pkgs dependencyOverlays; } newCategoryDefinitions
-              newUserPackageDefinition user_options_set.packageName
-            )
-          ] ++ (builtins.attrValues (builtins.mapAttrs (catName: _:
-            (
-              if user_options_set.luaPath != "" then (utils.baseBuilder user_options_set.luaPath)
+              if user_options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
               else (
                 if keepLuaBuilder != null then 
                 keepLuaBuilder else 
                 builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
               )
+            ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newUserPackageDefinition user_options_set.packageName
+          )
+        ];
+      finalXtra = lib.mkIf (user_options_set.enable && (user_options_set.extraPackageDefs !={}) ) (builtins.attrValues (builtins.mapAttrs (catName: _:
+          (
+            if user_options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
+            else (
+              if keepLuaBuilder != null then 
+              keepLuaBuilder else 
+              builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-            { inherit pkgs dependencyOverlays; } newCategoryDefinitions
-            xtraUserPkgDef catName
-          ) xtraUserPkgDef));
+          )
+          { inherit pkgs dependencyOverlays; } newCategoryDefinitions
+          xtraPkgDef catName
+        ) xtraPkgDef));
+        finalUserPkgs = lib.mkIf ( user_options_set.enable || (options_set.enable && (user_options_set.extraPackageDefs !={}) )) (
+          if (user_options_set.enable && (user_options_set.extraPackageDefs !={}) )
+          then finalPrim ++ finalXtra
+          else finalPrim
+        );
+      in {
+        packages = lib.mkIf user_options_set.enable finalUserPkgs;
       }
     ) config.${defaultPackageName}.users;
 
@@ -385,13 +389,8 @@
         categories = options_set.categories;
       };
     };
-    xtraPkgDef = options_set.extraPackageDefs;
-  in
-  {
-    nixpkgs.overlays = dependencyOverlays;
-    users.users = newUserPackageDefinitions;
-    environment.systemPackages = lib.mkIf options_set.enable
-      [
+    xtraPkgDef = lib.mkIf (options_set ? extraPackageDefs) options_set.extraPackageDefs;
+    finalPrim = lib.mkIf options_set.enable [
         (
           (
             if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
@@ -402,7 +401,8 @@
             )
           ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
-      ] ++ (builtins.attrValues (builtins.mapAttrs (catName: _:
+      ];
+    finalXtra = lib.mkIf (options_set.enable && options_set ? extraPackageDefs ) (builtins.attrValues (builtins.mapAttrs (catName: _:
         (
           if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
           else (
@@ -414,7 +414,16 @@
         { inherit pkgs dependencyOverlays; } newCategoryDefinitions
         xtraPkgDef catName
       ) xtraPkgDef));
+      finalSystemPkgs = lib.mkIf ( options_set.enable || (options_set.enable && options_set ? extraPackageDefs )) (
+        if (options_set.enable && options_set ? extraPackageDefs )
+        then finalPrim ++ finalXtra
+        else finalPrim
+      );
+  in
+  {
+    nixpkgs.overlays = dependencyOverlays;
+    users.users = newUserPackageDefinitions;
+    environment.systemPackages = lib.mkIf options_set.enable finalSystemPkgs;
   };
-
 }
 
