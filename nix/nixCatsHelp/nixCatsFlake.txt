@@ -130,11 +130,9 @@ If you decide you wish to split your customBuildsOverlay up,
 see :help `nixCats.flake.nixperts.overlays`
 or look at the overlays/default.nix file.
 
-<IMPORTANT> When defining your overlays,
-all overlays that are not defined via
-overlay <1>, the standardPluginOverlay, should be
-defined in a SEPARATE LIST named <otherOverlays>.
-Otherwise the exports will not work correctly.
+<IMPORTANT> When defining your overlays, they will be
+defined in a SEPARATE LIST named <dependencyOverlays>.
+You will need <dependencyOverlays> later.
 
 <pkgs>
 -- After the overlays we wish to include are all defined:
@@ -520,20 +518,19 @@ First, <customPackager>. This would allow you to choose what
 settings and categories you wanted in a flake that imports this flake,
 without needing to redefine anything else.
 
-Then <otherOverlays>. These are a list of all overlays 
-that you imported that are not standardPluginOverlay.
+Then <dependencyOverlays>. These are a list of all overlays 
+that you imported.
 You may use utils.mergeOverlayLists to incorporate overlays 
 from other nixCats flakes without worrying about naming conflicts.
 When making your flake you must follow
 this format when creating your pkgs set.
 This format is not very complex. The format is this.
-1. Make a list called otherOverlays.
-2. Put every overlay that isn't standardPluginOverlay in there.
+1. Make a list called dependencyOverlays.
+2. Put every overlay in there.
 3. when you add overlays to pkgs, 
-    use ++ to add otherOverlays to a list containing
-    the call to standardPluginOverlay.
-This allows you to be able to export otherOverlays
-at the end in the final outputs because it is separate.
+    overlays = dependencyOverlays;
+This allows you to be able to export overlays
+in the final outputs because it is separate.
 
 Then <categoryDefinitions>
 The function where you set up your categories in flake.nix
@@ -590,6 +587,8 @@ For our purposes, we do not consider derivations to be attrsets.
 <mergeOverlayLists> oldOverlist: newOverlist: self: super: let
 for merging lists of overlays like those in otherOverlays in a way 
 that updates to avoid naming conflicts between overlays in different nixCats flakes imported.
+within overlays that are sets, will recursively update until
+a derivation, or something not a set is reached.
 
 <mkDefaultOverlay> finalBuilder: defaultName:
 <mkExtraOverlays> finalBuilder: packageDefinitions:
