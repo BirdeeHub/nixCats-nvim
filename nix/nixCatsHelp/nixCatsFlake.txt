@@ -159,15 +159,20 @@ That argument is the name of the neovim package to be packaged.
 
 1. The path to the lua to include (in the flake, we use the self variable to get
      this path and wrap the lua when wrapRc = true)
-2. The pkgs set so that it can use it for making its own derivations.
+
+2. A set containing:
+  The pkgs set so that it can use it for making its own derivations.
+  The dependencyOverlays set so it may send them through passthrough.
+
 3. our function that takes an individual package definition
      and returns a set of categoryDefinitions.
+
 4. our set of packageDefinitions see: `nixCats.flake.outputs.packageDefinitions`
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
       inherit (utils) baseBuilder;
-      nixCatsBuilder = baseBuilder "${./.}" pkgs categoryDefinitions packageDefinitions;
+      nixCatsBuilder = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;
         # notice how it doesn't care the last 2 are defined lower in the file?
 <
       # Flakes that import only this function from our flake may still access the help.
@@ -487,7 +492,7 @@ They look like this:
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
       luaPath = "${./.}";
-      inherit inputs otherOverlays
+      inherit dependencyOverlays
         categoryDefinitions packageDefinitions;
     };
 
@@ -495,7 +500,7 @@ They look like this:
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
       luaPath = "${./.}";
-      inherit inputs otherOverlays
+      inherit dependencyOverlays
         categoryDefinitions packageDefinitions;
     };
     # remember how the entire thing was inside the
@@ -541,7 +546,7 @@ This allows importing flakes to do a lot less copy pasting.
 <mkNixosModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit inputs otherOverlays 
+    inherit dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
 Pass this set into utils.mkNixosModules and choose a defaultPackageName.
@@ -604,14 +609,14 @@ We create the module by exporting the following in our flake outputs.
 <mkNixosModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit inputs otherOverlays 
+    inherit dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
     luaPath = "${self}";
-    inherit inputs otherOverlays 
+    inherit dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
 
@@ -687,7 +692,8 @@ as the nixos module has for system, but for the user managed by home-manager.
         default = {};
         description = ''
           Same as nixCats settings and categories except, you are in charge of making sure
-          that the aliases don't collide with any other packageDefinitions
+          that the aliases don't collide with any other packageDefinitions.
+          Will build all included.
         '';
         type = with types; attrsOf (submodule {
           options = {

@@ -109,6 +109,7 @@
                 type = (types.attrsOf types.anything);
                 description = ''
                   Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
+                  Will build all included.
                 '';
                 example = ''
                   {
@@ -235,6 +236,7 @@
                     type = (types.attrsOf types.anything);
                     description = ''
                       Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
+                      Will build all included.
                     '';
                     example = ''
                       {

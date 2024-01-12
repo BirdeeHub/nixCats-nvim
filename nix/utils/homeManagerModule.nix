@@ -78,6 +78,7 @@
         description = ''
           Same as nixCats settings and categories except, you are in charge of making sure
           that the aliases don't collide with any other packageDefinitions
+          Will build all included.
         '';
         type = with types; attrsOf (submodule {
           options = {
