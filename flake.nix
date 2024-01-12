@@ -22,7 +22,14 @@
       flake = false;
     };
 
+    # will be removed after the following pr is accepted:
     # https://github.com/folke/lazy.nvim/pull/1259
+    # If you do use it before then, keep in mind that this one creates
+    # a directory named lazy-nvim while the official
+    # will create one named lazy.nvim
+    # this is because it is imported via our defaultPluginOverlay right now.
+    # this is relevant when you fetch the lazypath in your lua.
+    # and thus you will need to change it once the upstream occurs.
     "plugins-lazy-nvim" = {
       url = "github:BirdeeHub/lazy.nvim";
       flake = false;
@@ -135,6 +142,8 @@
             pkgs.nixCatsBuilds.markdown-preview-nvim
           ];
           lazy = with pkgs.neovimPlugins; [
+            # lazy will be imported via pkgs.vimPlugins.lazy-nvim
+            # after upstream pr is accepted.
             lazy-nvim
           ];
           general = {
@@ -286,7 +295,6 @@
         nixCats = {
           settings = settings.nixCats; 
           categories = {
-            lazy = false;
             generalBuildInputs = true;
             markdown = true;
             general.vimPlugins = true;
@@ -300,6 +308,9 @@
             # this does not have an associated category of plugins, 
             # but lua can still check for it
             lspDebugMode = false;
+            # by default, we dont want lazy.nvim
+            # we could omit this for the same effect
+            lazy = false;
             # you could also pass something else:
             themer = true;
             colorscheme = "onedark";
@@ -320,7 +331,6 @@
         regularCats = { 
           settings = settings.unwrappedLua;
           categories = {
-            lazy = false;
             generalBuildInputs = true;
             markdown = true;
             general = true;
@@ -329,6 +339,9 @@
             debug = false;
             test = true;
             lspDebugMode = false;
+            # by default, we dont want lazy.nvim
+            # we could omit this for the same effect
+            lazy = false;
             themer = true;
             colorscheme = "catppuccin";
             theBestCat = "says meow!!";
