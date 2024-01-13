@@ -23,7 +23,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim/frankenstein";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim/nixCats-5.0.0";
   };
 
   # see :help nixCats.flake.outputs

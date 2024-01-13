@@ -120,15 +120,18 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 --[[ Uh-oh! We don't want to use mason on nix! ]]
 --[[ luckily we have our lazyAdd utility!      ]]
 --[[ We can use it to add true only if not     ]]
---[[ loaded via niCats                         ]]
+--[[ loaded via niCats. When NOT loaded in nix ]]
+--[[ It returns the 1st value, otherwise,      ]]
+--[[ it returns the 2nd value.                 ]]
+--[[    (or nil if there wasnt one)            ]]
 --[[ ----------------------------------------- ]]
       {
         'williamboman/mason.nvim',
-        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true),
+        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true, false),
       },
       {
         'williamboman/mason-lspconfig.nvim',
-        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true),
+        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true, false),
       },
 
       -- Useful status updates for LSP
