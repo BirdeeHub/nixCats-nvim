@@ -90,7 +90,7 @@ local lazyOptions = {
 --[[ plugin name list(or table),                 ]]
 --[[ and our lazypath when loaded via nix.       ]]
 --[[ after that we just pass in the normal 2     ]]
---[[ remaining --[[ arguments to the lazy setup  ]]
+--[[ remaining arguments to the lazy setup()     ]]
 --[[ ------------------------------------------- ]]
 require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 {
@@ -120,7 +120,8 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 --[[ Uh-oh! We don't want to use mason on nix! ]]
 --[[ luckily we have our lazyAdd utility!      ]]
 --[[ We can use it to add true only if not     ]]
---[[ loaded via nix. When NOT loaded in nix    ]]
+--[[ loaded via nix.                           ]]
+--[[ When NOT loaded in nix                    ]]
 --[[ It returns the 1st value, otherwise,      ]]
 --[[ it returns the 2nd value.                 ]]
 --[[    (or nil if there wasnt one)            ]]
@@ -318,8 +319,8 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 --[[ --------------------------------- ]]
 --[[ Uh-oh! This one has a build step! ]]
 --[[ Nix has already done that for us. ]]
---[[ Use this util function to disable ]]
---[[ build steps on nix.               ]]
+--[[ Use the lazyAdd function to       ]]
+--[[ disable build steps on nix.       ]]
 --[[ --------------------------------- ]]
         build = require('nixCatsUtils.lazyCat').lazyAdd('make'),
         cond = require('nixCatsUtils.lazyCat').lazyAdd(function()
@@ -716,10 +717,6 @@ if require('nixCatsUtils').isNixCats then
     })
   end
 else
---[[ ------------------------------------- ]]
---[[ Handling mason is covered in the help ]]
---[[ See :help nixCats.luaUtils.mason      ]]
---[[ ------------------------------------- ]]
   -- Ensure the servers above are installed
   local mason_lspconfig = require 'mason-lspconfig'
 
@@ -738,7 +735,10 @@ else
     end,
   }
 end
-
+--[[ ------------------------------------- ]]
+--[[ Handling mason is covered in the help ]]
+--[[ See :help nixCats.luaUtils.mason      ]]
+--[[ ------------------------------------- ]]
 
 
 
