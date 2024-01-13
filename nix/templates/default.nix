@@ -19,6 +19,14 @@
       An EXAMPLE Home Manager module configuration template
     '';
   };
+  kickstart-nvim = {
+    path = ./kickstart-nvim;
+    description = ''
+      The entirety of the main init.lua file implemented as a nixCats flake.
+      With additional nix items for sanity.
+      This is to serve as the tutorial for using the nixCats lazy wrapper.
+    '';
+  };
   mergeFlakeWithExisting = {
     path = ./touchUpExisting;
     description = ''
