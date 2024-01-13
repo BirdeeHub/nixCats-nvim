@@ -150,6 +150,25 @@ Then you can set leader keys, before any plugins are downloaded via pckr
   -- only stuff pertaining to downloading should be added to pckr's table.
 
 ---------------------------------------------------------------------------------
+                                                       *nixCats.luaUtils.lazy*
+AWAITING UPSTREAM
+See: https://github.com/folke/lazy.nvim/pull/1259
+The wrapper exists in the luaUtils folder, but it only works if you
+use my fork of lazy.nvim until the changes go through.
+Some changes may occur in the meantime to it so I would not suggest this.
+
+For instructions on using the lazy wrapper, check out this template example!
+>nix
+    kickstart-nvim = {
+      path = ./kickstart-nvim;
+      description = ''
+        The entirety of the main init.lua file of kickstart.nvim
+        implemented as a nixCats flake. With additional nix items for sanity.
+        This is to serve as the tutorial for using the nixCats lazy wrapper.
+      '';
+    };
+<
+---------------------------------------------------------------------------------
 MASON AND LSPCONFIG                                   *nixCats.luaUtils.mason*
 
 This is a method you may use to make sure mason only tries to download stuff
@@ -263,13 +282,5 @@ The stuff added to servers table is what is passed to lspconfig/mason
     end
   end
 <
----------------------------------------------------------------------------------
-                                                       *nixCats.luaUtils.lazy*
-AWAITING UPSTREAM
-See: https://github.com/folke/lazy.nvim/pull/1259
-The wrapper exists in the luaUtils folder, but it only works if you
-use my fork of lazy.nvim until the changes go through.
-Some changes may occur in the meantime to it so I would not suggest this.
-
 =================================================================================
 vim:tw=78:ts=8:ft=help:norl:
