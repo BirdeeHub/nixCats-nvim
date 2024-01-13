@@ -54,13 +54,10 @@
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
       dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system}
-        ( (import ./overlays inputs) ++ 
-          [
-          # And here we apply standardPluginOverlay to our inputs.
-          (standardPluginOverlay inputs)
-            # add any flake overlays here.
-          ]
-        )) ];
+      ((import ./overlays inputs) ++ [
+        (utils.standardPluginOverlay inputs)
+        # add any flake overlays here.
+      ])) ];
       # we will be exporting
       # the overlays we defined for ease of use when
       # integrating various versions of your config with nix configs
