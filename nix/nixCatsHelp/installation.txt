@@ -82,7 +82,12 @@ In fact, you could even copy the nixCats into your
 main configuration's flake inputs, then, wherever you want,
 recreate the entire outputs set of the flake from just the utils set.
 
-These templates not suited to being initialized directly in your
+I actually use that method as it allows me to not only install multiple
+different customized versions, but also return them as standalone
+packages from my system flake. The point is, there are probably about as many
+ways to import nixCats as there are ways to configure nvim itself.
+
+These templates are not suited to being initialized directly in your
 nvim config folder like the first one was.
 They are minimal examples of how to import nixCats in different ways.
 
@@ -191,55 +196,58 @@ It could produce any of 4 configured neovim packages.
 
 ---------------------------------------------------------------------------------------
                                                            *nixCats.templates*
-The templates are imported in the utils set.
+The templates are imported by the utils set.
 They are located at nix/templates in this repo.
+The following is nix/templates/default.nix
 >nix
-    utils.templates = {
-      fresh = {
-        path = ../templates/fresh;
-        description = "starting point template for making your neovim flake";
-      };
-      nixosModule = {
-        path = ../templates/nixosModule;
-        description = ''
-          An EXAMPLE nixOS module configuration template
-        '';
-      };
-      homeModule = {
-        path = ../templates/homeManager;
-        description = ''
-          An EXAMPLE Home Manager module configuration template
-        '';
-      };
-      mergeFlakeWithExisting = {
-        path = ../templates/touchUpExisting;
-        description = ''
-          An EXAMPLE template showing how to merge in parts of other nixCats repos.
-        '';
-      };
-      LSPs = {
-        path = ../templates/LSPs;
-        description = ''
-          An EXAMPLE template showing how to merge in parts of other nixCats repos.
-        '';
-      };
-      luaUtils = {
-        path = ../templates/luaUtils;
-        description = ''
-          A template that includes lua utils for using neovim package managers
-          when your config file is not loaded via nix.
-        '';
-      };
-      overlayfile = {
-        path = ../templates/overlayfile;
-        description = ''
-          A template for an empty overlay file defined as described in
-          :help nixCats.flake.nixperts.overlays and overlays/default.nix
-        '';
-      };
-
-      default = utils.templates.fresh;
+  {
+    default = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
     };
+    fresh = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
+    };
+    nixosModule = {
+      path = ./nixosModule;
+      description = ''
+        An EXAMPLE nixOS module configuration template
+      '';
+    };
+    homeModule = {
+      path = ./homeManager;
+      description = ''
+        An EXAMPLE Home Manager module configuration template
+      '';
+    };
+    mergeFlakeWithExisting = {
+      path = ./touchUpExisting;
+      description = ''
+        An EXAMPLE template showing how to merge in parts of other nixCats repos.
+      '';
+    };
+    LSPs = {
+      path = ./LSPs;
+      description = ''
+        An EXAMPLE template showing how to merge in parts of other nixCats repos.
+      '';
+    };
+    luaUtils = {
+      path = ./luaUtils;
+      description = ''
+        A template that includes lua utils for using neovim package managers
+        when your config file is not loaded via nix.
+      '';
+    };
+    overlayfile = {
+      path = ./overlayfile;
+      description = ''
+        A template for an empty overlay file defined as described in
+        :help nixCats.flake.nixperts.overlays and overlays/default.nix
+      '';
+    };
+  }
 <
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
