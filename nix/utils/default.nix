@@ -8,6 +8,11 @@ rec {
     # The big function that does everything
     baseBuilder = import ../builder;
 
+    templates = import ../templates;
+
+    # allows for inputs named plugins-something to be turned into plugins automatically
+    standardPluginOverlay = import ./standardPluginOverlay.nix;
+
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
@@ -42,9 +47,6 @@ rec {
           );
         }
       );
-
-    # allows for inputs named plugins-something to be turned into plugins automatically
-    standardPluginOverlay = import ./standardPluginOverlay.nix;
 
     # returns a merged set of definitions, with new overriding old.
     # updates anything it finds that isn't another set.
@@ -90,8 +92,6 @@ rec {
           inherit luaPath keepLuaBuilder categoryDefinitions
             packageDefinitions defaultPackageName;
         } utils);
-
-    templates = import ../templates;
 
   };
 

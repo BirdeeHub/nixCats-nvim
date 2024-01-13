@@ -2,20 +2,29 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- THIS SETUP AND catPacker ARE FOR
--- pckr THE NEOVIM PLUGIN MANAGER
--- They do nothing if your config is loaded via nix.
+--[[ ----------------------------------- ]]
+--[[ THIS SETUP AND catPacker ARE FOR    ]]
+--[[ pckr THE NEOVIM PLUGIN MANAGER      ]]
+--[[ They do NOTHING if your config      ]]
+--[[ is loaded via nix.                  ]]
+--[[ ----------------------------------- ]]
+--[[
+if you plan to always load your nixCats via nix,
+you can safely ignore this setup call,
+and the require('nixCatsUtils.catPacker').setup call below it.
 
--- if you plan to always load your nixCats via nix,
--- you can safely ignore this setup call,
--- and the require('nixCatsUtils.catPacker').setup call below it.
-
--- IF YOU DO NOT DO THIS SETUP CALL:
--- the result will be that, when you load this folder without using nix,
--- the global nixCats function which you use everywhere
--- to check for categories will throw an error.
--- This setup function will give it a default value.
--- Of course, if you only ever download nvim with nix, this isnt needed.
+IF YOU DO NOT DO THIS SETUP CALL:
+the result will be that, when you load this folder without using nix,
+the global nixCats function which you use everywhere
+to check for categories will throw an error.
+This setup function will give it a default value.
+Of course, if you only ever download nvim with nix, this isnt needed.]]
+--[[ ----------------------------------- ]]
+--[[ This setup function will provide    ]]
+--[[ a default value for the nixCats('') ]]
+--[[ function so that it will not throw  ]]
+--[[ an error if not loaded via nixCats  ]]
+--[[ ----------------------------------- ]]
 require('nixCatsUtils').setup {
   non_nix_value = true,
 }
@@ -26,10 +35,12 @@ require('nixCatsUtils').setup {
 -- OUT of that file, as they are ONLY loaded when this
 -- configuration is NOT loaded via nix.
 require('nixCatsUtils.catPacker').setup({
-    -- ### DONT USE CONFIG VARIABLE ###
-    -- unless you are ok with that instruction
-    -- not being ran when used via nix,
-    -- pckr will not be ran when using nix
+--[[ ------------------------------------------ ]]
+--[[ ### DONT USE CONFIG VARIABLE ###           ]]
+--[[ unless you are ok with that instruction    ]]
+--[[ not being ran when used via nix,           ]]
+--[[ pckr will not be ran when using nix        ]]
+--[[ ------------------------------------------ ]]
   { 'joshdick/onedark.vim', },
   { 'nvim-tree/nvim-web-devicons', },
 
