@@ -22,6 +22,19 @@
       flake = false;
     };
 
+    # will be removed after the following pr is accepted:
+    # https://github.com/folke/lazy.nvim/pull/1259
+    # If you do use it before then, keep in mind that this one creates
+    # a directory named lazy-nvim while the official
+    # will create one named lazy.nvim
+    # this is because it is imported via our defaultPluginOverlay right now.
+    # this is relevant when you fetch the lazypath in your lua.
+    # and thus you will need to change it once the upstream occurs.
+    "plugins-lazy-nvim" = {
+      url = "github:BirdeeHub/lazy.nvim";
+      flake = false;
+    };
+
     # neovim = {
     #   url = "github:neovim/neovim";
     #   flake = false;
@@ -34,11 +47,11 @@
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, ... }@inputs:
-    # This line makes this package available for all major systems
-    # system is just a string like "x86_64-linux" or "aarch64-darwin"
-    flake-utils.lib.eachDefaultSystem (system: let
+  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
       utils = (import ./nix/utils).utils;
+    in flake-utils.lib.eachDefaultSystem (system: let
+    # The above line makes this package available for all major systems
+    # system is just a string like "x86_64-linux" or "aarch64-darwin"
 
       # see :help nixCats.flake.outputs.overlays
       # This overlay grabs all the inputs named in the format
@@ -53,14 +66,14 @@
       # `pkgs.nixCatsBuilds` is a set of plugins defined in that file.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
-      otherOverlays = (import ./overlays inputs) ++ [
+      dependencyOverlays = (import ./overlays inputs) ++ [
+        (standardPluginOverlay inputs)
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
       pkgs = import nixpkgs {
         inherit system;
-        overlays = otherOverlays ++ 
-          [ (standardPluginOverlay inputs) ];
+        overlays = dependencyOverlays;
         # config.allowUnfree = true;
       };
 
@@ -71,8 +84,8 @@
 
       # see :help nixCats.flake.outputs.builder
       # you could also just import the baseBuilder straight from nixCats github
-      baseBuilder = import ./nix/builder;
-      nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
+      inherit (utils) baseBuilder;
+      nixCatsBuilder = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;
         # notice how it doesn't care that the last 2 are defined lower in the file?
 
       # see :help nixCats.flake.outputs.categories
@@ -127,6 +140,11 @@
           markdown = with pkgs.vimPlugins; [
             # yes it knows this isn't with pkgs.vimPlugins
             pkgs.nixCatsBuilds.markdown-preview-nvim
+          ];
+          lazy = with pkgs.neovimPlugins; [
+            # lazy will be imported via pkgs.vimPlugins.lazy-nvim
+            # after upstream pr is accepted.
+            lazy-nvim
           ];
           general = {
             gitPlugins = with pkgs.neovimPlugins; [
@@ -290,6 +308,9 @@
             # this does not have an associated category of plugins, 
             # but lua can still check for it
             lspDebugMode = false;
+            # by default, we dont want lazy.nvim
+            # we could omit this for the same effect
+            lazy = false;
             # you could also pass something else:
             themer = true;
             colorscheme = "onedark";
@@ -318,6 +339,9 @@
             debug = false;
             test = true;
             lspDebugMode = false;
+            # by default, we dont want lazy.nvim
+            # we could omit this for the same effect
+            lazy = false;
             themer = true;
             colorscheme = "catppuccin";
             theBestCat = "says meow!!";
@@ -359,43 +383,39 @@
       };
 
       # To choose settings and categories from the flake that calls this flake.
-      customPackager = baseBuilder self pkgs categoryDefinitions;
-
-      # You may use these to modify some or all of your categoryDefinitions
-      customBuilders = {
-        fresh = baseBuilder;
-        keepLua = baseBuilder self;
-      };
-      inherit utils;
+      customPackager = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions;
 
       # and you export this so people dont have to redefine stuff.
-      inherit otherOverlays;
+      inherit dependencyOverlays;
       inherit categoryDefinitions;
       inherit packageDefinitions;
 
       # we also export a nixos module to allow configuration from configuration.nix
       nixosModules.default = utils.mkNixosModules {
         defaultPackageName = "nixCats";
-        luaPath = "${self}";
-        inherit nixpkgs inputs otherOverlays
+        luaPath = "${./.}";
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
       # and the same for home manager
       homeModule = utils.mkHomeModules {
         defaultPackageName = "nixCats";
-        luaPath = "${self}";
-        inherit nixpkgs inputs otherOverlays
+        luaPath = "${./.}";
+        inherit dependencyOverlays
           categoryDefinitions packageDefinitions;
       };
+    # remember how the entire thing was inside the
+    # flake-utils.lib.eachDefaultSystem function?
+    # well here is the end of it.
+  }) // {
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
+    inherit utils;
+    inherit (utils) templates baseBuilder;
+    keepLuaBuilder = utils.baseBuilder "${./.}";
+  };
 
-    }
-    # these get merged in at the end to the result of flake-utils.eachDefaultSystem
-    # This makes it so we dont have to type our system name to get our template.
-    # flake-utils is annoying that way. It puts everything in a system attrset
-    # even if it doesn't make sense.
-    # These will never be system dependent anyway.
-    # we dont have access to anything inside flake-utils here though.
-    # for how to use these templates see :help nixCats.installation_options
-  ) // { templates = (import ./nix/utils).utils.templates; };
 
 }

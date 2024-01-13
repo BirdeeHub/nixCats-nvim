@@ -1,9 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 {
-  nixpkgs
-  , inputs
-  , otherOverlays
+  oldDependencyOverlays
   , luaPath ? ""
   , keepLuaBuilder ? null
   , categoryDefinitions
@@ -12,9 +10,9 @@
   , ...
 }: utils:
 
-{ config, pkgs, ... }@misc: {
+{ config, pkgs, lib, ... }@misc: {
 
-  options = with nixpkgs.lib; {
+  options = with lib; {
 
     ${defaultPackageName} = {
 
@@ -78,25 +76,10 @@
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions'';
+        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
         example = ''
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
-      };
-      addInputs = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''
-          A set of flake inputs to make available to
-          standardPluginOverlay and categoryDefinitions
-        '';
-        example = ''the inputs set of a flake'';
-      };
-      pkgsAdditions = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''things to add to pkgs outside of system and overlays'';
-        example = ''{ config.allowUnfree = true; }'';
       };
       categoryDefinitions = {
         replace = mkOption {
@@ -112,6 +95,53 @@
             # see :help nixCats.flake.outputs.categories
             categoryDefinitions = packageDef: { }
           '';
+        };
+        extraPackageDefs = mkOption {
+          default = {};
+          description = ''
+            Same as nixCats settings and categories except, you are in charge of making sure
+            that the aliases don't collide with any other packageDefinitions
+          '';
+          type = with types; attrsOf (submodule {
+            options = {
+              settings = mkOption {
+                default = packageDefinitions.${config.${defaultPackageName}.packageName}.settings or {};
+                type = (types.attrsOf types.anything);
+                description = ''
+                  Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
+                  Will build all included.
+                '';
+                example = ''
+                  {
+                    wrapRc = true;
+                    configDirName = "nixCats-nvim";
+                    customAliases = [ "xtravim" ];
+                    # nvimSRC = inputs.neovim;
+                  }
+                '';
+              };
+              categories = mkOption {
+                default = packageDefinitions.${config.${defaultPackageName}.packageName}.categories or {};
+                type = (types.attrsOf types.anything);
+                description = "same as nixCats.categories, but for the extra package";
+                example = ''
+                  {
+                    generalBuildInputs = true;
+                    markdown = true;
+                    gitPlugins = true;
+                    general = true;
+                    custom = true;
+                    neonixdev = true;
+                    debug = false;
+                    test = true;
+                    lspDebugMode = false;
+                    themer = true;
+                    colorscheme = "onedark";
+                  }
+                '';
+              };
+            };
+          });
         };
         merge = mkOption {
           default = null;
@@ -153,9 +183,9 @@
               default = luaPath;
               type = types.str;
               description = ''
-                The path to your nvim config directory in the store. In the base nixCats flake, this is "''${self}".
+                The path to your nvim config directory in the store. In the base nixCats flake, this is "''${./.}".
               '';
-              example = ''"''${self}/systemNvimConfig"'';
+              example = ''"''${./.}"'';
             };
             settings = mkOption {
               default = null;
@@ -191,25 +221,60 @@
                 }
               '';
             };
+            extraPackageDefs = mkOption {
+              default = {};
+              description = ''
+                Same as nixCats settings and categories except, you are in charge of making sure
+                that the aliases don't collide with any other packageDefinitions
+              '';
+              type = with types; attrsOf (submodule {
+                options = {
+                  settings = mkOption {
+                    default = packageDefinitions.${config.${defaultPackageName}.packageName}.settings or {};
+                    type = (types.attrsOf types.anything);
+                    description = ''
+                      Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
+                      Will build all included.
+                    '';
+                    example = ''
+                      {
+                        wrapRc = true;
+                        configDirName = "nixCats-nvim";
+                        customAliases = [ "xtravim" ];
+                        # nvimSRC = inputs.neovim;
+                      }
+                    '';
+                  };
+                  categories = mkOption {
+                    default = packageDefinitions.${config.${defaultPackageName}.packageName}.categories or {};
+                    type = (types.attrsOf types.anything);
+                    description = "same as nixCats.categories, but for the extra package";
+                    example = ''
+                      {
+                        generalBuildInputs = true;
+                        markdown = true;
+                        gitPlugins = true;
+                        general = true;
+                        custom = true;
+                        neonixdev = true;
+                        debug = false;
+                        test = true;
+                        lspDebugMode = false;
+                        themer = true;
+                        colorscheme = "onedark";
+                      }
+                    '';
+                  };
+                };
+              });
+            };
             addOverlays = mkOption {
               default = [];
               type = (types.listOf types.anything);
-              description = ''A list of overlays to make available to categoryDefinitions'';
+              description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
               example = ''
                 [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
               '';
-            };
-            addInputs = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = ''A set of flake inputs to make available to standardPluginOverlay and categoryDefinitions'';
-              example = ''the inputs set of a flake'';
-            };
-            pkgsAdditions = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = ''things to add to pkgs outside of system and overlays'';
-              example = ''{ config.allowUnfree = true; }'';
             };
             categoryDefinitions = {
               replace = mkOption {
@@ -251,16 +316,9 @@
   };
 
   config = let
+    dependencyOverlays = [ (utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays) ];
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
-      newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays user_options_set.addOverlays) ];
-      newPkgs = import nixpkgs ({
-        inherit (pkgs) system;
-        overlays = newOtherOverlays ++ [
-            # here we can also add the regular inputs from other nixCats like so
-            (utils.standardPluginOverlay (inputs // user_options_set.addInputs))
-          ];
-      } // user_options_set.pkgsAdditions);
       newCategoryDefinitions = if user_options_set.categoryDefinitions.replace != null
         then user_options_set.categoryDefinitions.replace
         else (
@@ -278,33 +336,42 @@
               else packageDefinitions.${user_options_set.packageName}.categories;
         };
       };
-      in {
-        packages = nixpkgs.lib.mkIf user_options_set.enable
-          [ (
-              (
-                if user_options_set.luaPath != "" then (import ../builder user_options_set.luaPath)
-                else (
-                  if keepLuaBuilder != null then 
-                  keepLuaBuilder else 
-                  builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
-                )
+      xtraPkgDef = lib.mkIf (user_options_set.extraPackageDefs !={}) options_set.extraPackageDefs;
+      finalPrim = lib.mkIf user_options_set.enable [
+          (
+            (
+              if user_options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
+              else (
+                if keepLuaBuilder != null then 
+                keepLuaBuilder else 
+                builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
               )
-              newPkgs newCategoryDefinitions
-              newUserPackageDefinition user_options_set.packageName
+            ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newUserPackageDefinition user_options_set.packageName
+          )
+        ];
+      finalXtra = lib.mkIf (user_options_set.enable && (user_options_set.extraPackageDefs !={}) ) (builtins.attrValues (builtins.mapAttrs (catName: _:
+          (
+            if user_options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
+            else (
+              if keepLuaBuilder != null then 
+              keepLuaBuilder else 
+              builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ];
+          )
+          { inherit pkgs dependencyOverlays; } newCategoryDefinitions
+          xtraPkgDef catName
+        ) xtraPkgDef));
+        finalUserPkgs = lib.mkIf ( user_options_set.enable || (options_set.enable && (user_options_set.extraPackageDefs !={}) )) (
+          if (user_options_set.enable && (user_options_set.extraPackageDefs !={}) )
+          then finalPrim ++ finalXtra
+          else finalPrim
+        );
+      in {
+        packages = lib.mkIf user_options_set.enable finalUserPkgs;
       }
     ) config.${defaultPackageName}.users;
 
     options_set = config.${defaultPackageName};
-    newOtherOverlays = [ (utils.mergeOverlayLists otherOverlays options_set.addOverlays) ];
-    newPkgs = import nixpkgs ({
-      inherit (pkgs) system;
-      overlays = newOtherOverlays ++ [
-          # here we can also add the regular inputs from other nixCats like so
-          (utils.standardPluginOverlay (inputs // options_set.addInputs))
-        ];
-    } // options_set.pkgsAdditions);
     newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
       then options_set.categoryDefinitions.replace
       else (
@@ -318,22 +385,41 @@
         categories = options_set.categories;
       };
     };
-  in
-  {
-    users.users = newUserPackageDefinitions;
-    environment.systemPackages = nixpkgs.lib.mkIf options_set.enable
-      [ (
+    xtraPkgDef = lib.mkIf (options_set ? extraPackageDefs) options_set.extraPackageDefs;
+    finalPrim = lib.mkIf options_set.enable [
+        (
           (
-            if options_set.luaPath != "" then (import ../builder options_set.luaPath)
+            if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
             else (
               if keepLuaBuilder != null then 
               keepLuaBuilder else 
               builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
             )
-          ) newPkgs newCategoryDefinitions newSystemPackageDefinition options_set.packageName
+          ) { inherit pkgs dependencyOverlays; } newCategoryDefinitions newSystemPackageDefinition options_set.packageName
         )
       ];
+    finalXtra = lib.mkIf (options_set.enable && options_set ? extraPackageDefs ) (builtins.attrValues (builtins.mapAttrs (catName: _:
+        (
+          if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
+          else (
+            if keepLuaBuilder != null then 
+            keepLuaBuilder else 
+            builtins.throw "no lua or keepLua builder supplied to mkNixosModules"
+          )
+        )
+        { inherit pkgs dependencyOverlays; } newCategoryDefinitions
+        xtraPkgDef catName
+      ) xtraPkgDef));
+      finalSystemPkgs = lib.mkIf ( options_set.enable || (options_set.enable && options_set ? extraPackageDefs )) (
+        if (options_set.enable && options_set ? extraPackageDefs )
+        then finalPrim ++ finalXtra
+        else finalPrim
+      );
+  in
+  {
+    nixpkgs.overlays = dependencyOverlays;
+    users.users = newUserPackageDefinitions;
+    environment.systemPackages = lib.mkIf options_set.enable finalSystemPkgs;
   };
-
 }
 

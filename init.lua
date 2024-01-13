@@ -1,28 +1,123 @@
-
--- THIS SETUP AND catPacker ARE FOR
--- pckr THE NEOVIM PLUGIN MANAGER
--- They do nothing if your config is loaded via nix.
-
--- when using this as a normal nvim config folder
--- default_cat_value is what nixCats('anything')
--- will return.
--- you may also require myLuaConf.isNixCats
--- to determine if this was loaded as a nix config
--- you must set this here at the start
-require('nixCatsUtils').setup {
-  default_cat_value = true,
-}
-
+-- These 2 need to be set up before any plugins are loaded.
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- load the plugins via pckr
+--[[ ----------------------------------- ]]
+--[[ THIS SETUP AND catPacker ARE FOR    ]]
+--[[ pckr THE NEOVIM PLUGIN MANAGER      ]]
+--[[ They do NOTHING if your config      ]]
+--[[ is loaded via nix.                  ]]
+--[[ ----------------------------------- ]]
+--[[
+if you plan to always load your nixCats via nix,
+you can safely ignore this setup call,
+and the require('nixCatsUtils.catPacker').setup call below it.
+
+IF YOU DO NOT DO THIS SETUP CALL:
+the result will be that, when you load this folder without using nix,
+the global nixCats function which you use everywhere
+to check for categories will throw an error.
+This setup function will give it a default value.
+Of course, if you only ever download nvim with nix, this isnt needed.]]
+--[[ ----------------------------------- ]]
+--[[ This setup function will provide    ]]
+--[[ a default value for the nixCats('') ]]
+--[[ function so that it will not throw  ]]
+--[[ an error if not loaded via nixCats  ]]
+--[[ ----------------------------------- ]]
+require('nixCatsUtils').setup {
+  non_nix_value = true,
+}
+-- then load the plugins via pckr
 -- YOU are in charge of putting the plugin
 -- urls and build steps in there,
 -- and you should keep any setup functions
 -- OUT of that file, as they are ONLY loaded when this
 -- configuration is NOT loaded via nix.
-require('nixCatsUtils.catPacker')
+require('nixCatsUtils.catPacker').setup({
+--[[ ------------------------------------------ ]]
+--[[ ### DONT USE CONFIG VARIABLE ###           ]]
+--[[ unless you are ok with that instruction    ]]
+--[[ not being ran when used via nix,           ]]
+--[[ pckr will not be ran when using nix        ]]
+--[[ ------------------------------------------ ]]
+  { 'joshdick/onedark.vim', },
+  { 'nvim-tree/nvim-web-devicons', },
+
+  { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate',
+    requires = {
+      'nvim-treesitter/nvim-treesitter-textobjects',
+    },
+  },
+  {'nvim-telescope/telescope.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', run = 'which make && make', }
+    },
+  },
+
+  { 'neovim/nvim-lspconfig',
+    requires = {
+      { 'williamboman/mason.nvim', },
+      { 'williamboman/mason-lspconfig.nvim', },
+      { 'j-hui/fidget.nvim', },
+      { 'folke/neodev.nvim', },
+      { 'folke/neoconf.nvim', },
+    },
+  },
+
+  { 'hrsh7th/nvim-cmp',
+    requires = {
+      { 'onsails/lspkind.nvim', },
+      { 'L3MON4D3/LuaSnip', },
+      { 'saadparwaiz1/cmp_luasnip', },
+      { 'hrsh7th/cmp-nvim-lsp', },
+      { 'hrsh7th/cmp-nvim-lua', },
+      { 'hrsh7th/cmp-nvim-lsp-signature-help', },
+      { 'hrsh7th/cmp-path', },
+      { 'rafamadriz/friendly-snippets', },
+      { 'hrsh7th/cmp-buffer', },
+      { 'hrsh7th/cmp-cmdline', },
+      { 'dmitmel/cmp-cmdline-history', },
+    },
+  },
+
+  { 'mfussenegger/nvim-dap',
+    requires = {
+      { 'rcarriga/nvim-dap-ui', },
+      { 'theHamsta/nvim-dap-virtual-text', },
+      { 'jay-babu/mason-nvim-dap.nvim', },
+    },
+  },
+
+  { 'm-demare/hlargs.nvim', },
+  { 'mbbill/undotree', },
+  { 'tpope/vim-fugitive', },
+  { 'tpope/vim-rhubarb', },
+  { 'tpope/vim-sleuth', },
+  { 'folke/which-key.nvim', },
+  { 'lewis6991/gitsigns.nvim', },
+  { 'nvim-lualine/lualine.nvim', },
+  { 'lukas-reineke/indent-blankline.nvim', },
+  { 'numToStr/Comment.nvim', },
+  { 'kylechui/nvim-surround',
+    requires = { 'tpope/vim-repeat', },
+  },
+
+  {
+    "iamcco/markdown-preview.nvim",
+    run = function() vim.fn["mkdp#util#install"]() end,
+  },
+
+  -- all the rest of the setup will be done using the normal setup functions later,
+  -- thus working regardless of what method loads the plugins.
+  -- only stuff pertaining to downloading should be added to pckr.
+
+})
+
+-- OK, again, that isnt needed if you load this setup via nix, but it is an option.
+
+
 
 -- [[ Setting options ]]
 -- See `:help vim.o`

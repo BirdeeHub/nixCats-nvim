@@ -4,6 +4,15 @@ rec {
 
   # These are to be exported in flake outputs
   utils = {
+
+    # The big function that does everything
+    baseBuilder = import ../builder;
+
+    templates = import ../templates;
+
+    # allows for inputs named plugins-something to be turned into plugins automatically
+    standardPluginOverlay = import ./standardPluginOverlay.nix;
+
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
@@ -39,9 +48,6 @@ rec {
         }
       );
 
-    # allows for inputs named plugins-something to be turned into plugins automatically
-    standardPluginOverlay = import ./standardPluginOverlay.nix;
-
     # returns a merged set of definitions, with new overriding old.
     # updates anything it finds that isn't another set.
     # this means it works slightly differently for environment variables
@@ -62,47 +68,30 @@ rec {
 
 
     mkNixosModules = {
-      nixpkgs
-      , inputs
-      , otherOverlays
+      dependencyOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }@exports: (import ./nixosModule.nix exports utils);
+      , ... }: (import ./nixosModule.nix {
+          oldDependencyOverlays = dependencyOverlays;
+          inherit luaPath keepLuaBuilder categoryDefinitions
+            packageDefinitions defaultPackageName;
+        } utils);
 
     mkHomeModules = {
-      nixpkgs
-      , inputs
-      , otherOverlays
+      dependencyOverlays
       , luaPath ? ""
       , keepLuaBuilder ? null
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }@exports: (import ./homeManagerModule.nix exports utils);
-
-    templates = {
-      fresh = {
-        path = ../templates/fresh;
-        description = "starting point template for making your neovim flake";
-      };
-      nixosModule = {
-        path = ../templates/nixosModule;
-        description = "nixOS module configuration template";
-      };
-      homeModule = {
-        path = ../templates/homeManager;
-        description = "Home Manager module configuration template";
-      };
-      mergeFlakeWithExisting = {
-        path = ../templates/touchUpExisting;
-        description = "A template showing how to merge in parts of other nixCats repos";
-      };
-
-      default = utils.templates.fresh;
-    };
+      , ... }: (import ./homeManagerModule.nix {
+          oldDependencyOverlays = dependencyOverlays;
+          inherit luaPath keepLuaBuilder categoryDefinitions
+            packageDefinitions defaultPackageName;
+        } utils);
 
   };
 

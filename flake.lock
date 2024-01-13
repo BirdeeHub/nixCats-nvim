@@ -42,11 +42,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1703933935,
-        "narHash": "sha256-OFx8qdf42a85YANtPI85K67FoJdScZ5RF2IYDq6l6t4=",
+        "lastModified": 1705126038,
+        "narHash": "sha256-GOMw/vpkEZYDTPbt68C1rKBVjpxLeo+9uyt4Nq+DmEM=",
         "owner": "nix-community",
         "repo": "nixd",
-        "rev": "ec595f84cedb9119c9e647950ba7ef11fbdbedfd",
+        "rev": "976ac792dd40871330b1b74dc91851d0ae7d2a43",
         "type": "github"
       },
       "original": {
@@ -91,11 +91,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1703499205,
-        "narHash": "sha256-lF9rK5mSUfIZJgZxC3ge40tp1gmyyOXZ+lRY3P8bfbg=",
+        "lastModified": 1704842529,
+        "narHash": "sha256-OTeQA+F8d/Evad33JMfuXC89VMetQbsU4qcaePchGr4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "e1fa12d4f6c6fe19ccb59cac54b5b3f25e160870",
+        "rev": "eabe8d3eface69f5bb16c18f8662a702f50c20d5",
         "type": "github"
       },
       "original": {
@@ -108,11 +108,11 @@
     "plugins-hlargs": {
       "flake": false,
       "locked": {
-        "lastModified": 1702317151,
-        "narHash": "sha256-AgHETTIsDOLgEnEaFWq1kXY+Ye/DUU6W+95M37VNOVw=",
+        "lastModified": 1704665732,
+        "narHash": "sha256-WJMyYWlw4j3bGTX7iuQ3y6M+XKJkWtp+0zIkKyfKVRc=",
         "owner": "m-demare",
         "repo": "hlargs.nvim",
-        "rev": "872c332dcc65324604011fa6056c4d71253e399b",
+        "rev": "e45fd1f18f2fadf7d4ebe6f14ed1e70c7fca02da",
         "type": "github"
       },
       "original": {
@@ -121,12 +121,29 @@
         "type": "github"
       }
     },
+    "plugins-lazy-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704806170,
+        "narHash": "sha256-NZ94THu07jnV+K7LkNnNNt9h8PkoLT/tXMbqzqZlU+8=",
+        "owner": "BirdeeHub",
+        "repo": "lazy.nvim",
+        "rev": "5f41e57c5efa2e201dbaa98595d52efe8ec37e51",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "lazy.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixd": "nixd",
         "nixpkgs": "nixpkgs_2",
-        "plugins-hlargs": "plugins-hlargs"
+        "plugins-hlargs": "plugins-hlargs",
+        "plugins-lazy-nvim": "plugins-lazy-nvim"
       }
     },
     "systems": {

@@ -76,8 +76,8 @@ if not require('nixCatsUtils').isNixCats then
   mason_lspconfig.setup_handlers {
     function(server_name)
       require('lspconfig')[server_name].setup {
-        capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
-        on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+        on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
         settings = servers[server_name],
         filetypes = (servers[server_name] or {}).filetypes,
       }
@@ -86,8 +86,8 @@ if not require('nixCatsUtils').isNixCats then
 else
   for server_name,_ in pairs(servers) do
     require('lspconfig')[server_name].setup({
-      capabilities = require('myLuaConf.LSPs.caps-onattach').get_capabilities(),
-      on_attach = require('myLuaConf.LSPs.caps-onattach').on_attach,
+      capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+      on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
       cmd = (servers[server_name] or {}).cmd,

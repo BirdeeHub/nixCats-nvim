@@ -63,9 +63,37 @@ There are several other templates.
 They are designed to be used as examples for
 importing versions of your nixCats into another existing configuration.
 
-They are not particularly suited to being ran directly in your
+---------------------------------------------------------------------------------------
+                                            *nixCats.installation_nixOS_users*
+<attention>
+If you already have a system flake, you probably want to configure
+your neovim as a module. There are some templates below that you should
+not import directly into your flake, but should instead take a look at
+and use as an example of what to do.
+
+Modules have the same configuration options as the flake version.
+
+Therefore, it is VERY easy to begin with the flake version,
+have it separate while you work with it, and then either
+leave it separate as a flake, or copy your configuration
+into the module version.
+
+In fact, you could even copy the nixCats into your
+main configuration's flake inputs, then, wherever you want,
+recreate the entire outputs set of the flake from just the utils set.
+
+I actually use that method as it allows me to not only install multiple
+different customized versions, but also return them as standalone
+packages from my system flake. The point is, there are probably about as many
+ways to import nixCats as there are ways to configure nvim itself.
+
+These templates are not suited to being initialized directly in your
 nvim config folder like the first one was.
 They are minimal examples of how to import nixCats in different ways.
+
+<->
+A short introduction to the main templates
+and examples of some auto-exported options:
 
 This one shows the options that get exported as a home manager module
 It also shows how to import the module.
@@ -151,7 +179,6 @@ It could produce any of 4 configured neovim packages.
                 themer = true;
                 # you could also pass something else:
                 colorscheme = "catppuccin";
-                # you could :lua print(vim.inspect(require('nixCats')))
                 # see :help nixCats
               };
             };
@@ -167,5 +194,68 @@ It could produce any of 4 configured neovim packages.
   }
 <
 
+---------------------------------------------------------------------------------------
+                                                           *nixCats.templates*
+The templates are imported by the utils set.
+They are located at nix/templates in this repo.
+The following is nix/templates/default.nix
+>nix
+  {
+    default = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
+    };
+    fresh = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
+    };
+    nixosModule = {
+      path = ./nixosModule;
+      description = ''
+        An EXAMPLE nixOS module configuration template
+      '';
+    };
+    homeModule = {
+      path = ./homeManager;
+      description = ''
+        An EXAMPLE Home Manager module configuration template
+      '';
+    };
+    kickstart-nvim = {
+      path = ./kickstart-nvim;
+      description = ''
+        The entirety of the main init.lua file implemented as a nixCats flake.
+        With additional nix items for sanity.
+        This is to serve as the tutorial for using the nixCats lazy wrapper.
+      '';
+    };
+    mergeFlakeWithExisting = {
+      path = ./touchUpExisting;
+      description = ''
+        An EXAMPLE template showing how to merge in parts of other nixCats repos.
+      '';
+    };
+    LSPs = {
+      path = ./LSPs;
+      description = ''
+        An EXAMPLE template showing how to merge in parts of other nixCats repos.
+      '';
+    };
+    luaUtils = {
+      path = ./luaUtils;
+      description = ''
+        A template that includes lua utils for using neovim package managers
+        when your config file is not loaded via nix.
+      '';
+    };
+    overlayfile = {
+      path = ./overlayfile;
+      description = ''
+        A template for an empty overlay file defined as described in
+        :help nixCats.flake.nixperts.overlays and overlays/default.nix
+      '';
+    };
+  }
+<
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
