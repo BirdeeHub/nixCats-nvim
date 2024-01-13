@@ -17,5 +17,12 @@ PLEASE HELP WITH DOCS AND README!!!
 
 I dislike readmes in particular.
 If you see any inaccuracies in the docs, let me know or submit a pr.
+Any templates you would like to help fix up comments for?
+
+Anything on this front is welcome.
+
+Im trying to just get information on the page.
+
+Believe it or not theres still at least 3 completely undocumented ways to import a custom neovim package. And then one more of them is in my system config.
 
 Thank you!!!
