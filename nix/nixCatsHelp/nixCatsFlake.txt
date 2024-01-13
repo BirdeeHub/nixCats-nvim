@@ -483,7 +483,7 @@ They look like this:
     customPackager = baseBuilder "${./.}" pkgs categoryDefinitions;
 
     # and you export this so people dont have to redefine stuff.
-    inherit otherOverlays;
+    inherit dependencyOverlays;
     inherit categoryDefinitions;
     inherit packageDefinitions;
 
