@@ -9,9 +9,10 @@
     - check for it in your neovim lua configuration with nixCats('attr.path.to.yourList')
 - Can be configured as a flake, nixos or home-manager module.
   - It can then be imported by someone else and reconfigured with the same options and exported again. And again. And again. You get it.
-- blank flake template that can be initialized into your existing neovim directory
+- blank flake template that can be initialized into your existing neovim config directory
+- blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - luaUtils template containing the tools for integrating with pckr or lazy.
-- other templates containing examples of how to use the module options, and even one that implements the main init.lua of kickstart.nvim! (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
+- other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
 - Extensive in-editor help.
 
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
@@ -22,11 +23,9 @@ It is aimed at people who know enough lua to comfortably proceed from a kickstar
 who want to swap to using nix while still using lua for configuration.
 
 For 95% of plugins and lsps, you won't need to do more than add plugin names to categories you make in flake.nix,
-
 then configure in lua using lspconfig or the regular setup or config functions provided by the plugin.
 
 The end result is it ends up being very much like using a neovim package manager,
-
 except with the bonus of being able to install and set up more than just neovim plugins.
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
@@ -170,15 +169,7 @@ These are general nix things, not specific to this project.
 
 #### Installation:
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
-
-    -- on nixOS?
-    You should check out the module templates.
-    (After you explore for a bit first!)
-    However don't initialize them into your config folder like the main one.
-    The module templates are just examples.
-    They have all the same capabilities as the flake.
-    Use the in editor help.
-    
+for more info, including a list of templates available.
 
 ```bash
 # everyone else:
@@ -194,7 +185,7 @@ nix shell github:BirdeeHub/nixCats-nvim#nixCats
 # now running nvim will open nixCats until you exit the shell.
 ```
 Now that you are within an editor outfitted to edit a flake,
-you can access the help for nixCats by typing :help nixCats and choosing one
+you can access the help for nixCats by typing `:help nixCats` and choosing one
 of the options suggested by the auto-complete.
 
 Now that you have access to the help and a nix lsp, to get started,
@@ -202,11 +193,18 @@ first exit neovim. (but not the nix shell!)
 
 In a terminal, navigate to your nvim directory and run the following command:
 ```bash
+  # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
+  # module template:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#module
+  # for package manager integration utilities for functionality without nix
+  # added at lua/nixCatsUtils also run:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
+  # If using zsh with extra regexing, be sure to escape the #
 ```
-This will create an empty version of flake.nix for you to fill in,
+This will create an empty version of flake.nix (or systemCat.nix and homeCat.nix) for you to fill in,
 along with an empty overlays directory for any custom builds from source
-required, if any. It will directly import the builder, utils, and
+required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
 
 Re-enter the nixCats nvim version by typing nvim . and take a look!
@@ -214,7 +212,7 @@ Reference the help and nixCats-nvim itself as a guide for importing your setup.
 
 You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
-only when that particular category is enabled in the current package by checking ```nixCats('your.cats.name')``` first.
+only when that particular category is enabled in the current package by checking `nixCats('your.cats.name')` first.
 
 It is a similar process to migrating to a new neovim plugin manager.
 
@@ -252,29 +250,7 @@ importing versions of your nixCats into another existing configuration.
 
 They are not particularly suited to being ran directly in your
 nvim config folder like the first one was.
-They are minimal examples of how to import nixCats in different ways.
-
-This one shows the options that get exported as a home manager module
-It also shows how to import the module.
-It is not a complete home manager flake in and of itself.
-```bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#homeModule
-```
-This one shows the options that get exported as a nixOS module
-It also shows how to import the module.
-It is not a complete nixOS flake in and of itself.
-```bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#nixosModule
-```
-This next one shows, within another flake, how to import 
-only some parts of other nixCats and overwrite or add others.
-You could use it, for example, to import just the overlays from another nixCats
-without having to copy paste them into your own version.
-```bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#mergeFlakeWithExisting
-```
-When you make categories in your flake.nix,
-and then check them in lua, that creates your primary set of options.
+They are minimal examples of stuff that you can do.
 
 You can modify ANYTHING within anything that imports your nixCats (in any way),
 however, usually, all you would need to do is choose a package you defined,
@@ -304,7 +280,7 @@ Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borro
 
 Thank you!!! It taught me both about an overlay's existence and how it works.
 
-I also borrowed some code from nixpkgs and included links.
+I also borrowed a decent amount of code from nixpkgs and made modifications.
 
 #### Alternative / similar projects:
 
