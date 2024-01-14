@@ -284,7 +284,7 @@ I also borrowed a decent amount of code from nixpkgs and made modifications.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
   A project with a similar philosophy to this one, but much simpler in many respects.
-  It does not have an after folder, nor does it have categories, exported options, or modules.
+  It does not have have categories, exported options, or modules.
   It does have a download system for downloading tester plugins only when ran as a dev shell.
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
