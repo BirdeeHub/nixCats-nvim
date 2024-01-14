@@ -9,6 +9,10 @@ Keep in mind they may not work so well on nixos,
 so when you are on nixOS you should load neovim via nix
 (not sure if that part needs stating)
 
+to get your lua utils run
+>bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
+<
 ALSO keep in mind, if you are not using nix, you will have to download
 all your non-plugin, non-lsp dependencies manually, and this may suck.
 Therefore, all this stuff about package managers may be of limited utility.
