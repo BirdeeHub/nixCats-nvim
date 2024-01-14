@@ -11,9 +11,12 @@
   - It can then be imported by someone else and reconfigured with the same options and exported again. And again. And again. You get it.
 - blank flake template that can be initialized into your existing neovim config directory
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
-- luaUtils template containing the tools for integrating with pckr or lazy.
-- other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
+- `luaUtils` template containing the tools for integrating with pckr or lazy.
+  - (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
+- other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
+
+## Introduction
 
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
 
@@ -73,19 +76,11 @@ Luckily you have the ability to export a minimal package with whatever you want 
 
 It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The after directory just makes the numbers purple.
 
-#### Introduction:
- 
-I originally made this just for myself. I wanted to swap to NixOS.
-
-The category scheme was good. I found it easy to use. It got much better over time as I came to properly understand nix.
-
-Now here it is:
-
-*The mission:*
+##### *The mission:*
 - Replace nix package managers for plugins and lsps and keep everything else in the normal lua scheme. 
-- 1 config directory, still allow project specific packaging.
+- 1 NORMAL nvim config directory, still allow project specific packaging.
 
-*The solution:*
+##### *The solution:*
 - Use nix to download the stuff and make it available to neovim.
 - Include a nix store directory as a config folder, allowing all config to work like normal.
 - Create nixCats by writing the packageDefinitions.categories set to a lua file so the lua may know what categories are packaged
@@ -99,29 +94,26 @@ Now here it is:
 #### These are the reasons I wanted to do it this way: 
 
 - The setup instructions for new plugins are all in Lua so translating them is effort.
->
 - I didn't want to be forced into creating a new lua file, 
     writing lua within nix, or creating hooks for a DSL for every new plugin.
->
 - I wanted my neovim config to be neovim flavored 
     - (so that I can take advantage of all the neovim dev tools with minimal fuss)
->
 - I still wanted my config to know what plugins and LSPs I included in the package
     so I created nixCats.
 
 In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay.
 
-All config folders like `ftplugin/` and `after/` work as designed (see :h rtp), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
+All config folders like `ftplugin/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
 Although, it does specifically expect `init.lua` rather than `init.vim` at root level.
 
-It runs on linux, mac, and WSL. 
+It runs on linux, mac, and WSL.
 You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste. If you're not on linux you don't need to care what those last 2 things mean.
 
 This is designed to give you package specific config, AND nixOS integration AND home manager integration, without ditching your lua. Or even leaving lua much at all.
 
 That being said, definitely explore first while you understand the concept. It boils down to a few concepts.
 
-*The idea*:
+#### *The idea*:
 1. import flake as config file.
 2. Sort categories.
 3. Convert set that chooses the categories included verbatim to a lua table returned by nixCats.
@@ -155,6 +147,7 @@ If you encounter any build steps that are not well handled by nixpkgs,
 or you need to import a plugin straight from git that has a non-standard build step and no flake,
 and need to do a custom definition, [customBuildsOverlay](./overlays/customBuildsOverlay.nix) is the place for it. 
 Fair warning, this requires knowledge of nix derivations and should be needed only infrequently.
+It will not be needed more than in any other method of configuring neovim via nix.
 
 #### Drawbacks:
 

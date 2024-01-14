@@ -23,6 +23,4 @@ Anything on this front is welcome.
 
 Im trying to just get information on the page.
 
-Believe it or not theres still at least 3 completely undocumented ways to import a custom neovim package. And then one more of them is in my system config.
-
 Thank you!!!
