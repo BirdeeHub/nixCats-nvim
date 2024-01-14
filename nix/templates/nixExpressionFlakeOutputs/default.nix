@@ -24,6 +24,8 @@ However, you should not see any issues if you use the pkgs generated here.
   systemPkgs = if (attrs ? pkgs) then attrs.pkgs else null;
   # this means you should add any overlays you wish to include for neovim here.
 
+  # this util merges nixCats overlays with this one so we don't have to redefine them
+  # you could just provide a list here.
   dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system}
     ((import ./overlays inputs) ++ [
       (utils.standardPluginOverlay inputs)
