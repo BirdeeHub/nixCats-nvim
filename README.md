@@ -127,6 +127,16 @@ That being said, definitely explore first while you understand the concept. It b
 
 ---
 
+#### Drawbacks:
+
+Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
+Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
+Mason does not work on nixOS although it does on other OS options.
+
+These are general nix things, not specific to this project.
+
+---
+
 #### Basic usage:
 
 (full usage covered in included help files, accessible here and inside neovim, but much better viewed in-editor)
@@ -148,17 +158,6 @@ or you need to import a plugin straight from git that has a non-standard build s
 and need to do a custom definition, [customBuildsOverlay](./overlays/customBuildsOverlay.nix) is the place for it. 
 Fair warning, this requires knowledge of nix derivations and should be needed only infrequently.
 It will not be needed more than in any other method of configuring neovim via nix.
-
-#### Drawbacks:
-
-Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
-Let me know when you figure it out I'm kinda a nix noob still. [How to contribute](./CONTRIBUTING.md)
-
-Mason does not work on nixOS although it does on other OS options.
-
-These are general nix things, not specific to this project.
-
----
 
 #### Installation:
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
