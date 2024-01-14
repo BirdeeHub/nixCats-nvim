@@ -205,7 +205,7 @@
           themer = with pkgs.vimPlugins;
             (builtins.getAttr packageDef.categories.colorscheme {
                 # Theme switcher without creating a new category
-                "onedark" = onedark-vim;
+                "onedark" = onedark-nvim;
                 "catppuccin" = catppuccin-nvim;
                 "catppuccin-mocha" = catppuccin-nvim;
                 "tokyonight" = tokyonight-nvim;
