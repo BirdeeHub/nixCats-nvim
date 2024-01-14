@@ -7,16 +7,10 @@
     path = ./fresh;
     description = "starting point template for making your neovim flake";
   };
-  nixosModule = {
-    path = ./nixosModule;
+  module = {
+    path = ./module;
     description = ''
-      An EXAMPLE nixOS module configuration template
-    '';
-  };
-  homeModule = {
-    path = ./homeManager;
-    description = ''
-      An EXAMPLE Home Manager module configuration template
+      starting point for creating a nixCats module for your system and home-manager
     '';
   };
   kickstart-nvim = {

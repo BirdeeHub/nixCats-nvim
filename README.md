@@ -1,5 +1,19 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
+## Features:
+- Allows normal neovim configuration file scheme to be loaded from the nix store.
+- Easy-to-use Nix Category system for many configurations in 1 repository! 
+  - to use:
+    - Make a new list in the set in the flake for it (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
+    - enable the category for a particular neovim package in packageDefinitions set.
+    - check for it in your neovim lua configuration with nixCats('attr.path.to.yourList')
+- Can be configured as a flake, nixos or home-manager module.
+  - It can then be imported by someone else and reconfigured with the same options and exported again. And again. And again. You get it.
+- blank flake template that can be initialized into your existing neovim directory
+- luaUtils template containing the tools for integrating with pckr or lazy.
+- other templates containing examples of how to use the module options, and even one that implements the main init.lua of kickstart.nvim! (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
+- Extensive in-editor help.
+
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
 
 This repo is not a lua showcase. You are meant to use your own lua once you understand what is going on.
@@ -58,29 +72,27 @@ It works as a regular config folder too using the `luaUtils` template and [help:
 
 Luckily you have the ability to export a minimal package with whatever you want in it for this reason should you choose without needing a new config file.
 
-It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too.
-
-When you are deleting my lua dont forget about the after folder. It makes the numbers purple. 
-It does this afterwards because stuff kept overriding it and it was a good opportunity to show the utility of the after folder.
+It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The after directory just makes the numbers purple.
 
 #### Introduction:
  
 I originally made this just for myself. I wanted to swap to NixOS.
 
-The category scheme was good. I found it easy to use.
+The category scheme was good. I found it easy to use. It got much better over time as I came to properly understand nix.
 
 Now here it is:
 
 *The mission:*
-- Replace lazy and mason with nix, keep everything else in lua. 
-- 1 config folder, still allow project specific packaging.
+- Replace nix package managers for plugins and lsps and keep everything else in the normal lua scheme. 
+- 1 config directory, still allow project specific packaging.
 
 *The solution:*
 - Use nix to download the stuff and make it available to neovim.
-- Include the flake as a config folder, allowing all config to work like normal.
-- Create nixCats so the lua may know what categories are packaged
--  You may optionally have your config in your normal directory as well.
-   - (You will still be able to reference nixCats and the help should you do this.)
+- Include a nix store directory as a config folder, allowing all config to work like normal.
+- Create nixCats by writing the packageDefinitions.categories set to a lua file so the lua may know what categories are packaged
+-  You may optionally have your config in your normal directory as well via wrapRc setting,
+   - You can copy your flake there and iterate on lua changes quicker while configuring (otherwise you have to `git add . && nix build` everytime because it loads from the store).
+   - You will still be able to reference nixCats and the help should you do this.
 - I ended up including a way to download via neovim plugin
     managers when away from nix because people seem to want
     a way to load their config without nix as an option.
@@ -98,7 +110,7 @@ Now here it is:
 - I still wanted my config to know what plugins and LSPs I included in the package
     so I created nixCats.
 
-In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) or occasionally [customBuildsOverlay](./overlays/customBuildsOverlay.nix).
+In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay.
 
 All config folders like `ftplugin/` and `after/` work as designed (see :h rtp), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
 Although, it does specifically expect `init.lua` rather than `init.vim` at root level.
