@@ -127,16 +127,6 @@ That being said, definitely explore first while you understand the concept. It b
 
 ---
 
-#### Drawbacks:
-
-Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
-Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
-Mason does not work on nixOS although it does on other OS options.
-
-These are general nix things, not specific to this project.
-
----
-
 #### Basic usage:
 
 (full usage covered in included help files, accessible here and inside neovim, but much better viewed in-editor)
@@ -263,6 +253,14 @@ With them you could partially or entirely add to, change, or recreate this flake
 in another flake without having to redefine things (although you can only either add new lua or recreate it).
 
 ---
+
+#### Drawbacks:
+
+Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
+Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
+Mason does not work on nixOS although it does on other OS options.
+
+These are general nix things, not specific to this project.
 
 #### Special mentions:
 
