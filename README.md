@@ -12,7 +12,7 @@
 - blank flake template that can be initialized into your existing neovim config directory
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
-  - (currently uses my fork of lazy.nvim, pending PR for the 2 options added)
+  - (currently uses my fork of lazy.nvim, pending PR for the 2 options added, fingers crossed that it is accepted)
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
 
