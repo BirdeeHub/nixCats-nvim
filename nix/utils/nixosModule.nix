@@ -35,9 +35,9 @@
         type = types.str;
         description = ''
           The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${self}".
+          In the base nixCats flake, this is "''${./.}".
         '';
-        example = ''"''${self}/systemLuaConfig"'';
+        example = ''"''${./.}/systemLuaConfig"'';
       };
       settings = mkOption {
         default = packageDefinitions.${config.${defaultPackageName}.packageName}.settings or {};
@@ -185,7 +185,7 @@
               description = ''
                 The path to your nvim config directory in the store. In the base nixCats flake, this is "''${./.}".
               '';
-              example = ''"''${./.}"'';
+              example = ''"''${./.}/userLuaConfig"'';
             };
             settings = mkOption {
               default = null;
