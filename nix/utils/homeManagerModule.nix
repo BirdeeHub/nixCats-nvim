@@ -176,9 +176,9 @@
             then keepLuaBuilder else 
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
 
-      newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
-        then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
-      newPkgs = import newNixpkgs {
+      # newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
+      #   then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
+      newPkgs = import nixpkgs {
         inherit (pkgs) config system;
         overlays = dependencyOverlays.${pkgs.system};
       };
