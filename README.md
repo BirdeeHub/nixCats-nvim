@@ -84,7 +84,7 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 
 Luckily you have the ability to export a minimal package with whatever you want in it for this reason should you choose without needing a new config file.
 
-It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The after directory just makes the numbers purple.
+It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The current version of the after directory just makes the numbers purple.
 
 ##### *The mission:*
 - Replace nix package managers for plugins and lsps and keep everything else in the normal lua scheme. 
@@ -266,11 +266,16 @@ in another flake without having to redefine things (although you can only either
 
 #### Drawbacks:
 
+Specific to my project:
+
+You cannot launch nvim with nvim and must choose an alias.
+This is the trade off for installing multiple versions of the same version of nvim to the same user's PATH.
+
+General nix + nvim things:
+
 Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
 Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
 Mason does not work on nixOS although it does on other OS options.
-
-These are general nix things, not specific to this project.
 
 #### Special mentions:
 
@@ -288,9 +293,9 @@ I also borrowed a decent amount of code from nixpkgs and made modifications.
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
   It does not use Nix to manage plugins. Use nixCats after this one if you want to move your version of kickstart to nix.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project that also holds to a normal neovim config structure. It does not have have categories, exported options, or modules.
-  It starts you at the basics, and doesnt do a lot of extra stuff for you.
-  If mine has too many nix features for you, or you have no ambitions of doing multiple configurations in 1 config file, this is probably your next best starting point.
+  A project that, like mine, also holds to a normal neovim config structure. It does not have have categories, exported options, or modules.
+  It starts you at the basics, using the raw, wrapNeovimUnstable function and doesnt do much extra for you.
+   - If mine has too many nix features for you, or you have no ambitions of doing multiple configurations in 1 config file, this is probably your next best starting point.
 - [`NixVim`](https://github.com/nix-community/nixvim):
   A Neovim distribution configured using a NixOS module.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
