@@ -7,8 +7,9 @@
   , categoryDefinitions
   , packageDefinitions
   , defaultPackageName
+  , utils
   , ...
-}: utils:
+}:
 
 { config, pkgs, lib, ... }@misc: {
 

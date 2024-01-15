@@ -77,11 +77,12 @@ with builtins; rec {
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }: (import ./nixosModule.nix {
-          oldDependencyOverlays = dependencyOverlays;
-          inherit luaPath keepLuaBuilder categoryDefinitions
-            packageDefinitions defaultPackageName;
-        } utils);
+      , ... }:
+      (import ./nixosModule.nix {
+        oldDependencyOverlays = dependencyOverlays;
+        inherit luaPath keepLuaBuilder categoryDefinitions
+          packageDefinitions defaultPackageName utils;
+      });
 
     mkHomeModules = {
       dependencyOverlays
@@ -90,11 +91,12 @@ with builtins; rec {
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
-      , ... }: (import ./homeManagerModule.nix {
-          oldDependencyOverlays = dependencyOverlays;
-          inherit luaPath keepLuaBuilder categoryDefinitions
-            packageDefinitions defaultPackageName;
-        } utils);
+      , ... }:
+      (import ./homeManagerModule.nix {
+        oldDependencyOverlays = dependencyOverlays;
+        inherit luaPath keepLuaBuilder categoryDefinitions
+          packageDefinitions defaultPackageName utils;
+      });
 
   };
 
