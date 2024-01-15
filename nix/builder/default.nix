@@ -22,7 +22,7 @@ let
       then dependencyOverlays
       else dependencyOverlays.${system};
   } // extra_pkg_config)
-  else fpkgs;
+  else pkgs;
   catDefs = {
     startupPlugins = {};
     optionalPlugins = {};
