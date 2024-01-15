@@ -100,43 +100,37 @@
         description = ''
           Same as nixCats settings and categories except, you are in charge of making sure
           that the aliases don't collide with any other packageDefinitions
+
+                a function that recieves a set containing a pkgs instance
+                for the neovim instance being created as input
+                and returns a set containing a settings set and a categories set.
         '';
-        type = with types; nullOr (attrsOf (submodule {
-          options = mkOption {
-            default = null;
-            type = nullOr (functionTo (attrsOf anything));
-            description = ''
-              a function that recieves a set containing a pkgs instance
-              for the neovim instance being created as input
-              and returns a set containing a settings set and a categories set.
-            '';
-            example = ''
-              { pkgs, ... }: {
-                settings = {
-                  wrapRc = true;
-                  configDirName = "nixCats-nvim";
-                  viAlias = false;
-                  vimAlias = false;
-                  # nvimSRC = inputs.neovim;
-                  customAliases = [ "nixCats" ];
-                };
-                categories = {
-                  generalBuildInputs = true;
-                  markdown = true;
-                  gitPlugins = true;
-                  general = true;
-                  custom = true;
-                  neonixdev = true;
-                  debug = false;
-                  test = true;
-                  lspDebugMode = false;
-                  themer = true;
-                  colorscheme = "onedark";
-                };
-              }
-            '';
-          };
-        }));
+        type = with types; nullOr (attrsOf (functionTo (attrsOf anything)));
+        example = ''
+          { pkgs, ... }: {
+            settings = {
+              wrapRc = true;
+              configDirName = "nixCats-nvim";
+              viAlias = false;
+              vimAlias = false;
+              # nvimSRC = inputs.neovim;
+              customAliases = [ "nixCats" ];
+            };
+            categories = {
+              generalBuildInputs = true;
+              markdown = true;
+              gitPlugins = true;
+              general = true;
+              custom = true;
+              neonixdev = true;
+              debug = false;
+              test = true;
+              lspDebugMode = false;
+              themer = true;
+              colorscheme = "onedark";
+            };
+          }
+        '';
       };
     };
 
