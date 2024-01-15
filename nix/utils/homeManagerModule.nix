@@ -147,11 +147,18 @@
     dependencyOverlays = oldDependencyOverlays // {
       ${pkgs.system} = [
         (utils.mergeOverlayLists
-          (utils.mergeOverlayLists
-            oldDependencyOverlays.${pkgs.system} options_set.addOverlays
-          ) pkgs.overlays)
+          oldDependencyOverlays.${pkgs.system} options_set.addOverlays
+        )
       ];
     };
+    # dependencyOverlays = oldDependencyOverlays // {
+    #   ${pkgs.system} = [
+    #     (utils.mergeOverlayLists
+    #       (utils.mergeOverlayLists
+    #         oldDependencyOverlays.${pkgs.system} options_set.addOverlays
+    #       ) pkgs.overlays)
+    #   ];
+    # };
     mapToPackages = options_set: dependencyOverlays: (let
       newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
         then options_set.categoryDefinitions.replace
@@ -172,8 +179,7 @@
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
       newPkgs = import newNixpkgs {
-        inherit (pkgs) config;
-        inherit (pkgs) system;
+        inherit pkgs;
         overlays = dependencyOverlays.${pkgs.system};
       };
 
