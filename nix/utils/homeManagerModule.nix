@@ -53,7 +53,10 @@
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
+        description = ''
+          A list of overlays to make available to nixCats but not to your system.
+          Will have access to system overlays regardless of this setting.
+        '';
         example = ''
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
@@ -99,41 +102,39 @@
           that the aliases don't collide with any other packageDefinitions
         '';
         type = with types; nullOr (attrsOf (submodule {
-          options = {
-            definition = mkOption {
-              default = null;
-              type = nullOr (functionTo (attrsOf anything));
-              description = ''
-                a function that recieves a set containing a pkgs instance
-                for the neovim instance being created as input
-                and returns a set containing a settings set and a categories set.
-              '';
-              example = ''
-                { pkgs, ... }: {
-                  settings = {
-                    wrapRc = true;
-                    configDirName = "nixCats-nvim";
-                    viAlias = false;
-                    vimAlias = false;
-                    # nvimSRC = inputs.neovim;
-                    customAliases = [ "nixCats" ];
-                  };
-                  categories = {
-                    generalBuildInputs = true;
-                    markdown = true;
-                    gitPlugins = true;
-                    general = true;
-                    custom = true;
-                    neonixdev = true;
-                    debug = false;
-                    test = true;
-                    lspDebugMode = false;
-                    themer = true;
-                    colorscheme = "onedark";
-                  };
-                }
-              '';
-            };
+          options = mkOption {
+            default = null;
+            type = nullOr (functionTo (attrsOf anything));
+            description = ''
+              a function that recieves a set containing a pkgs instance
+              for the neovim instance being created as input
+              and returns a set containing a settings set and a categories set.
+            '';
+            example = ''
+              { pkgs, ... }: {
+                settings = {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  viAlias = false;
+                  vimAlias = false;
+                  # nvimSRC = inputs.neovim;
+                  customAliases = [ "nixCats" ];
+                };
+                categories = {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                };
+              }
+            '';
           };
         }));
       };
@@ -167,16 +168,19 @@
           (if keepLuaBuilder != null
             then keepLuaBuilder else 
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
+
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
+      newPkgs = import newNixpkgs {
+        inherit (pkgs) config;
+        inherit (pkgs) system;
+        overlays = dependencyOverlays.${pkgs.system};
+      };
+
     in (builtins.map (catName: _:
       newLuaBuilder {
+          pkgs = newPkgs;
           inherit dependencyOverlays;
-          pkgs = import newNixpkgs {
-            inherit (pkgs) config;
-            inherit (pkgs) system;
-            overlays = dependencyOverlays.${pkgs.system};
-          };
         } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
     );
   in
