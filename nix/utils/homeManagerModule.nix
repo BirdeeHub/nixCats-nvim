@@ -18,38 +18,17 @@
 
     ${defaultPackageName} = {
 
-      enable = mkOption {
-        default = false;
-        type = types.bool;
-        description = "Enable ${defaultPackageName}";
-      };
-      luaPath = mkOption {
-        default = luaPath;
-        type = types.str;
-        description = ''
-          The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${./.}".
-        '';
-        example = ''"''${./.}/systemLuaConfig"'';
-      };
-      packageNames = mkOption {
-        default = [ "${defaultPackageName}" ];
-        type = (types.listOf types.str);
-        description = ''A list of packages from packageDefinitions to include'';
-        example = ''
-          [ "nixCats" ]
-        '';
-      };
       nixpkgs_version = mkOption {
         default = null;
-        type = types.nullOr (types.functionTo (types.attrsOf types.anything));
+        type = types.nullOr (types.anything);
         description = ''
           a different nixpkgs import to use. By default will use the one from the flake.
         '';
         example = ''
-          import inputs.nixpkgs
+          inputs.nixpkgs
         '';
       };
+
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
@@ -61,6 +40,32 @@
           [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '';
       };
+
+      enable = mkOption {
+        default = false;
+        type = types.bool;
+        description = "Enable ${defaultPackageName}";
+      };
+
+      luaPath = mkOption {
+        default = luaPath;
+        type = types.str;
+        description = ''
+          The path to your nvim config directory in the store.
+          In the base nixCats flake, this is "''${./.}".
+        '';
+        example = ''"''${./.}/userLuaConfig"'';
+      };
+
+      packageNames = mkOption {
+        default = [ "${defaultPackageName}" ];
+        type = (types.listOf types.str);
+        description = ''A list of packages from packageDefinitions to include'';
+        example = ''
+          [ "nixCats" ]
+        '';
+      };
+
       categoryDefinitions = {
         replace = mkOption {
           default = null;
@@ -95,39 +100,54 @@
           '';
         };
       };
+
       packages = mkOption {
         default = null;
         description = ''
-          Same as nixCats settings and categories except, you are in charge of making sure
-          that the aliases don't collide with any other packageDefinitions
+          VERY IMPORTANT when setting aliases for each package,
+          they must not be the same as ANY other neovim package for that user.
+          YOU MAY NOT ALIAS TO NVIM ITSELF
+          It will cause a build conflict.
 
-                a function that recieves a set containing a pkgs instance
-                for the neovim instance being created as input
-                and returns a set containing a settings set and a categories set.
+          You also cannot install nixCats via multiple sources per user.
+          i.e. if you have it installed as a package, you cannot install it
+          as a module.
+
+          However, you can have as many nixCats as you want,
+          as long as you obey those rules.
+          This is a big step up from only being able to have 1 neovim
+          at all per user, so excuse me for the inconvenience. This may be fixed someday.
+
+          for information on the values you may return,
+          see :help nixCats.flake.outputs.settings
+          and :help nixCats.flake.outputs.categories
+          https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/nixCatsFlake.txt
         '';
         type = with types; nullOr (attrsOf (functionTo (attrsOf anything)));
         example = ''
-          { pkgs, ... }: {
-            settings = {
-              wrapRc = true;
-              configDirName = "nixCats-nvim";
-              viAlias = false;
-              vimAlias = false;
-              # nvimSRC = inputs.neovim;
-              customAliases = [ "nixCats" ];
-            };
-            categories = {
-              generalBuildInputs = true;
-              markdown = true;
-              gitPlugins = true;
-              general = true;
-              custom = true;
-              neonixdev = true;
-              debug = false;
-              test = true;
-              lspDebugMode = false;
-              themer = true;
-              colorscheme = "onedark";
+          nixCats.packages = { 
+            nixCats = { pkgs, ... }: {
+              settings = {
+                wrapRc = true;
+                configDirName = "nixCats-nvim";
+                viAlias = false;
+                vimAlias = false;
+                # nvimSRC = inputs.neovim;
+                aliases = [ "nixCats" ];
+              };
+              categories = {
+                generalBuildInputs = true;
+                markdown = true;
+                gitPlugins = true;
+                general = true;
+                custom = true;
+                neonixdev = true;
+                debug = false;
+                test = true;
+                lspDebugMode = false;
+                themer = true;
+                colorscheme = "onedark";
+              };
             };
           }
         '';
