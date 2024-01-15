@@ -133,7 +133,10 @@
     options_set = config.${defaultPackageName};
     dependencyOverlays = oldDependencyOverlays // {
       ${pkgs.system} = [
-        (utils.mergeOverlayLists oldDependencyOverlays.${pkgs.system} options_set.addOverlays)
+        (utils.mergeOverlayLists
+          (utils.mergeOverlayLists
+            oldDependencyOverlays.${pkgs.system} options_set.addOverlays
+          ) pkgs.overlays)
       ];
     };
     mapToPackages = options_set: (let
@@ -158,8 +161,7 @@
           pkgs = import nixpkgs {
             inherit (pkgs) config;
             inherit (pkgs) system;
-            overlays = (utils.mergeOverlayLists
-              dependencyOverlays.${pkgs.system} pkgs.overlays);
+            overlays = dependencyOverlays.${pkgs.system};
           };
         } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
     );
