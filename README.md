@@ -1,7 +1,9 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
 ## attention: this branch is a work in progress.
-Templates are incorrect, and help is outdated.
+> Help is outdated although still useful.
+
+> lazy.nvim wrapper util for nix is awaiting pull request [1259](https://github.com/folke/lazy.nvim/pull/1259)
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
