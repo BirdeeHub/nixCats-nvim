@@ -23,7 +23,7 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction (packageDefinitons.${name}));
+  } // (categoryDefFunction ({ inherit settings categories pkgs name; }));
   inherit (catDefs)
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs
@@ -31,6 +31,7 @@ let
   extraPythonPackages extraPython3Packages
   extraLuaPackages optionalLuaAdditions;
 
+  thisPackage = (packageDefinitons { inherit pkgs; }).${name};
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -42,9 +43,9 @@ let
     configDirName = "nvim";
     customAliases = null;
     nvimSRC = null;
-  } // packageDefinitons.${name}.settings;
+  } // thisPackage.settings;
 
-  categories = packageDefinitons.${name}.categories;
+  categories = thisPackage.categories;
 
 in
   let

@@ -91,7 +91,7 @@
       # see :help nixCats.flake.outputs.categories
       # and
       # :help nixCats.flake.outputs.categoryDefinitions.scheme
-      categoryDefinitions = packageDef: {
+      categoryDefinitions = { pkgs, ... }@packageDef: {
         # to define and use a new category, simply add a new list to a set here, 
         # and later, you will include categoryname = true; in the set you
         # provide when you build the package using this builder function.
@@ -262,7 +262,7 @@
       };
 
       # see :help nixCats.flake.outputs.settings
-      settings = {
+      settings = { pkgs, ... }: {
         nixCats = {
           # will check for config in the store rather than .config
           wrapRc = true;
@@ -291,9 +291,9 @@
       # The get function is to prevent errors when querying subcategories.
 
       # see :help nixCats.flake.outputs.packageDefinitions
-      packageDefinitions = {
+      packageDefinitions = { pkgs, ... }@misc: {
         nixCats = {
-          settings = settings.nixCats; 
+          settings = (settings misc).nixCats ; 
           categories = {
             generalBuildInputs = true;
             markdown = true;
@@ -329,7 +329,7 @@
           };
         };
         regularCats = { 
-          settings = settings.unwrappedLua;
+          settings = (settings misc).unwrappedLua;
           categories = {
             generalBuildInputs = true;
             markdown = true;
@@ -366,11 +366,11 @@
     {
       # this will make a package out of each of the packageDefinitions defined above
       # and set the default package to the one named here.
-      packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+      packages = utils.mkPackages nixCatsBuilder (packageDefinitions { inherit pkgs; }) "nixCats";
 
       # this will make an overlay out of each of the packageDefinitions defined above
       # and set the default overlay to the one named here.
-      overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
+      overlays = utils.mkOverlays nixCatsBuilder (packageDefinitions { inherit pkgs; }) "nixCats";
 
       # choose your package for devShell
       # and add whatever else you want in it.

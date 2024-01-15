@@ -1,5 +1,8 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
+## attentions: this branch is a work in progress.
+> Modules are currently broken, as they are under improvements
+
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
 - Easy-to-use Nix Category system for many configurations in 1 repository! 
