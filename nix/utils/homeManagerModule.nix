@@ -40,8 +40,15 @@
           [ "nixCats" ]
         '';
       };
-      nixpkgs_version = mkPackageOption {
-        default = nixpkgs;
+      nixpkgs_version = mkOption {
+        default = null;
+        type = types.nullOr (types.functionTo (types.attrsOf types.anything));
+        description = ''
+          a different nixpkgs import to use. By default will use the one from the flake.
+        '';
+        example = ''
+          inputs.nixpkgs
+        '';
       };
       addOverlays = mkOption {
         default = [];
@@ -59,11 +66,13 @@
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
+            you should use ''${pkgs.system} provided in the packageDef set
+            to access system specific items.
             Will replace the categoryDefinitions of the flake with this value.
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = packageDef: { }
+            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
         merge = mkOption {
@@ -79,7 +88,7 @@
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = packageDef: { }
+            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
       };
@@ -88,14 +97,17 @@
         description = ''
           Same as nixCats settings and categories except, you are in charge of making sure
           that the aliases don't collide with any other packageDefinitions
-          Will build all included.
         '';
         type = with types; nullOr (attrsOf (submodule {
           options = {
             definition = mkOption {
               default = null;
               type = nullOr (functionTo (attrsOf anything));
-              description = "same as nixCats.categories, but for the extra package";
+              description = ''
+                a function that recieves a set containing a pkgs instance
+                for the neovim instance being created as input
+                and returns a set containing a settings set and a categories set.
+              '';
               example = ''
                 { pkgs, ... }: {
                   settings = {
@@ -139,7 +151,7 @@
           ) pkgs.overlays)
       ];
     };
-    mapToPackages = options_set: (let
+    mapToPackages = options_set: dependencyOverlays: (let
       newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
         then options_set.categoryDefinitions.replace
         else (
@@ -155,10 +167,12 @@
           (if keepLuaBuilder != null
             then keepLuaBuilder else 
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
+      newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
+        then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
     in (builtins.map (catName: _:
       newLuaBuilder {
           inherit dependencyOverlays;
-          pkgs = import nixpkgs {
+          pkgs = import newNixpkgs {
             inherit (pkgs) config;
             inherit (pkgs) system;
             overlays = dependencyOverlays.${pkgs.system};
@@ -167,7 +181,7 @@
     );
   in
   {
-    home.packages = lib.mkIf (options_set.enable) (mapToPackages options_set);
+    home.packages = lib.mkIf options_set.enable (mapToPackages options_set dependencyOverlays);
   };
 
 }

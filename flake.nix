@@ -274,6 +274,7 @@
     # see :help nixCats.flake.outputs.packageDefinitions
     packageDefinitions = {
       nixCats = { pkgs, ... }@misc: {
+        # we pass the arguments to our settings set as well.
         settings = (settings misc).nixCats ; 
         categories = {
           generalBuildInputs = true;
@@ -317,12 +318,8 @@
           general = true;
           custom = true;
           neonixdev = true;
-          debug = false;
           test = true;
           lspDebugMode = false;
-          # by default, we dont want lazy.nvim
-          # we could omit this for the same effect
-          lazy = false;
           themer = true;
           colorscheme = "catppuccin";
           theBestCat = "says meow!!";
@@ -351,9 +348,11 @@
     # this is just for using utils such as pkgs.mkShell
     # The one used to build neovim is resolved inside the builder
     # and is passed to our categoryDefinitions and packageDefinitions
-    pkgs = import inputs.nixpkgs { inherit system; };
+    pkgs = import nixpkgs { inherit system; };
   in
   {
+    # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
+
     # this will make a package out of each of the packageDefinitions defined above
     # and set the default package to the one named here.
     packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
@@ -377,11 +376,14 @@
     inherit customPackager;
     dependencyOverlays = dependencyOverlays.${system};
   }) // {
+
+    # these outputs will be NOT wrapped with ${system}
+
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
       inherit (system_resolved) dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions;
+      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {

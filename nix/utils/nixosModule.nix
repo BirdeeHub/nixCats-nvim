@@ -7,8 +7,10 @@
   , categoryDefinitions
   , packageDefinitions
   , defaultPackageName
+  , utils
+  , nixpkgs
   , ...
-}: utils:
+}:
 
 { config, pkgs, lib, ... }@misc: {
 
