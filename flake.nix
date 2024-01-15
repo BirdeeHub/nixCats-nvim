@@ -374,7 +374,8 @@
 
       # To choose settings and categories from the flake that calls this flake.
       # and you export overlays so people dont have to redefine stuff.
-      inherit customPackager dependencyOverlays;
+      inherit customPackager;
+      dependencyOverlays = dependencyOverlays.${system};
   }) // {
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
