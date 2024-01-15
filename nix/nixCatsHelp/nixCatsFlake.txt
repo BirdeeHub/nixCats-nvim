@@ -467,7 +467,6 @@ They look like this:
 
     # then in the next section, we apply the names as the final input
     inherit (utils) baseBuilder;
-    inherit (system_resolved) dependencyOverlays;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions;
@@ -501,9 +500,6 @@ They look like this:
     # To choose settings and categories from the flake that calls this flake.
     # and you export overlays so people dont have to redefine stuff.
     inherit customPackager;
-    # this one was already in this format, so
-    # we access ${system} so that it doesnt get wrapped twice
-    dependencyOverlays = dependencyOverlays.${system};
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
@@ -511,23 +507,21 @@ They look like this:
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
     };
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
     # and update them into the rest of the outputs returned by the
     # eachDefaultSystem function.
-    inherit utils;
+    inherit utils categoryDefinitions dependencyOverlays packageDefinitions;
     inherit (utils) templates baseBuilder;
-    inherit categoryDefinitions;
-    inherit packageDefinitions;
     keepLuaBuilder = utils.baseBuilder luaPath;
   };
 <

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }: let
+{ config, lib, inputs, ... }: let
   utils = inputs.nixCats.utils;
   # the options for this are defined at the end of the file,
   # and will be how to include this template module in your system configuration.
@@ -25,10 +25,8 @@ in {
       packageNames = [ "myHomeModuleNvim" ];
 
       luaPath = "${./.}";
-      # you could also import lua from the flake though,
-      # which we do for user config after this config for root
+      # you could also import lua from the flake though, by not including this.
 
-      # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
       categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
         propagatedBuildInputs = {

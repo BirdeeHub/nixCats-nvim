@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }: let
+{ config, lib, inputs, ... }: let
   utils = inputs.nixCats.utils;
   # the options for this are defined at the end of the file,
   # and will be how to include this template module in your system configuration.

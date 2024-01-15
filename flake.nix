@@ -398,14 +398,14 @@
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
-      inherit dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
-      inherit dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
     };
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
