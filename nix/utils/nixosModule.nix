@@ -130,10 +130,8 @@
               settings = {
                 wrapRc = true;
                 configDirName = "nixCats-nvim";
-                viAlias = false;
-                vimAlias = false;
                 # nvimSRC = inputs.neovim;
-                aliases = [ "nixCats" ];
+                aliases = [ "vim" "nixCats" ];
               };
               categories = {
                 generalBuildInputs = true;
@@ -155,7 +153,10 @@
 
       users = mkOption {
         default = {};
-        description = "same as system config but per user instead";
+        description = ''
+          same as system config but per user instead
+          and without addOverlays or nixpkgs_version
+        '';
         type = with types; attrsOf (submodule {
           options = {
             enable = mkOption {
@@ -247,10 +248,8 @@
                     settings = {
                       wrapRc = true;
                       configDirName = "nixCats-nvim";
-                      viAlias = false;
-                      vimAlias = false;
                       # nvimSRC = inputs.neovim;
-                      aliases = [ "nixCats" ];
+                      aliases = [ "vim" "nixCats" ];
                     };
                     categories = {
                       generalBuildInputs = true;

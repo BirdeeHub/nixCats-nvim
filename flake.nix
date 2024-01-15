@@ -58,19 +58,34 @@
     extra_pkg_config = {
       # allowUnfree = true;
     };
+    # sometimes our overlays require a ${system} to access the overlay.
+    # management of this variable is one of the harder parts of using flakes.
+
+    # so I have done it here in an interesting way to keep it out of the way.
+
+    # First, we will define just our overlays per system.
+    # later we will pass them into the builder, and the resulting pkgs set
+    # will get passed to the categoryDefinitions and packageDefinitions
+    # which follow this section.
+
+    # this allows you to use pkgs.${system} whenever you want in those sections
+    # without fear.
     system_resolved = flake-utils.lib.eachDefaultSystem (system: let
       # see :help nixCats.flake.outputs.overlays
-      # This overlay grabs all the inputs named in the format
-      # `plugins-<pluginName>`
-      # Once we add this overlay to our nixpkgs, we are able to
-      # use `pkgs.neovimPlugins`, which is a set of our plugins.
       standardPluginOverlay = utils.standardPluginOverlay;
       dependencyOverlays = (import ./overlays inputs) ++ [
+        # This overlay grabs all the inputs named in the format
+        # `plugins-<pluginName>`
+        # Once we add this overlay to our nixpkgs, we are able to
+        # use `pkgs.neovimPlugins`, which is a set of our plugins.
         (standardPluginOverlay inputs)
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
     in {
+      # these overlays will be wrapped with ${system}
+      # and we will call the same flake-utils function
+      # later on to access them.
       inherit dependencyOverlays;
     });
     # see :help nixCats.flake.outputs.categories
@@ -246,7 +261,12 @@
       };
     };
 
-    # And then build a package with specific categories from above here:
+
+
+
+    # packageDefinitions:
+
+    # Now build a package with specific categories from above
     # All categories you wish to include must be marked true,
     # but false may be omitted.
     # This entire set is also passed to nixCats for querying within the lua.
@@ -255,6 +275,7 @@
 
     # see :help nixCats.flake.outputs.packageDefinitions
     packageDefinitions = {
+      # these also recieve our pkgs variable
       nixCats = { pkgs, ... }@misc: {
         # see :help nixCats.flake.outputs.settings
         settings = {
@@ -263,7 +284,8 @@
           configDirName = "nixCats-nvim";
           aliases = [ "vi" "vim" ];
           # nvimSRC = inputs.neovim;
-        }; 
+        };
+        # see :help nixCats.flake.outputs.packageDefinitions
         categories = {
           generalBuildInputs = true;
           markdown = true;
@@ -298,7 +320,7 @@
           # see :help nixCats
         };
       };
-      regularCats = { pkgs, ... }@misc: { 
+      regularCats = { pkgs, ... }@misc: {
         settings = {
           # will check for config in .config rather than the store
           # this is mostly useful for fast iteration while editing lua.
@@ -332,7 +354,11 @@
       };
     };
   in
-    # see :help nixCats.flake.outputs.exports
+
+  # In this section, the main thing you will need to do is change the default package name
+  # to the name of the packageDefinitions entry you wish to use as the default.
+
+  # see :help nixCats.flake.outputs.exports
   flake-utils.lib.eachDefaultSystem (system: let
     inherit (utils) baseBuilder;
     inherit (system_resolved) dependencyOverlays;
