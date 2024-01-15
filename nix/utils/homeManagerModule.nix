@@ -154,9 +154,9 @@
     dependencyOverlays = oldDependencyOverlays // {
       ${pkgs.system} = [
         (utils.mergeOverlayLists
-          (utils.mergeOverlayLists
+          [ (utils.mergeOverlayLists
             oldDependencyOverlays.${pkgs.system} options_set.addOverlays
-          ) pkgs.overlays)
+          ) ] pkgs.overlays)
       ];
     };
     mapToPackages = options_set: dependencyOverlays: (let
@@ -176,14 +176,14 @@
             then keepLuaBuilder else 
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
 
-      # newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
-      #   then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
-      newPkgs = import nixpkgs {
+      newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
+        then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
+      newPkgs = import newNixpkgs {
         inherit (pkgs) config system;
         overlays = dependencyOverlays.${pkgs.system};
       };
 
-    in (builtins.map (catName: _:
+    in (builtins.map (catName:
       newLuaBuilder {
           pkgs = newPkgs;
           inherit dependencyOverlays;
