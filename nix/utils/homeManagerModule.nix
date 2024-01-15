@@ -39,14 +39,14 @@
           [ "nixCats" ]
         '';
       };
-      addOverlays = mkOption {
-        default = [];
-        type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
-        example = ''
-          [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
-        '';
-      };
+      # addOverlays = mkOption {
+      #   default = [];
+      #   type = (types.listOf types.anything);
+      #   description = ''A list of overlays to make available to categoryDefinitions (and pkgs in general)'';
+      #   example = ''
+      #     [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+      #   '';
+      # };
       categoryDefinitions = {
         replace = mkOption {
           default = null;
@@ -127,12 +127,12 @@
 
   config = let
     options_set = config.${defaultPackageName};
-    dependencyOverlays = oldDependencyOverlays // {
-      ${pkgs.system} = [
-        (utils.mergeOverlayLists oldDependencyOverlays.${pkgs.system} options_set.addOverlays)
-      ];
-    };
-    mapToPackages = options_set: dependencyOverlays: (let
+    # dependencyOverlays = oldDependencyOverlays // {
+    #   ${pkgs.system} = [
+    #     (utils.mergeOverlayLists oldDependencyOverlays.${pkgs.system} options_set.addOverlays)
+    #   ];
+    # };
+    mapToPackages = options_set: (let
       newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
         then options_set.categoryDefinitions.replace
         else (
@@ -150,13 +150,13 @@
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
     in (
       builtins.map (catName: _:
-        newLuaBuilder { inherit pkgs dependencyOverlays; } newCategoryDefinitions pkgDefs catName
+        newLuaBuilder { inherit pkgs; dependencyOverlays = oldDependencyOverlays; } newCategoryDefinitions pkgDefs catName
       ) options_set.packageNames)
     );
   in
   {
-    nixpkgs.overlays = dependencyOverlays.${pkgs.system};
-    home.packages = lib.mkIf (options_set.enable) mapToPackages options_set dependencyOverlays;
+    nixpkgs.overlays = oldDependencyOverlays.${pkgs.system};
+    home.packages = lib.mkIf (options_set.enable) mapToPackages options_set;
   };
 
 }
