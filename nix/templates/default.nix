@@ -34,7 +34,7 @@
       :help nixCats.flake.nixperts.overlays
     '';
   };
-  overlayfile = {
+  overlayFile = {
     path = ./overlayfile;
     description = ''
       A template for an empty overlay file defined as described in
