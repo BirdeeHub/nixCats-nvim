@@ -9,16 +9,18 @@ path:
   , dependencyOverlays
   , nixCats_passthru ? {}
   , ...
-}:
+}@attrs:
 categoryDefFunction:
 packageDefinitons: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
-  fpkgs = if pkgs == null && nixpkgs != null && system != null
+  fpkgs = if pkgs == null && !(nixpkgs == null || system == null)
   then import nixpkgs ({
     inherit system;
-    overlays = dependencyOverlays.${system};
+    overlays = if builtins.isList dependencyOverlays
+      then dependencyOverlays
+      else dependencyOverlays.${system};
   } // extra_pkg_config)
   else fpkgs;
   catDefs = {
@@ -215,20 +217,6 @@ in
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
     inherit dependencyOverlays packageDefinitons;
-    nixosModule = (import ../utils).utils.mkNixosModules {
-      defaultPackageName = name;
-      luaPath = path;
-      packageDefinitons = packageDefinitons;
-      categoryDefinitions = categoryDefFunction;
-      inherit dependencyOverlays;
-    };
-    homeModule = (import ../utils).utils.mkHomeModules {
-      defaultPackageName = name;
-      luaPath = path;
-      packageDefinitons = packageDefinitons;
-      categoryDefinitions = categoryDefFunction;
-      inherit dependencyOverlays;
-    };
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
