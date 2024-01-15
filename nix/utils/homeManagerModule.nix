@@ -160,7 +160,7 @@
     );
   in
   {
-    nixpkgs.overlays = dependencyOverlays.${pkgs.system};
+    # nixpkgs.overlays = dependencyOverlays.${pkgs.system};
     home.packages = lib.mkIf (options_set.enable) mapToPackages options_set;
   };
 
