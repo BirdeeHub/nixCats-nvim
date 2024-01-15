@@ -91,10 +91,11 @@ with builtins; rec {
       , categoryDefinitions
       , packageDefinitions
       , defaultPackageName
+      , nixpkgs
       , ... }:
       (import ./homeManagerModule.nix {
         oldDependencyOverlays = dependencyOverlays;
-        inherit luaPath keepLuaBuilder categoryDefinitions
+        inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
           packageDefinitions defaultPackageName utils;
       });
 

@@ -387,7 +387,7 @@
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
       inherit (system_resolved) dependencyOverlays;
-      inherit luaPath categoryDefinitions packageDefinitions;
+      inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
