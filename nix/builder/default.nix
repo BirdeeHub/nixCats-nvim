@@ -52,7 +52,7 @@ let
   settings = {
     wrapRc = true;
     viAlias = false;
-    vimAlias = true;
+    vimAlias = false;
     withNodeJs = false;
     withRuby = true;
     extraName = "";
