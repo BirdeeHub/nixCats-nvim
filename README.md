@@ -78,7 +78,7 @@ Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nv
 It has some stuff for nix, regular plugin setup functions as defined by the plugin rather than lazy,
 and lspconfig instead of mason.
 
-It works as a regular config folder too using the `luaUtils` template and [help: nixCats.luaUtils](./nix/nixCatsHelp/luaUtils.txt).
+It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](./nix/nixCatsHelp/luaUtils.txt).
 
 `luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility of trying to download all the dependencies for your overcomplicated config on a machine without using nix...
 
