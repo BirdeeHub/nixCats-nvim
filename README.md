@@ -1,7 +1,7 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
 ## attention: this branch is a work in progress.
-> Help is outdated although still useful.
+> Help is outdated although still useful. :help nixCats.flake needs updating on the new handling of flake-utils.
 
 > lazy.nvim wrapper util for nix is awaiting pull request [1259](https://github.com/folke/lazy.nvim/pull/1259)
 
@@ -287,14 +287,15 @@ I also borrowed a decent amount of code from nixpkgs and made modifications.
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
   It does not use Nix to manage plugins. Use nixCats after this one if you want to move your version of kickstart to nix.
-- [`neovim-flake`](https://github.com/jordanisaacs/neovim-flake):
-  Configured using a Nix module DSL.
+- [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
+  A project that also holds to a normal neovim config structure. It does not have have categories, exported options, or modules.
+  It starts you at the basics, and doesnt do a lot of extra stuff for you.
+  If mine has too many nix features for you, or you have no ambitions of doing multiple configurations in 1 config file, this is probably your next best starting point.
 - [`NixVim`](https://github.com/nix-community/nixvim):
   A Neovim distribution configured using a NixOS module.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
-- [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project that also holds to a normal neovim config structure, but much simpler in many respects.
-  It does not have have categories, exported options, or modules. Mine is designed to be simple at first and when you are ready, have all the other options you may want already available whereas this one starts at the bottom.
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
+- [`neovim-flake`](https://github.com/jordanisaacs/neovim-flake):
+  Configured using a Nix module DSL.
