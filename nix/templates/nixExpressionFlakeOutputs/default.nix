@@ -1,50 +1,36 @@
-# Copyright (c) 2023 BirdeeHub
-# Licensed under the MIT license
-
-/*
-
-This is a weird way to import nixCats.
-Its actually the one I use. I use it because it allows me to
-output all the nixCats things from my system flake, but also
-to have it integrated into my main config repo,
-and have the same config for system and home-manager.
-
-It has its own problem, the systemPkg thing described below.
-However, you should not see any issues if you use the pkgs generated here.
-
-*/
-
-{inputs, ... }@attrs:
-(inputs.flake-utils.lib.eachDefaultSystem (system: let
-  inherit (inputs) nixpkgs nixCats;
-  inherit (nixCats) utils;
-  # use of this systemPkg variable should be avoided as
-  # it would mean the nvim packages produced
-  # may not be as system independent as expected
-  systemPkgs = if (attrs ? pkgs) then attrs.pkgs else null;
-  # this means you should add any overlays you wish to include for neovim here.
-
-  # this util merges nixCats overlays with this one so we don't have to redefine them
-  # you could just provide a list here.
-  dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system}
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
+{inputs, ... }@attrs: let
+  inherit (inputs) flake-utils nixpkgs;
+  inherit (inputs.nixCats) utils;
+  luaPath = "${./.}";
+  # the following extra_pkg_config contains any values
+  # which you want to pass to the config set of nixpkgs
+  # import nixpkgs { config = extra_pkg_config; inherit system; }
+  # will not apply to module imports
+  # as that will have your system values
+  extra_pkg_config = {
+    # allowUnfree = true;
+  };
+  system_resolved = flake-utils.lib.eachDefaultSystem (system: let
+    # see :help nixCats.flake.outputs.overlays
+    # This overlay grabs all the inputs named in the format
+    # `plugins-<pluginName>`
+    # Once we add this overlay to our nixpkgs, we are able to
+    # use `pkgs.neovimPlugins`, which is a set of our plugins.
+    dependencyOverlays = [ (utils.mergeOverlayLists inputs.nixCats.dependencyOverlays.${system}
     ((import ./overlays inputs) ++ [
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
-    ])
-  ) ];
-  pkgs = import nixpkgs {
-    inherit system;
-    overlays = dependencyOverlays;
-    # config.allowUnfree = true;
-  };
+      inputs.codeium.overlays.${system}.default
+    ])) ];
+  in { inherit dependencyOverlays; });
+  inherit (system_resolved) dependencyOverlays;
 
-  inherit (utils) baseBuilder;
-  nixCatsBuilder = baseBuilder "${./.}" { inherit pkgs dependencyOverlays; } categoryDefinitions packageDefinitions;
-
-  categoryDefinitions = packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 
     propagatedBuildInputs = {
-      general = with pkgs; [
+      generalBuildInputs = with pkgs; [
       ];
     };
 
@@ -54,11 +40,13 @@ However, you should not see any issues if you use the pkgs generated here.
     };
 
     startupPlugins = {
-      general = with pkgs.vimPlugins; [
+      general = [
       ];
     };
 
     optionalPlugins = {
+      customPlugins = with pkgs.nixCatsBuilds; [ ];
+      gitPlugins = with pkgs.neovimPlugins; [ ];
       general = with pkgs.vimPlugins; [ ];
     };
 
@@ -75,63 +63,102 @@ However, you should not see any issues if you use the pkgs generated here.
       ];
     };
 
+    # lists of the functions you would have passed to
+    # python.withPackages or lua.withPackages
+    extraPythonPackages = {
+      test = (_:[]);
+    };
+    extraPython3Packages = {
+      test = (_:[]);
+    };
+    extraLuaPackages = {
+      test = [ (_:[]) ];
+    };
+
   };
 
   packageDefinitions = {
-    nixCats = {
+    nixCats = {pkgs , ... }: {
+      # they contain a settings set defined above
+      # see :help nixCats.flake.outputs.settings
       settings = {
         wrapRc = true;
-        # so that it finds my ai auths in ~/.cache/birdeevim
-        configDirName = "arbitrary-name";
-        viAlias = true;
-        vimAlias = true;
+        # IMPORTANT:
+        # you may not alias to nvim
+        # your alias may not conflict with your other packages.
+        aliases = [ "vim" ];
+        # nvimSRC = inputs.neovim;
       };
+      # and a set of categories that you want
+      # (and other information to pass to lua)
       categories = {
         general = true;
         test = true;
+        example = {
+          youCan = "add more than just booleans";
+          toThisSet = [
+            "and the contents of this categories set"
+            "will be accessible to your lua with"
+            "nixCats('path.to.value')"
+            "see :help nixCats"
+          ];
+        };
       };
     };
   };
 in
-{
-  # packages and overlays here are the same as flake.nix except without the default output
-  packages = (builtins.mapAttrs (name: _: nixCatsBuilder name) packageDefinitions);
+  # see :help nixCats.flake.outputs.exports
+  flake-utils.lib.eachDefaultSystem (system: let
+    inherit (utils) baseBuilder;
+    customPackager = baseBuilder luaPath {
+      inherit system dependencyOverlays extra_pkg_config nixpkgs;
+    } categoryDefinitions;
+    nixCatsBuilder = customPackager packageDefinitions;
+    # this is just for using utils such as pkgs.mkShell
+    # The one used to build neovim is resolved inside the builder
+    # and is passed to our categoryDefinitions and packageDefinitions
+    pkgs = import nixpkgs { inherit system; };
+  in {
+    # this will make a package out of each of the packageDefinitions defined above
+    # and set the default package to the one named here.
+    packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
 
-  overlays = utils.mkExtraOverlays nixCatsBuilder packageDefinitions "nixCats";
+    # this will make an overlay out of each of the packageDefinitions defined above
+    # and set the default overlay to the one named here.
+    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
 
-  devShell = pkgs.mkShell {
-    name = "nixCats";
-    packages = [ (nixCatsBuilder "nixCats") ];
-    inputsFrom = [ ];
-    shellHook = ''
-    '';
-  };
+    # choose your package for devShell
+    # and add whatever else you want in it.
+    devShell = pkgs.mkShell {
+      name = "nixCats";
+      packages = [ (nixCatsBuilder "nixCats") ];
+      inputsFrom = [ ];
+      shellHook = ''
+      '';
+    };
 
-  # To choose settings and categories from the flake that calls this flake.
-  customPackager = baseBuilder "${./.}" { inherit pkgs dependencyOverlays;} categoryDefinitions;
-
-  # and you export this so people dont have to redefine stuff.
-  inherit dependencyOverlays;
-  inherit categoryDefinitions;
-  inherit packageDefinitions;
-
+    # To choose settings and categories from the flake that calls this flake.
+    # and you export overlays so people dont have to redefine stuff.
+    inherit customPackager;
+  }
+) // {
   # we also export a nixos module to allow configuration from configuration.nix
   nixosModules.default = utils.mkNixosModules {
     defaultPackageName = "nixCats";
-    luaPath = "${./.}";
-    inherit dependencyOverlays
-      categoryDefinitions packageDefinitions;
+    inherit dependencyOverlays;
+    inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
   };
   # and the same for home manager
   homeModule = utils.mkHomeModules {
     defaultPackageName = "nixCats";
-    luaPath = "${./.}";
-    inherit dependencyOverlays
-      categoryDefinitions packageDefinitions;
+    inherit dependencyOverlays;
+    inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
   };
-}) // {
-    inherit (inputs.nixCats) utils;
-    inherit (inputs.nixCats.utils) templates baseBuilder;
-    keepLuaBuilder = inputs.nixCats.utils.baseBuilder "${./.}";
-})
-
+  # now we can export some things that can be imported in other
+  # flakes, WITHOUT needing to use a system variable to do it.
+  # and update them into the rest of the outputs returned by the
+  # eachDefaultSystem function.
+  inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
+  inherit (utils) templates baseBuilder;
+  keepLuaBuilder = utils.baseBuilder luaPath;
+}

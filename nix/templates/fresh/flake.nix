@@ -80,12 +80,11 @@
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
-    in {
       # these overlays will be wrapped with ${system}
       # and we will call the same flake-utils function
       # later on to access them.
-      inherit dependencyOverlays;
-    });
+    in { inherit dependencyOverlays; });
+    inherit (system_resolved) dependencyOverlays;
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -100,86 +99,86 @@
       # at BUILD TIME for plugins. WILL NOT be available to PATH
       # However, they WILL be available to the shell 
       # and neovim path when using nix develop
-        propagatedBuildInputs = {
-        };
-
-        # lspsAndRuntimeDeps:
-        # this section is for dependencies that should be available
-        # at RUN TIME for plugins. Will be available to PATH within neovim terminal
-        # this includes LSPs
-        lspsAndRuntimeDeps = {
-        };
-
-        # This is for plugins that will load at startup without using packadd:
-        startupPlugins = {
-        };
-
-        # not loaded automatically at startup.
-        # use with packadd and an autocommand in config to achieve lazy loading
-        optionalPlugins = {
-        };
-
-        # environmentVariables:
-        # this section is for environmentVariables that should be available
-        # at RUN TIME for plugins. Will be available to path within neovim terminal
-        environmentVariables = {
-        };
-
-        # If you know what these are, you can provide custom ones by category here.
-        # If you dont, check this link out:
-        # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-        extraWrapperArgs = {
-        };
-
-        # lists of the functions you would have passed to
-        # python.withPackages or lua.withPackages
-        extraPythonPackages = {
-        };
-        extraPython3Packages = {
-        };
-        extraLuaPackages = {
-        };
+      propagatedBuildInputs = {
       };
 
+      # lspsAndRuntimeDeps:
+      # this section is for dependencies that should be available
+      # at RUN TIME for plugins. Will be available to PATH within neovim terminal
+      # this includes LSPs
+      lspsAndRuntimeDeps = {
+      };
+
+      # This is for plugins that will load at startup without using packadd:
+      startupPlugins = {
+      };
+
+      # not loaded automatically at startup.
+      # use with packadd and an autocommand in config to achieve lazy loading
+      optionalPlugins = {
+      };
+
+      # environmentVariables:
+      # this section is for environmentVariables that should be available
+      # at RUN TIME for plugins. Will be available to path within neovim terminal
+      environmentVariables = {
+      };
+
+      # If you know what these are, you can provide custom ones by category here.
+      # If you dont, check this link out:
+      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+      extraWrapperArgs = {
+      };
+
+      # lists of the functions you would have passed to
+      # python.withPackages or lua.withPackages
+      extraPythonPackages = {
+      };
+      extraPython3Packages = {
+      };
+      extraLuaPackages = {
+      };
+    };
 
 
-      # And then build a package with specific categories from above here:
-      # All categories you wish to include must be marked true,
-      # but false may be omitted.
-      # This entire set is also passed to nixCats for querying within the lua.
 
-      # see :help nixCats.flake.outputs.packageDefinitions
-      packageDefinitions = {
-        # These are the names of your packages
-        # you can include as many as you wish.
-        nixCats = {pkgs , ... }: {
-          # they contain a settings set defined above
-          # see :help nixCats.flake.outputs.settings
-          settings = {
-            wrapRc = true;
-            # IMPORTANT:
-            # you may not alias to nvim
-            # your alias may not conflict with your other packages.
-            aliases = [ "vim" ];
-            # nvimSRC = inputs.neovim;
-          };
-          # and a set of categories that you want
-          # (and other information to pass to lua)
-          categories = {
-            test = true;
-            example = {
-              youCan = "add more than just booleans";
-              toThisSet = [
-                "and the contents of this categories set"
-                "will be accessible to your lua with"
-                "nixCats('path.to.value')"
-                "see :help nixCats"
-              ];
-            };
+    # And then build a package with specific categories from above here:
+    # All categories you wish to include must be marked true,
+    # but false may be omitted.
+    # This entire set is also passed to nixCats for querying within the lua.
+
+    # see :help nixCats.flake.outputs.packageDefinitions
+    packageDefinitions = {
+      # These are the names of your packages
+      # you can include as many as you wish.
+      nixCats = {pkgs , ... }: {
+        # they contain a settings set defined above
+        # see :help nixCats.flake.outputs.settings
+        settings = {
+          wrapRc = true;
+          # IMPORTANT:
+          # you may not alias to nvim
+          # your alias may not conflict with your other packages.
+          aliases = [ "vim" ];
+          # nvimSRC = inputs.neovim;
+        };
+        # and a set of categories that you want
+        # (and other information to pass to lua)
+        categories = {
+          test = true;
+          example = {
+            youCan = "add more than just booleans";
+            toThisSet = [
+              "and the contents of this categories set"
+              "will be accessible to your lua with"
+              "nixCats('path.to.value')"
+              "see :help nixCats"
+            ];
           };
         };
       };
-    in
+    };
+  in
 
 
   # In this section, the main thing you will need to do is change the default package name
@@ -188,7 +187,6 @@
   # see :help nixCats.flake.outputs.exports
   flake-utils.lib.eachDefaultSystem (system: let
     inherit (utils) baseBuilder;
-    inherit (system_resolved) dependencyOverlays;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions;
@@ -222,7 +220,6 @@
     # To choose settings and categories from the flake that calls this flake.
     # and you export overlays so people dont have to redefine stuff.
     inherit customPackager;
-    dependencyOverlays = dependencyOverlays.${system};
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
@@ -230,23 +227,21 @@
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
+      inherit dependencyOverlays;
       inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
+      inherit dependencyOverlays;
       inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
     # and update them into the rest of the outputs returned by the
     # eachDefaultSystem function.
-    inherit utils;
+    inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
     inherit (utils) templates baseBuilder;
-    inherit categoryDefinitions;
-    inherit packageDefinitions;
     keepLuaBuilder = utils.baseBuilder luaPath;
   };
 

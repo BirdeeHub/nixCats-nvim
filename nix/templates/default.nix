@@ -27,7 +27,7 @@
       when your config file is not loaded via nix.
     '';
   };
-  overlayConsolidator = {
+  overlayHub = {
     path = ./overlayHub;
     description = ''
       A template for overlays/default.nix
@@ -60,13 +60,6 @@
       The entirety of the main init.lua file implemented as a nixCats flake.
       With additional nix items for sanity.
       This is to serve as the tutorial for using the nixCats lazy wrapper.
-    '';
-  };
-  mergeFlakeWithExisting = {
-    path = ./touchUpExisting;
-    description = ''
-      An EXAMPLE template showing how to merge in parts of other
-      nixCats repos into a flake setup.
     '';
   };
 }

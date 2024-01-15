@@ -72,22 +72,20 @@
     # without fear.
     system_resolved = flake-utils.lib.eachDefaultSystem (system: let
       # see :help nixCats.flake.outputs.overlays
-      standardPluginOverlay = utils.standardPluginOverlay;
       dependencyOverlays = (import ./overlays inputs) ++ [
         # This overlay grabs all the inputs named in the format
         # `plugins-<pluginName>`
         # Once we add this overlay to our nixpkgs, we are able to
         # use `pkgs.neovimPlugins`, which is a set of our plugins.
-        (standardPluginOverlay inputs)
+        (utils.standardPluginOverlay inputs)
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
-    in {
       # these overlays will be wrapped with ${system}
       # and we will call the same flake-utils function
       # later on to access them.
-      inherit dependencyOverlays;
-    });
+    in { inherit dependencyOverlays; });
+    inherit (system_resolved) dependencyOverlays;
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -361,7 +359,6 @@
   # see :help nixCats.flake.outputs.exports
   flake-utils.lib.eachDefaultSystem (system: let
     inherit (utils) baseBuilder;
-    inherit (system_resolved) dependencyOverlays;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions;
@@ -370,8 +367,7 @@
     # The one used to build neovim is resolved inside the builder
     # and is passed to our categoryDefinitions and packageDefinitions
     pkgs = import nixpkgs { inherit system; };
-  in
-  {
+  in {
     # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
 
     # this will make a package out of each of the packageDefinitions defined above
@@ -395,7 +391,6 @@
     # To choose settings and categories from the flake that calls this flake.
     # and you export overlays so people dont have to redefine stuff.
     inherit customPackager;
-    dependencyOverlays = dependencyOverlays.${system};
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
@@ -403,23 +398,21 @@
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
+      inherit dependencyOverlays;
       inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
-      inherit (system_resolved) dependencyOverlays;
+      inherit dependencyOverlays;
       inherit luaPath categoryDefinitions packageDefinitions nixpkgs;
     };
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
     # and update them into the rest of the outputs returned by the
     # eachDefaultSystem function.
-    inherit utils;
+    inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
     inherit (utils) templates baseBuilder;
-    inherit categoryDefinitions;
-    inherit packageDefinitions;
     keepLuaBuilder = utils.baseBuilder luaPath;
   };
 
