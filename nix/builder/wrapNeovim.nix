@@ -20,7 +20,7 @@ rec {
     , extraName ? ""
     , nixCats
     , runB4Config
-    , customAliases
+    , aliases
     , nixCats_passthru ? {}
   }:
     let
@@ -80,6 +80,8 @@ rec {
       # I handle this with customRC 
       # otherwise it will get loaded in at the wrong time after startup plugins.
       wrapRc = true;
-      inherit nixCats customAliases nixCats_passthru;
+      customAliases = aliases;
+      inherit (nixCats_passthru) nixCats_packageName;
+      inherit nixCats nixCats_passthru;
   });
 }

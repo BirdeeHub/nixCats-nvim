@@ -38,6 +38,7 @@ let
     # entry to load in packpath
     , packpathDirs
     , nixCats
+    , nixCats_packageName
     , customAliases ? null
     , nixCats_passthru ? {}
     , ...
@@ -81,7 +82,7 @@ let
     # wrapper with most arguments we need, excluding those that cause problems to
     # generate rplugin.vim, but still required for the final wrapper.
     finalMakeWrapperArgs =
-      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_passthru.nixCats_packageName}" ]
+      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
       ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
       ++ lib.optionals finalAttrs.wrapRc [ "--add-flags" "-u ${writeText "init.lua" rcContent}" ]
       ++ finalAttrs.generatedWrapperArgs
@@ -103,8 +104,8 @@ let
       # extra actions upon
       postBuild = lib.optionalString stdenv.isLinux ''
         rm $out/share/applications/nvim.desktop
-        substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_passthru.nixCats_packageName}.desktop \
-          --replace 'Name=Neovim' 'Name=${nixCats_passthru.nixCats_packageName}'
+        substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
+          --replace 'Name=Neovim' 'Name=${nixCats_packageName}'
       ''
       + lib.optionalString finalAttrs.withPython3 ''
         makeWrapper ${python3Env.interpreter} $out/bin/nvim-python3 --unset PYTHONPATH
@@ -119,14 +120,14 @@ let
         ln -s ${perlEnv}/bin/perl $out/bin/nvim-perl
       ''
       + lib.optionalString finalAttrs.vimAlias ''
-        ln -s $out/bin/${nixCats_passthru.nixCats_packageName} $out/bin/vim
+        ln -s $out/bin/${nixCats_packageName} $out/bin/vim
       ''
       + lib.optionalString finalAttrs.viAlias ''
-        ln -s $out/bin/${nixCats_passthru.nixCats_packageName} $out/bin/vi
+        ln -s $out/bin/${nixCats_packageName} $out/bin/vi
       ''
       + lib.optionalString (customAliases != null)
       (builtins.concatStringsSep "\n" (builtins.map (alias: ''
-        ln -s $out/bin/${nixCats_passthru.nixCats_packageName} $out/bin/${alias}
+        ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
       '') customAliases))
       + lib.optionalString (manifestRc != null) (let
         manifestWrapperArgs =
