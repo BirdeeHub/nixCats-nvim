@@ -280,7 +280,7 @@
           # will check for config in the store rather than .config
           wrapRc = true;
           configDirName = "nixCats-nvim";
-          aliases = [ "vi" "vim" ];
+          aliases = [ "vim" "vimcat" ];
           # nvimSRC = inputs.neovim;
         };
         # see :help nixCats.flake.outputs.packageDefinitions
