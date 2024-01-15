@@ -1,8 +1,7 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
 ## attention: this branch is a work in progress.
-Templates are incorrect.
-Modules work once again.
+Templates are incorrect, and help is outdated.
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
