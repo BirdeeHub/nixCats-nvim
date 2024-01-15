@@ -24,7 +24,7 @@
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
 
-> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH, something nix normally does not allow.
+> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module, something that would normally cause a collision error.
 
 ## Introduction
 
@@ -269,7 +269,7 @@ in another flake without having to redefine things (although you can only either
 Specific to my project:
 
 You cannot launch nvim with nvim and must choose an alias.
-This is the trade off for installing multiple versions of the same version of nvim to the same user's PATH.
+This is the trade off for installing multiple versions of the same version of nvim to the same user's PATH from a module, something that would normally cause a collision error.
 
 General nix + nvim things:
 
