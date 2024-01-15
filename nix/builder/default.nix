@@ -40,7 +40,7 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction ({ inherit settings categories name; system = fpkgs.pkgs; pkgs = fpkgs; }));
+  } // (categoryDefFunction ({ inherit settings categories name; pkgs = fpkgs; }));
   inherit (catDefs)
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs

@@ -40,6 +40,9 @@
           [ "nixCats" ]
         '';
       };
+      nixpkgs_version = mkPackageOption {
+        default = nixpkgs;
+      };
       addOverlays = mkOption {
         default = [];
         type = (types.listOf types.anything);
@@ -150,13 +153,15 @@
             then keepLuaBuilder else 
             builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
     in (builtins.map (catName: _:
-        newLuaBuilder {
-            inherit dependencyOverlays;
-            pkgs = import nixpkgs {
-              inherit pkgs;
-              overlays = dependencyOverlays.${pkgs.system};
-            };
-          } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
+      newLuaBuilder {
+          inherit dependencyOverlays;
+          pkgs = import nixpkgs {
+            inherit (pkgs) config;
+            inherit (pkgs) system;
+            overlays = (utils.mergeOverlayLists
+              dependencyOverlays.${pkgs.system} pkgs.overlays);
+          };
+        } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
     );
   in
   {
