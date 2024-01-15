@@ -1,7 +1,8 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-## attentions: this branch is a work in progress.
-> Modules are currently broken, as they are under improvements
+## attention: this branch is a work in progress.
+Templates are incorrect.
+Modules work once again.
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
@@ -18,6 +19,11 @@
   - (currently uses my fork of lazy.nvim, pending PR for the 2 options added, https://github.com/folke/lazy.nvim/pull/1259)
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
+
+## Attention:
+> You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
+
+> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH, something nix normally does not allow.
 
 ## Introduction
 
