@@ -1,6 +1,6 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-rec {
+with builtins; rec {
 
   # These are to be exported in flake outputs
   utils = {
@@ -16,7 +16,10 @@ rec {
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
-      // (builtins.mapAttrs (name: _: finalBuilder name) packageDefinitions);
+      // utils.mkExtraPackages finalBuilder packageDefinitions;
+
+    mkExtraPackages = finalBuilder: packageDefinitions:
+    (mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
     # makes an overlay you can add to allow importing as pkgs.packageName
     # and also a default overlay similarly to above but for overlays.
@@ -29,15 +32,15 @@ rec {
       { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); };
 
     mkExtraOverlays = finalBuilder: packageDefinitions:
-      builtins.mapAttrs (name: _: (self: super: { ${name} = finalBuilder name; })) packageDefinitions;
+      (mapAttrs (name: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
 
     # maybe you want multiple nvim packages in the same system and want
     # to add them like pkgs.MyNeovims.packageName when you install them?
     # both to keep it organized and also to not have to worry about naming conflicts with programs?
-    mkMultiOverlay = finalBuilder: packageDefinitions: importName: namesIncList:
+    mkMultiOverlay = finalBuilder: importName: namesIncList:
       (self: super: {
-        ${importName} = builtins.listToAttrs (
-          builtins.map
+        ${importName} = listToAttrs (
+          map
             (name:
               {
                 inherit name;
@@ -58,7 +61,7 @@ rec {
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
     # Merges everything into 1 overlay
-    mergeOverlayLists = with builtins; oldOverlist: newOverlist: self: super: let
+    mergeOverlayLists = oldOverlist: newOverlist: self: super: let
       oldOversMapped = map (value: value self super) oldOverlist;
       newOversMapped = map (value: value self super) newOverlist;
       combinedOversCalled = oldOversMapped ++ newOversMapped;
@@ -102,7 +105,7 @@ rec {
   # 2 recursive functions that rely on each other to
   # convert nix attrsets and lists to Lua tables and lists of strings, 
   # while literally translating booleans and null
-  luaTablePrinter = with builtins; attrSet: let
+  luaTablePrinter = attrSet: let
     luatableformatter = attrSet: let
       nameandstringmap = mapAttrs (n: value: let
           name = ''[ [[${n}]] ]'';
@@ -124,7 +127,7 @@ rec {
   in
   LuaTable;
 
-  luaListPrinter = with builtins; theList: let
+  luaListPrinter = theList: let
     lualistformatter = theList: let
       stringlist = map (value:
         if value == true then "true"
@@ -155,9 +158,9 @@ rec {
     flattenAttrMapLeaves twoArgFunc (RecFilterCats categories categoryDefs);
 
   filterAndFlattenMapInner = categories: oneArgFunc: SetOfCategoryLists:
-    builtins.map oneArgFunc (filterAndFlatten categories SetOfCategoryLists);
+    map oneArgFunc (filterAndFlatten categories SetOfCategoryLists);
 
-  RecFilterForTrue = with builtins; categories: let 
+  RecFilterForTrue = categories: let 
     filterIt = attr: (lib.filterAttrs (name: value:
         if isBool value
         then value
@@ -172,7 +175,7 @@ rec {
   mapper categories;
 
   # Overlays values in place of filtered true values from above
-  RecFilterCats = with builtins; categories: categoryDefs: let
+  RecFilterCats = categories: categoryDefs: let
     mapper = subCats: defAttrs: mapAttrs 
         (name: value: let
           newDefAttr = getAttr name defAttrs;
@@ -184,13 +187,13 @@ rec {
   in
   mapper (RecFilterForTrue categories) categoryDefs;
 
-  flattenToList = with builtins; attrset: concatMap
+  flattenToList = attrset: concatMap
     (v:
       if isAttrs v && !lib.isDerivation v then flattenToList v else
       (if isList v then v else [v])
     ) (attrValues attrset);
 
-  flattenAttrMapLeaves = with builtins; twoArgFunc: attrset: let
+  flattenAttrMapLeaves = twoArgFunc: attrset: let
     mapAttrValues = attr: attrValues (mapAttrs (name: value:
         if (isList value || isAttrs value)
         then value
@@ -204,7 +207,7 @@ rec {
   flatten attrset;
 
   # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
-  lib = with builtins; {
+  lib = {
     isDerivation = value: value.type or null == "derivation";
 
     recursiveUpdateUntil = pred: lhs: rhs:

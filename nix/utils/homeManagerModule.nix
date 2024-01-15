@@ -166,7 +166,7 @@
 
   config = let
     options_set = config.${defaultPackageName};
-    dependencyOverlays = [ (utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays) ];
+    dependencyOverlays = [ (utils.mergeOverlayLists oldDependencyOverlays.${pkgs.system} options_set.addOverlays) ];
     newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
       then options_set.categoryDefinitions.replace
       else (

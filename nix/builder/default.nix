@@ -1,11 +1,26 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-path: { pkgs, dependencyOverlays, nixCats_passthru ? {}, ... }:
+path:
+{
+  pkgs ? null
+  , nixpkgs ? null
+  , extra_pkg_config ? {}
+  , system ? null
+  , dependencyOverlays
+  , nixCats_passthru ? {}
+  , ...
+}:
 categoryDefFunction:
 packageDefinitons: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
+  fpkgs = if pkgs == null && nixpkgs != null && system != null
+  then import nixpkgs ({
+    inherit system;
+    overlays = dependencyOverlays.${system};
+  } // extra_pkg_config)
+  else fpkgs;
   catDefs = {
     startupPlugins = {};
     optionalPlugins = {};
@@ -23,7 +38,7 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction ({ inherit settings categories pkgs name; }));
+  } // (categoryDefFunction ({ inherit settings categories name; pkgs = fpkgs; }));
   inherit (catDefs)
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs
@@ -31,7 +46,7 @@ let
   extraPythonPackages extraPython3Packages
   extraLuaPackages optionalLuaAdditions;
 
-  thisPackage = (packageDefinitons { inherit pkgs; }).${name};
+  thisPackage = packageDefinitons.${name} { pkgs = fpkgs; };
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -50,7 +65,7 @@ let
 in
   let
     # copy entire flake to store directory
-    LuaConfig = pkgs.stdenv.mkDerivation {
+    LuaConfig = fpkgs.stdenv.mkDerivation {
       name = "nixCats-special-rtp-entry-LuaConfig";
       builder = builtins.toFile "builder.sh" /* bash */ ''
         source $stdenv/setup
@@ -63,16 +78,16 @@ in
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = { ... }@allDeps:
-    pkgs.stdenv.mkDerivation (let
+    fpkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
           nixCats_wrapRc = settings.wrapRc;
           nixCats_packageName = name;
           nixCats_store_config_location = "${LuaConfig}";
         };
-      init = pkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
+      init = fpkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
-      cats = pkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-      depsTable = pkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
+      cats = fpkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+      depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
     in {
       name = "nixCats";
       src = ../nixCatsHelp;
@@ -111,7 +126,7 @@ in
       LuaAdditions = if builtins.isString optionalLuaAdditions
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
-          (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+          (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in # just in case someone overwrites it.
     (if settings.wrapRc then /* vim */ ''
       let configdir = "${LuaConfig}"
@@ -130,9 +145,9 @@ in
     filterAndFlatten = (import ../utils)
           .filterAndFlatten categories;
 
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
-    start = pkgs.lib.unique (filterAndFlatten startupPlugins);
-    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
+    buildInputs = [ fpkgs.stdenv.cc.cc.lib ] ++ fpkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    start = fpkgs.lib.unique (filterAndFlatten startupPlugins);
+    opt = fpkgs.lib.unique (filterAndFlatten optionalPlugins);
 
     # For wrapperArgs:
     # This one filters and flattens like above but for attrs of attrs 
@@ -157,7 +172,7 @@ in
 
     # add any dependencies/lsps/whatever we need available at runtime
     FandF_WrapRuntimeDeps = filterAndFlattenMapInner (value:
-      ''--prefix PATH : "${pkgs.lib.makeBinPath [ value ] }"''
+      ''--prefix PATH : "${fpkgs.lib.makeBinPath [ value ] }"''
     );
 
     # extraPythonPackages and the like require FUNCTIONS that return lists.
@@ -167,7 +182,7 @@ in
       (x: let
         appliedfunctions = filterAndFlattenMapInner (value: (value) x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
-        uniquifiedList = pkgs.lib.unique combinedFuncRes;
+        uniquifiedList = fpkgs.lib.unique combinedFuncRes;
       in
       uniquifiedList);
 
@@ -179,21 +194,21 @@ in
         || settings.configDirName != "nvim"
         then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
-      ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
-      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
-      ++ (pkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
+      ++ (fpkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
+      ++ (fpkgs.lib.unique (FandF_envVarSet environmentVariables))
+      ++ (fpkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     );
 
     # add our propagated build dependencies
-    myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+    myNeovimUnwrapped = fpkgs.neovim-unwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
     });
 
   in
   # add our lsps and plugins and our config, and wrap it all up!
-(import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
+(import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
   nixCats_passthru = nixCats_passthru // {
     keepLuaBuilder = (import ../utils).utils.baseBuilder path;
     nixCats_packageName = name;
