@@ -47,7 +47,7 @@
           a different nixpkgs import to use. By default will use the one from the flake.
         '';
         example = ''
-          inputs.nixpkgs
+          import inputs.nixpkgs
         '';
       };
       addOverlays = mkOption {
@@ -138,13 +138,6 @@
 
   config = let
     options_set = config.${defaultPackageName};
-    # dependencyOverlays = oldDependencyOverlays // {
-    #   ${pkgs.system} = [
-    #     (utils.mergeOverlayLists
-    #       oldDependencyOverlays.${pkgs.system} options_set.addOverlays
-    #     )
-    #   ];
-    # };
     dependencyOverlays = oldDependencyOverlays // {
       ${pkgs.system} = [
         (utils.mergeOverlayLists
@@ -172,14 +165,13 @@
 
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
-      newPkgs = import newNixpkgs {
-        inherit (pkgs) config system;
-        overlays = dependencyOverlays.${pkgs.system};
-      };
 
     in (builtins.map (catName:
       newLuaBuilder {
-          pkgs = newPkgs;
+          pkgs =  import newNixpkgs {
+            inherit (pkgs) config system;
+            overlays = dependencyOverlays.${pkgs.system};
+          };
           inherit dependencyOverlays;
         } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
     );
