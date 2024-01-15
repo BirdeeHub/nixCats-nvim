@@ -154,13 +154,12 @@
             inherit dependencyOverlays;
             pkgs = import nixpkgs {
               inherit pkgs;
-              overlays = oldDependencyOverlays.${pkgs.system};
+              overlays = dependencyOverlays.${pkgs.system};
             };
           } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
     );
   in
   {
-    # nixpkgs.overlays = dependencyOverlays.${pkgs.system};
     home.packages = lib.mkIf (options_set.enable) (mapToPackages options_set);
   };
 
