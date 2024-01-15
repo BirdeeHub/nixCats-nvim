@@ -5,7 +5,7 @@
   cfg = config.myNixCats;
 in {
   imports = [
-    inputs.nixCats.homeModule.${pkgs.system}
+    inputs.nixCats.homeModule
   ];
   config = {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
@@ -18,10 +18,11 @@ in {
       enable = true;
       # this will add the overlays from ./overlays and also,
       # add any plugins in inputs named "plugins-pluginName" to pkgs.neovimPlugins
+      # It will not apply to overall system, just nixCats.
       addOverlays = (import ./overlays inputs) ++ [
         (utils.standardPluginOverlay inputs)
       ];
-      packageName = "myHomeModuleNvim";
+      packageNames = [ "myHomeModuleNvim" ];
 
       luaPath = "${./.}";
       # you could also import lua from the flake though,
@@ -29,7 +30,7 @@ in {
 
       # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
-      categoryDefinitions.replace = (packageDef: {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
         propagatedBuildInputs = {
           # add to general or create a new list called whatever
           general = [];
@@ -75,118 +76,38 @@ in {
         };
       });
 
-      settings = if cfg.settings != null then cfg.settings
-      else {
-        # This folder is ran from the store
-        # if wrapRc = true;
-        # since this is in our main config folder,
-        # rather than in ~/.config/configDirName
-        # this should always be true.
-        wrapRc = true;
-        # It will look for configDirName in .local, etc
-        # this name does not need to match packageName
-        configDirName = "myHomeModuleNvim";
-        viAlias = false;
-        vimAlias = true;
-      };
-
-      categories = if cfg.categories != null then cfg.categories
-      else {
-        # themer = true;
-        # colorscheme = catppuccin;
-        general = true;
-        test = true;
-      };
-
-      extraPackageDefs = {
-        xtravim = {
+      # see :help nixCats.flake.outputs.packageDefinitions
+      packages = {
+        # These are the names of your packages
+        # you can include as many as you wish.
+        myHomeModuleNvim = {pkgs , ... }: {
+          # they contain a settings set defined above
+          # see :help nixCats.flake.outputs.settings
           settings = {
             wrapRc = true;
-            configDirName = "myHomeModuleNvim";
-            customAliases = [ "xtravim" ];
+            # IMPORTANT:
+            # you may not alias to nvim
+            # your alias may not conflict with your other packages.
+            aliases = [ "vim" "homeVim" ];
             # nvimSRC = inputs.neovim;
           };
+          # and a set of categories that you want
+          # (and other information to pass to lua)
           categories = {
-            general = true;
             test = true;
+            example = {
+              youCan = "add more than just booleans";
+              toThisSet = [
+                "and the contents of this categories set"
+                "will be accessible to your lua with"
+                "nixCats('path.to.value')"
+                "see :help nixCats"
+              ];
+            };
           };
         };
-      } // (if cfg.extraPackageDefs != null
-        then cfg.extraPackageDefs else {});
-
-    };
-  };
-
-  # this module will export these options for your main configuration file.
-  # you will set up the configuration here, and you may tweak it there with these
-  options = with lib; {
-    myNixCats = {
-      enable = mkOption {
-        default = false;
-        type = types.bool;
-        description = "Enable myHomeModuleNvim";
-      };
-      settings = mkOption {
-        default = null;
-        type = types.nullOr (types.attrsOf types.anything);
-        description = "You may optionally provide a new category set for packageDefinitions";
-        example = ''
-          {
-            wrapRc = true;
-            configDirName = "myHomeModuleNvim";
-            # nvimSRC = inputs.neovim;
-          }
-        '';
-      };
-      categories = mkOption {
-        default = null;
-        type = types.nullOr (types.attrsOf types.anything);
-        description = "You may optionally provide a new category set for packageDefinitions";
-        example = ''
-          {
-            general = true;
-            test = true;
-          }
-        '';
-      };
-      extraPackageDefs = mkOption {
-        default = null;
-        description = ''
-          Same as nixCats settings and categories except, you are in charge of making sure
-          that the aliases don't collide with any other packageDefinitions
-          Will build all included.
-        '';
-        type = with types; nullOr (attrsOf (submodule {
-          options = {
-            settings = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = ''
-                Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
-              '';
-              example = ''
-                {
-                  wrapRc = true;
-                  configDirName = "nixCats-nvim";
-                  customAliases = [ "xtravim" ];
-                  # nvimSRC = inputs.neovim;
-                }
-              '';
-            };
-            categories = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = "same as nixCats.categories, but for the extra package";
-              example = ''
-                {
-                  general = true;
-                  test = true;
-                }
-              '';
-            };
-          };
-        }));
       };
     };
   };
+
 }

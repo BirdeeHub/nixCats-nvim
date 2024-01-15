@@ -5,7 +5,7 @@
   cfg = config.myNixCats;
 in {
   imports = [
-    inputs.nixCats.nixosModules.${pkgs.system}.default
+    inputs.nixCats.nixosModules.default
   ];
   config = {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
@@ -18,10 +18,11 @@ in {
       enable = true;
       # this will add the overlays from ./overlays and also,
       # add any plugins in inputs named "plugins-pluginName" to pkgs.neovimPlugins
+      # It will not apply to overall system, just nixCats.
       addOverlays = (import ./overlays inputs) ++ [
         (utils.standardPluginOverlay inputs)
       ];
-      packageName = "myNixModuleNvim";
+      packageNames = [ "myNixModuleNvim" ];
 
       luaPath = "${./.}";
       # you could also import lua from the flake though,
@@ -29,7 +30,7 @@ in {
 
       # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
-      categoryDefinitions.replace = (packageDef: {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
         propagatedBuildInputs = {
           # add to general or create a new list called whatever
           general = [];
@@ -75,52 +76,43 @@ in {
         };
       });
 
-      settings = if cfg.settings != null then cfg.settings
-      else {
-        # This folder is ran from the store
-        # if wrapRc = true;
-        # since this is in our main config folder,
-        # rather than in ~/.config/configDirName
-        # this should always be true.
-        wrapRc = true;
-        # It will look for configDirName in .local, etc
-        # this name does not need to match packageName
-        configDirName = "myNixModuleNvim";
-        viAlias = false;
-        vimAlias = true;
-      };
-
-      categories = if cfg.categories != null then cfg.categories
-      else {
-        # themer = true;
-        # colorscheme = catppuccin;
-        general = true;
-        test = true;
-      };
-
-      extraPackageDefs = {
-        xtravim = {
+      # see :help nixCats.flake.outputs.packageDefinitions
+      packages = {
+        # These are the names of your packages
+        # you can include as many as you wish.
+        myNixModuleNvim = {pkgs , ... }: {
+          # they contain a settings set defined above
+          # see :help nixCats.flake.outputs.settings
           settings = {
             wrapRc = true;
-            configDirName = "nixCats-nvim";
-            customAliases = [ "xtravim" ];
+            # IMPORTANT:
+            # you may not alias to nvim
+            # your alias may not conflict with your other packages.
+            aliases = [ "vim" "systemVim" ];
             # nvimSRC = inputs.neovim;
           };
+          # and a set of categories that you want
+          # (and other information to pass to lua)
           categories = {
-            general = true;
             test = true;
+            example = {
+              youCan = "add more than just booleans";
+              toThisSet = [
+                "and the contents of this categories set"
+                "will be accessible to your lua with"
+                "nixCats('path.to.value')"
+                "see :help nixCats"
+              ];
+            };
           };
         };
-      } // (if cfg.extraPackageDefs != null
-        then cfg.extraPackageDefs else {});
+      };
 
 
 
-      # and other options for the user REPLACE_ME
-      # It is highly suggested to use home manager instead of these options
       users.REPLACE_ME = {
         enable = true;
-        packageName = "nixCats";
+        packageNames = [ "REPLACE_MEs_VIM" ];
         # this will be the base nixCats but with eyeliner-nvim and tokyonight
         # this one imports the lua from nixCats and adds the plugin.
         # categoryDefinitions.merge will recursively update them
@@ -128,7 +120,7 @@ in {
         # or add new ones, as we do here.
         # For environmentVariables, it will update them individually rather than by category.
         # this is because each category of environmentVariables is a set rather than a list.
-        categoryDefinitions.merge = (packageDef: {
+        categoryDefinitions.merge = ({ pkgs, settings, categories, name, ... }@packageDef: {
           startupPlugins = {
             eyeliner = with pkgs.vimPlugins; [
               eyeliner-nvim
@@ -145,85 +137,52 @@ in {
             '';
           };
         });
-        # enable the category
-        categories = inputs.nixCats.packageDefinitions.${pkgs.system}.nixCats.categories
-        // {
-          eyeliner = true;
-          colorscheme = "tokyonight";
-        };
-      };
-    };
-  };
-
-  # this module will export these options for your main configuration file.
-  # you will set up the configuration here, and you may tweak it there with these
-  options = with lib; {
-    myNixCats = {
-      enable = mkOption {
-        default = false;
-        type = types.bool;
-        description = "Enable myNixModuleNvim";
-      };
-      settings = mkOption {
-        default = null;
-        type = types.nullOr (types.attrsOf types.anything);
-        description = "You may optionally provide a new category set for packageDefinitions";
-        example = ''
-          {
-            wrapRc = true;
-            configDirName = "myNixModuleNvim";
-            # nvimSRC = inputs.neovim;
-          }
-        '';
-      };
-      categories = mkOption {
-        default = null;
-        type = types.nullOr (types.attrsOf types.anything);
-        description = "You may optionally provide a new category set for packageDefinitions";
-        example = ''
-          {
-            general = true;
-            test = true;
-          }
-        '';
-      };
-      extraPackageDefs = mkOption {
-        default = null;
-        description = ''
-          Same as nixCats settings and categories except, you are in charge of making sure
-          that the aliases don't collide with any other packageDefinitions
-          Will build all included.
-        '';
-        type = with types; nullOr (attrsOf (submodule {
-          options = {
-            settings = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = ''
-                Same as nixCats.settings except, you are in charge of making sure the aliases don't collide with any other packageDefinitions
-              '';
-              example = ''
-                {
-                  wrapRc = true;
-                  configDirName = "nixCats-nvim";
-                  customAliases = [ "xtravim" ];
-                  # nvimSRC = inputs.neovim;
-                }
-              '';
+        packages = {
+          REPLACE_MEs_VIM = {pkgs, ...}: {
+            settings = {
+              # will check for config in the store rather than .config
+              wrapRc = true;
+              configDirName = "nixCats-nvim";
+              aliases = [ "REPLACE_MY_VIM" ];
+              # nvimSRC = inputs.neovim;
             };
-            categories = mkOption {
-              default = {};
-              type = (types.attrsOf types.anything);
-              description = "same as nixCats.categories, but for the extra package";
-              example = ''
-                {
-                  general = true;
-                  test = true;
-                }
-              '';
+            # see :help nixCats.flake.outputs.packageDefinitions
+            categories = {
+              generalBuildInputs = true;
+              markdown = true;
+              general.vimPlugins = true;
+              general.gitPlugins = true;
+              custom = true;
+              neonixdev = true;
+              test = {
+                subtest1 = true;
+              };
+              debug = false;
+              # this does not have an associated category of plugins, 
+              # but lua can still check for it
+              lspDebugMode = false;
+              # by default, we dont want lazy.nvim
+              # we could omit this for the same effect
+              lazy = false;
+              eyeliner = true;
+              # you could also pass something else:
+              themer = true;
+              colorscheme = "tokyonight";
+              theBestCat = "says meow!!";
+              theWorstCat = {
+                thing'1 = [ "MEOW" "HISSS" ];
+                thing2 = [
+                  {
+                    thing3 = [ "give" "treat" ];
+                  }
+                  "I LOVE KEYBOARDS"
+                ];
+                thing4 = "couch is for scratching";
+              };
+              # see :help nixCats
             };
           };
-        }));
+        };
       };
     };
   };
