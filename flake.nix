@@ -52,7 +52,9 @@
     luaPath = "${./.}";
     # the following extra_pkg_config contains any values
     # which you want to pass to the config set of nixpkgs
-    # import nixpkgs (with config; { })
+    # import nixpkgs { config = extra_pkg_config; inherit system; }
+    # will not apply to module imports
+    # as that will have your system values
     extra_pkg_config = {
       # allowUnfree = true;
     };
@@ -68,7 +70,9 @@
         # add any flake overlays here.
         inputs.nixd.overlays.default
       ];
-    in { inherit dependencyOverlays; });
+    in {
+      inherit dependencyOverlays;
+    });
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -242,28 +246,6 @@
       };
     };
 
-    # see :help nixCats.flake.outputs.settings
-    settings = { pkgs, ... }: {
-      nixCats = {
-        # will check for config in the store rather than .config
-        wrapRc = true;
-        configDirName = "nixCats-nvim";
-        viAlias = false;
-        vimAlias = true;
-        # nvimSRC = inputs.neovim;
-      };
-      unwrappedLua = {
-        # will check for config in .config rather than the store
-        # this is mostly useful for fast iteration while editing lua.
-        wrapRc = false;
-        # will now look for nixCats-nvim within .config and .local and others
-        configDirName = "nixCats-nvim";
-        viAlias = false;
-        vimAlias = true;
-      };
-    };
-
-
     # And then build a package with specific categories from above here:
     # All categories you wish to include must be marked true,
     # but false may be omitted.
@@ -274,8 +256,14 @@
     # see :help nixCats.flake.outputs.packageDefinitions
     packageDefinitions = {
       nixCats = { pkgs, ... }@misc: {
-        # we pass the arguments to our settings set as well.
-        settings = (settings misc).nixCats ; 
+        # see :help nixCats.flake.outputs.settings
+        settings = {
+          # will check for config in the store rather than .config
+          wrapRc = true;
+          configDirName = "nixCats-nvim";
+          aliases = [ "vi" "vim" ];
+          # nvimSRC = inputs.neovim;
+        }; 
         categories = {
           generalBuildInputs = true;
           markdown = true;
@@ -311,7 +299,14 @@
         };
       };
       regularCats = { pkgs, ... }@misc: { 
-        settings = (settings misc).unwrappedLua;
+        settings = {
+          # will check for config in .config rather than the store
+          # this is mostly useful for fast iteration while editing lua.
+          wrapRc = false;
+          # will now look for nixCats-nvim within .config and .local and others
+          configDirName = "nixCats-nvim";
+          aliases = [ "testCat" ];
+        };
         categories = {
           generalBuildInputs = true;
           markdown = true;
