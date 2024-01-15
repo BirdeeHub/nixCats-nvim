@@ -1,6 +1,6 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-## attention: this branch is a work in progress.
+### Attention: this branch is a work in progress.
 > Help is outdated although still useful. :help nixCats.flake needs updating on the new handling of flake-utils.
 
 > lazy.nvim wrapper util for nix is awaiting pull request [1259](https://github.com/folke/lazy.nvim/pull/1259)
@@ -12,6 +12,10 @@
     - Make a new list in the set in the flake for it (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
     - enable the category for a particular neovim package in packageDefinitions set.
     - check for it in your neovim lua configuration with nixCats('attr.path.to.yourList')
+- the nixCats command is your method of communicating with neovim from nix outside of installing plugins.
+  - you can pass any extra info through the same set you define which categories you want to include.
+  - it will be printed verbatim to a table in a lua file.
+  - Not only will it be easily accessible anywhere from within neovim via the nixCats command, but also from your category definitions within nix as well for even more subcategory control. 
 - Can be configured as a flake, nixos or home-manager module.
   - It can then be imported by someone else and reconfigured with the same options and exported again. And again. And again. You get it.
 - blank flake template that can be initialized into your existing neovim config directory
@@ -24,7 +28,11 @@
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
 
-> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module, something that would normally cause a collision error.
+> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module such as home manager, something that would normally cause a collision error.
+
+> The default launch name is the package name in the packageDefinitions set in flake.nix for that package. You may then make any other aliases that you please as long as they do not conflict.
+
+> Nvim does not know about the wrapper script. Nvim is named `nvim` and is in a file in the store. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any other issues.
 
 ## Introduction
 
@@ -173,9 +181,9 @@ nix shell github:BirdeeHub/nixCats-nvim
 #or
 nix shell github:BirdeeHub/nixCats-nvim#nixCats
 # If using zsh with extra regexing, be sure to escape the #
-
-# now running nvim will open nixCats until you exit the shell.
 ```
+Now, typing `nixCats` `vim` or `vimcat` will open nixCats until you exit the shell.
+
 Now that you are within an editor outfitted to edit a flake,
 you can access the help for nixCats by typing `:help nixCats` and choosing one
 of the options suggested by the auto-complete.
@@ -199,8 +207,9 @@ along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-Re-enter the nixCats nvim version by typing nvim . and take a look!
+Re-enter the nixCats nvim version by typing `vim .` or `nixCats .` and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
+Typing `:help nixCats` will open up a list of help options for this flake via auto-complete.
 
 You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
@@ -244,17 +253,12 @@ They are not particularly suited to being ran directly in your
 nvim config folder like the first one was.
 They are minimal examples of stuff that you can do.
 
-You can modify ANYTHING within anything that imports your nixCats (in any way),
-however, usually, all you would need to do is choose a package you defined,
-or put different values in categories, because you can check the categories
-set within your lua and react to them.
-
 You could more or less build your own nixVim in your flake by choosing
 your categories carefully and referring to them within your lua.
 And then the options would get automatically exported
 for any way a nix user may want to set them.
 
-All info is covered in the included help files.
+All info I could manage to cover is covered in the included help files.
 For this section,
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
 and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.txt)

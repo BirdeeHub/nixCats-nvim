@@ -12,7 +12,6 @@ nixCats.flake.outputs.exports.mkNixosModules	nixCatsFlake.txt	/*nixCats.flake.ou
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*
-nixCats.installation_nixOS_users	installation.txt	/*nixCats.installation_nixOS_users*
 nixCats.installation_options	installation.txt	/*nixCats.installation_options*
 nixCats.luaUtils	luaUtils.txt	/*nixCats.luaUtils*
 nixCats.luaUtils.intro	luaUtils.txt	/*nixCats.luaUtils.intro*
