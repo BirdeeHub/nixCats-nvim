@@ -5,6 +5,7 @@
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
+- Export advanced options to nix without having to write more nix than it takes to add plugins to lists of your choosing.
 - Easy-to-use Nix Category system for many configurations in 1 repository! 
   - to use:
     - Make a new list in the set in the flake for it (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
@@ -92,11 +93,11 @@ Luckily you have the ability to export a minimal package with whatever you want 
 
 It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The current version of the after directory just makes the numbers purple.
 
-##### *The mission:*
+#### *The mission:*
 - Replace nix package managers for plugins and lsps and keep everything else in the normal lua scheme. 
 - 1 NORMAL nvim config directory, still allow project specific packaging.
 
-##### *The solution:*
+#### *The solution:*
 - Use nix to download the stuff and make it available to neovim.
 - Include a nix store directory as a config folder, allowing all config to work like normal.
 - Create nixCats by writing the packageDefinitions.categories set to a lua file so the lua may know what categories are packaged
@@ -107,7 +108,7 @@ It also has completion for the command line because I like that and also is mult
     managers when away from nix because people seem to want
     a way to load their config without nix as an option.
 
-#### These are the reasons I wanted to do it this way: 
+#### *The reasons I wanted to do it this way:*
 
 - The setup instructions for new plugins are all in Lua so translating them is effort.
 - I didn't want to be forced into creating a new lua file, 
@@ -116,6 +117,8 @@ It also has completion for the command line because I like that and also is mult
     - (so that I can take advantage of all the neovim dev tools with minimal fuss)
 - I still wanted my config to know what plugins and LSPs I included in the package
     so I created nixCats.
+
+---
 
 In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay.
 
