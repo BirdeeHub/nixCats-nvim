@@ -165,8 +165,7 @@ It could produce any of 4 configured neovim packages.
             settings = {
               wrapRc = true;
               configDirName = "nixCats-nvim";
-              viAlias = false;
-              vimAlias = true;
+              aliases = [ "customVim" ];
             };
             categories = {
               generalBuildInputs = true;

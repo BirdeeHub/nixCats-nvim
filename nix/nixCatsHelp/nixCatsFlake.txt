@@ -546,7 +546,12 @@ They look like this:
 
     # these outputs will be NOT wrapped with ${system}
 
-    # we also export a nixos module to allow configuration from configuration.nix
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
+
+    # we export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       defaultPackageName = "nixCats";
       inherit dependencyOverlays luaPath
@@ -558,10 +563,6 @@ They look like this:
       inherit dependencyOverlays luaPath
         categoryDefinitions packageDefinitions nixpkgs;
     };
-    # now we can export some things that can be imported in other
-    # flakes, WITHOUT needing to use a system variable to do it.
-    # and update them into the rest of the outputs returned by the
-    # eachDefaultSystem function.
     inherit utils categoryDefinitions dependencyOverlays packageDefinitions;
     inherit (utils) templates baseBuilder;
     keepLuaBuilder = utils.baseBuilder luaPath;
@@ -775,7 +776,7 @@ as the nixos module has for system, but for the user managed by home-manager.
         default = null;
         description = ''
           VERY IMPORTANT when setting aliases for each package,
-          they must not be the same as ANY other neovim package for that user.
+          they must not be the same as any other neovim package for that user.
           YOU MAY NOT ALIAS TO NVIM ITSELF
           It will cause a build conflict.
 
