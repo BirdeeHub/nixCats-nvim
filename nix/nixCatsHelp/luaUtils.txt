@@ -35,6 +35,8 @@ There is a template for them, and you can use the flake init -t
 variable to import the luaUtils template in the root directory of your config
 to add it to your project in the correct place.
 
+-------------------------------------------------------------------------------
+                                                      *nixCats.luaUtils.setup*
 They are located within the lua/nixCatsUtils directory of the
 flake. The main init.lua in it contains a require("nixCatsUtils").setup
 function, and a require("nixCatsUtils").isNixCats variable.
@@ -55,17 +57,16 @@ This setup function will give it a default value.
 Of course, if you only ever download nvim with nix, this isnt needed.
 But it cant hurt to include anyway.
 >lua
-  -- first thing in your init.lua file
+  vim.g.mapleader = ' '
+  vim.g.maplocalleader = ' '
+  -- it doesnt matter if its before or after leader key but
+  -- you want this first thing in your init.lua file
   require('nixCatsUtils').setup {
     non_nix_value = true,
   }
 <
 ---------------------------------------------------------------------------------
-                                                       *nixCats.luaUtils.pckr*
-Then you can set leader keys, before any plugins are downloaded via pckr
->lua
-  vim.g.mapleader = ' '
-  vim.g.maplocalleader = ' '
+Now for pckr example:                                  *nixCats.luaUtils.pckr*
   -- load the plugins via pckr
   -- YOU are in charge of putting the plugin
   -- urls and build steps in there,
@@ -78,6 +79,10 @@ Then you can set leader keys, before any plugins are downloaded via pckr
   -- unless you are ok with that instruction 
   -- not being ran when used via nix,
   -- this file will not be ran when using nix
+
+  -- Do what you would have done via config variable,
+  -- somewhere else checked by category.
+>lua
   require('nixCatsUtils.catPacker').setup({
     -- My plugins here, an example for you.
     { 'joshdick/onedark.vim', },
