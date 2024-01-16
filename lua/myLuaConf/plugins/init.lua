@@ -24,6 +24,7 @@ vim.g.undotree_SplitWidth = 40
 require('hlargs').setup {
   color = '#32a88f',
 }
+vim.cmd([[hi clear @lsp.type.parameter]])
 vim.cmd([[hi link @lsp.type.parameter Hlargs]])
 require('Comment').setup()
 require('fidget').setup()
