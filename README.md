@@ -1,12 +1,12 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-### Attention: this branch is a work in progress.
+##### Attention: this branch is a work in progress.
 > lazy.nvim wrapper util for nix is awaiting pull request [1259](https://github.com/folke/lazy.nvim/pull/1259)
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
-- Export advanced options to nix without having to write more nix than it takes to add plugins to lists of your choosing.
-- Easy-to-use Nix Category system for many configurations in 1 repository! 
+- Configure without leaving flake.nix and regular neovim config scheme and still export advanced configuration options!
+- Easy-to-use Nix Category system for many configurations in 1 repository!
   - to use:
     - Make a new list in the set in the flake for it (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
     - enable the category for a particular neovim package in packageDefinitions set.
@@ -67,7 +67,9 @@ You should make use of the in-editor help at:
 
 The help can be viewed here on github but it is adviseable to use a nix shell to view it from within the editor.
 
-Simply run ```nix shell github:BirdeeHub/nixCats-nvim``` and run nvim to read it.
+Simply run `nix shell github:BirdeeHub/nixCats-nvim` and run `nixCats` to open nvim and read it.
+
+Or `nix run github:BirdeeHub/nixCats-nvim` to open it directly.
 
 This is because there is (reasonable) syntax highlighting for the code examples in the help when viewed within nvim.
 
