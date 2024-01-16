@@ -50,7 +50,7 @@ except with the bonus of being able to install and set up more than just neovim 
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
-You can nixCats('attr.path.to.value") to discover what nix categories you created are included in the current package.
+You can `nixCats('attr.path.to.value")` to discover what nix categories you created are included in the current package.
 
 Doing so allows you to define as many different packages as you want from the same config file.
 

@@ -13,7 +13,7 @@ neovim-unwrapped:
 
 let
   wrapper = {
-      extraName ? ""
+    extraName ? ""
     # should contain all args but the binary. Can be either a string or list
     , wrapperArgs ? []
     # a limited RC script used only to generate the manifest for remote plugins
