@@ -16,7 +16,7 @@
   - it will be printed verbatim to a table in a lua file.
   - Not only will it be easily accessible anywhere from within neovim via the nixCats command, but also from your category definitions within nix as well for even more subcategory control. 
 - Can be configured as a flake, nixos or home-manager module.
-  - It can then be imported by someone else and reconfigured with the same options and exported again. And again. And again. You get it.
+  - If using a flake it can then be imported by someone else and reconfigured and exported again. And again. And again. You get it.
 - blank flake template that can be initialized into your existing neovim config directory
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
