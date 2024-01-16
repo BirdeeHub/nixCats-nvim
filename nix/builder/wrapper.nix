@@ -185,6 +185,7 @@ let
 
     meta = neovim-unwrapped.meta // {
       # To prevent builds on hydra
+      mainProgram = "${nixCats_packageName}";
       hydraPlatforms = [];
       # prefer wrapper over the package
       priority = (neovim-unwrapped.meta.priority or 0) - 1;
