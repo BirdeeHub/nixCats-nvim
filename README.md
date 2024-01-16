@@ -1,8 +1,6 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
 ### Attention: this branch is a work in progress.
-> Help is outdated although still useful. :help nixCats.flake needs updating on the new handling of flake-utils.
-
 > lazy.nvim wrapper util for nix is awaiting pull request [1259](https://github.com/folke/lazy.nvim/pull/1259)
 
 ## Features:
