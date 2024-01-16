@@ -66,7 +66,7 @@
     # will get passed to the categoryDefinitions and packageDefinitions
     # which follow this section.
 
-    # this allows you to use pkgs.${system} whenever you want in those sections
+    # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
     system_resolved = flake-utils.lib.eachDefaultSystem (system: let
       # see :help nixCats.flake.outputs.overlays

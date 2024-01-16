@@ -1,5 +1,9 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
+/*
+Call this file with an inputs set containing nixCats, flake-utils and nixpkgs
+and recieve a set of flake outputs to pass anywhere you want.
+*/
 {inputs, ... }@attrs: let
   inherit (inputs) flake-utils nixpkgs;
   inherit (inputs.nixCats) utils;
