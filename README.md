@@ -67,7 +67,7 @@ You should make use of the in-editor help at:
 
 The help can be viewed here on github but it is adviseable to use a nix shell to view it from within the editor.
 
-Simply run `nix shell github:BirdeeHub/nixCats-nvim` and run `nixCats` to open nvim and read it.
+Simply run `nix shell github:BirdeeHub/nixCats-nvim` and then run `nixCats` to open nvim and read it.
 
 Or `nix run github:BirdeeHub/nixCats-nvim` to open it directly.
 
