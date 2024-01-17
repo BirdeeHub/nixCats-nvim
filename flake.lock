@@ -124,11 +124,11 @@
     "plugins-lazy-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1705476175,
-        "narHash": "sha256-+kEcvdSX4nK0K2LqKtLpr9z79nt8bIh9uzPndBjqbis=",
+        "lastModified": 1705476471,
+        "narHash": "sha256-zcREIcoYkAuvESo8xEqZncv31s38zDf6FILq1SdAbmA=",
         "owner": "BirdeeHub",
         "repo": "lazy.nvim",
-        "rev": "51e844a4f543980d2242cc708ac2afbf7234f383",
+        "rev": "f17f33266d10567b29fb6b1f36c42027fa76336d",
         "type": "github"
       },
       "original": {
