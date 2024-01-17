@@ -82,11 +82,11 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     local oldPath = lazyCFG.dev.path
     lazyCFG.dev.path = function(plugin)
       local path = nil
-      if type(lazyCFG.dev.path) == "string" and vim.fn.isdirectory(lazyCFG.dev.path .. "/" .. plugin.name) == 1 then
+      if type(oldPath) == "string" and vim.fn.isdirectory(oldPath .. "/" .. plugin.name) == 1 then
         path = oldPath .. "/" .. plugin.name
-      elseif type(lazyCFG.dev.path) == "function" then
-        path = lazyCFG.dev.path(plugin)
-        if type(lazyCFG.dev.path) ~= "string" then
+      elseif type(oldPath) == "function" then
+        path = oldPath(plugin)
+        if type(path) ~= "string" then
           path = nil
         end
       end
