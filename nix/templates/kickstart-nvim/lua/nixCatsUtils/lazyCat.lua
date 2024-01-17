@@ -96,6 +96,8 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
           path = myNeovimPackages .. "/start/" .. plugin.name
         elseif vim.fn.isdirectory(myNeovimPackages .. "/opt/" .. plugin.name) == 1 then
           path = myNeovimPackages .. "/opt/" .. plugin.name
+        else
+          path = "~/projects/" .. plugin.name
         end
       end
       return path
