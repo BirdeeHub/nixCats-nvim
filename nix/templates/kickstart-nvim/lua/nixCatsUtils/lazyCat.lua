@@ -61,16 +61,16 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.performance.rtp = {}
     end
 
-    -- https://github.com/folke/lazy.nvim/pull/1259
-    lazyCFG.performance.rtp.override_base_rtp = function(_, ME, VIMRUNTIME, NVIM_LIB)
+    -- https://github.com/folke/lazy.nvim/pull/1276
+    lazyCFG.performance.rtp.override_base_rtp = function(_, ME)
       return {
         nixCatsConfigDir,
         nixCatsPath,
         grammarDir,
         vim.fn.stdpath("data") .. "/site",
         ME,
-        VIMRUNTIME,
-        NVIM_LIB,
+        vim.env.VIMRUNTIME,
+        vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim",
         nixCatsConfigDir .. "/after",
       }
     end
@@ -79,15 +79,25 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
-    -- https://github.com/folke/lazy.nvim/pull/1259
-    if lazyCFG.dev.extra_paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
-      lazyCFG.dev.extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
-    else
-      local pathsToInclude
-      pathsToInclude = lazyCFG.dev.paths
-      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/start")
-      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/opt")
-      lazyCFG.dev.extra_paths = pathsToInclude
+    local oldPath = lazyCFG.dev.path
+    lazyCFG.dev.path = function(plugin)
+      local path = nil
+      if type(lazyCFG.dev.path) == "string" and vim.fn.isdirectory(lazyCFG.dev.path .. "/" .. plugin.name) == 1 then
+        path = oldPath .. "/" .. plugin.name
+      elseif type(lazyCFG.dev.path) == "function" then
+        path = lazyCFG.dev.path(plugin)
+        if type(lazyCFG.dev.path) ~= "string" then
+          path = nil
+        end
+      end
+      if path == nil then
+        if vim.fn.isdirectory(myNeovimPackages .. "/start/" .. plugin.name) == 1 then
+          path = myNeovimPackages .. "/start/" .. plugin.name
+        elseif vim.fn.isdirectory(myNeovimPackages .. "/opt/" .. plugin.name) == 1 then
+          path = myNeovimPackages .. "/opt/" .. plugin.name
+        end
+      end
+      return path
     end
 
     if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then

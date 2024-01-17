@@ -79,9 +79,26 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
-    lazyCFG.dev.path = myNeovimPackages .. "/start"
-
-    local desired_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
+    local oldPath = lazyCFG.dev.path
+    lazyCFG.dev.path = function(plugin)
+      local path = nil
+      if type(lazyCFG.dev.path) == "string" and vim.fn.isdirectory(lazyCFG.dev.path .. "/" .. plugin.name) == 1 then
+        path = oldPath .. "/" .. plugin.name
+      elseif type(lazyCFG.dev.path) == "function" then
+        path = lazyCFG.dev.path(plugin)
+        if type(lazyCFG.dev.path) ~= "string" then
+          path = nil
+        end
+      end
+      if path == nil then
+        if vim.fn.isdirectory(myNeovimPackages .. "/start/" .. plugin.name) == 1 then
+          path = myNeovimPackages .. "/start/" .. plugin.name
+        elseif vim.fn.isdirectory(myNeovimPackages .. "/opt/" .. plugin.name) == 1 then
+          path = myNeovimPackages .. "/opt/" .. plugin.name
+        end
+      end
+      return path
+    end
 
     if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then
       lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
