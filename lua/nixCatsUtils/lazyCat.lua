@@ -61,16 +61,16 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.performance.rtp = {}
     end
 
-    -- https://github.com/folke/lazy.nvim/pull/1259
-    lazyCFG.performance.rtp.override_base_rtp = function(_, ME, VIMRUNTIME, NVIM_LIB)
+    -- https://github.com/folke/lazy.nvim/pull/1276
+    lazyCFG.performance.rtp.override_base_rtp = function(_, ME)
       return {
         nixCatsConfigDir,
         nixCatsPath,
         grammarDir,
         vim.fn.stdpath("data") .. "/site",
         ME,
-        VIMRUNTIME,
-        NVIM_LIB,
+        vim.env.VIMRUNTIME,
+        vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim",
         nixCatsConfigDir .. "/after",
       }
     end
@@ -79,16 +79,9 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
-    -- https://github.com/folke/lazy.nvim/pull/1259
-    if lazyCFG.dev.extra_paths == nil or type(lazyCFG.performance.rtp.paths) ~= 'table' then
-      lazyCFG.dev.extra_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
-    else
-      local pathsToInclude
-      pathsToInclude = lazyCFG.dev.paths
-      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/start")
-      table.insert(pathsToInclude, #pathsToInclude + 1, myNeovimPackages .. "/opt")
-      lazyCFG.dev.extra_paths = pathsToInclude
-    end
+    lazyCFG.dev.path = myNeovimPackages .. "/start"
+
+    local desired_paths = { myNeovimPackages .. "/start", myNeovimPackages .. "/opt", }
 
     if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then
       lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
