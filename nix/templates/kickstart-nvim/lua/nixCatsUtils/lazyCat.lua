@@ -79,6 +79,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
+    -- https://github.com/folke/lazy.nvim/pull/1157
     local oldPath = lazyCFG.dev.path
     lazyCFG.dev.path = function(plugin)
       local path = nil

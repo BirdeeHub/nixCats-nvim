@@ -23,7 +23,7 @@
     };
 
     # will be removed after the following pr is accepted:
-    # https://github.com/folke/lazy.nvim/pull/1259
+    # https://github.com/folke/lazy.nvim/pull/1276
     # If you do use it before then, keep in mind that this one creates
     # a directory named lazy-nvim while the official
     # will create one named lazy.nvim
