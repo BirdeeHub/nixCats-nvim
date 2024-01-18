@@ -20,7 +20,9 @@ let
     inherit system;
     overlays = if builtins.isList dependencyOverlays
       then dependencyOverlays
-      else dependencyOverlays.${system};
+      else if builtins.isAttrs dependencyOverlays
+      then dependencyOverlays.${system}
+      else [];
   } // { config = extra_pkg_config; })
   else pkgs;
   catDefs = {
@@ -55,6 +57,8 @@ let
     vimAlias = false;
     withNodeJs = false;
     withRuby = true;
+    rubyEnv = null;
+    withPerl = false;
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
@@ -220,7 +224,7 @@ in
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
-  inherit (settings) vimAlias viAlias withRuby extraName withNodeJs aliases;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs rubyEnv aliases;
   configure = {
     inherit customRC;
     packages.myVimPackage = {

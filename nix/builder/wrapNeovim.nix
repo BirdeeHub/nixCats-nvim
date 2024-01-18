@@ -12,8 +12,10 @@ rec {
     , withPython3 ? true,  extraPython3Packages ? (_: [])
     /* the function you would have passed to lua.withPackages */
     , extraLuaPackages ? (_: [])
+    , withPerl ? false
     , withNodeJs ? false
     , withRuby ? true
+    , rubyEnv ? null
     , vimAlias ? false
     , viAlias ? false
     , configure ? {}
