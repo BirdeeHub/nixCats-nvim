@@ -1,6 +1,43 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-> lazy.nvim wrapper util for nix is awaiting pull request [#1276](https://github.com/folke/lazy.nvim/pull/1276) and [#1157](https://github.com/folke/lazy.nvim/pull/1157)
+You will not be backed into any corners using the nixCats scheme, either as a flake or module, instead of the normal neovim module.
+
+It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
+
+This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
+
+- If you like your lua configuration, but want to do all that cool direnv stuff you heard about?
+  - This is your scheme.
+
+- You want to make a nix-based neovim distribution out of your normal neovim distribution and export advanced options to your nix users without having to do all the nix wiring for that yourself?
+  - This is also your scheme.
+
+- You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And have access to in-editor documentation while you do it?
+
+  - This is still your scheme. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
+
+This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
+
+The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files if you don't want to, and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal .config/nvim
+
+Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
+
+There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file. And thus nixCats was born. A system for doing just that in an effective and organized manner.
+
+The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER PACKAGE. Because you do this through the same set that also gets passed to your lua, your lua will always know what categories it has available, and then you can pass ANY extra info you want through that same set. All will be made available.
+
+## Attention:
+> You cannot launch nixCats with the nvim command. You may, however, launch it with ANYTHING else you would like to choose (which does not cause user level conflicts anyway).
+
+> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module such as home manager, something that would normally cause a collision error.
+
+> The default launch name is the package name in the packageDefinitions set in flake.nix for that package. You may then make any other aliases that you please as long as they do not conflict.
+
+> This also means that your $EDITOR variable should match the name in your packageDefinitions set in flake.nix so that stuff like git opens the right thing.
+
+> Nvim does not know about the wrapper script. Nvim is named `nvim` and is in a file in the store. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any other issues.
+
+
 
 ## Features:
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
@@ -22,24 +59,13 @@
   - (currently uses my fork of lazy.nvim, pending PR for the 2 options added, [#1276](https://github.com/folke/lazy.nvim/pull/1276) and [#1157](https://github.com/folke/lazy.nvim/pull/1157))
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
-
-## Attention:
-> You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
-
-> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module such as home manager, something that would normally cause a collision error.
-
-> The default launch name is the package name in the packageDefinitions set in flake.nix for that package. You may then make any other aliases that you please as long as they do not conflict.
-
-> Nvim does not know about the wrapper script. Nvim is named `nvim` and is in a file in the store. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any other issues.
+> lazy.nvim wrapper util for nix is awaiting pull request [#1276](https://github.com/folke/lazy.nvim/pull/1276) and [#1157](https://github.com/folke/lazy.nvim/pull/1157)
 
 ## Introduction
 
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
 
 This repo is not a lua showcase. You are meant to use your own lua once you understand what is going on.
-
-It is aimed at people who know enough lua to comfortably proceed from a kickstarter level setup
-who want to swap to using nix while still using lua for configuration.
 
 For 95% of plugins and lsps, you won't need to do more than add plugin names to categories you make in flake.nix,
 then configure in lua using lspconfig or the regular setup or config functions provided by the plugin.
@@ -49,14 +75,13 @@ except with the bonus of being able to install and set up more than just neovim 
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
-You can `nixCats('attr.path.to.value")` to discover what nix categories you created are included in the current package.
+You can `nixCats('attr.path.to.value')` to discover what nix categories you created are included in the current package.
 
 Doing so allows you to define as many different packages as you want from the same config file.
 
 nixCats can also send other info from nix to lua other than what categories are included, but that is the main use.
 
-It then also exports as much stuff as possible for when you want to add some version of your own nixCats flake 
-to a system nix config flake but maybe want to change something for that specific system without making a separate package for it if desired.
+It then also exports as much stuff as possible based on how you configured your category and package definitions, including home manager and nixos modules.
 
 You should make use of the in-editor help at:
 
@@ -83,9 +108,6 @@ There is about as much help as there is nix code in this entire project.
 
 Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim), with a couple changes. 
 
-It has some stuff for nix, regular plugin setup functions as defined by the plugin rather than lazy,
-and lspconfig instead of mason.
-
 It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](./nix/nixCatsHelp/luaUtils.txt).
 
 `luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility of trying to download all the dependencies for your overcomplicated config on a machine without using nix...
@@ -93,21 +115,6 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 Luckily you have the ability to export a minimal package with whatever you want in it for this reason should you choose without needing a new config file.
 
 It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The current version of the after directory just makes the numbers purple.
-
-#### *The mission:*
-- Replace nix package managers for plugins and lsps and keep everything else in the normal lua scheme. 
-- 1 NORMAL nvim config directory, still allow project specific packaging.
-
-#### *The solution:*
-- Use nix to download the stuff and make it available to neovim.
-- Include a nix store directory as a config folder, allowing all config to work like normal.
-- Create nixCats by writing the packageDefinitions.categories set to a lua file so the lua may know what categories are packaged
--  You may optionally have your config in your normal directory as well via wrapRc setting,
-   - You can copy your flake there and iterate on lua changes quicker while configuring (otherwise you have to `git add . && nix build` everytime because it loads from the store).
-   - You will still be able to reference nixCats and the help should you do this.
-- I ended up including a way to download via neovim plugin
-    managers when away from nix because people seem to want
-    a way to load their config without nix as an option.
 
 #### *The reasons I wanted to do it this way:*
 
@@ -161,7 +168,7 @@ You then choose what categories to include in the package.
 
 You then set them up in your lua, using the default methods to do so. No more translating to your package manager! (If you were using lazy, the opt section goes into the setup function in the lua)
 
-You can optionally ask what categories you have in this package, whenever you use `nixCats('attr.path.to.value")`
+You can optionally ask what categories you have in this package, whenever you use `nixCats('attr.path.to.value')`
 
 If you encounter any build steps that are not well handled by nixpkgs, 
 or you need to import a plugin straight from git that has a non-standard build step and no flake,

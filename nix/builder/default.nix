@@ -90,9 +90,14 @@ in
           nixCats_packageName = name;
           nixCats_store_config_location = "${LuaConfig}";
         };
+      settingsPlus = settings // {
+          nixCats_packageName = name;
+          nixCats_store_config_location = "${LuaConfig}";
+        };
       init = fpkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = fpkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+      settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ../utils).luaTablePrinter settingsPlus}'';
       depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
     in {
       name = "nixCats";
@@ -104,6 +109,7 @@ in
         mkdir -p $out/doc
         cp ${init} $out/lua/nixCats/init.lua
         cp ${cats} $out/lua/nixCats/cats.lua
+        cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/included.lua
       '';
       installPhase = ''

@@ -1,6 +1,7 @@
 local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.included')
+M.settings = require('nixCats.settings')
 
 -- will return the nearest parent category value, unless the nearest
 -- parent is a table, in which case that means a different subcategory
@@ -36,6 +37,10 @@ function M.addGlobals()
     vim.api.nvim_create_user_command('NixCats',
     [[lua print(vim.inspect(require('nixCats.cats')))]] ,
     { desc = 'So Cute!' })
+
+    vim.api.nvim_create_user_command('NixCatsSettings',
+    [[lua print(vim.inspect(require('nixCats.settings')))]] ,
+    { desc = 'All the settings' })
 
     vim.api.nvim_create_user_command('Pawsibile',
     [[lua print(vim.inspect(require('nixCats.included')))]] ,
