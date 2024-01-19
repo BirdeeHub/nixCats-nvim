@@ -1,20 +1,20 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-You will not be backed into any corners using the nixCats scheme, either as a flake or module, instead of the normal neovim module or pkgs.wrapNeovimUnstable.
+You will not be backed into any corners using the nixCats scheme, either as a flake or module.
 
 It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
+
+However the flake can be used without nixos or home manager, so if you don't have that set up, you should choose the flake to start with.
 
 This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
 
 - If you like your lua configuration, but want to do all that cool direnv stuff you heard about?
-  - This is your scheme.
 
 - You want to make a nix-based neovim distribution out of your normal neovim distribution and export advanced options to your nix users without having to do all the nix wiring for that yourself?
-  - This is also your scheme.
 
 - You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And be guided along the way by extensive IN-EDITOR DOCUMENTATION?
 
-  - This is still your scheme. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
+Then this is your project. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
