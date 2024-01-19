@@ -12,19 +12,21 @@ This is a neovim configuration scheme for new and advanced nix users alike, and 
 - You want to make a nix-based neovim distribution out of your normal neovim distribution and export advanced options to your nix users without having to do all the nix wiring for that yourself?
   - This is also your scheme.
 
-- You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And have access to in-editor documentation while you do it?
+- You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And be guided along the way by extensive IN-EDITOR DOCUMENTATION?
 
   - This is still your scheme. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
-The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files if you don't want to, and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal .config/nvim
+The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files if you don't want to, and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
 
 Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
 
 There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file. And thus nixCats was born. A system for doing just that in an effective and organized manner.
 
-The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER PACKAGE. Because you do this through the same set that also gets passed to your lua, your lua will always know what categories it has available, and then you can pass ANY extra info you want through that same set. All will be made available.
+The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY.
+
+Because you do this through the same set that also gets passed to your lua, your lua will always know what categories it has available, and then you can pass ANY extra info you want through that same set. All will be made available via a handy nixCats plugin.
 
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with ANYTHING else you would like to choose (which does not cause user level conflicts anyway).

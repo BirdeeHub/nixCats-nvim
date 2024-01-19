@@ -83,7 +83,7 @@ in
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
-    nixCats = { ... }@allDeps:
+    nixCats = { ... }@allPluginDeps:
     fpkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
           nixCats_wrapRc = settings.wrapRc;
@@ -98,7 +98,7 @@ in
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = fpkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
       settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ../utils).luaTablePrinter settingsPlus}'';
-      depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allDeps}'';
+      depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
       src = ../nixCatsHelp;
