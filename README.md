@@ -1,6 +1,6 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-You will not be backed into any corners using the nixCats scheme, either as a flake or module, instead of the normal neovim module.
+You will not be backed into any corners using the nixCats scheme, either as a flake or module, instead of the normal neovim module or pkgs.wrapNeovimUnstable.
 
 It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
 
@@ -16,9 +16,9 @@ This is a neovim configuration scheme for new and advanced nix users alike, and 
 
   - This is still your scheme. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
 
-This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
+This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
-The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files if you don't want to, and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
+The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
 
 Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
 
@@ -29,7 +29,7 @@ The second main feature is the category system, which allows you to enable and d
 Because you do this through the same set that also gets passed to your lua, your lua will always know what categories it has available, and then you can pass ANY extra info you want through that same set. All will be made available via a handy nixCats plugin.
 
 ## Attention:
-> You cannot launch nixCats with the nvim command. You may, however, launch it with ANYTHING else you would like to choose (which does not cause user level conflicts anyway).
+> You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
 
 > This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module such as home manager, something that would normally cause a collision error.
 
@@ -112,11 +112,9 @@ Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nv
 
 It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](./nix/nixCatsHelp/luaUtils.txt).
 
-`luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility of trying to download all the dependencies for your overcomplicated config on a machine without using nix...
+`luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility from before of trying to download all 4 versions of rust, node, ripgrep, and fd for your overcomplicated config on a machine without using nix...
 
-Luckily you have the ability to export a minimal package with whatever you want in it for this reason should you choose without needing a new config file.
-
-It also has completion for the command line because I like that and also is multi file because I want to show the folders all work and because I like that too. The current version of the after directory just makes the numbers purple.
+It also has some extra niceties I enjoy and the nixd and nil_ls lsps
 
 #### *The reasons I wanted to do it this way:*
 
