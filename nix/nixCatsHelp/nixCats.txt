@@ -182,5 +182,14 @@ Use this fact as you wish.
 You could use it to pass information like port numbers or paths
 Or whatever else you want.
 
+nixCats also contains other info.
+
+require('nixCats').included
+  -- contains a final list of all the plugins included
+    in the package and their paths, and the path to treesitter parsers.
+
+require('nixCats').settings
+  -- contains the settings set for the package
+
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
