@@ -20,7 +20,7 @@ along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-Re-enter the nixCats nvim version by typing nvim . and take a look!
+Re-enter the nixCats nvim version by typing nixCats . and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
 
 You add plugins to the flake.nix, call whatever setup function is required by the plugin,

@@ -191,7 +191,7 @@ nix shell github:BirdeeHub/nixCats-nvim
 nix shell github:BirdeeHub/nixCats-nvim#nixCats
 # If using zsh with extra regexing, be sure to escape the #
 ```
-Now, typing `nixCats` `vim` or `vimcat` will open nixCats until you exit the shell.
+Now, typing `nixCats` will open nixCats until you exit the shell.
 
 Now that you are within an editor outfitted to edit a flake,
 you can access the help for nixCats by typing `:help nixCats` and choosing one
@@ -216,7 +216,7 @@ along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-Re-enter the nixCats nvim version by typing `vim .` or `nixCats .` and take a look!
+Re-enter the nixCats nvim version by typing `nixCats .` and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
 Typing `:help nixCats` will open up a list of help options for this flake via auto-complete.
 

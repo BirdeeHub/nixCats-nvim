@@ -73,7 +73,7 @@ in
     # copy entire flake to store directory
     LuaConfig = fpkgs.stdenv.mkDerivation {
       name = "nixCats-special-rtp-entry-LuaConfig";
-      builder = builtins.toFile "builder.sh" /* bash */ ''
+      builder = fpkgs.writeText "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out
         cp -r ${path}/* $out/
@@ -101,9 +101,7 @@ in
       depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
-      src = ../nixCatsHelp;
-      phases = [ "buildPhase" "installPhase" ];
-      buildPhase = ''
+      builder = fpkgs.writeText "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
@@ -111,9 +109,7 @@ in
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/included.lua
-      '';
-      installPhase = ''
-        cp -r $src/* $out/doc/
+        cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });
     # doing it this way makes nixCats command and
