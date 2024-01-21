@@ -1,20 +1,14 @@
 # nixCats-nvim: A Lua-natic's kickstarter flake
 
-You will not be backed into any corners using the nixCats scheme, either as a flake or module.
-
-It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
-
-However the flake can be used without nixos or home manager, so if you don't have that set up, you should choose the flake to start with.
-
 This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
 
-- If you like your lua configuration, but want to do all that cool direnv stuff you heard about?
+- If you like your lua configuration, but want to do all that cool direnv stuff you heard about with nix?
 
 - You want to make a nix-based neovim distribution out of your normal neovim distribution and export advanced options to your nix users without having to do all the nix wiring for that yourself?
 
 - You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And be guided along the way by extensive IN-EDITOR DOCUMENTATION?
 
-Then this is your project. (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
+Then this is your project! (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
@@ -24,9 +18,16 @@ Nix is for downloading and should stay for downloading. Your lua just needs to k
 
 There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file. And thus nixCats was born. A system for doing just that in an effective and organized manner.
 
-The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY.
+The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY and have your lua know about it without any stress (thanks to the nixCats messaging system).
 
-Because you do this through the same set that also gets passed to your lua, your lua will always know what categories it has available, and then you can pass ANY extra info you want through that same set. All will be made available via a handy nixCats plugin.
+Simply add plugins and lsps and stuff to lists in flake.nix, and then configure like normal!
+
+You will not be backed into any corners using the nixCats scheme, either as a flake or module.
+
+It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
+
+However the flake can be used without nixos or home manager, so if you don't have that set up, you should choose the flake to start with.
+
 
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
@@ -58,7 +59,7 @@ Because you do this through the same set that also gets passed to your lua, your
 - blank flake template that can be initialized into your existing neovim config directory
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
-  - (currently uses my fork of lazy.nvim, pending PR for the 2 options added, [#1276](https://github.com/folke/lazy.nvim/pull/1276))
+  - (currently uses my fork of lazy.nvim, pending PR for 1 extra option [#1276](https://github.com/folke/lazy.nvim/pull/1276))
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
 > lazy.nvim wrapper util for nix is awaiting pull request [#1276](https://github.com/folke/lazy.nvim/pull/1276)
