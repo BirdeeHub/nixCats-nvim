@@ -2,6 +2,18 @@ importName: inputs: let
   overlay = self: super: { 
     ${importName} = {
 
+      lazy-nvim = super.vimUtils.buildVimPlugin {
+        pname = "lazy.nvim";
+        version = "2023-11-04";
+        src = super.fetchFromGitHub {
+          owner = "folke";
+          repo = "lazy.nvim";
+          rev = "28126922c9b54e35a192ac415788f202c3944c9f";
+          sha256 = "";
+        };
+        meta.homepage = "https://github.com/folke/lazy.nvim/";
+      };
+
       # I needed to do this because the one on nixpkgs wasnt working
       # reddit user bin-c found this link for me.
       # and I adapted the funtion to my overlay

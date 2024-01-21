@@ -22,16 +22,6 @@
       flake = false;
     };
 
-    # will create a directory named lazy-nvim
-    # a name you will use when fetching the lazypath
-    # when the nixpkgs version catches up,
-    # you can remove this and use pkgs.vimPlugins.lazy-nvim
-    # and it will create a directory named lazy.nvim instead
-    "plugins-lazy-nvim" = {
-      url = "github:folke/lazy.nvim";
-      flake = false;
-    };
-
     # neovim = {
     #   url = "github:neovim/neovim";
     #   flake = false;
@@ -136,10 +126,10 @@
           # yes it knows this isn't with pkgs.vimPlugins
           pkgs.nixCatsBuilds.markdown-preview-nvim
         ];
-        lazy = with pkgs.neovimPlugins; [
+        lazy = with pkgs.vimPlugins; [
           # lazy will be imported via pkgs.vimPlugins.lazy-nvim
-          # after upstream pr is accepted.
-          lazy-nvim
+          # after newest version of lazy makes it to nixpkgs-unstable
+          pkgs.nixCatsBuilds.lazy-nvim
         ];
         general = {
           gitPlugins = with pkgs.neovimPlugins; [

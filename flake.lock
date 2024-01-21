@@ -121,29 +121,12 @@
         "type": "github"
       }
     },
-    "plugins-lazy-nvim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1705833828,
-        "narHash": "sha256-Qicyec1ZvSb5JVVTW8CrTjndHCLso8Rb2V5IA6D4Rps=",
-        "owner": "folke",
-        "repo": "lazy.nvim",
-        "rev": "28126922c9b54e35a192ac415788f202c3944c9f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "folke",
-        "repo": "lazy.nvim",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixd": "nixd",
         "nixpkgs": "nixpkgs_2",
-        "plugins-hlargs": "plugins-hlargs",
-        "plugins-lazy-nvim": "plugins-lazy-nvim"
+        "plugins-hlargs": "plugins-hlargs"
       }
     },
     "systems": {
