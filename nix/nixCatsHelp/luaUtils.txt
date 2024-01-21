@@ -161,12 +161,6 @@ Now for pckr example:                                  *nixCats.luaUtils.pckr*
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
 AWAITING UPSTREAM
-See: https://github.com/folke/lazy.nvim/pull/1259
-The wrapper exists in the luaUtils folder, but it only works if you
-use my fork of lazy.nvim until the changes go through.
-Some changes may occur in the meantime to it so I would not suggest this.
-The changes may not even go through at all. Its up to folke.
-
 For instructions on using the lazy wrapper, check out this template example!
 >nix
     kickstart-nvim = {

@@ -62,10 +62,8 @@ However the flake can be used without nixos or home manager, so if you don't hav
 - blank flake template that can be initialized into your existing neovim config directory
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
-  - (currently uses my fork of lazy.nvim, pending PR for 1 extra option [#1276](https://github.com/folke/lazy.nvim/pull/1276))
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
-> lazy.nvim wrapper util for nix is awaiting pull request [#1276](https://github.com/folke/lazy.nvim/pull/1276)
 
 ## Introduction
 

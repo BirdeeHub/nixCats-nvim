@@ -48,11 +48,17 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
   local lazypath
   if nixCatsPath == nil then
     lazypath = regularLazyDownload()
+    vim.opt.rtp:prepend(lazypath)
   else
 
     local grammarDir = require('nixCats').pawsible.allPlugins.ts_grammar_plugin
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
+
+    lazypath = nixLazyPath
+    if lazypath == nil then
+      lazypath = regularLazyDownload()
+    end
 
     if lazyCFG.performance == nil then
       lazyCFG.performance = {}
@@ -60,29 +66,22 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     if lazyCFG.performance.rtp == nil then
       lazyCFG.performance.rtp = {}
     end
-
-    -- https://github.com/folke/lazy.nvim/pull/1276
-    lazyCFG.performance.rtp.override_base_rtp = function(DEFAULT, ME)
-      return {
-        nixCatsConfigDir,
-        nixCatsPath,
-        grammarDir,
-        -- vim.fn.stdpath("data") .. "/site",
-        DEFAULT[2],
-        -- LAZYPATH
-        ME,
-        vim.env.VIMRUNTIME,
-        -- vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim",
-        DEFAULT[5],
-        nixCatsConfigDir .. "/after",
-      }
-    end
+    lazyCFG.performance.rtp.reset = false
+    vim.opt.rtp = {
+      nixCatsConfigDir,
+      nixCatsPath,
+      grammarDir,
+      vim.fn.stdpath("data") .. "/site",
+      lazypath,
+      vim.env.VIMRUNTIME,
+      vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim",
+      nixCatsConfigDir .. "/after",
+    }
 
     if lazyCFG.dev == nil then
       lazyCFG.dev = {}
     end
 
-    -- https://github.com/folke/lazy.nvim/pull/1157
     local oldPath = lazyCFG.dev.path
     lazyCFG.dev.path = function(plugin)
       local path = nil
@@ -115,14 +114,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev.patterns = toInclude
     end
 
-    lazypath = nixLazyPath
-    if lazypath == nil then
-      lazypath = regularLazyDownload()
-    end
-
   end
-
-  vim.opt.rtp:prepend(lazypath)
 
   require('lazy').setup(lazySpecs, lazyCFG)
 end

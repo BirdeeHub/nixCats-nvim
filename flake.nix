@@ -22,16 +22,13 @@
       flake = false;
     };
 
-    # will be removed after the following pr is accepted:
-    # https://github.com/folke/lazy.nvim/pull/1276
-    # If you do use it before then, keep in mind that this one creates
-    # a directory named lazy-nvim while the official
-    # will create one named lazy.nvim
-    # this is because it is imported via our defaultPluginOverlay right now.
-    # this is relevant when you fetch the lazypath in your lua.
-    # and thus you will need to change it once the upstream occurs.
+    # will create a directory named lazy-nvim
+    # a name you will use when fetching the lazypath
+    # when the nixpkgs version catches up,
+    # you can remove this and use pkgs.vimPlugins.lazy-nvim
+    # and it will create a directory named lazy.nvim instead
     "plugins-lazy-nvim" = {
-      url = "github:BirdeeHub/lazy.nvim";
+      url = "github:folke/lazy.nvim";
       flake = false;
     };
 

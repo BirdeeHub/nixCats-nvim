@@ -73,6 +73,8 @@ if require('nixCatsUtils').isNixCats then
   -- when that happens, add them to the list, then also specify name in the lazySpec
   pluginList[ [[Comment.nvim]] ] = ""
   pluginList[ [[LuaSnip]] ] = ""
+  -- when the version of nixpkgs catches up with the version with pull/1157
+  -- you can change this to lazy.nvim and import via pkgs.vimPlugins.lazy-nvim in flake.nix
   nixLazyPath = allPlugins.start[ [[lazy-nvim]] ]
 end
 
