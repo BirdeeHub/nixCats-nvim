@@ -78,7 +78,7 @@
           (filter (entry: grammarMatcher entry) allPluginsMapped));
 
         builderLines = map (grmr: /* bash */''
-          cp -P ${grmr}/parser/*.so $out/parser
+          cp --no-dereference ${grmr}/parser/*.so $out/parser
         '') treesitter_grammars;
 
         builderText = (/* bash */''
