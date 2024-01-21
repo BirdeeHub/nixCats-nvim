@@ -649,8 +649,10 @@ require('which-key').register({
 --[[ ------------------------------------- ]]
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
--- require('mason').setup()
--- require('mason-lspconfig').setup()
+if not require('nixCatsUtils').isNixCats then
+  require('mason').setup()
+  require('mason-lspconfig').setup()
+end
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
