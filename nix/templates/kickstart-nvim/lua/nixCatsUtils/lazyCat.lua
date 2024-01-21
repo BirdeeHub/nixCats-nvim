@@ -67,9 +67,12 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
         nixCatsConfigDir,
         nixCatsPath,
         grammarDir,
+        -- vim.fn.stdpath("data") .. "/site",
         DEFAULT[2],
+        -- LAZYPATH
         ME,
         vim.env.VIMRUNTIME,
+        -- vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim",
         DEFAULT[5],
         nixCatsConfigDir .. "/after",
       }
