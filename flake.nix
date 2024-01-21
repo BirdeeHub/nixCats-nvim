@@ -358,15 +358,23 @@
 
   # see :help nixCats.flake.outputs.exports
   flake-utils.lib.eachDefaultSystem (system: let
+    # get our base builder
     inherit (utils) baseBuilder;
+    # give it everything except packageDefinitions
     customPackager = baseBuilder luaPath {
+      # we pass in the things to make a pkgs variable to build nvim with later
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
+      # and also our categoryDefinitions
     } categoryDefinitions;
+
+    # and this will be our builder! it takes a name from our packageDefinitions as an argument, and builds an nvim.
     nixCatsBuilder = customPackager packageDefinitions;
-    # this is just for using utils such as pkgs.mkShell
+
+    # this pkgs variable is just for using utils such as pkgs.mkShell
+    # within this outputs set.
+    pkgs = import nixpkgs { inherit system; };
     # The one used to build neovim is resolved inside the builder
     # and is passed to our categoryDefinitions and packageDefinitions
-    pkgs = import nixpkgs { inherit system; };
   in {
     # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
 
@@ -388,11 +396,14 @@
       '';
     };
 
-    # To choose settings and categories from the flake that calls this flake.
-    # and you export overlays so people dont have to redefine stuff.
+    # To set just packageDefinitions from the config that calls this flake.
     inherit customPackager;
   }) // {
 
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
     # these outputs will be NOT wrapped with ${system}
 
     # we also export a nixos module to allow configuration from configuration.nix
@@ -407,13 +418,12 @@
       inherit dependencyOverlays luaPath
         categoryDefinitions packageDefinitions nixpkgs;
     };
-    # now we can export some things that can be imported in other
-    # flakes, WITHOUT needing to use a system variable to do it.
-    # and update them into the rest of the outputs returned by the
-    # eachDefaultSystem function.
-    inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
+    inherit utils categoryDefinitions packageDefinitions;
     inherit (utils) templates baseBuilder;
     keepLuaBuilder = utils.baseBuilder luaPath;
+    inherit dependencyOverlays;
+    # dependencyOverlays was wrapped with the ${system} variable earlier,
+    # so we export that here as well.
   };
 
 }
