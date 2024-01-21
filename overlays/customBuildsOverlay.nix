@@ -4,7 +4,7 @@ importName: inputs: let
 
       lazy-nvim = super.vimUtils.buildVimPlugin {
         pname = "lazy.nvim";
-        version = "2023-11-04";
+        version = "2024-01-21";
         src = super.fetchFromGitHub {
           owner = "folke";
           repo = "lazy.nvim";
