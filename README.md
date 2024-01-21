@@ -2,15 +2,19 @@
 
 This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
 
-- If you like your lua configuration, but want to do all that cool direnv stuff you heard about with nix?
+- If you like your normal nvim configuration, but want to do all that cool direnv stuff you heard about with nix?
 
 - You want to make a nix-based neovim distribution out of your normal neovim distribution and export advanced options to your nix users without having to do all the nix wiring for that yourself?
 
 - You are new to nix and just want to initialize a template into your existing neovim directory, add a few programs and plugins to a list and have it just work, but want to make sure you arent backed into any corners later? And be guided along the way by extensive IN-EDITOR DOCUMENTATION?
 
-Then this is your project! (just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
+Then this is your place to start!
 
-This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
+(just remember to change your $EDITOR variable, the reason why is explained below in the section marked `Attention:`)
+
+This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
+
+All configuration can be done from flake.nix, with the option of custom overlays for specifc things there should you need it (rare!).
 
 The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
 
@@ -20,14 +24,13 @@ There is no live updating from nix. Nix runs, it installs your stuff, and then i
 
 The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY and have your lua know about it without any stress (thanks to the nixCats messaging system).
 
-Simply add plugins and lsps and stuff to lists in flake.nix, and then configure like normal!
+Simply add plugins and lsps and stuff to lists in flake.nix, and then configure like normal! You dont always want a plugin? Ask `nixCats("the.category")` and learn if you want to load it this time!
 
 You will not be backed into any corners using the nixCats scheme, either as a flake or module.
 
 It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
 
-However the flake can be used without nixos or home manager, so if you don't have that set up, you should choose the flake to start with.
-
+However the flake can be used without nixos or home manager, so if you don't have that set up or aren't on nixos, you should choose the flake to start with.
 
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
