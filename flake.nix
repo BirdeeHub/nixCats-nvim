@@ -123,8 +123,7 @@
         ];
         # yes these category names are arbitrary
         markdown = with pkgs.vimPlugins; [
-          # yes it knows this isn't with pkgs.vimPlugins
-          pkgs.nixCatsBuilds.markdown-preview-nvim
+          markdown-preview-nvim
         ];
         lazy = with pkgs.vimPlugins; [
           # lazy will be imported via pkgs.vimPlugins.lazy-nvim
