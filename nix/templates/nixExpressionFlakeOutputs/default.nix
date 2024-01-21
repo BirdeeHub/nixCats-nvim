@@ -26,7 +26,6 @@ and recieve a set of flake outputs to pass anywhere you want.
     ((import ./overlays inputs) ++ [
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
-      inputs.codeium.overlays.${system}.default
     ])) ];
   in { inherit dependencyOverlays; });
   inherit (system_resolved) dependencyOverlays;
