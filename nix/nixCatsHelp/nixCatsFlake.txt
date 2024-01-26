@@ -696,7 +696,7 @@ as the nixos module has for system, but for the user managed by home-manager.
           a different nixpkgs import to use. By default will use the one from the flake.
         '';
         example = ''
-          inputs.nixpkgs
+          nixpkgs_version = inputs.nixpkgs
         '';
       };
 
@@ -707,9 +707,9 @@ as the nixos module has for system, but for the user managed by home-manager.
           A list of overlays to make available to nixCats but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
-        example = ''
-          [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
-        '';
+        example = (lib.literalExpression ''
+          addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+        '');
       };
 
       enable = mkOption {
@@ -721,11 +721,11 @@ as the nixos module has for system, but for the user managed by home-manager.
       luaPath = mkOption {
         default = luaPath;
         type = types.str;
-        description = ''
+        description = (lib.literalExpression ''
           The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${./.}".
-        '';
-        example = ''"''${./.}/systemLuaConfig"'';
+          In the base nixCats flake, this is "${./.}".
+        '');
+        example = (lib.literalExpression "${./.}/userLuaConfig");
       };
 
       packageNames = mkOption {
@@ -733,7 +733,7 @@ as the nixos module has for system, but for the user managed by home-manager.
         type = (types.listOf types.str);
         description = ''A list of packages from packageDefinitions to include'';
         example = ''
-          [ "nixCats" ]
+          packageNames = [ "nixCats" ]
         '';
       };
 
@@ -741,17 +741,17 @@ as the nixos module has for system, but for the user managed by home-manager.
         replace = mkOption {
           default = null;
           type = types.nullOr (types.functionTo (types.attrsOf types.anything));
-          description = ''
+          description = (lib.literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
-            you should use ''${pkgs.system} provided in the packageDef set
+            you should use ${pkgs.system} provided in the packageDef set
             to access system specific items.
             Will replace the categoryDefinitions of the flake with this value.
-          '';
+          '');
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
+            categoryDefinitions.replace = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
         merge = mkOption {
@@ -767,7 +767,7 @@ as the nixos module has for system, but for the user managed by home-manager.
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
+            categoryDefinitions.merge = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
       };
@@ -776,18 +776,19 @@ as the nixos module has for system, but for the user managed by home-manager.
         default = null;
         description = ''
           VERY IMPORTANT when setting aliases for each package,
-          they must not be the same as any other neovim package for that user.
+          they must not be the same as ANY other neovim package for that user.
           YOU MAY NOT ALIAS TO NVIM ITSELF
           It will cause a build conflict.
+          again, YOU MAY NOT ALIAS TO NVIM ITSELF
 
-          You also cannot install nixCats via multiple sources per user.
-          i.e. if you have it installed as a package, you cannot install it
-          as a module.
+          You also cannot install nixCats via
+          multiple nixCats modules from different repos per user.
+          This should not be an issue as a single module can output multiple packages.
 
-          However, you can have as many nixCats as you want,
+          You can have as many nixCats installed per user as you want,
           as long as you obey those rules.
           This is a big step up from only being able to have 1 neovim
-          at all per user, so excuse me for the inconvenience. This may be fixed someday.
+          at all per user, so excuse me for the inconvenience.
 
           for information on the values you may return,
           see :help nixCats.flake.outputs.settings

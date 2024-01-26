@@ -25,7 +25,7 @@
           a different nixpkgs import to use. By default will use the one from the flake.
         '';
         example = ''
-          inputs.nixpkgs
+          nixpkgs_version = inputs.nixpkgs
         '';
       };
 
@@ -36,9 +36,9 @@
           A list of overlays to make available to nixCats but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
-        example = ''
-          [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
-        '';
+        example = (lib.literalExpression ''
+          addOverlays = [ (self: super: { neovimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+        '');
       };
 
       enable = mkOption {
@@ -50,11 +50,11 @@
       luaPath = mkOption {
         default = luaPath;
         type = types.str;
-        description = ''
+        description = (lib.literalExpression ''
           The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${./.}".
-        '';
-        example = ''"''${./.}/systemLuaConfig"'';
+          In the base nixCats flake, this is "${./.}".
+        '');
+        example = (lib.literalExpression "${./.}/userLuaConfig");
       };
 
       packageNames = mkOption {
@@ -62,7 +62,7 @@
         type = (types.listOf types.str);
         description = ''A list of packages from packageDefinitions to include'';
         example = ''
-          [ "nixCats" ]
+          packageNames = [ "nixCats" ]
         '';
       };
 
@@ -70,17 +70,17 @@
         replace = mkOption {
           default = null;
           type = types.nullOr (types.functionTo (types.attrsOf types.anything));
-          description = ''
+          description = (lib.literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
-            you should use ''${pkgs.system} provided in the packageDef set
+            you should use ${pkgs.system} provided in the packageDef set
             to access system specific items.
             Will replace the categoryDefinitions of the flake with this value.
-          '';
+          '');
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
+            categoryDefinitions.replace = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
         merge = mkOption {
@@ -96,7 +96,7 @@
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: { }
+            categoryDefinitions.merge = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
       };
