@@ -8,8 +8,8 @@ importName: inputs: let
         src = super.fetchFromGitHub {
           owner = "folke";
           repo = "lazy.nvim";
-          rev = "28126922c9b54e35a192ac415788f202c3944c9f";
-          sha256 = "sha256-Qicyec1ZvSb5JVVTW8CrTjndHCLso8Rb2V5IA6D4Rps=";
+          rev = "aedcd79811d491b60d0a6577a9c1701063c2a609";
+          sha256 = "sha256-8gbwjDkpXOSiLwv7fIBSZWFPi8kd6jyLMFa3S5BZXdM=";
         };
         meta.homepage = "https://github.com/folke/lazy.nvim/";
       };
