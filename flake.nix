@@ -27,10 +27,6 @@
     #   flake = false;
     # };
 
-    # a flake import. We will import this one with an overlay
-    # but you could also import the package itself instead.
-    # overlays are just nice if they are offered.
-    nixd.url = "github:nix-community/nixd/5b338749ab1eb158ba17d56a249ec28c5fce40c6";
   };
 
   # see :help nixCats.flake.outputs
@@ -66,7 +62,6 @@
         # use `pkgs.neovimPlugins`, which is a set of our plugins.
         (utils.standardPluginOverlay inputs)
         # add any flake overlays here.
-        inputs.nixd.overlays.default
       ];
       # these overlays will be wrapped with ${system}
       # and we will call the same flake-utils function
