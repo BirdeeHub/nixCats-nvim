@@ -2,6 +2,8 @@ importName: inputs: let
   overlay = self: super: { 
     ${importName} = {
 
+      # will be deleted after hits nixpkgs-unstable
+      # https://nixpk.gs/pr-tracker.html?pr=283933
       lazy-nvim = super.vimUtils.buildVimPlugin {
         pname = "lazy.nvim";
         version = "2024-01-23";

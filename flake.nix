@@ -122,7 +122,7 @@
         ];
         lazy = with pkgs.vimPlugins; [
           # lazy will be imported via pkgs.vimPlugins.lazy-nvim
-          # after newest version of lazy makes it to nixpkgs-unstable
+          # after https://nixpk.gs/pr-tracker.html?pr=283933
           pkgs.nixCatsBuilds.lazy-nvim
         ];
         general = {

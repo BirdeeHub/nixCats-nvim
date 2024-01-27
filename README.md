@@ -64,7 +64,7 @@ However the flake can be used without nixos or home manager, so if you don't hav
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
-> lazy.nvim wrapper util requires the newest version of lazy. In order to keep the same internal folder name as the official pkgs.vimPlugins derivation, it is imported in [customBuildsOverlay](./overlays/customBuildsOverlay.nix) until it is updated in nixpkgs-unstable.
+> lazy.nvim wrapper util requires the newest version of lazy. In order to keep the same internal folder name as the official pkgs.vimPlugins derivation, it is imported in [customBuildsOverlay](./overlays/customBuildsOverlay.nix) until it is updated in nixpkgs-unstable [tracker](https://nixpk.gs/pr-tracker.html?pr=283933)
 
 ## Introduction
 
