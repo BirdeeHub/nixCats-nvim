@@ -60,6 +60,10 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazypath = regularLazyDownload()
     end
 
+    if type(lazyCFG) ~= "table" then
+      lazyCFG = {}
+    end
+
     if lazyCFG.performance == nil then
       lazyCFG.performance = {}
     end

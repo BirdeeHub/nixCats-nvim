@@ -508,7 +508,7 @@ They look like this:
     } categoryDefinitions;
     nixCatsBuilder = customPackager packageDefinitions;
 
-    # this is just for using utils such as pkgs.mkShell
+    # this is just for using utils in the following section such as pkgs.mkShell
     # The one used to build neovim is resolved inside the builder
     # and is passed to our categoryDefinitions and packageDefinitions
     pkgs = import nixpkgs { inherit system; };
@@ -581,7 +581,7 @@ settings and categories you wanted in a flake that imports this flake,
 without needing to redefine anything else.
 
 Then <dependencyOverlays>.
-These are a list of all overlays that you imported.
+These are all the overlays that you imported.
 You may use utils.mergeOverlayLists to incorporate overlays 
 from other nixCats flakes without worrying about naming conflicts.
 
@@ -712,6 +712,9 @@ as the nixos module has for system, but for the user managed by home-manager.
         '');
       };
 
+      # the above 2 are the only ones not also available at
+      # a per-user level in the nixos system module.
+
       enable = mkOption {
         default = false;
         type = types.bool;
@@ -837,7 +840,7 @@ as the nixos module has for system, but for the user managed by home-manager.
               description = "Enable ${defaultPackageName}";
             };
             # the same options but per user....
-            # Not here because its the same.
+            # Not shown here because its the same.
           };
         });
       };

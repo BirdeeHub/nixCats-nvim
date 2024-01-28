@@ -52,9 +52,42 @@ But it cant hurt to include anyway.
     non_nix_value = true,
   }
 
+  if require('nixCatsUtils').isNixCats then
+    print('using nixCats')
+  end
+
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
 For instructions on using the lazy wrapper, check out this template example!
+
+Use the following command in a new directory and check it out!
+>bash
+  nix flakt init -t github:BirdeeHub/nixCats-nvim#kickstart-nvim
+<
+Once you understand what is going on to use the lazy wrapper util,
+use lazyCat in the lua utils template!
+
+The 2 main utilities at require('nixCatsUtils.lazyCat')
+>lua
+  --the main wrapper
+  function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
+  -- pluginTable is a table of plugin names, either as a list or as the names
+  -- of a table of pluginName = "a string";
+
+  -- if not nix, return the first thing.
+  -- If it is nix, return the second, or nil if not provided.
+  -- used for disabling things like lazy build steps on nix when needed
+  function M.lazyAdd(v, o)
+<
+
+The other 2:
+>lua
+  -- to help you merge the start and opt lists in require('nixCats').included
+  function M.mergePluginTables(table1, table2)
+  -- its available if you want it, but it is used in the wrapper on pluginTable
+  function M.getTableNamesOrListValues(pluginTable)
+<
+The tutorial:
 >nix
     kickstart-nvim = {
       path = ./kickstart-nvim;
@@ -84,7 +117,7 @@ For instructions on using the lazy wrapper, check out this template example!
   -- somewhere else checked by category.
 >lua
   require('nixCatsUtils.catPacker').setup({
-    -- My plugins here, an example for you.
+    -- My plugins here from flake.nix, an example for you.
     { 'joshdick/onedark.vim', },
     { 'nvim-tree/nvim-web-devicons', },
 

@@ -121,9 +121,7 @@
           markdown-preview-nvim
         ];
         lazy = with pkgs.vimPlugins; [
-          # lazy will be imported via pkgs.vimPlugins.lazy-nvim
-          # after https://nixpk.gs/pr-tracker.html?pr=283933
-          pkgs.nixCatsBuilds.lazy-nvim
+          lazy-nvim
         ];
         general = {
           gitPlugins = with pkgs.neovimPlugins; [

@@ -14,13 +14,13 @@ Then this is your place to start!
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
-All configuration can be done from flake.nix, with the option of custom overlays for specifc things there should you need it (rare!).
+All loading can be done from flake.nix, with the option of custom overlays for specifc things there should you need it (rare!). Alternatively, you could import it as a module (nixos and/or home-manager)! Then configure in the normal neovim scheme.
 
 The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like neodev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
 
 Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
 
-There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file. And thus nixCats was born. A system for doing just that in an effective and organized manner.
+There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file. And thus nixCats was born. A system for doing just that in an effective and organized manner. It can pass anything other than nix functions, because again, nix is done by the time any lua ever executes.
 
 The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY and have your lua know about it without any stress (thanks to the nixCats messaging system).
 
@@ -64,7 +64,6 @@ However the flake can be used without nixos or home manager, so if you don't hav
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
-> lazy.nvim wrapper util requires the newest version of lazy. In order to keep the same internal folder name as the official pkgs.vimPlugins derivation, it is imported in [customBuildsOverlay](./overlays/customBuildsOverlay.nix) until it is updated in nixpkgs-unstable [tracker](https://nixpk.gs/pr-tracker.html?pr=283933)
 
 ## Introduction
 

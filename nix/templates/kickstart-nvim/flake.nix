@@ -102,7 +102,7 @@
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
         lazy = with pkgs.vimPlugins; [
-          pkgs.nixCatsBuilds.lazy-nvim
+          lazy-nvim
         ];
         general = {
           gitPlugins = with pkgs.neovimPlugins; [
