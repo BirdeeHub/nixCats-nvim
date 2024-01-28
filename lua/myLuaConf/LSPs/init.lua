@@ -10,8 +10,7 @@ if nixCats('neonixdev') then
   require('neodev').setup({})
   -- this allows our thing to have plugin library detection
   -- despite not being in our .config/nvim folder
-  -- I learned about it here:
-  -- https://github.com/lecoqjacob/nixCats-nvim/blob/main/.neoconf.json
+  -- NEOCONF REQUIRES .neoconf.json AT PROJECT ROOT
   require("neoconf").setup({
     plugins = {
       lua_ls = {

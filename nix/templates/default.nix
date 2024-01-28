@@ -41,6 +41,13 @@
       :help nixCats.flake.nixperts.overlays
     '';
   };
+  neoconfFile = {
+    path = ./neoconfFile;
+    description = ''
+      The .neoconf.json file at project root of nixCats telling neodev to perform
+      plugin library detection despite not being in $XDG_CONFIG_HOME/nvim folder.
+    '';
+  };
   nixExpressionFlakeOutputs = {
     path = ./nixExpressionFlakeOutputs;
     description = ''

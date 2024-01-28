@@ -29,10 +29,9 @@ local servers = {}
 --   require('neodev').setup({})
 --     -- this allows our thing to have plugin library detection
 --     -- despite not being in our .config/nvim folder
---     -- I learned about it here:
---     -- https://github.com/lecoqjacob/nixCats-nvim/blob/main/.neoconf.json
 --     -- These need to be loaded after mason setup function
 --     -- and before passing to mason lspconfig
+--     -- NEOCONF REQUIRES .neoconf.json AT PROJECT ROOT
 --   require("neoconf").setup({
 --     plugins = {
 --       lua_ls = {
