@@ -1,54 +1,55 @@
 ---------------------------------------------------------------------------------------
 INSTALLATION:                                                   *nixCats.installation_options*
 >bash
-  # to test:
-  nix shell github:BirdeeHub/nixCats-nvim
-  #or
-  nix shell github:BirdeeHub/nixCats-nvim#nixCats
-  # If using zsh with extra regexing, be sure to escape the #
-<
-Now that you are within an editor outfitted to edit a flake,
-you can access the help for nixCats by typing :help nixCats and choosing one
-of the options suggested by the auto-complete.
-
 Now that you have access to the help and a nix lsp, to get started,
 first exit neovim. (but not the nix shell!)
 
 In a terminal, navigate to your nvim directory and run the following command:
 >bash
+  # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
+  # module template:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#module
+  # for package manager integration utilities for functionality without nix
+  # added at lua/nixCatsUtils also run:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
+  # If using zsh with extra regexing, be sure to escape the #
 <
-This will create an empty version of flake.nix for you to fill in,
+This will create an empty version of flake.nix (or systemCat.nix and homeCat.nix) for you to fill in,
 along with an empty overlays directory for any custom builds from source
-required, if any. It will directly import the builder, utils, and
+required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
 
-Re-enter the nixCats nvim version by typing nvim . and take a look!
+Re-enter the nixCats nvim version by typing nixCats . and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
 
-You add plugins to the flake.nix, call the default setup function in your lua,
+You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
-only when that particular category is enabled in the current package.
-for how to check, see :h `nixCats`
-
+only when that particular category is enabled in the current package
+by checking the output of:
+>lua
+  nixCats('your.cats.name')
+<
 It is a similar process to migrating to a new neovim plugin manager.
 
-You are, of course, free to clone or fork nixCats-nvim instead if you prefer.
+You are, of course, free to clone or fork nixCats-nvim instead
+and migrate your stuff into it if you prefer.
 
 Use the help and nixCats-nvim itself as an example.
 The help will still be accessible in your version of the editor.
 
-When you have your plugins added, you can build it using 'nix build' and it
-will build to a result directory, or 'nix profile install' to install it to your
-profile. Make sure you run 'git add .' first as anything not staged will not
+When you have your plugins added, you can build it using nix build and it
+will build to a result directory, or nix profile install to install it to your
+profile. Make sure you run `git add .` first as anything not staged will not
 be added to the store and thus not be findable by either nix or neovim.
 See nix documentation on how to use these commands further at:
-https://nixos.org/manual/nix/stable/command-ref/new-cli/nix
+[the nix command reference manual]
+(https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
 
 When you have a working version, you can begin to explore the many
 options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
-There are many, thanks to the virtues of the category scheme of this flake.
+There are MANY, thanks to the virtues of the category scheme of this flake.
 
 It is made to be customized into your own portable nix neovim distribution 
 with as many options as you wish, while requiring you to leave the normal
@@ -63,51 +64,89 @@ There are several other templates.
 They are designed to be used as examples for
 importing versions of your nixCats into another existing configuration.
 
-They are not particularly suited to being ran directly in your
-nvim config folder like the first one was.
-They are minimal examples of how to import nixCats in different ways.
+---------------------------------------------------------------------------------------
+                                                           *nixCats.templates*
+The templates are imported by the utils set.
+They are located at nix/templates in this repo.
+The following is nix/templates/default.nix
+>nix
+  {
+    default = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
+    };
+    fresh = {
+      path = ./fresh;
+      description = "starting point template for making your neovim flake";
+    };
+    module = {
+      path = ./module;
+      description = ''
+        starting point for creating a nixCats module for your system and home-manager
+      '';
+    };
+    LSPs = {
+      path = ./LSPs;
+      description = ''
+        An EXAMPLE template showing how to import lsps via mason when not
+        using nix.
+      '';
+    };
+    luaUtils = {
+      path = ./luaUtils;
+      description = ''
+        A template that includes lua utils for using neovim package managers
+        when your config file is not loaded via nix.
+      '';
+    };
+    overlayHub = {
+      path = ./overlayHub;
+      description = ''
+        A template for overlays/default.nix
+        :help nixCats.flake.nixperts.overlays
+      '';
+    };
+    overlayFile = {
+      path = ./overlayfile;
+      description = ''
+        A template for an empty overlay file defined as described in
+        :help nixCats.flake.nixperts.overlays
+      '';
+    };
+    neoconfFile = {
+      path = ./neoconfFile;
+      description = ''
+        The .neoconf.json file at project root of nixCats telling neodev to perform
+        plugin library detection despite not being in $XDG_CONFIG_HOME/nvim folder.
+      '';
+    };
+    nixExpressionFlakeOutputs = {
+      path = ./nixExpressionFlakeOutputs;
+      description = ''
+        how to import as just the outputs section of the flake, so that you can use
+        flake-utils.lib.meld to merge its outputs with your system outputs
+        (or just add the ones you want manually)
+        It is best practice to avoid using the system pkgs and its overlays in this method
+        as then you could not output packages for systems not defined in your system flake.
+        It creates a new one instead to use.
 
-This one shows the options that get exported as a home manager module
-It also shows how to import the module.
-It is not a complete home manager flake in and of itself.
->bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#homeModule
+        Call it from your system flake and call it with inputs (and optionally pkgs) as arguments.
+      '';
+    };
+    kickstart-nvim = {
+      path = ./kickstart-nvim;
+      description = ''
+        The entirety of the main init.lua file implemented as a nixCats flake.
+        With additional nix items for sanity.
+        This is to serve as the tutorial for using the nixCats lazy wrapper.
+      '';
+    };
+  }
 <
-This one shows the options that get exported as a nixOS module
-It also shows how to import the module.
-It is not a complete nixOS flake in and of itself.
->bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#nixosModule
-<
-This next one shows, within another flake, how to import 
-only some parts of other nixCats and overwrite or add others.
-You could use it, for example, to import just the overlays from another nixCats
-without having to copy paste them into your own version.
->bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#mergeFlakeWithExisting
-<
-When you make categories in your flake.nix,
-and then check them in lua, that creates your primary set of options.
-
-You can modify ANYTHING within a flake that imports your nixCats,
-however, usually, all you would need to do is choose a package you defined,
-or put different values in categories, because you can check the categories
-set within your lua and react to them.
-
-You could more or less build your own nixVim in your flake by choosing
-your categories carefully and referring to them within your lua.
-And then the options would get automatically exported
-for any way a nix user may want to set them.
-
-This is what it looks like to choose a specific package
-or choose new categories within another flake that imports yours.
-Yours will look slightly different, because you will 
-probably choose to make different categories than I did.
-And you will probably also choose different package names.
+---------------------------------------------------------------------------------------
 
 You could run nix build on a standalone flake.nix containing this.
 It could produce any of 4 configured neovim packages.
-
 >nix
   {
       description = "How to import nixCats flake in a flake. Several ways.";
@@ -118,54 +157,53 @@ It could produce any of 4 configured neovim packages.
       };
       outputs = { self, nixpkgs, flake-utils, nixCats-nvim }@inputs: 
       flake-utils.lib.eachDefaultSystem (system: let 
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              nixCats-nvim.overlays.${system}.nixCats
-              nixCats-nvim.overlays.${system}.regularCats
-            ];
-          };
-          # this is the equivalent of the nixCats package
-          # but with a different colorscheme
-          customVimBuilder = nixCats-nvim.customPackager.${system} packageDefinitions;
-          packageDefinitions = {
-            customvim = {
-              settings = {
-                wrapRc = true;
-                configDirName = "nixCats-nvim";
-                viAlias = false;
-                vimAlias = true;
-              };
-              categories = {
-                generalBuildInputs = true;
-                markdown = true;
-                gitPlugins = true;
-                general = true;
-                custom = true;
-                neonixdev = true;
-                test = true;
-                debug = false;
-                # this does not have an associated category of plugins, 
-                # but lua can still check for it
-                lspDebugMode = false;
-                themer = true;
-                # you could also pass something else:
-                colorscheme = "catppuccin";
-                # you could :lua print(vim.inspect(require('nixCats')))
-                # see :help nixCats
-              };
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            nixCats-nvim.overlays.${system}.nixCats
+            nixCats-nvim.overlays.${system}.regularCats
+          ];
+        };
+        # this is the equivalent of the nixCats package
+        # but with a different colorscheme
+        customVimBuilder = nixCats-nvim.customPackager.${system} packageDefinitions;
+        packageDefinitions = {
+          customvim = {
+            settings = {
+              wrapRc = true;
+              configDirName = "nixCats-nvim";
+              aliases = [ "customVim" ];
+            };
+            categories = {
+              generalBuildInputs = true;
+              markdown = true;
+              gitPlugins = true;
+              general = true;
+              custom = true;
+              neonixdev = true;
+              test = true;
+              debug = false;
+              # this does not have an associated category of plugins, 
+              # but lua can still check for it
+              lspDebugMode = false;
+              themer = true;
+              # you could also pass something else:
+              colorscheme = "catppuccin";
+              # see :help nixCats
             };
           };
-      in
-          {
-              packages.default = nixCats-nvim.packages.${system}.nixCats;
-              packages.nixCats = pkgs.nixCats;
-              packages.regularCats = pkgs.regularCats;
-              packages.customvim = customVimBuilder "customvim";
-          }
-      );
+        };
+    in
+      {
+        packages.default = nixCats-nvim.packages.${system}.nixCats;
+        packages.nixCats = pkgs.nixCats;
+        packages.regularCats = pkgs.regularCats;
+        packages.customvim = customVimBuilder "customvim";
+      }
+    );
   }
 <
+---------------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

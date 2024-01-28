@@ -11,22 +11,16 @@ Everything else is done in a regular lua config style.
 Download in flake.nix and then, simply pretend the root of the flake 
 is the root of your Lua config. 
 
-1 exception, when wrapRc = true, 
-`stdpath('config')` will still point to ~/.config/<configDirName>.
-But your lua config will be in the store.
-This is ok, because most of the reason for a plugin to use
-it would be to find something outside the directory. 
-Inside is mostly handled by vim.
-You could use vim.g.configdir,
-which I make when I load the config folder,
-to get current config directory for your uses, if ever necessary.
-It will be present and correct regardless of settings.
-You could also use debug.getinfo(1, "S").source:sub(2) or something similar.
-Keep in mind they will be read-only if in the store!
-
 *******************************************************
-One IMPORTANT note:
-When editing the files within the flake directory,
+TWO IMPORTANT NOTES:
+
+<1> YOU CANNOT LAUNCH THIS VIA nvim COMMAND
+      IT HAS THE NAME OF THE PACKAGE YOU SET,
+      AND WHATEVER ALIASES YOU GAVE IT.
+      This is due to the ability to install multiple nvims via home manager
+      or per single user on nixos.
+
+<2> When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 Using wrapRc = true would mean this also applies to lua files.
@@ -38,6 +32,18 @@ Related:
 For detecting what was included by 
 the flake in your Lua, see:
 :help `nixCats`
+
+`stdpath('config')` will still point to ~/.config/<configDirName>.
+But your lua config will be in the store.
+This is ok, because most of the reason for a plugin to use
+it would be to find something outside the directory. 
+Inside is mostly handled by vim.
+You could use vim.g.configdir,
+which I make when I load the config folder,
+to get current config directory for your uses, if ever necessary.
+It will be present and correct regardless of settings.
+You could also use debug.getinfo(1, "S").source:sub(2) or something similar.
+Keep in mind they will be read-only if in the store!
 
 =======================================================================================
 Flake Inputs:                                            *nixCats.flake.inputs*
@@ -52,8 +58,8 @@ you may use this format to import them, replacing the fields marked with <>
 <
 If the plugin has a dot in it's name, you should name it something else.
 The name here only affects the filename of the overall plugin, and should
-only affect things like packadd that refer to the actual filename of the
-plugin. Usually I would replace it with - or _
+only affect things like vim.cmd("packadd <filename>") that refer to
+the actual filename of the plugin. Usually I would replace it with _
 You will then add it to categoryDefinitions later with the NEW name.
 You may also use this to pin the version of a plugin.
 More info on flake url syntax at:
@@ -83,13 +89,53 @@ unless they are for build time, then put them under propagatedBuildInputs
 Flake Outputs Introduction                              *nixCats.flake.outputs*
 
 With our inputs to our flake taken care of:
+First, we take care of importing our utils set.
+The reason we are doing this now, is so that it can be defined outside of
+the flake-utils.lib.eachDefaultSystem function, and thus we can export it
+without having to include a system variable when we import it somewhere else.
+>nix
+  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
+    utils = (import ./nix/utils).utils;
+    luaPath = "${./.}";
+    extra_pkg_config = {
+      # allowUnfree = true;
+    };
+<
+We call flake utils to get system variable for all default systems.
+It simply calls the function with each system value, and maps the resulting
+set from { mySet = {}; } to { mySet.${system} = {}; }
+Many overlays require being accessed via ${system} variable in this manner,
+and thus there is a method for handling it in nixCats.
+>nix
+  system_resolved = flake-utils.lib.eachDefaultSystem (system: let
+    # see :help nixCats.flake.outputs.overlays
+    dependencyOverlays = (import ./overlays inputs) ++ [
+      # This overlay grabs all the inputs named in the format
+      # `plugins-<pluginName>`
+      # Once we add this overlay to our nixpkgs, we are able to
+      # use `pkgs.neovimPlugins`, which is a set of our plugins.
+      (utils.standardPluginOverlay inputs)
+      # add any flake overlays here.
+      inputs.nixd.overlays.default
+    ];
+    # these overlays will be wrapped with ${system}
+    # and we will call the same flake-utils function
+    # later on to access them.
+  in { inherit dependencyOverlays; });
+  inherit (system_resolved) dependencyOverlays;
+<
+This will allow us to pass system independent overlays to our module options.
+And also allow more outputs to be outside of the 2nd and final flake utils,
+allowing us to avoid mapping certain things in this manner.
 
-First, we call flake utils to get system variable for all default systems.
-Then we import our nixCats utils, so that we can access things
-like overlay <1>, utils.standardPluginOverlay.
+Managing the system variable in combination with overlays
+can be one of the harder parts of flake usage.
+This flake resolves our pkgs instance later to help with this, and takes care
+of passing the correct pkgs instance to the categoryDefinitions for use in
+defining your plugins.
 
                                                *nixCats.flake.outputs.overlays*
-Then, we define our overlays.
+We now define our overlays.
 We have 2 main overlays to discuss.
 
 <1>
@@ -106,8 +152,10 @@ with 'pkgs.neovimPlugins.somepluginname'
 <2>
 -- The second is overlays/customBuildsOverlay.nix:
 
+It is imported via overlays/default.nix above
+
 If you need to interact with one of these overlays, it will be this one.
-You should not need to do it much. 
+You should not need to do it much.
 overlays/default.nix imports this overlay and any others like it.
 see :help `nixCats.flake.nixperts.overlays`
 
@@ -122,50 +170,9 @@ If you decide you wish to split your customBuildsOverlay up,
 see :help `nixCats.flake.nixperts.overlays`
 or look at the overlays/default.nix file.
 
-<IMPORTANT> When defining your overlays,
-all overlays that are not defined via
-overlay <1>, the standardPluginOverlay, should be
-defined in a SEPARATE LIST named <otherOverlays>.
-Otherwise the exports will not work correctly.
-
-<pkgs>
--- After the overlays we wish to include are all defined:
-
-We now generate the pkgs set that contains all the nixpkgs and overlay packages, 
-and the system variable from flake-utils. If you imported any flakes with
-overlays, add their overlay here as well.
-
-pkgs will contain all our plugins and programs we will need from this point on.
-with the occasional exception of a flake that has no overlays, which you just
-add to a category directly.
-
----------------------------------------------------------------------------------------
-Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
-
-Now we define our builder function.
-We do this by importing ./nix/builder/default.nix which is
-a function that takes 5 arguments.
-Right now we are going to call it with just the first 4 of them. This will
-leave us with a function that takes 1 argument.
-That argument is the name of the neovim package to be packaged.
-
-1. The path to the lua to include (in the flake, we use the self variable to get
-     this path and wrap the lua when wrapRc = true)
-2. The pkgs set so that it can use it for making its own derivations.
-3. our function that takes an individual package definition
-     and returns a set of categoryDefinitions.
-4. our set of packageDefinitions see: `nixCats.flake.outputs.packageDefinitions`
-
-It is now a function that takes a name, and returns your chosen neovim package.
->nix
-      baseBuilder = import ./nix/builder;
-      nixCatsBuilder = baseBuilder self pkgs categoryDefinitions packageDefinitions;
-        # notice how it doesn't care the last 2 are defined lower in the file?
-<
-      # We defined baseBuilder separately
-      # so that we can easily export it later.
-      # this will ensure that other flakes that import
-      # only this function from our flake may still access the help.
+<IMPORTANT> When defining your overlays, they will be
+defined in a SEPARATE LIST named <dependencyOverlays>.
+You will need <dependencyOverlays> later.
 
 ---------------------------------------------------------------------------------------
                                             *nixCats.flake.outputs.categories*
@@ -178,7 +185,7 @@ which allows categoryDefinitions to be much more dynamic.
 
 These are the things you can return:
 >nix
-  categoryDefinitions = packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 <
 <propagatedBuildInputs> 
   a flexible set of categories, each containing internal
@@ -227,8 +234,6 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
     Therefore, I have included this option.
 }
 
-how this function actually works is covered in more depth in
-:help `nixCats.flake.nixperts.nvimBuilder`
 In essence, the contents of each set listed here are filtered
 based on the packageDefinitions set you provide, 
 where by including categoryname = true; you enable that category.
@@ -332,12 +337,72 @@ This applies in many situations. Take this one for example.
     { plugin = derivation; config.vim = ""; config.lua = ""; }
 <
 ---------------------------------------------------------------------------------------
+Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
+
+generate packages by calling that builder function we just created.
+Place them in the packageDefinitions set.
+
+First, pick the set of settings you wish to include.
+
+Then, pass it a set of named boolean values like this:
+{ categoryname1 = true; categoryname2 = false; etc... }
+False may be omitted. True may not be omitted.
+Only true matters for what plugins will be added.
+
+These categories are defined in the Builder function above 
+by placing named lists of plugins in the flexible sets provided.
+The category names are the names of those lists. 
+Add a new list, then enable the category here.
+
+If you have categories with the same name in 
+multiple different sets outlined above in the builder,
+all plugins in those categories will be
+included when you set "thatname = true;" here.
+hence, general = true; will include the general lspsAndDeps category,
+as well as the general startupPlugins category.
+
+an example package definition:
+>nix
+  packageDefinitions = {
+    nixCats = { pkgs, ... }: {
+      setting = {
+        wrapRc = true;
+        # nvimSRC = inputs.neovim;
+        aliases = [ "viCat" ];
+      };
+      categories = {
+        custom = true;
+        gitPlugins = true;
+        general = true;
+        neonixdev = true;
+
+        # this does not have an associated category of plugins, 
+        # but lua can still check for it
+        lspDebugMode = false;
+
+        # you could also pass something else and it calls 
+        # builtins.toString on it and passes it in as a string
+        theBestCat = "says meow!!!";
+        # maybe you need to pass a port or path in or something idk.
+        # you could :lua print(require('nixCats').theBestCat)
+      };
+    };
+  };
+<
+You can require('nixCats') for the set you define here in your lua
+It returns a lua table of the same format.
+
+see :help `nixCats`
+
+For more nuances on enabling categories and subcategories, see above at
+:help `nixCats.flake.outputs.categoryDefinitions.scheme`
+
+----------------------------------------------------------------------------------------
 Settings Profiles:                             *nixCats.flake.outputs.settings*
 
 These are the defaults:
 >nix
-  settings = {
-    defaults = {
+    default_settings = {
 <
       # do you want to package the lua from this flake in the store?
       # or would you rather it just read it in your .config/<configDirName>?
@@ -370,157 +435,155 @@ These are the defaults:
       # then put inputs.neovim (or whatever you called it) here.
       # It will be used to override the source for neovim-unwrapped.
       nvimSRC = null;
+<
+      YOU ARE IN CHARGE OF MAKING SURE THESE ALIASES DO NOT COLLIDE WITH
+      ANYTHING ELSE
+>nix
+      # [ "takes" "a" "list" "of" "strings" "and" "makes" "an" "alias" "for" "each" ];
+      aliases = null;
     };
-  };
 <
 If you wish to have something different, you may define some or all of these
 options, in a set within the settings set to be included in the packaging section below.
 
----------------------------------------------------------------------------------------
-Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
+--------------------------------------------------------------------------------------
+Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
-generate packages by calling that builder function we just created.
-Place them in the packageDefinitions set.
+Now we define our builder function.
+We inherit utils.baseBuilder which is
+a function that takes 5 arguments. It is defined in ./nix/builder
+Right now we are going to call it with just the first 4 of them. This will
+leave us with a function that takes 1 argument.
+That argument is the name of the neovim package to be packaged.
 
-First, pick the set of settings you wish to include.
+1. The path to the lua to include (in the flake, we use the self variable to get
+     this path and wrap the lua when wrapRc = true)
 
-Then, pass it a set of named boolean values like this:
-{ categoryname1 = true; categoryname2 = false; etc... }
-False may be omitted. True may not be omitted.
-Only true matters for what plugins will be added.
+2. A set containing:
+  The dependencyOverlays set, extra_pkg_config, nixpkgs, and system so it can
+  resolve pkgs and pass it where it needs to go.
 
-These categories are defined in the Builder function above 
-by placing named lists of plugins in the flexible sets provided.
-The category names are the names of those lists. 
-Add a new list, then enable the category here.
+3. our function that takes an individual package definition
+     and returns a set of categoryDefinitions.
 
-If you have categories with the same name in 
-multiple different sets outlined above in the builder,
-all plugins in those categories will be
-included when you set "thatname = true;" here.
-hence, general = true; will include the general lspsAndDeps category,
-as well as the general startupPlugins category.
+4. our set of packageDefinitions see: `nixCats.flake.outputs.packageDefinitions`
 
-an example package definition:
+It is now a function that takes a name, and returns your chosen neovim package.
 >nix
-  packageDefinitions = {
-    nixCats = { 
-      setting = settings.nixCats;
-      categories = {
-        custom = true;
-        gitPlugins = true;
-        general = true;
-        neonixdev = true;
-
-        # this does not have an associated category of plugins, 
-        # but lua can still check for it
-        lspDebugMode = false;
-
-        # you could also pass something else and it calls 
-        # builtins.toString on it and passes it in as a string
-        theBestCat = "says meow!!!";
-        # maybe you need to pass a port or path in or something idk.
-        # you could :lua print(require('nixCats').theBestCat)
-      };
-    };
-  };
+  flake-utils.lib.eachDefaultSystem (system: let
+    inherit (utils) baseBuilder;
+    customPackager = baseBuilder luaPath {
+      inherit nixpkgs system dependencyOverlays extra_pkg_config;
+    } categoryDefinitions;
+    nixCatsBuilder = customPackager packageDefinitions;
 <
-You can require('nixCats') for the set you define here in your lua
-It returns a lua table of the same format.
-
-see :help `nixCats`
-
-For more nuances on enabling categories and subcategories, see above at
-:help `nixCats.flake.outputs.categoryDefinitions.scheme`
-
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
 
-First, we define our packages.
-We can use utils.mkPackages to do this. 
-It allows us to choose a default package, and
-then it also exports all of them by name to choose from separately.
-
-Then we define our overlays, using utils.mkOverlay to do this for the same reason.
-utils.mkOverlay also makes a default overlay, and then 1 overlay per package.
-
-Then we define our dev shell. We simply use our nixCatsBuilder for that one.
->nix
-  packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
-
-  overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
-
-  devShell = pkgs.mkShell {
-    name = "nixCats-devShell";
-    packages = [ (nixCatsBuilder "nixCats") ];
-    inputsFrom = [ ];
-    shellHook = ''
-    '';
-  };
-<
-Now for the required exports for nix integration options.
-
-They allow you to always export all of the same customization options to new
-flakes as the original one has, but for your own flake.
+The main thing you may need to do in this section is
+to change the default package name to whatever the name of
+your default packageDefinition of choice is.
 
 for information on how to use these options when importing your nixCats flake,
 see :help `nixCats.installation_options`
 
 They look like this:
 >nix
-  # To choose settings and categories from the flake that calls this flake.
-  customPackager = baseBuilder self pkgs categoryDefinitions;
+    # see :help nixCats.flake.outputs.exports
+  flake-utils.lib.eachDefaultSystem (system: let
+    # this is how we use the builder:
 
-  # You may use these to modify some or all of your categoryDefinitions
-  customBuilders = {
-    fresh = baseBuilder;
-    keepLua = baseBuilder self;
-  };
-  inherit utils;
+    # first it needs a path to the lua to include
 
-  inherit otherOverlays;
-  inherit categoryDefinitions;
-  inherit packageDefinitions;
+    # it takes a set with nixpkgs and system and our overlays
+    # so that it can internally resolve pkgs variable
+    # and avoid issues with system variable in module options for you.
 
-  nixosModules.default = utils.mkNixosModules {
-    defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays
-      categoryDefinitions packageDefinitions;
-  };
+    # then it takes our categoryDefinitions and packageDefinitions
 
-  # and the same for home manager
-  homeModule = utils.mkHomeModules {
-    defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays
-      categoryDefinitions packageDefinitions;
+    # then in the next section, we apply the names as the final input
+    inherit (utils) baseBuilder;
+    customPackager = baseBuilder luaPath {
+      inherit nixpkgs system dependencyOverlays extra_pkg_config;
+    } categoryDefinitions;
+    nixCatsBuilder = customPackager packageDefinitions;
+
+    # this is just for using utils in the following section such as pkgs.mkShell
+    # The one used to build neovim is resolved inside the builder
+    # and is passed to our categoryDefinitions and packageDefinitions
+    pkgs = import nixpkgs { inherit system; };
+    # as you can see, "resolve pkgs" does not mean anything fancy.
+    # however, with overlays and system variable,
+    # sometimes you can get yourself in a loop when
+    # doing more advanced things. So this flake takes care of that for you.
+    # it will make sure pkgs is passed to the categoryDefinitions and packageDefinitions
+  in
+  {
+    # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
+
+    # this will make a package out of each of the packageDefinitions defined above
+    # and set the default package to the one named here.
+    packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+
+    # this will make an overlay out of each of the packageDefinitions defined above
+    # and set the default overlay to the one named here.
+    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
+
+    # choose your package for devShell
+    # and add whatever else you want in it.
+    devShell = pkgs.mkShell {
+      name = "nixCats";
+      packages = [ (nixCatsBuilder "nixCats") ];
+      inputsFrom = [ ];
+      shellHook = ''
+      '';
+    };
+
+    # To choose settings and categories from the flake that calls this flake.
+    # and you export overlays so people dont have to redefine stuff.
+    inherit customPackager;
+  }) // {
+
+    # these outputs will be NOT wrapped with ${system}
+
+    # now we can export some things that can be imported in other
+    # flakes, WITHOUT needing to use a system variable to do it.
+    # and update them into the rest of the outputs returned by the
+    # eachDefaultSystem function.
+
+    # we export a nixos module to allow configuration from configuration.nix
+    nixosModules.default = utils.mkNixosModules {
+      defaultPackageName = "nixCats";
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
+    };
+    # and the same for home manager
+    homeModule = utils.mkHomeModules {
+      defaultPackageName = "nixCats";
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
+    };
+    inherit utils categoryDefinitions dependencyOverlays packageDefinitions;
+    inherit (utils) templates baseBuilder;
+    keepLuaBuilder = utils.baseBuilder luaPath;
   };
 <
+
+First, we export all the packages in our package definitions
+as packages and overlays using our utilities, and define a devShell.
+
+Now for the required exports for nix integration options.
+They allow you to always export all of the same customization options to new
+flakes as the original one has, but for your own flake.
+
 First, <customPackager>. This would allow you to choose what
 settings and categories you wanted in a flake that imports this flake,
 without needing to redefine anything else.
 
-Then <customBuilders>. These are just baseBuilder, exported both with and
-without a lua path already supplied.
-You could import the fresh builder and utils straight from nixCats, 
-alowing you to be free of personally including the builder and nixCatsHelp directories,
-allowing you to use those but otherwise have a fresh start.
-
-Then <otherOverlays>. These are a list of all overlays 
-that you imported that are not standardPluginOverlay.
+Then <dependencyOverlays>.
+These are all the overlays that you imported.
 You may use utils.mergeOverlayLists to incorporate overlays 
 from other nixCats flakes without worrying about naming conflicts.
-When making your flake you must follow
-this format when creating your pkgs set.
-This format is not very complex. The format is this.
-1. Make a list called otherOverlays.
-2. Put every overlay that isn't standardPluginOverlay in there.
-3. when you add overlays to pkgs, 
-    use ++ to add otherOverlays to a list containing
-    the call to standardPluginOverlay.
-This allows you to be able to export otherOverlays
-at the end in the final outputs because it is separate.
 
 Then <categoryDefinitions>
 The function where you set up your categories in flake.nix
@@ -532,8 +595,8 @@ This allows importing flakes to do a lot less copy pasting.
 
 <mkNixosModules> {
     defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    luaPath = "${./.}";
+    inherit nixpkgs dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
 Pass this set into utils.mkNixosModules and choose a defaultPackageName.
@@ -547,13 +610,20 @@ The same as mkNixosModules above, but for home manager.
 
 
 Then last, the <utils> set, which we imported from ./builder/utils.nix
+We export the <utils> set, along with some items inside it.
+Those are <templates> and <baseBuilder>
+Then we also define a <keepLuaBuilder>, which is a <baseBuilder> with our config path
+passed into it.
 
-In total, the <utils> set contains 8 functions
+In total, the <utils> set contains 11 functions and then the templates set.
 
 First, the ones mentioned above.
+Then, we also have:
 
 <mkPackages> finalBuilder: packageDefinitions: defaultName:
 makes each package and also a default one
+<mkExtraPackages> finalBuilder: packageDefinitions:
+same as mkPackages but without the default one
 
 <mkOverlays> finalBuilder: packageDefinitions: defaultName:
 makes an overlay for each package and also a default one
@@ -572,6 +642,8 @@ For our purposes, we do not consider derivations to be attrsets.
 <mergeOverlayLists> oldOverlist: newOverlist: self: super: let
 for merging lists of overlays like those in otherOverlays in a way 
 that updates to avoid naming conflicts between overlays in different nixCats flakes imported.
+within overlays that are sets, will recursively update until
+a derivation, or something not a set is reached.
 
 <mkDefaultOverlay> finalBuilder: defaultName:
 <mkExtraOverlays> finalBuilder: packageDefinitions:
@@ -590,17 +662,21 @@ We create the module by exporting the following in our flake outputs.
 
 <mkNixosModules> {
     defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    luaPath = "${./.}";
+    inherit nixpkgs dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
-    luaPath = "${self}";
-    inherit nixpkgs inputs otherOverlays 
+    luaPath = "${./.}";
+    inherit nixpkgs dependencyOverlays
       categoryDefinitions packageDefinitions;
 };
+
+where dependencyOverlays is a set of system names
+with lists of overlays in each item. Such that
+the lists would be accessed via dependencyOverlays.${system}
 
 If you do not have a luaPath, you may pass it a keepLua builder.
 utils.mkNixosModules exports a nixos module with the following options,
@@ -613,99 +689,72 @@ as the nixos module has for system, but for the user managed by home-manager.
     # Set these with ${defaultPackageName} in your configuration.nix
     ${defaultPackageName} = {
 
+      nixpkgs_version = mkOption {
+        default = null;
+        type = types.nullOr (types.anything);
+        description = ''
+          a different nixpkgs import to use. By default will use the one from the flake.
+        '';
+        example = ''
+          nixpkgs_version = inputs.nixpkgs
+        '';
+      };
+
+      addOverlays = mkOption {
+        default = [];
+        type = (types.listOf types.anything);
+        description = ''
+          A list of overlays to make available to nixCats but not to your system.
+          Will have access to system overlays regardless of this setting.
+        '';
+        example = (lib.literalExpression ''
+          addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+        '');
+      };
+
+      # the above 2 are the only ones not also available at
+      # a per-user level in the nixos system module.
+
       enable = mkOption {
         default = false;
         type = types.bool;
         description = "Enable ${defaultPackageName}";
       };
-      packageName = mkOption {
-        default = "${defaultPackageName}";
-        type = types.str;
-        description = ''
-          The name of the package to be built from packageDefinitions.
-          If using BOTH custom settings and categories, this can be arbitrary
-        '';
-        example = ''${defaultPackageName}'';
-      };
+
       luaPath = mkOption {
         default = luaPath;
         type = types.str;
-        description = ''
+        description = (lib.literalExpression ''
           The path to your nvim config directory in the store.
-          In the base nixCats flake, this is "''${self}".
-        '';
-        example = ''"''${self}/systemLuaConfig"'';
+          In the base nixCats flake, this is "${./.}".
+        '');
+        example = (lib.literalExpression "${./.}/userLuaConfig");
       };
-      settings = mkOption {
-        default = packageDefinitions.${config.${defaultPackageName}.packageName}.settings or {};
-        type = (types.attrsOf types.anything);
-        description = "You may optionally provide your own settings set for packageDefinitions";
+
+      packageNames = mkOption {
+        default = [ "${defaultPackageName}" ];
+        type = (types.listOf types.str);
+        description = ''A list of packages from packageDefinitions to include'';
         example = ''
-          {
-            wrapRc = true;
-            configDirName = "nixCats-nvim";
-            viAlias = false;
-            vimAlias = true;
-            # nvimSRC = inputs.neovim;
-          }
+          packageNames = [ "nixCats" ]
         '';
       };
-      categories = mkOption {
-        default = packageDefinitions.${config.${defaultPackageName}.packageName}.categories or {};
-        type = (types.attrsOf types.anything);
-        description = "You may optionally provide your own category set for packageDefinitions";
-        example = ''
-          {
-            generalBuildInputs = true;
-            markdown = true;
-            gitPlugins = true;
-            general = true;
-            custom = true;
-            neonixdev = true;
-            debug = false;
-            test = true;
-            lspDebugMode = false;
-            themer = true;
-            colorscheme = "onedark";
-          }
-        '';
-      };
-      addOverlays = mkOption {
-        default = [];
-        type = (types.listOf types.anything);
-        description = ''A list of overlays to make available to categoryDefinitions'';
-        example = ''
-          [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
-        '';
-      };
-      addInputs = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''
-          A set of flake inputs to make available to 
-          standardPluginOverlay and categoryDefinitions
-        '';
-        example = ''the inputs set of a flake'';
-      };
-      pkgsAdditions = mkOption {
-        default = {};
-        type = (types.attrsOf types.anything);
-        description = ''things to add to pkgs outside of system and overlays'';
-        example = ''{ config.allowUnfree = true; }'';
-      };
+
       categoryDefinitions = {
         replace = mkOption {
           default = null;
           type = types.nullOr (types.functionTo (types.attrsOf types.anything));
-          description = ''
+          description = (lib.literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
+            you should use ${pkgs.system} provided in the packageDef set
+            to access system specific items.
             Will replace the categoryDefinitions of the flake with this value.
-          '';
+          '');
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = packageDef: { }
+            categoryDefinitions.replace = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
         merge = mkOption {
@@ -721,22 +770,77 @@ as the nixos module has for system, but for the user managed by home-manager.
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
-            categoryDefinitions = packageDef: { }
+            categoryDefinitions.merge = { pkgs, settings, categories, name, ... }@packageDef: { }
           '';
         };
       };
 
-      # Set these with ${defaultPackageName}.users.<username>
-      # these options are only present for nixosModules
-      # for home-manager, it only manages 1 user per home config,
-      # so it has only the options above, which will apply to that user.
+      packages = mkOption {
+        default = null;
+        description = ''
+          VERY IMPORTANT when setting aliases for each package,
+          they must not be the same as ANY other neovim package for that user.
+          YOU MAY NOT ALIAS TO NVIM ITSELF
+          It will cause a build conflict.
+          again, YOU MAY NOT ALIAS TO NVIM ITSELF
+
+          You also cannot install nixCats via
+          multiple nixCats modules from different repos per user.
+          This should not be an issue as a single module can output multiple packages.
+
+          You can have as many nixCats installed per user as you want,
+          as long as you obey those rules.
+          This is a big step up from only being able to have 1 neovim
+          at all per user, so excuse me for the inconvenience.
+
+          for information on the values you may return,
+          see :help nixCats.flake.outputs.settings
+          and :help nixCats.flake.outputs.categories
+          https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/nixCatsFlake.txt
+        '';
+        type = with types; nullOr (attrsOf (functionTo (attrsOf anything)));
+        example = ''
+          nixCats.packages = { 
+            nixCats = { pkgs, ... }: {
+              settings = {
+                wrapRc = true;
+                configDirName = "nixCats-nvim";
+                # nvimSRC = inputs.neovim;
+                aliases = [ "vim" "nixCats" ];
+              };
+              categories = {
+                generalBuildInputs = true;
+                markdown = true;
+                gitPlugins = true;
+                general = true;
+                custom = true;
+                neonixdev = true;
+                debug = false;
+                test = true;
+                lspDebugMode = false;
+                themer = true;
+                colorscheme = "onedark";
+              };
+            };
+          }
+        '';
+      };
+
       users = mkOption {
         default = {};
-        description = "same as system config but per user instead";
+        description = ''
+          same as system config but per user instead
+          and without addOverlays or nixpkgs_version
+        '';
         type = with types; attrsOf (submodule {
           options = {
-            # all the same options but per user....
-            # Not here because its the same.
+            enable = mkOption {
+              default = false;
+              type = types.bool;
+              description = "Enable ${defaultPackageName}";
+            };
+            # the same options but per user....
+            # Not shown here because its the same.
           };
         });
       };

@@ -1,11 +1,30 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-path: pkgs:
+path:
+{
+  pkgs ? null
+  , nixpkgs ? null
+  , extra_pkg_config ? {}
+  , system ? null
+  , dependencyOverlays
+  , nixCats_passthru ? {}
+  , ...
+}@attrs:
 categoryDefFunction:
 packageDefinitons: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
+  fpkgs = if pkgs == null && !(nixpkgs == null || system == null)
+  then import nixpkgs ({
+    inherit system;
+    overlays = if builtins.isList dependencyOverlays
+      then dependencyOverlays
+      else if builtins.isAttrs dependencyOverlays
+      then dependencyOverlays.${system}
+      else [];
+  } // { config = extra_pkg_config; })
+  else pkgs;
   catDefs = {
     startupPlugins = {};
     optionalPlugins = {};
@@ -23,7 +42,7 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction (packageDefinitons.${name}));
+  } // (categoryDefFunction ({ inherit settings categories name; pkgs = fpkgs; }));
   inherit (catDefs)
   startupPlugins optionalPlugins 
   lspsAndRuntimeDeps propagatedBuildInputs
@@ -31,26 +50,30 @@ let
   extraPythonPackages extraPython3Packages
   extraLuaPackages optionalLuaAdditions;
 
+  thisPackage = packageDefinitons.${name} { pkgs = fpkgs; };
   settings = {
     wrapRc = true;
     viAlias = false;
     vimAlias = false;
     withNodeJs = false;
     withRuby = true;
+    rubyEnv = null;
+    withPerl = false;
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
+    aliases = null;
     nvimSRC = null;
-  } // packageDefinitons.${name}.settings;
+  } // thisPackage.settings;
 
-  categories = packageDefinitons.${name}.categories;
+  categories = thisPackage.categories;
 
 in
   let
     # copy entire flake to store directory
-    LuaConfig = pkgs.stdenv.mkDerivation {
-      name = builtins.baseNameOf path;
-      builder = builtins.toFile "builder.sh" ''
+    LuaConfig = fpkgs.stdenv.mkDerivation {
+      name = "nixCats-special-rtp-entry-LuaConfig";
+      builder = fpkgs.writeText "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out
         cp -r ${path}/* $out/
@@ -58,64 +81,66 @@ in
     };
 
     # see :help nixCats
-    nixCats = {
-      plugin = pkgs.stdenv.mkDerivation (let
-        categoriesPlus = categories // {
-            inherit (settings) wrapRc;
-            nixCats_packageName = name;
-          };
-        init = builtins.toFile "init.lua" (builtins.readFile ./nixCats.lua);
-        globalCats = builtins.toFile "globalCats.lua" (builtins.readFile ./globalCats.lua);
-        # we import as a string because you cannot pass derivation paths when using toFile
-        cats = ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-        # nix attr names can have ' characters....
-        # Yes they show up unaltered now in lua....................
-        cleanCats = builtins.replaceStrings [ "'" ] [ "\'\"\'\"\'" ] cats;
-      in {
-        name = "nixCats";
-        src = ../nixCatsHelp;
-        phases = [ "buildPhase" "installPhase" ];
-        buildPhase = ''
-          source $stdenv/setup
-          mkdir -p $out/lua/nixCats
-          mkdir -p $out/doc
-          cp ${init} $out/lua/nixCats/init.lua
-          cp ${globalCats} $out/lua/nixCats/globalCats.lua
-          echo '${cleanCats}' > $out/lua/nixCats/cats.lua
-        '';
-        installPhase = ''
-          cp -r $src/* $out/doc/
-        '';
-      });
-      # doing it this way makes nixCats command and
-      # configdir variable available even with new plugin scheme
-      # as well as any local pack dir
-      config.vim = ''
-        let configdir = stdpath('config')
-        execute "set runtimepath-=" . configdir
-        execute "set runtimepath-=" . configdir . "/after"
-      '' + (if settings.wrapRc then ''
-        let configdir = "${LuaConfig}"
-      '' else "") + ''
-        lua require('nixCats.globalCats')
-        let runtimepath_list = split(&runtimepath, ',')
-        call insert(runtimepath_list, configdir, 0)
-        let &runtimepath = join(runtimepath_list, ',')
-        execute "set runtimepath+=" . configdir . "/after"
+    # this function gets passed all the way into the wrapper so that we can also add
+    # other dependencies that get resolved later in the process such as treesitter grammars.
+    nixCats = { ... }@allPluginDeps:
+    fpkgs.stdenv.mkDerivation (let
+      categoriesPlus = categories // {
+          nixCats_wrapRc = settings.wrapRc;
+          nixCats_packageName = name;
+          nixCats_store_config_location = "${LuaConfig}";
+        };
+      settingsPlus = settings // {
+          nixCats_packageName = name;
+          nixCats_store_config_location = "${LuaConfig}";
+        };
+      init = fpkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
+      # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
+      cats = fpkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
+      settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ../utils).luaTablePrinter settingsPlus}'';
+      depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allPluginDeps}'';
+    in {
+      name = "nixCats";
+      builder = fpkgs.writeText "builder.sh" /* bash */ ''
+        source $stdenv/setup
+        mkdir -p $out/lua/nixCats
+        mkdir -p $out/doc
+        cp ${init} $out/lua/nixCats/init.lua
+        cp ${cats} $out/lua/nixCats/cats.lua
+        cp ${settingsTable} $out/lua/nixCats/settings.lua
+        cp ${depsTable} $out/lua/nixCats/included.lua
+        cp -r ${../nixCatsHelp}/* $out/doc/
       '';
-    };
+    });
+    # doing it this way makes nixCats command and
+    # configdir variable available even with new plugin scheme
+    # as well as any local pack dir
+    runB4Config = (/* vim */ ''
+      let configdir = stdpath('config')
+      execute "set runtimepath-=" . configdir
+      execute "set runtimepath-=" . configdir . "/after"
+    '') + (if settings.wrapRc then /* vim */''
+      let configdir = "${LuaConfig}"
+    '' else "") + /* vim */ ''
+      lua require('nixCats').addGlobals()
+      lua require('nixCats.saveTheCats')
+      let runtimepath_list = split(&runtimepath, ',')
+      call insert(runtimepath_list, configdir, 0)
+      let &runtimepath = join(runtimepath_list, ',')
+      execute "set runtimepath+=" . configdir . "/after"
+    '';
 
     customRC = let
       LuaAdditions = if builtins.isString optionalLuaAdditions
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
-          (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+          (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in # just in case someone overwrites it.
-    (if settings.wrapRc then ''
+    (if settings.wrapRc then /* vim */ ''
       let configdir = "${LuaConfig}"
-    '' else ''
+    '' else /* vim */ ''
       let configdir = stdpath('config')
-    '') + ''
+    '') + /* vim */ ''
       execute "source " . configdir . "/init.lua"
 
       lua << EOF
@@ -128,9 +153,9 @@ in
     filterAndFlatten = (import ../utils)
           .filterAndFlatten categories;
 
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
-    start = [ nixCats ] ++ pkgs.lib.unique (filterAndFlatten startupPlugins);
-    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
+    buildInputs = [ fpkgs.stdenv.cc.cc.lib ] ++ fpkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    start = fpkgs.lib.unique (filterAndFlatten startupPlugins);
+    opt = fpkgs.lib.unique (filterAndFlatten optionalPlugins);
 
     # For wrapperArgs:
     # This one filters and flattens like above but for attrs of attrs 
@@ -155,7 +180,7 @@ in
 
     # add any dependencies/lsps/whatever we need available at runtime
     FandF_WrapRuntimeDeps = filterAndFlattenMapInner (value:
-      ''--prefix PATH : "${pkgs.lib.makeBinPath [ value ] }"''
+      ''--prefix PATH : "${fpkgs.lib.makeBinPath [ value ] }"''
     );
 
     # extraPythonPackages and the like require FUNCTIONS that return lists.
@@ -165,7 +190,7 @@ in
       (x: let
         appliedfunctions = filterAndFlattenMapInner (value: (value) x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
-        uniquifiedList = pkgs.lib.unique combinedFuncRes;
+        uniquifiedList = fpkgs.lib.unique combinedFuncRes;
       in
       uniquifiedList);
 
@@ -177,27 +202,36 @@ in
         || settings.configDirName != "nvim"
         then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
-      ++ (pkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
-      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
-      ++ (pkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
+      ++ (fpkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
+      ++ (fpkgs.lib.unique (FandF_envVarSet environmentVariables))
+      ++ (fpkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     );
 
     # add our propagated build dependencies
-    myNeovimUnwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+    myNeovimUnwrapped = fpkgs.neovim-unwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
     });
 
   in
   # add our lsps and plugins and our config, and wrap it all up!
-(import ./wrapNeovim.nix).wrapNeovim pkgs myNeovimUnwrapped {
-  inherit extraMakeWrapperArgs;
-  inherit (settings) vimAlias viAlias withRuby extraName withNodeJs;
+(import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
+  nixCats_passthru = nixCats_passthru // {
+    keepLuaBuilder = (import ../utils).utils.baseBuilder path;
+    nixCats_packageName = name;
+    utils = (import ../utils).utils;
+    categoryDefinitions = categoryDefFunction;
+    inherit dependencyOverlays packageDefinitons;
+  };
+
+  inherit extraMakeWrapperArgs nixCats runB4Config;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs rubyEnv aliases;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
-      inherit start opt;
+      start = start;
+      inherit opt;
     };
   };
     /* the function you would have passed to python.withPackages */
