@@ -71,6 +71,7 @@ However the flake can be used without nixos or home manager, so if you don't hav
 - `luaUtils` template containing the tools for integrating with pckr or lazy.
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
+- I mentioned the templates already but if you want to see them all on github they are here: [templates](./nix/templates)
 
 ## Introduction <a name="introduction"></a>
 
