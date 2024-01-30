@@ -50,9 +50,8 @@ I wrote the nix directory so you dont have to. It contains the builder and utils
 2. [Introduction](#introduction)
 3. [Installation](#installation)
 4. [Further Usage](#extrainfo)
-5. [Drawbacks](#drawbacks)
-6. [Special Mentions](#mentions)
-7. [Alternative / Similar Projects](#alternatives)
+5. [outro](#outro)
+6. [Alternative / Similar Projects](#alternatives)
 
 ## Features: <a name="features"></a>
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
@@ -247,7 +246,9 @@ and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.tx
 
 ---
 
-#### Drawbacks: <a name="drawbacks"></a>
+### Outro: <a name="outro"></a>
+
+#### Drawbacks:
 
 Specific to my project:
 
@@ -260,7 +261,7 @@ Some vscode debuggers are not on nixpkgs so you have to build them in customBuil
 Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
 Mason does not work on nixOS although it does on other OS options.
 
-#### Special mentions: <a name="mentions"></a>
+#### Special mentions:
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
@@ -270,7 +271,7 @@ Thank you!!! It taught me both about an overlay's existence and how it works.
 
 I also borrowed a decent amount of code from nixpkgs and made modifications.
 
-#### Alternative / similar projects: <a name="alternatives"></a>
+### Alternative / similar projects: <a name="alternatives"></a>
 
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
