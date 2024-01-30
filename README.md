@@ -120,8 +120,6 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 
 `luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility from before of trying to download all 4 versions of rust, node, ripgrep, and fd for your overcomplicated config on a machine without using nix...
 
-It also has some extra niceties I enjoy and the nixd and nil_ls lsps
-
 #### *The reasons I wanted to do it this way:*
 
 - The setup instructions for new plugins are all in Lua so translating them is effort.
