@@ -50,7 +50,7 @@ I wrote the nix directory so you dont have to. It contains the builder and utils
 2. [Introduction](#introduction)
 3. [Installation](#installation)
 4. [Further Usage](#extrainfo)
-5. [outro](#outro)
+5. [Outro](#outro)
 6. [Alternative / Similar Projects](#alternatives)
 
 ## Features: <a name="features"></a>
