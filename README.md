@@ -50,7 +50,7 @@ I wrote the nix directory so you dont have to. It contains the builder and utils
 2. [Introduction](#introduction)
 3. [Installation](#installation)
 4. [Further Usage](#extrainfo)
-5. [Outro](#outro)
+5. [Extra Information](#outro)
 6. [Alternative / Similar Projects](#alternatives)
 
 ## Features: <a name="features"></a>
@@ -246,7 +246,7 @@ and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.tx
 
 ---
 
-### Outro: <a name="outro"></a>
+### Extra Information: <a name="outro"></a>
 
 #### Drawbacks:
 
