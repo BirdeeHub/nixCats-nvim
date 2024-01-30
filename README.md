@@ -149,10 +149,6 @@ see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
 for more info, including a list of templates available.
 
 ```bash
-# everyone else:
-# still use the in editor help.
-# to begin:
-
 # to test:
 nix shell github:BirdeeHub/nixCats-nvim
 #or
