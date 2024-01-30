@@ -32,7 +32,7 @@ It is easy to convert between flake and module versions, so do not worry at the 
 
 However the flake can be used without nixos or home manager, so if you don't have that set up or aren't on nixos, you should choose the flake to start with.
 
-I wrote the nix directory so you dont have to. It contains the builder and utils and help and templates and can be imported straight from github via the utils set, allowing you to keep your directory for your configuration.
+I wrote the nix directory so you dont have to. It contains the builder and utils and help and templates and can be imported straight from github via the utils set, allowing you to keep your directory for your configuration. The help is imported within the builder and thus will be available in any configuration based on nixCats.
 
 ## Attention:
 > You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
