@@ -43,9 +43,16 @@ However the flake can be used without nixos or home manager, so if you don't hav
 
 > Nvim does not know about the wrapper script. Nvim is named `nvim` and is in a file in the store. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any other issues.
 
+## Table of Contents
+1. [Features](#features)
+2. [Introduction](#introduction)
+3. [Installation](#installation)
+4. [Further Usage](#extrainfo)
+5. [Drawbacks](#drawbacks)
+6. [Special Mentions](#mentions)
+7. [Alternative / Similar Projects](#alternatives)
 
-
-## Features:
+## Features: <a name="features"></a>
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
 - Configure without leaving flake.nix and regular neovim config scheme and still export advanced configuration options!
 - Easy-to-use Nix Category system for many configurations in 1 repository!
@@ -65,7 +72,7 @@ However the flake can be used without nixos or home manager, so if you don't hav
 - other templates containing examples of how to do other things with nixCats, and even one that implements the main init.lua of kickstart.nvim! (for a full list see [:help nixCats.installation_options](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
 
-## Introduction
+## Introduction <a name="introduction"></a>
 
 This is a kickstarter style repo. It borrows a LOT of lua from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It has mostly the same plugins.
 
@@ -73,9 +80,6 @@ This repo is not a lua showcase. You are meant to use your own lua once you unde
 
 For 95% of plugins and lsps, you won't need to do more than add plugin names to categories you make in flake.nix,
 then configure in lua using lspconfig or the regular setup or config functions provided by the plugin.
-
-The end result is it ends up being very much like using a neovim package manager,
-except with the bonus of being able to install and set up more than just neovim plugins.
 
 It also allows for easy project specific packaging using nixCats for all the cool direnv stuff.
 
@@ -128,8 +132,6 @@ It also has some extra niceties I enjoy and the nixd and nil_ls lsps
 - I still wanted my config to know what plugins and LSPs I included in the package
     so I created nixCats.
 
----
-
 In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay.
 
 All config folders like `ftplugin/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
@@ -140,45 +142,9 @@ You will need nix with flakes enabled, git, a clipboard manager of some kind, an
 
 This is designed to give you package specific config, AND nixOS integration AND home manager integration, without ditching your lua. Or even leaving lua much at all.
 
-That being said, definitely explore first while you understand the concept. It boils down to a few concepts.
-
-#### *The idea*:
-1. import flake as config file.
-2. Sort categories.
-3. Convert set that chooses the categories included verbatim to a lua table returned by nixCats.
-4. export all the options possible
-
-    The clever part is organizing it so that it is not unusable.
-
-    It is entirely possible to use this flake and barely deal with the nix,
-    and then make better use of the nix integration options
-    as desired later for when you go to import the flake to your system flake/flakes
-
 ---
 
-#### Basic usage:
-
-(full usage covered in included help files, accessible here and inside neovim, but much better viewed in-editor)
-
-You install the plugins/LSP/debugger/program using nix, by adding them to a category in the flake (or creating a new category for it!)
-
-You may need to add their link to the flake inputs if they are not on nixpkgs already.
-
-For specific tags or branches look at [this nix documentation](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples) and use that format in your flake input for it.
-
-You then choose what categories to include in the package.
-
-You then set them up in your lua, using the default methods to do so. No more translating to your package manager! (If you were using lazy, the opt section goes into the setup function in the lua)
-
-You can optionally ask what categories you have in this package, whenever you use `nixCats('attr.path.to.value')`
-
-If you encounter any build steps that are not well handled by nixpkgs, 
-or you need to import a plugin straight from git that has a non-standard build step and no flake,
-and need to do a custom definition, [customBuildsOverlay](./overlays/customBuildsOverlay.nix) is the place for it. 
-Fair warning, this requires knowledge of nix derivations and should be needed only infrequently.
-It will not be needed more than in any other method of configuring neovim via nix.
-
-#### Installation:
+#### Installation: <a name="installation"></a>
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
 for more info, including a list of templates available.
 
@@ -246,6 +212,14 @@ options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
 There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
+#### Further usage: <a name="extrainfo"></a>
+
+(full usage covered in included help files, accessible here and inside neovim, but *much better viewed in-editor*)
+
+You may need to add their link to the flake inputs if they are not on nixpkgs already.
+
+For specific tags or branches look at [this nix documentation](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples) and use that format in your flake input for it.
+
 It is made to be customized into your own portable nix neovim distribution 
 with as many options as you wish, while requiring you to leave the normal
 nvim configuration scheme as little as possible.
@@ -253,7 +227,7 @@ nvim configuration scheme as little as possible.
 Think of it like, a build-your-own nixVim kit that doesn't
 require you to know all about nix right away to get most of the benefits.
 
-Further info:
+Further info for getting started:
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
 
 There are several other templates.
@@ -274,12 +248,9 @@ For this section,
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
 and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.txt)
 
-With them you could partially or entirely add to, change, or recreate this flake.nix and/or the lua 
-in another flake without having to redefine things (although you can only either add new lua or recreate it).
-
 ---
 
-#### Drawbacks:
+#### Drawbacks: <a name="drawbacks"></a>
 
 Specific to my project:
 
@@ -292,7 +263,7 @@ Some vscode debuggers are not on nixpkgs so you have to build them in customBuil
 Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
 Mason does not work on nixOS although it does on other OS options.
 
-#### Special mentions:
+#### Special mentions: <a name="mentions"></a>
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better yet.
 
@@ -302,7 +273,7 @@ Thank you!!! It taught me both about an overlay's existence and how it works.
 
 I also borrowed a decent amount of code from nixpkgs and made modifications.
 
-#### Alternative / similar projects:
+#### Alternative / similar projects: <a name="alternatives"></a>
 
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
