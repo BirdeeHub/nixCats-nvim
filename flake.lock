@@ -20,11 +20,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1706683685,
-        "narHash": "sha256-FtPPshEpxH/ewBOsdKBNhlsL2MLEFv1hEnQ19f/bFsQ=",
+        "lastModified": 1706925685,
+        "narHash": "sha256-hVInjWMmgH4yZgA4ZtbgJM1qEAel72SYhP5nOWX4UIM=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "5ad9903c16126a7d949101687af0aa589b1d7d3d",
+        "rev": "79a13f1437e149dc7be2d1290c74d378dad60814",
         "type": "github"
       },
       "original": {
@@ -37,11 +37,11 @@
     "plugins-hlargs": {
       "flake": false,
       "locked": {
-        "lastModified": 1704665732,
-        "narHash": "sha256-WJMyYWlw4j3bGTX7iuQ3y6M+XKJkWtp+0zIkKyfKVRc=",
+        "lastModified": 1706816930,
+        "narHash": "sha256-pp8FBDqNiFTVr0PVyJfZvB9Mdvzuse54ug56fT1Y2nQ=",
         "owner": "m-demare",
         "repo": "hlargs.nvim",
-        "rev": "e45fd1f18f2fadf7d4ebe6f14ed1e70c7fca02da",
+        "rev": "e881f3a424139cc70c83121ec548732efdd67682",
         "type": "github"
       },
       "original": {
