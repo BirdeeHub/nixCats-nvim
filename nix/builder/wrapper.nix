@@ -105,7 +105,9 @@ let
       postBuild = lib.optionalString stdenv.isLinux ''
         rm $out/share/applications/nvim.desktop
         substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
-          --replace 'Name=Neovim' 'Name=${nixCats_packageName}'
+          --replace 'Name=Neovim' 'Name=${nixCats_packageName}'\
+          --replace 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
+          --replace 'Exec=nvim %F' 'Exec=${nixCats_packageName} %F'
       ''
       + lib.optionalString finalAttrs.withPython3 ''
         makeWrapper ${python3Env.interpreter} $out/bin/nvim-python3 --unset PYTHONPATH
