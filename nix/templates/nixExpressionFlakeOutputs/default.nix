@@ -8,6 +8,7 @@ and recieve a set of flake outputs to pass anywhere you want.
   inherit (inputs) flake-utils nixpkgs;
   inherit (inputs.nixCats) utils;
   luaPath = "${./.}";
+  forEachSystem = flake-utils.lib.eachSystem flake-utils.lib.allSystems;
   # the following extra_pkg_config contains any values
   # which you want to pass to the config set of nixpkgs
   # import nixpkgs { config = extra_pkg_config; inherit system; }
@@ -16,7 +17,7 @@ and recieve a set of flake outputs to pass anywhere you want.
   extra_pkg_config = {
     # allowUnfree = true;
   };
-  system_resolved = flake-utils.lib.eachDefaultSystem (system: let
+  system_resolved = forEachSystem (system: let
     # see :help nixCats.flake.outputs.overlays
     # This overlay grabs all the inputs named in the format
     # `plugins-<pluginName>`
@@ -111,7 +112,7 @@ and recieve a set of flake outputs to pass anywhere you want.
   };
 in
   # see :help nixCats.flake.outputs.exports
-  flake-utils.lib.eachDefaultSystem (system: let
+  forEachSystem (system: let
     inherit (utils) baseBuilder;
     customPackager = baseBuilder luaPath {
       inherit system dependencyOverlays extra_pkg_config nixpkgs;

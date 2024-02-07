@@ -48,6 +48,7 @@
   outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let
     inherit (nixCats) utils;
     luaPath = "${./.}";
+    forEachSystem = flake-utils.lib.eachSystem flake-utils.lib.allSystems;
     # the following extra_pkg_config contains any values
     # which you want to pass to the config set of nixpkgs
     # import nixpkgs { config = extra_pkg_config; inherit system; }
@@ -68,7 +69,7 @@
 
     # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
-    system_resolved = flake-utils.lib.eachDefaultSystem (system: let
+    system_resolved = forEachSystem (system: let
       # see :help nixCats.flake.outputs.overlays
       standardPluginOverlay = utils.standardPluginOverlay;
       dependencyOverlays = (import ./overlays inputs) ++ [
@@ -185,7 +186,7 @@
   # to the name of the packageDefinitions entry you wish to use as the default.
 
   # see :help nixCats.flake.outputs.exports
-  flake-utils.lib.eachDefaultSystem (system: let
+  forEachSystem (system: let
     inherit (utils) baseBuilder;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;

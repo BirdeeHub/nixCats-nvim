@@ -107,7 +107,7 @@ set from { mySet = {}; } to { mySet.${system} = {}; }
 Many overlays require being accessed via ${system} variable in this manner,
 and thus there is a method for handling it in nixCats.
 >nix
-  system_resolved = flake-utils.lib.eachDefaultSystem (system: let
+  system_resolved = flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
     # see :help nixCats.flake.outputs.overlays
     dependencyOverlays = (import ./overlays inputs) ++ [
       # This overlay grabs all the inputs named in the format
@@ -470,7 +470,7 @@ That argument is the name of the neovim package to be packaged.
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
-  flake-utils.lib.eachDefaultSystem (system: let
+  flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
     inherit (utils) baseBuilder;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
@@ -490,7 +490,7 @@ see :help `nixCats.installation_options`
 They look like this:
 >nix
     # see :help nixCats.flake.outputs.exports
-  flake-utils.lib.eachDefaultSystem (system: let
+  flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
     # this is how we use the builder:
 
     # first it needs a path to the lua to include
