@@ -132,7 +132,7 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 - I still wanted my config to know what plugins and LSPs I included in the package
     so I created nixCats.
 
-In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay.
+In terms of the nix code, you should not have to leave [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when its not on nixpkgs and the standardPluginOverlay does not work.
 
 All config folders like `ftplugin/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `packadd` when you want it.
 Although, it does specifically expect `init.lua` rather than `init.vim` at root level.
