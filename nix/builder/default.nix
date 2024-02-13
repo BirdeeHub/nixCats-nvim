@@ -1,17 +1,17 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-path:
+luaPath:
 {
-  pkgs ? null
-  , nixpkgs ? null
+  pkgs ? null # <-- either this with everything included,
+  , nixpkgs ? null # <-- or this one
   , extra_pkg_config ? {}
-  , system ? null
-  , dependencyOverlays
+  , system ? null # <-- and this one
+  , dependencyOverlays ? null # <-- and this one
   , nixCats_passthru ? {}
   , ...
-}@attrs:
+}:
 categoryDefFunction:
-packageDefinitons: name:
+packageDefFunction: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
@@ -20,11 +20,35 @@ let
     inherit system;
     overlays = if builtins.isList dependencyOverlays
       then dependencyOverlays
-      else if builtins.isAttrs dependencyOverlays
+      else if builtins.isAttrs dependencyOverlays && builtins.hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
       else [];
   } // { config = extra_pkg_config; })
-  else pkgs;
+  else if pkgs != null then pkgs
+  else builtins.throw ''
+    Arguments accepted:
+
+    luaPath:
+    {
+      pkgs ? null                 # <-- either pkgs with everything included
+      , nixpkgs ? null            # <-- or include nixpkgs,
+      , extra_pkg_config ? {}
+      , system ? null             # <-- and system
+      , dependencyOverlays ? null # <-- and the overlays
+      , nixCats_passthru ? {}
+      , ...
+    }:
+    categoryDefFunction:
+    packageDefFunction:
+    packageName:
+
+    # Note:
+    You must provide nixpkgs and system along with any dependencyOverlays,
+    or a pkgs attribute to the nixCats builder function
+    in the set recieved as the second argument
+
+    dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
+  '';
   catDefs = {
     startupPlugins = {};
     optionalPlugins = {};
@@ -50,7 +74,7 @@ let
   extraPythonPackages extraPython3Packages
   extraLuaPackages optionalLuaAdditions;
 
-  thisPackage = packageDefinitons.${name} { pkgs = fpkgs; };
+  thisPackage = packageDefFunction.${name} { pkgs = fpkgs; };
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -76,7 +100,7 @@ in
       builder = fpkgs.writeText "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out
-        cp -r ${path}/* $out/
+        cp -r ${luaPath}/* $out/
       '';
     };
 
@@ -218,11 +242,12 @@ in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
   nixCats_passthru = nixCats_passthru // {
-    keepLuaBuilder = (import ../utils).utils.baseBuilder path;
+    keepLuaBuilder = (import ../utils).utils.baseBuilder luaPath;
     nixCats_packageName = name;
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
-    inherit dependencyOverlays packageDefinitons;
+    packageDefinitions = packageDefFunction;
+    inherit dependencyOverlays;
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
