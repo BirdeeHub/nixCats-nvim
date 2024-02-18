@@ -110,6 +110,9 @@ and recieve a set of flake outputs to pass anywhere you want.
       };
     };
   };
+  # In this section, the main thing you will need to do is change the default package name
+  # to the name of the packageDefinitions entry you wish to use as the default.
+    defaultPackageName = "nixCats";
 in
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
@@ -125,17 +128,17 @@ in
   in {
     # this will make a package out of each of the packageDefinitions defined above
     # and set the default package to the one named here.
-    packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+    packages = utils.mkPackages nixCatsBuilder packageDefinitions defaultPackageName;
 
     # this will make an overlay out of each of the packageDefinitions defined above
     # and set the default overlay to the one named here.
-    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
+    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions defaultPackageName;
 
     # choose your package for devShell
     # and add whatever else you want in it.
     devShell = pkgs.mkShell {
-      name = "nixCats";
-      packages = [ (nixCatsBuilder "nixCats") ];
+      name = defaultPackageName;
+      packages = [ (nixCatsBuilder defaultPackageName) ];
       inputsFrom = [ ];
       shellHook = ''
       '';
@@ -148,14 +151,12 @@ in
 ) // {
   # we also export a nixos module to allow configuration from configuration.nix
   nixosModules.default = utils.mkNixosModules {
-    defaultPackageName = "nixCats";
-    inherit dependencyOverlays luaPath
+    inherit defaultPackageName dependencyOverlays luaPath
       categoryDefinitions packageDefinitions nixpkgs;
   };
   # and the same for home manager
   homeModule = utils.mkHomeModules {
-    defaultPackageName = "nixCats";
-    inherit dependencyOverlays luaPath
+    inherit defaultPackageName dependencyOverlays luaPath
       categoryDefinitions packageDefinitions nixpkgs;
   };
   # now we can export some things that can be imported in other
