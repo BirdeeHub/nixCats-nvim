@@ -188,6 +188,8 @@ nixCats also contains other info.
   require('nixCats').included
     -- contains a final list of all the plugins included
     -- in the package and their paths, and the path to treesitter parsers.
+    -- does not include lsps and runtime dependencies,
+    -- you can retrieve their paths with vim.fn.exepath if needed.
 
   require('nixCats').settings
     -- contains the settings set for the package
