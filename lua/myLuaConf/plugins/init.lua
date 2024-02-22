@@ -146,6 +146,7 @@ require('which-key').setup({
       g = true, -- bindings for prefixed with g
     },
   },
+  operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
     -- BUGGED IN OIL BUFFERS
     -- Until https://github.com/folke/which-key.nvim/pull/578
     -- even disabling will not prevent these errors
