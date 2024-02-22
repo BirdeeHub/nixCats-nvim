@@ -398,7 +398,7 @@ For more nuances on enabling categories and subcategories, see above at
 :help `nixCats.flake.outputs.categoryDefinitions.scheme`
 
 ----------------------------------------------------------------------------------------
-Settings Profiles:                             *nixCats.flake.outputs.settings*
+Settings                                       *nixCats.flake.outputs.settings*
 
 These are the defaults:
 >nix
@@ -407,9 +407,6 @@ These are the defaults:
       # do you want to package the lua from this flake in the store?
       # or would you rather it just read it in your .config/<configDirName>?
       # nixCats and this help will work either way.
-      # this value will also be included in nixCats.
-      # The false setting is useful for fast iteration of lua changes.
-      # But it restricts where you may save the lua to the .config directory.
 >nix
       wrapRc = true;
 <
@@ -443,8 +440,25 @@ These are the defaults:
       aliases = null;
     };
 <
-If you wish to have something different, you may define some or all of these
-options, in a set within the settings set to be included in the packaging section below.
+
+QUICK TIP: wrapRc
+
+The wrapRc option is very useful for testing lua changes.
+It removes the need to stage and rebuild to see your lua changes reflected.
+You will still need to rebuild when making changes to nix regardless of the
+value of wrapRc
+
+However it means that the lua isn't going run if it isn't in the right
+folder, i.e. when installed and ran from github with nix run
+
+If the lua is not in `vim.fn.stdpath('config')`, it will not work.
+By default this is ~/.config/nvim on linux systems, although we can
+change nvim to whatever we wish via the configDirName setting.
+
+The best way to use the wrapRc option is to symlink the correct
+.config directory to wherever your neovim directory in your
+nix config is, and enable it while testing changes,
+then setting it back to true and committing when it works.
 
 --------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
