@@ -231,11 +231,6 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open float
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 
--- these 3 jankily fix which-key related errors for some reason
-vim.keymap.set('n', '<C-W>', '<c-w>', { desc = '+window'})
-vim.keymap.set({"n", "v", "x"}, '"', '"', { desc = '+registers'})
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
 -- kickstart.nvim starts you with this. 
 -- But it constantly clobbers your system clipboard whenever you delete anything.
 

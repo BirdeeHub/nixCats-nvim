@@ -122,7 +122,42 @@ vim.cmd([[hi GitSignsAdd guifg=#04de21]])
 vim.cmd([[hi GitSignsChange guifg=#83fce6]])
 vim.cmd([[hi GitSignsDelete guifg=#fa2525]])
 
-require('which-key').setup()
+-- Which key has kind-of a lot of bugs.
+-- Nix or not, some things need to be disabled.
+require('which-key').setup({
+  plugins = {
+    marks = true, -- shows a list of your marks on ' and `
+    -- BUGGED registers plugin
+    registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+    -- the presets plugin, adds help for a bunch of default keybindings in Neovim
+    -- No actual key bindings are created
+    spelling = {
+      enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+      suggestions = 20, -- how many suggestions should be shown in the list?
+    },
+    presets = {
+      operators = true, -- adds help for operators like d, y, ...
+      motions = true, -- adds help for motions
+      text_objects = true, -- help for text objects triggered after entering an operator
+      -- BUGGED window control keys display
+      windows = false, -- default bindings on <c-w>
+      nav = true, -- misc bindings to work with windows
+      z = true, -- bindings for folds, spelling and others prefixed with z
+      g = true, -- bindings for prefixed with g
+    },
+  },
+    -- BUGGED IN OIL BUFFERS
+    -- Until https://github.com/folke/which-key.nvim/pull/578
+    -- even disabling will not prevent these errors
+    -- But when it works, this is how to disable
+  disable = {
+    buftypes = { "acwrite" },
+    filetypes = { "oil" },
+  },
+})
+-- I had these errors before nixos, but I fixed them in a dumb way.
+-- I simply bound them again myself and it mostly worked...
+-- this is the better way to prevent the errors.
 
 -- document existing key chains
 require('which-key').register {
