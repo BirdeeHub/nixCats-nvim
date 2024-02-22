@@ -17,7 +17,7 @@ and recieve a set of flake outputs to pass anywhere you want.
   extra_pkg_config = {
     # allowUnfree = true;
   };
-  system_resolved = forEachSystem (system: let
+  inherit (forEachSystem (system: let
     # see :help nixCats.flake.outputs.overlays
     # This overlay grabs all the inputs named in the format
     # `plugins-<pluginName>`
@@ -28,8 +28,7 @@ and recieve a set of flake outputs to pass anywhere you want.
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
     ])) ];
-  in { inherit dependencyOverlays; });
-  inherit (system_resolved) dependencyOverlays;
+  in { inherit dependencyOverlays; })) dependencyOverlays;
 
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 
