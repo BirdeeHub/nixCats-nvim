@@ -174,6 +174,7 @@
               nvim-surround
               indent-blankline-nvim
               nvim-web-devicons
+              oil-nvim
             ];
           };
         };

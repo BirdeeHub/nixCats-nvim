@@ -91,6 +91,7 @@ require('nixCatsUtils.catPacker').setup({
   },
 
   { 'm-demare/hlargs.nvim', },
+  { "stevearc/oil.nvim" },
   { 'mbbill/undotree', },
   { 'tpope/vim-fugitive', },
   { 'tpope/vim-rhubarb', },
@@ -201,8 +202,8 @@ vim.g.netrw_banner=0
 -- See `:help vim.keymap.set()`
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = 'Moves Line Down' })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = 'Moves Line Up' })
--- vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = 'Scroll Down' })
--- vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = 'Scroll Up' })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = 'Scroll Down' })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = 'Scroll Up' })
 vim.keymap.set("n", "n", "nzzzv", { desc = 'Next Search Result' })
 vim.keymap.set("n", "N", "Nzzzv", { desc = 'Previous Search Result' })
 
@@ -218,11 +219,6 @@ vim.keymap.set('n','B','^i', { noremap = true, silent = true, desc = 'edit at be
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- Netrw
-vim.keymap.set("n", "<leader>FF", "<cmd>Explore<CR>", { noremap = true, desc = '[F]ile[F]inder' })
-vim.keymap.set("n", "<leader>Fh", "<cmd>e .<CR>", { noremap = true, desc = '[F]ile[h]ome' })
-
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })

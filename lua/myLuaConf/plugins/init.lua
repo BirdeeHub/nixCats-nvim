@@ -122,6 +122,38 @@ vim.cmd([[hi GitSignsAdd guifg=#04de21]])
 vim.cmd([[hi GitSignsChange guifg=#83fce6]])
 vim.cmd([[hi GitSignsDelete guifg=#fa2525]])
 
+require("oil").setup({
+  columns = {
+    "icon",
+    "permissions",
+    "size",
+    -- "mtime",
+  },
+  keymaps = {
+    ["g?"] = "actions.show_help",
+    ["<CR>"] = "actions.select",
+    ["<C-s>"] = "actions.select_vsplit",
+    ["<C-h>"] = "actions.select_split",
+    ["<C-t>"] = "actions.select_tab",
+    ["<C-p>"] = "actions.preview",
+    ["<C-c>"] = "actions.close",
+    ["<C-l>"] = "actions.refresh",
+    ["-"] = "actions.parent",
+    ["_"] = "actions.open_cwd",
+    ["`"] = "actions.cd",
+    ["~"] = "actions.tcd",
+    ["gs"] = "actions.change_sort",
+    ["gx"] = "actions.open_external",
+    ["g."] = "actions.toggle_hidden",
+
+    -- Which-key does not like this keybind AT ALL
+    -- ["g\\"] = "actions.toggle_trash",
+    ["gtt"] = "actions.toggle_trash",
+    ["g\\"] = false,
+  },
+})
+vim.keymap.set("n", "-", "<cmd>Oil<CR>", { noremap = true, desc = 'Open Parent Directory' })
+vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Open nvim root directory' })
 -- Which key has kind-of a lot of bugs.
 -- Nix or not, some things need to be disabled.
 require('which-key').setup({
@@ -147,13 +179,8 @@ require('which-key').setup({
     },
   },
   operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
-    -- BUGGED IN OIL BUFFERS
-    -- Until https://github.com/folke/which-key.nvim/pull/578
-    -- even disabling will not prevent these errors
-    -- But when it works, this is how to disable
   disable = {
-    buftypes = { "acwrite" },
-    filetypes = { "oil" },
+    -- filetypes = { "oil" },
   },
 })
 -- I had these errors before nixos, but I fixed them in a dumb way.
@@ -169,6 +196,5 @@ require('which-key').register {
   ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
   ['<leader>m'] = { name = '[m]arkdown', _ = 'which_key_ignore' },
-  ['<leader>F'] = { name = '[F]ile explorer', _ = 'which_key_ignore' },
   ['<leader>t'] = { name = '[t]oggles', _ = 'which_key_ignore' },
 }
