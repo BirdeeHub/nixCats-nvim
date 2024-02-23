@@ -148,7 +148,7 @@ require("oil").setup({
 
     -- Which-key does not like this keybind AT ALL
     -- ["g\\"] = "actions.toggle_trash",
-    ["gtt"] = "actions.toggle_trash",
+    ["g!"] = "actions.toggle_trash",
     ["g\\"] = false,
   },
 })
