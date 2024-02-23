@@ -35,8 +35,10 @@ by checking the output of:
 <
 It is a similar process to migrating to a new neovim plugin manager.
 
-You are, of course, free to clone or fork nixCats-nvim instead
-and migrate your stuff into it if you prefer.
+Use a template, (or clone or fork the repo if you want)
+and migrate your plugins into the flake.nix file provided.
+
+Then configure in lua.
 
 Use the help and nixCats-nvim itself as an example.
 The help will still be accessible in your version of the editor.
