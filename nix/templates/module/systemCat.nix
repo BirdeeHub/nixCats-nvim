@@ -1,8 +1,5 @@
 { config, lib, inputs, ... }: let
   utils = inputs.nixCats.utils;
-  # the options for this are defined at the end of the file,
-  # and will be how to include this template module in your system configuration.
-  cfg = config.myNixCats;
 in {
   imports = [
     inputs.nixCats.nixosModules.default
@@ -10,7 +7,7 @@ in {
   config = {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
     # it will be the namespace for your options.
-    nixCats = lib.mkIf cfg.enable {
+    nixCats = {
       # these are some of the options. For the rest see
       # :help nixCats.flake.outputs.utils.mkNixosModules
       # you do not need to use every option here, anything you do not define
