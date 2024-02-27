@@ -80,10 +80,13 @@ The 3 main utilities at require('nixCatsUtils.lazyCat')
   -- used for disabling things like lazy build steps on nix when needed
 
   function M.enableForCategory(v, default)
+
   -- v will be passed to nixCats function.
-  -- the result is returned.
+  -- If the value is nil or false, return false.
+  -- else return true
+
   -- if not nix, return the default value,
-  -- or return false if default is not provided
+  -- or fall back on the nixCats default value if not provided
 <
 
 The other 2:
