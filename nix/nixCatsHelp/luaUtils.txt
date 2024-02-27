@@ -67,17 +67,23 @@ Use the following command in a new directory and check it out!
 Once you understand what is going on to use the lazy wrapper util,
 use lazyCat in the lua utils template!
 
-The 2 main utilities at require('nixCatsUtils.lazyCat')
+The 3 main utilities at require('nixCatsUtils.lazyCat')
 >lua
   --the main wrapper
   function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
   -- pluginTable is a table of plugin names, either as a list or as the names
   -- of a table of pluginName = "a string";
 
+  function M.lazyAdd(v, o)
   -- if not nix, return the first thing.
   -- If it is nix, return the second, or nil if not provided.
   -- used for disabling things like lazy build steps on nix when needed
-  function M.lazyAdd(v, o)
+
+  function M.enableForCategory(v, default)
+  -- v will be passed to nixCats function.
+  -- the result is returned.
+  -- if not nix, return the default value,
+  -- or return false if default is not provided
 <
 
 The other 2:

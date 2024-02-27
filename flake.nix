@@ -23,7 +23,7 @@
     };
 
     # neovim = {
-    #   url = "github:neovim/neovim";
+    #   url = "github:neovim/neovim/nightly";
     #   flake = false;
     # };
 

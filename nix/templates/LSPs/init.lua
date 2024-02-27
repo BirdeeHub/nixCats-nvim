@@ -25,6 +25,15 @@ end
 
 local servers = {}
 
+-- servers.clangd = {},
+-- servers.gopls = {},
+-- servers.pyright = {},
+-- servers.rust_analyzer = {},
+-- servers.tsserver = {},
+-- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
+
+-- you may also check your categories if you wish
+
 -- if nixCats('neonixdev') then
 --   require('neodev').setup({})
 --     -- this allows our thing to have plugin library detection
