@@ -79,7 +79,6 @@
         # use `pkgs.neovimPlugins`, which is a set of our plugins.
         (standardPluginOverlay inputs)
         # add any flake overlays here.
-        inputs.nixd.overlays.default
       ];
       # these overlays will be wrapped with ${system}
       # and we will call the same flake-utils function
