@@ -27,7 +27,7 @@
 
     # for if you wish to select a particular neovim version
     # neovim = {
-    #   url = "github:neovim/neovim";
+    #   url = "github:neovim/neovim/nightly";
     #   flake = false;
     # };
     # add this to the settings set later in flake.nix
@@ -100,6 +100,8 @@
       # However, they WILL be available to the shell 
       # and neovim path when using nix develop
       propagatedBuildInputs = {
+        generalBuildInputs = with pkgs; [
+        ];
       };
 
       # lspsAndRuntimeDeps:
@@ -107,36 +109,53 @@
       # at RUN TIME for plugins. Will be available to PATH within neovim terminal
       # this includes LSPs
       lspsAndRuntimeDeps = {
+        general = with pkgs; [
+        ];
       };
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
+        customPlugins = with pkgs.nixCatsBuilds; [ ];
+        gitPlugins = with pkgs.neovimPlugins; [ ];
+        general = with pkgs.vimPlugins; [ ];
       };
 
       # not loaded automatically at startup.
       # use with packadd and an autocommand in config to achieve lazy loading
       optionalPlugins = {
+        customPlugins = with pkgs.nixCatsBuilds; [ ];
+        gitPlugins = with pkgs.neovimPlugins; [ ];
+        general = with pkgs.vimPlugins; [ ];
       };
 
       # environmentVariables:
       # this section is for environmentVariables that should be available
       # at RUN TIME for plugins. Will be available to path within neovim terminal
       environmentVariables = {
+        test = {
+          CATTESTVAR = "It worked!";
+        };
       };
 
       # If you know what these are, you can provide custom ones by category here.
       # If you dont, check this link out:
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
       extraWrapperArgs = {
+        test = [
+          '' --set CATTESTVAR2 "It worked again!"''
+        ];
       };
 
       # lists of the functions you would have passed to
       # python.withPackages or lua.withPackages
       extraPythonPackages = {
+        test = [ (_:[]) ];
       };
       extraPython3Packages = {
+        test = [ (_:[]) ];
       };
       extraLuaPackages = {
+        test = [ (_:[]) ];
       };
     };
 
@@ -165,6 +184,10 @@
         # and a set of categories that you want
         # (and other information to pass to lua)
         categories = {
+          general = true;
+          gitPlugins = true;
+          customPlugins = true;
+          generalBuildInputs = true;
           test = true;
           example = {
             youCan = "add more than just booleans";
