@@ -59,6 +59,9 @@ But it cant hurt to include anyway.
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
 For instructions on using the lazy wrapper, check out this template example!
+Disclaimer, it uses a new lazy option only
+in pkgs.lazy-nvim from the unstable branch
+So you must either use unstable, or use an overlay to use the lazy wrapper
 
 Use the following command in a new directory and check it out!
 >bash
@@ -82,11 +85,11 @@ The 3 main utilities at require('nixCatsUtils.lazyCat')
   function M.enableForCategory(v, default)
 
   -- v will be passed to nixCats function.
-  -- If the value is nil or false, return false.
-  -- else return true
-
-  -- if not nix, return the default value,
-  -- or fall back on the nixCats default value if not provided
+  -- If the value fetched by nixCats is nil or false,
+  -- return false, otherwise return true
+  -- if not loaded by nix, return the default value,
+  -- or fall back on the nixCats default value provided by
+  -- the require("nixCatsUtils").setup function mentioned above
 <
 
 The other 2:

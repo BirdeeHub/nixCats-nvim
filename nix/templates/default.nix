@@ -59,6 +59,8 @@
       It creates a new one instead to use.
 
       Call it from your system flake and call it with inputs (and optionally pkgs) as arguments.
+
+      In my opinion, this is the best one, but probably not the best one to start with if new to nix.
     '';
   };
   kickstart-nvim = {

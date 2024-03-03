@@ -24,13 +24,14 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
-
+    nixCats.inputs.nixpkgs.follows = "nixpkgs";
+    nixCats.inputs.flake-utils.follows = "flake-utils";
     # for if you wish to select a particular neovim version
     # neovim = {
     #   url = "github:neovim/neovim/nightly";
     #   flake = false;
     # };
-    # add this to the settings set later in flake.nix
+    # add this input to the nvimSRC attribute of the settings set later in this file.
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,

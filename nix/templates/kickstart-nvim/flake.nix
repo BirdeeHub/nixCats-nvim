@@ -21,9 +21,12 @@
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 
   inputs = {
+    # LAZY WRAPPER ONLY WORKS ON UNSTABLE
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim/nixCats-5.0.0";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nixCats.inputs.nixpkgs.follows = "nixpkgs";
+    nixCats.inputs.flake-utils.follows = "flake-utils";
   };
 
   # see :help nixCats.flake.outputs

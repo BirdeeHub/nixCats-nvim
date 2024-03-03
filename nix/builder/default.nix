@@ -88,6 +88,7 @@ let
     configDirName = "nvim";
     aliases = null;
     nvimSRC = null;
+    neovim-unwrapped = null;
   } // thisPackage.settings;
 
   categories = thisPackage.categories;
@@ -233,7 +234,8 @@ in
     );
 
     # add our propagated build dependencies
-    myNeovimUnwrapped = fpkgs.neovim-unwrapped.overrideAttrs (prev: {
+    baseNvimUnwrapped = if settings.neovim-unwrapped == null then fpkgs.neovim-unwrapped else settings.neovim-unwrapped;
+    myNeovimUnwrapped = baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
     });

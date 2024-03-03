@@ -89,6 +89,7 @@ in {
           # and a set of categories that you want
           # (and other information to pass to lua)
           categories = {
+            general = true;
             test = true;
             example = {
               youCan = "add more than just booleans";
