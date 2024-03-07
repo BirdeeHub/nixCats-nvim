@@ -434,10 +434,8 @@ These are the defaults:
       # then put inputs.neovim (or whatever you called it) here.
       # It will be used to override the source for neovim-unwrapped.
       nvimSRC = null;
-      # this one you should not need to use, but if it bothers you that you
-      # cant change it from saying the old version number in
-      # the store after overriding nvimSRC, here you go.
-      # pass this any overrideable version of pkgs.neovim-unwrapped
+      # if just overriding the source and propagatedBuildInputs isnt enough
+      # you can pass this any overrideable version of pkgs.neovim-unwrapped
       neovim-unwrapped = null;
     };
 <
