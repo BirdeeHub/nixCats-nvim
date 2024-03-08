@@ -15,7 +15,6 @@ rec {
     , withPerl ? false
     , withNodeJs ? false
     , withRuby ? true
-    , rubyEnv ? null
     , vimAlias ? false
     , viAlias ? false
     , configure ? {}

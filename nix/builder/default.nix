@@ -81,7 +81,6 @@ let
     vimAlias = false;
     withNodeJs = false;
     withRuby = true;
-    rubyEnv = null;
     withPerl = false;
     extraName = "";
     withPython3 = true;
@@ -253,7 +252,7 @@ in
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs rubyEnv aliases;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
