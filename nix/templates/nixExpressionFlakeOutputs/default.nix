@@ -82,12 +82,18 @@
 
     # lists of the functions you would have passed to
     # python.withPackages or lua.withPackages
-    extraPythonPackages = {
-      test = (_:[]);
-    };
+
+    # get the path to this python environment
+    # in your lua config via
+    # vim.g.python3_host_prog
+    # or run from nvim terminal via :!nvim-python3
     extraPython3Packages = {
       test = (_:[]);
     };
+    extraPythonPackages = {
+      test = (_:[]);
+    };
+    # populates $LUA_PATH and $LUA_CPATH
     extraLuaPackages = {
       test = [ (_:[]) ];
     };

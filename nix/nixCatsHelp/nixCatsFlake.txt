@@ -218,11 +218,15 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   a flexible set of categories, each containing FUNCTIONS 
   that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
+  Is used to populate $LUA_PATH and $LUA_CPATH
 
 <extraPythonPackages> <extraPython3Packages> 
   TWO flexible sets of categories, one for python and the other for python3,
   each containing FUNCTIONS that return lists of python packages.
   These functions are the same thing that you would pass to python.withPackages.
+  You may get the path to this python environment in your lua config via
+  vim.g.python3_host_prog
+  or run from nvim terminal via :!nvim-python3
 
   <optionalLuaAdditions>* It can also take 
     a flexible set of categories, each containing a lua string

@@ -41,6 +41,7 @@ let
     , nixCats_packageName
     , customAliases ? null
     , nixCats_passthru ? {}
+    , luaEnv
     , ...
   }:
   assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
@@ -67,6 +68,7 @@ let
             "--add-flags" ''--cmd "set packpath^=${packDir}"''
             "--add-flags" ''--cmd "set rtp^=${packDir}"''
             "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]]"''
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"''
           ])
           ;
 
