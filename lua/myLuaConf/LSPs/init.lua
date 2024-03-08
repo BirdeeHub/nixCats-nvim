@@ -28,6 +28,7 @@ if nixCats('neonixdev') then
       signatureHelp = { enabled = true },
       diagnostics = {
         globals = { "nixCats" },
+        disable = { 'missing-fields' },
       },
     },
     workspace = { checkThirdParty = true },

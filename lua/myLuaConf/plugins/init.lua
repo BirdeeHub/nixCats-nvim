@@ -27,7 +27,6 @@ require('hlargs').setup {
 vim.cmd([[hi clear @lsp.type.parameter]])
 vim.cmd([[hi link @lsp.type.parameter Hlargs]])
 require('Comment').setup()
-require('fidget').setup()
 require('lualine').setup({
   options = {
     icons_enabled = false,
@@ -42,7 +41,23 @@ require('lualine').setup({
       },
     },
   },
+  inactive_sections = {
+    lualine_b = {
+      {
+        'filename', path = 3, status = true,
+      },
+    },
+    lualine_x = {'filetype'},
+  },
+  tabline = {
+    lualine_a = { 'buffers' },
+    -- if you use lualine-lsp-progress, I have mine here instead of fidget
+    -- lualine_b = { 'lsp_progress', },
+    lualine_z = { 'tabs' }
+  },
 })
+require('fidget').setup({})
+
 require('nvim-surround').setup()
 
 -- indent-blank-line
@@ -197,4 +212,5 @@ require('which-key').register {
   ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
   ['<leader>m'] = { name = '[m]arkdown', _ = 'which_key_ignore' },
   ['<leader>t'] = { name = '[t]oggles', _ = 'which_key_ignore' },
+  ['<leader><leader>'] = { name = 'buffer commands', _ = 'which_key_ignore' },
 }
