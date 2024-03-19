@@ -94,6 +94,7 @@ in {
             # you may not alias to nvim
             # your alias may not conflict with your other packages.
             aliases = [ "vim" "systemVim" ];
+            # caution: this option must be the same for all packages.
             # nvimSRC = inputs.neovim;
           };
           # and a set of categories that you want
@@ -150,6 +151,7 @@ in {
               wrapRc = true;
               configDirName = "nixCats-nvim";
               aliases = [ "REPLACE_MY_VIM" ];
+              # caution: this option must be the same for all packages.
               # nvimSRC = inputs.neovim;
             };
             # see :help nixCats.flake.outputs.packageDefinitions

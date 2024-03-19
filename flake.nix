@@ -269,6 +269,7 @@
           wrapRc = true;
           configDirName = "nixCats-nvim";
           aliases = [ "vim" "vimcat" ];
+          # caution: this option must be the same for all packages.
           # nvimSRC = inputs.neovim;
         };
         # see :help nixCats.flake.outputs.packageDefinitions

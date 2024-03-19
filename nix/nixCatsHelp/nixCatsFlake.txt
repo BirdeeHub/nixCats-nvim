@@ -433,6 +433,7 @@ These are the defaults:
       # see :help `$NVIM_APPNAME`
       configDirName = "nvim";
 
+      ### CAUTION: These 2 options must be the same for ALL nvim packages!! ###
       # use this to pin a specific neovim version.
       # import it in flake inputs with flake = false,
       # then put inputs.neovim (or whatever you called it) here.
