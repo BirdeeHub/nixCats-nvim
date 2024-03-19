@@ -48,6 +48,33 @@ let
 
   stdenv.mkDerivation (finalAttrs:
   let
+    generateProviderRc = {
+        withPython3 ? true
+      , withNodeJs ? false
+      , withRuby ? true
+      # perl is problematic https://github.com/NixOS/nixpkgs/issues/132368
+      , withPerl ? false
+
+      # so that we can pass the full neovim config while ignoring it
+      , ...
+      }: let
+        hostprog_check_table = {
+          node = withNodeJs;
+          python = false;
+          python3 = withPython3;
+          ruby = withRuby;
+          perl = withPerl;
+        };
+
+        genProviderCommand = prog: withProg:
+          if withProg then
+            "vim.g.${prog}_host_prog='${placeholder "out"}/bin/${nixCats_packageName}-${prog}'"
+          else
+            "vim.g.loaded_${prog}_provider=0";
+
+      hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
+    in
+        lib.concatStringsSep ";" hostProviderLua;
 
     rcContent = ''
       ${luaRcContent}
@@ -67,12 +94,10 @@ let
             in [
             "--add-flags" ''--cmd "set packpath^=${packDir}"''
             "--add-flags" ''--cmd "set rtp^=${packDir}"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]]"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"''
-          ])
-          ;
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]];vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"''
+          ]);
 
-    providerLuaRc = neovimUtils.generateProviderRc {
+    providerLuaRc = generateProviderRc {
       inherit withPython3 withNodeJs withPerl;
       withRuby = rubyEnv != null;
     };
@@ -112,16 +137,16 @@ let
           --replace 'Exec=nvim %F' 'Exec=${nixCats_packageName} %F'
       ''
       + lib.optionalString finalAttrs.withPython3 ''
-        makeWrapper ${python3Env.interpreter} $out/bin/nvim-python3 --unset PYTHONPATH
+        makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 --unset PYTHONPATH
       ''
       + lib.optionalString (finalAttrs.rubyEnv != null) ''
-        ln -s ${finalAttrs.rubyEnv}/bin/neovim-ruby-host $out/bin/nvim-ruby
+        ln -s ${finalAttrs.rubyEnv}/bin/neovim-ruby-host $out/bin/${nixCats_packageName}-ruby
       ''
       + lib.optionalString finalAttrs.withNodeJs ''
-        ln -s ${nodePackages.neovim}/bin/neovim-node-host $out/bin/nvim-node
+        ln -s ${nodePackages.neovim}/bin/neovim-node-host $out/bin/${nixCats_packageName}-node
       ''
       + lib.optionalString finalAttrs.withPerl ''
-        ln -s ${perlEnv}/bin/perl $out/bin/nvim-perl
+        ln -s ${perlEnv}/bin/perl $out/bin/${nixCats_packageName}-perl
       ''
       + lib.optionalString finalAttrs.vimAlias ''
         ln -s $out/bin/${nixCats_packageName} $out/bin/vim
