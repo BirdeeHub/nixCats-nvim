@@ -74,7 +74,7 @@ let
 
       hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
     in
-        lib.concatStringsSep ";" hostProviderLua;
+        (lib.concatStringsSep ";" hostProviderLua) + ";vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]";
 
     rcContent = ''
       ${luaRcContent}
@@ -94,11 +94,11 @@ let
             in [
             "--add-flags" ''--cmd "set packpath^=${packDir}"''
             "--add-flags" ''--cmd "set rtp^=${packDir}"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]];vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"''
+            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]]"''
           ]);
 
     providerLuaRc = generateProviderRc {
-      inherit withPython3 withNodeJs withPerl;
+      inherit withPython3 withNodeJs withPerl luaEnv;
       withRuby = rubyEnv != null;
     };
 
