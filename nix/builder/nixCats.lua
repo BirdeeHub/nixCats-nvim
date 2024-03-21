@@ -41,7 +41,7 @@ function M.addGlobals()
     [[lua print(vim.inspect(require('nixCats.settings')))]] ,
     { desc = 'All the settings' })
 
-    vim.api.nvim_create_user_command('Pawsibile',
+    vim.api.nvim_create_user_command('NixCatsPawsibile',
     [[lua print(vim.inspect(require('nixCats.included')))]] ,
     { desc = 'All the plugins' })
 
