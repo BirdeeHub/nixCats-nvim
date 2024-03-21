@@ -195,5 +195,8 @@ nixCats also contains other info.
     -- contains the settings set for the package
 <
 
+you can view these for debugging purposes with :NixCatsSettings and
+:NixCatsPawsible commands.
+
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
