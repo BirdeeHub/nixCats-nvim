@@ -129,6 +129,14 @@
         general = with pkgs.vimPlugins; [ ];
       };
 
+      # shared libraries to be added to LD_LIBRARY_PATH
+      # variable available to nvim runtime
+      sharedLibraries = {
+        general = with pkgs; [
+          # libgit2
+        ];
+      };
+
       # environmentVariables:
       # this section is for environmentVariables that should be available
       # at RUN TIME for plugins. Will be available to path within neovim terminal

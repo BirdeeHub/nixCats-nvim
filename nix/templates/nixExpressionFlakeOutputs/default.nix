@@ -67,6 +67,14 @@
       general = with pkgs.vimPlugins; [ ];
     };
 
+    # shared libraries to be added to LD_LIBRARY_PATH
+    # variable available to nvim runtime
+    sharedLibraries = {
+      general = with pkgs; [
+        # libgit2
+      ];
+    };
+
     environmentVariables = {
       test = {
         CATTESTVAR = "It worked!";

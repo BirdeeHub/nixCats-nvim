@@ -53,6 +53,7 @@ let
     startupPlugins = {};
     optionalPlugins = {};
     lspsAndRuntimeDeps = {};
+    sharedLibraries = {};
     propagatedBuildInputs = {};
     environmentVariables = {};
     extraWrapperArgs = {};
@@ -72,7 +73,7 @@ let
   lspsAndRuntimeDeps propagatedBuildInputs
   environmentVariables extraWrapperArgs 
   extraPythonPackages extraPython3Packages
-  extraLuaPackages optionalLuaAdditions;
+  extraLuaPackages optionalLuaAdditions sharedLibraries;
 
   thisPackage = packageDefFunction.${name} { pkgs = fpkgs; };
   settings = {
@@ -207,6 +208,11 @@ in
       ''--prefix PATH : "${fpkgs.lib.makeBinPath [ value ] }"''
     );
 
+    # add any dependencies/lsps/whatever we need available at runtime
+    FandF_WrapLinker = filterAndFlattenMapInner (value:
+      ''--prefix LD_LIBRARY_PATH : "${fpkgs.lib.makeLibraryPath [ value ] }"''
+    );
+
     # extraPythonPackages and the like require FUNCTIONS that return lists.
     # so we make a function that returns a function that returns lists.
     # this is used for the fields in the wrapper where the default value is (_: [])
@@ -227,6 +233,7 @@ in
         then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
       ++ (fpkgs.lib.unique (FandF_WrapRuntimeDeps lspsAndRuntimeDeps))
+      ++ (fpkgs.lib.unique (FandF_WrapLinker sharedLibraries))
       ++ (fpkgs.lib.unique (FandF_envVarSet environmentVariables))
       ++ (fpkgs.lib.unique (FandF_passWrapperArgs extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh

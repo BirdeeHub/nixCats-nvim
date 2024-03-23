@@ -205,6 +205,10 @@ These are the things you can return:
   a flexible set of categories, each containing optional plugins.
   Optional plugins need to be added with packadd before being required.
 
+<sharedLibraries>
+  a flexible set of categories, each containing a derivation for
+  a runtime shared library. Will be prepended to the LD_LIBRARY_PATH variable.
+
 <environmentVariables>
   a flexible set of categories, each containing an ATTRIBUTE SET of 
   EnvironmentVariableName = "EnvironmentVariableValue";
