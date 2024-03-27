@@ -437,6 +437,16 @@ These are the defaults:
       # see :help `$NVIM_APPNAME`
       configDirName = "nvim";
 
+      # These 2 options are useful for when you want to allow your dev shells
+      # to override things such as lsps and shared libraries that you have
+      # already in your configuration.
+      suffix-path = false;
+      # causes lspsAndDeps to be added to the END of
+      # PATH instead of the start
+      suffix-LD = false;
+      # causes sharedLibraries to be added to the END of
+      # LD_LIBRARY_PATH instead of the start
+
       ### CAUTION: These 2 options must be the same for ALL nvim packages!! ###
       # use this to pin a specific neovim version.
       # import it in flake inputs with flake = false,

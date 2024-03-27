@@ -89,6 +89,8 @@ let
     aliases = null;
     nvimSRC = null;
     neovim-unwrapped = null;
+    suffix-path = false;
+    suffix-LD = false;
   } // thisPackage.settings;
 
   categories = thisPackage.categories;
@@ -215,6 +217,8 @@ in
     extraMakeWrapperArgs = let 
       linkables = fpkgs.lib.unique (filterAndFlatten sharedLibraries);
       pathEnv = fpkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
+      preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
+      preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
     in builtins.concatStringsSep " " (
       # this sets the name of the folder to look for nvim stuff in
       (if settings.configDirName != null
@@ -222,8 +226,12 @@ in
         || settings.configDirName != "nvim"
         then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
-      ++ (if pathEnv != [] then [ ''--prefix PATH : "${fpkgs.lib.makeBinPath pathEnv }"'' ] else [])
-      ++ (if linkables != [] then [ ''--prefix LD_LIBRARY_PATH : "${fpkgs.lib.makeLibraryPath linkables }"'' ] else [])
+      ++ (if pathEnv != [] 
+            then [ ''--${preORpostPATH} PATH : "${fpkgs.lib.makeBinPath pathEnv }"'' ]
+          else [])
+      ++ (if linkables != []
+            then [ ''--${preORpostLD} LD_LIBRARY_PATH : "${fpkgs.lib.makeLibraryPath linkables }"'' ]
+          else [])
       ++ (fpkgs.lib.unique (FandF_envVarSet environmentVariables))
       ++ (fpkgs.lib.unique (filterAndFlatten extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
