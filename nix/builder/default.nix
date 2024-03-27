@@ -32,10 +32,10 @@ let
     {
       pkgs ? null                 # <-- either pkgs with everything included
       , nixpkgs ? null            # <-- or include nixpkgs,
-      , extra_pkg_config ? {}
       , system ? null             # <-- and system
       , dependencyOverlays ? null # <-- and the overlays
-      , nixCats_passthru ? {}
+      , extra_pkg_config ? {}     # <-- extra config such as allowUnfree
+      , nixCats_passthru ? {}     # <-- extra things to add to passthru attribute of derivation
       , ...
     }:
     categoryDefFunction:
@@ -68,12 +68,12 @@ let
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
   } // (categoryDefFunction ({ inherit settings categories name; pkgs = fpkgs; }));
-  inherit (catDefs)
-  startupPlugins optionalPlugins 
-  lspsAndRuntimeDeps propagatedBuildInputs
-  environmentVariables extraWrapperArgs 
-  extraPythonPackages extraPython3Packages
-  extraLuaPackages optionalLuaAdditions sharedLibraries;
+  inherit (catDefs) startupPlugins
+  optionalPlugins lspsAndRuntimeDeps
+  propagatedBuildInputs environmentVariables
+  extraWrapperArgs extraPythonPackages
+  extraPython3Packages extraLuaPackages
+  optionalLuaAdditions sharedLibraries;
 
   thisPackage = packageDefFunction.${name} { pkgs = fpkgs; };
   settings = {
