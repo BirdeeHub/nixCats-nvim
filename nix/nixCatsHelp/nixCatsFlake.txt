@@ -247,7 +247,10 @@ based on the packageDefinitions set you provide,
 where by including categoryname = true; you enable that category.
 :help `nixCats.flake.outputs.packageDefinitions`
 
-It does this recursively.
+It will remove duplicate items, so feel free to include the same thing in
+multiple categories if it suits your purposes.
+
+It does this recursively. (explained below)
                             *nixCats.flake.outputs.categoryDefinitions.scheme*
 
 If, inside one of these main sets, you had another set,
