@@ -164,22 +164,17 @@ with builtins; rec {
   filterAndFlattenMapInner = categories: oneArgFunc: SetOfCategoryLists:
     map oneArgFunc (filterAndFlatten categories SetOfCategoryLists);
 
-  RecFilterForTrue = categories: let 
-    filterIt = attr: (lib.filterAttrs (name: value:
+  # Overlays values in place of true values in categories
+  RecFilterCats = categories: categoryDefs: let
+    # remove all things that are not true, or an attribute set that is not also a derivation
+    filterLayer = attr: (lib.filterAttrs (name: value:
         if isBool value
         then value
         else if isAttrs value && !lib.isDerivation value
         then true
         else false
       ) attr);
-    mapper = cats: mapAttrs (name: value:
-        if isBool value then value else mapper (filterIt value)
-      ) (filterIt cats);
-  in
-  mapper categories;
-
-  # Overlays values in place of filtered true values from above
-  RecFilterCats = categories: categoryDefs: let
+    # overlay value from categoryDefs if the value in categories is true, else recurse
     mapper = subCats: defAttrs: mapAttrs 
         (name: value: let
           newDefAttr = getAttr name defAttrs;
@@ -187,25 +182,27 @@ with builtins; rec {
         if !(isAttrs value && isAttrs newDefAttr) || lib.isDerivation newDefAttr
         then newDefAttr
         else mapper value newDefAttr)
-      (intersectAttrs defAttrs subCats);
+      (intersectAttrs defAttrs (filterLayer subCats));
   in
-  mapper (RecFilterForTrue categories) categoryDefs;
+  mapper categories categoryDefs;
 
   flattenToList = attrset: concatMap
     (v:
-      if isAttrs v && !lib.isDerivation v then flattenToList v else
-      (if isList v then v else [v])
+      if isAttrs v && !lib.isDerivation v then flattenToList v
+      else if isList v then v
+      else if v != null then [v] else []
     ) (attrValues attrset);
 
   flattenAttrMapLeaves = twoArgFunc: attrset: let
     mapAttrValues = attr: attrValues (mapAttrs (name: value:
-        if (isList value || isAttrs value)
+        if (isAttrs value)
         then value
         else (twoArgFunc name value)
       ) attr);
     flatten = attr: concatMap (v:
-        if isAttrs v && !lib.isDerivation v then flatten v else
-        (if isList v then v else [v])
+        if isAttrs v && !lib.isDerivation v then flatten v
+        else if isList v then v
+        else if v != null then [v] else []
       ) (mapAttrValues attr);
   in
   flatten attrset;
