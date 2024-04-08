@@ -11,7 +11,7 @@ luaPath:
   , ...
 }:
 categoryDefFunction:
-packageDefFunction: name:
+packageDefinitions: name:
   # for a more extensive guide to this file
   # see :help nixCats.flake.nixperts.nvimBuilder
 let
@@ -39,7 +39,7 @@ let
       , ...
     }:
     categoryDefFunction:
-    packageDefFunction:
+    packageDefinitions:
     packageName:
 
     # Note:
@@ -75,7 +75,7 @@ let
   extraPython3Packages extraLuaPackages
   optionalLuaAdditions sharedLibraries;
 
-  thisPackage = packageDefFunction.${name} { pkgs = fpkgs; };
+  thisPackage = packageDefinitions.${name} { pkgs = fpkgs; };
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -252,7 +252,7 @@ in
     nixCats_packageName = name;
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
-    packageDefinitions = packageDefFunction;
+    packageDefinitions = packageDefinitions;
     inherit dependencyOverlays;
   };
 

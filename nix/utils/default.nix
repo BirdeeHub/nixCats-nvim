@@ -21,11 +21,34 @@ with builtins; rec {
     mkExtraPackages = finalBuilder: packageDefinitions:
     (mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
+    makeOverlays = 
+      luaPath:
+      {
+        nixpkgs
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }@pkgsParams:
+      categoryDefFunction:
+      packageDefinitions: defaultName: let
+        makeOverlay = name: final: prev: {
+          ${name} = utils.baseBuilder luaPath (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+        };
+        overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // { default = (makeOverlay defaultName); };
+      in overlays;
+
     # makes an overlay you can add to allow importing as pkgs.packageName
     # and also a default overlay similarly to above but for overlays.
     mkOverlays = finalBuilder: packageDefinitions: defaultName:
-      (utils.mkDefaultOverlay finalBuilder defaultName)
-      // (utils.mkExtraOverlays finalBuilder packageDefinitions);
+      let
+        warn = builtins.trace "WARNING: utils.mkOverlays is deprecated. Use utils.makeOverlays instead.";
+      in (warn (
+          (utils.mkDefaultOverlay finalBuilder defaultName) 
+          //
+          (utils.mkExtraOverlays finalBuilder packageDefinitions)
+        )
+      );
 
     # I may as well make these separate functions.
     mkDefaultOverlay = finalBuilder: defaultName:
@@ -45,6 +68,35 @@ with builtins; rec {
               {
                 inherit name;
                 value = finalBuilder name;
+              }
+            ) namesIncList
+          );
+        }
+      );
+
+    # maybe you want multiple nvim packages in the same system and want
+    # to add them like pkgs.MyNeovims.packageName when you install them?
+    # both to keep it organized and also to not have to worry about naming conflicts with programs?
+    # used same as makeOverlays but with importName and namesIncList instead of defaultName
+    makeMultiOverlay = luaPath:
+      {
+        nixpkgs
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }@pkgsParams:
+      categoryDefFunction:
+      packageDefinitions:
+      importName:
+      namesIncList:
+      (self: super: {
+        ${importName} = listToAttrs (
+          map
+            (name:
+              {
+                inherit name;
+                value =  utils.baseBuilder luaPath (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
               }
             ) namesIncList
           );
