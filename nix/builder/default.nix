@@ -168,7 +168,11 @@ in
     '' else /* vim */ ''
       let configdir = stdpath('config')
     '') + /* vim */ ''
-      execute "source " . configdir . "/init.lua"
+      if filereadable(configdir . "/init.lua")
+        execute "source " . configdir . "/init.lua"
+      elseif filereadable(configdir . "/init.vim")
+        execute "source " . configdir . "/init.vim"
+      endif
 
       lua << EOF
       ${LuaAdditions}
