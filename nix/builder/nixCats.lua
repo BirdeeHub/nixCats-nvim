@@ -46,6 +46,30 @@ function M.addGlobals()
     { desc = 'All the plugins' })
 
     require('_G').nixCats = M.get
+
+    vim.cmd([[
+        function! GetNixCat(value)
+            return luaeval('require("nixCats").get("' . a:value . '")')
+        endfunction
+    ]])
+
+    vim.cmd([[
+        function! GetNixSettings()
+            return v:lua.require('nixCats.settings')
+        endfunction
+    ]])
+
+    vim.cmd([[
+        function! GetAllNixCats()
+            return v:lua.require('nixCats.cats')
+        endfunction
+    ]])
+
+    vim.cmd([[
+        function! GetNixIncluded()
+            return v:lua.require('nixCats.included')
+        endfunction
+    ]])
 end
 
 return M

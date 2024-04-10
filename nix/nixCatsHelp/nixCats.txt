@@ -196,7 +196,19 @@ nixCats also contains other info.
 <
 
 you can view these for debugging purposes with :NixCatsSettings and
-:NixCatsPawsible commands.
+:NixCatsPawsible user commands.
+
+In addition to the user commands, you may access these 3 items directly within
+vimscript!
+
+GetNixCat(value) is equivalent to the nixCats(value) command in
+lua.
+
+GetNixSettings() is require('nixCats.settings')
+
+GetNixIncluded() is require('nixCats.included')
+
+GetAllNixCats() is require('nixCats.cats')
 
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
