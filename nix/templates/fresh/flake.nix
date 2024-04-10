@@ -242,18 +242,16 @@
     # and set the default package to the one named here.
     packages = utils.mkPackages nixCatsBuilder packageDefinitions defaultPackageName;
 
-    # this will make an overlay out of each of the packageDefinitions defined above
-    # and set the default overlay to the one named here.
-    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions defaultPackageName;
-
     # choose your package for devShell
     # and add whatever else you want in it.
-    devShell = pkgs.mkShell {
-      name = defaultPackageName;
-      packages = [ (nixCatsBuilder defaultPackageName) ];
-      inputsFrom = [ ];
-      shellHook = ''
-      '';
+    devShells = {
+      default = pkgs.mkShell {
+        name = defaultPackageName;
+        packages = [ (nixCatsBuilder defaultPackageName) ];
+        inputsFrom = [ ];
+        shellHook = ''
+        '';
+      };
     };
 
     # To choose settings and categories from the flake that calls this flake.
@@ -262,6 +260,14 @@
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
+
+    # this will make an overlay out of each of the packageDefinitions defined above
+    # and set the default overlay to the one named here.
+    overlays = utils.makeOverlays luaPath {
+      # we pass in the things to make a pkgs variable to build nvim with later
+      inherit nixpkgs dependencyOverlays extra_pkg_config;
+      # and also our categoryDefinitions
+    } categoryDefinitions packageDefinitions defaultPackageName;
 
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {

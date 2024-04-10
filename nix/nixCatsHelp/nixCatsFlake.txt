@@ -560,18 +560,16 @@ They look like this:
     # and set the default package to the one named here.
     packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
 
-    # this will make an overlay out of each of the packageDefinitions defined above
-    # and set the default overlay to the one named here.
-    overlays = utils.mkOverlays nixCatsBuilder packageDefinitions "nixCats";
-
     # choose your package for devShell
     # and add whatever else you want in it.
-    devShell = pkgs.mkShell {
-      name = "nixCats";
-      packages = [ (nixCatsBuilder "nixCats") ];
-      inputsFrom = [ ];
-      shellHook = ''
-      '';
+    devShells = {
+      default = pkgs.mkShell {
+        name = defaultPackageName;
+        packages = [ (nixCatsBuilder defaultPackageName) ];
+        inputsFrom = [ ];
+        shellHook = ''
+        '';
+      };
     };
 
     # To choose settings and categories from the flake that calls this flake.
@@ -585,6 +583,22 @@ They look like this:
     # flakes, WITHOUT needing to use a system variable to do it.
     # and update them into the rest of the outputs returned by the
     # eachDefaultSystem function.
+
+    # this will make an overlay out of each of the packageDefinitions defined above
+    # and set the default overlay to the one named here.
+    overlays = utils.makeOverlays luaPath {
+      # we pass in the things to make a pkgs variable to build nvim with later
+      inherit nixpkgs dependencyOverlays extra_pkg_config;
+      # and also our categoryDefinitions
+    } categoryDefinitions packageDefinitions defaultPackageName;
+
+    # this will make an overlay out of each of the packageDefinitions defined above
+    # and set the default overlay to the one named here.
+    overlays = utils.makeOverlays luaPath {
+      # we pass in the things to make a pkgs variable to build nvim with later
+      inherit nixpkgs dependencyOverlays extra_pkg_config;
+      # and also our categoryDefinitions
+    } categoryDefinitions packageDefinitions defaultPackageName;
 
     # we export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
@@ -660,8 +674,16 @@ makes each package and also a default one
 <mkExtraPackages> finalBuilder: packageDefinitions:
 same as mkPackages but without the default one
 
-<mkOverlays> finalBuilder: packageDefinitions: defaultName:
+<makeOverlays> luaPath: {
+        nixpkgs
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }@pkgsParams: categoryDefFunction: packageDefinitions:
+      defaultName:
 makes an overlay for each package and also a default one
+These are basically the same as the arguments to utils.baseBuilder
 
 <standardPluginOverlay> inputs:
 allows for inputs named plugins-something to be
@@ -670,7 +692,7 @@ turned into an overlay containing them as plugins automatically
 In addition to those, there is also 5 convenience functions:
 
 <mergeCatDefs> oldCats: newCats:
-for merging category definitions,
+for merging category definitions (and individual packages in packageDefinitions),
 will recursively update up to the first thing not an attrset.
 For our purposes, we do not consider derivations to be attrsets.
 
@@ -684,9 +706,10 @@ a derivation, or something not a set is reached.
 <mkExtraOverlays> finalBuilder: packageDefinitions:
 which when combined with // make up mkOverlays
 
-<mkMultiOverlay> finalBuilder: packageDefinitions: importName: namesIncList:
-Instead of taking a name, it takes an importName and a list of names.
-It will output them in an overlay accessible by pkgs.${importName}.${name}
+<mkMultiOverlay> <same args as makeOverlays but with the following 2 args instead of defaultName>:
+            importName: namesIncList:
+Instead of taking a defaultName, it takes an importName and a list of names.
+It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
 
 
 ---------------------------------------------------------------------------------------
