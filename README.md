@@ -171,6 +171,10 @@ In a terminal, navigate to your nvim directory and run the following command:
   nix flake init -t github:BirdeeHub/nixCats-nvim
   # module template:
   nix flake init -t github:BirdeeHub/nixCats-nvim#module
+  # the outputs function of the flake template but as its own file
+  # callable with import ./the/dir { inherit inputs; }
+  # to recieve all normal flake outputs
+  nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 
   # for package manager integration utilities for functionality without nix
   # added at lua/nixCatsUtils also run:

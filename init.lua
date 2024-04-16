@@ -2,12 +2,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
---[[ ----------------------------------- ]]
---[[ THIS SETUP AND catPacker ARE FOR    ]]
---[[ pckr THE NEOVIM PLUGIN MANAGER      ]]
---[[ They do NOTHING if your config      ]]
---[[ is loaded via nix.                  ]]
---[[ ----------------------------------- ]]
 --[[
 if you plan to always load your nixCats via nix,
 you can safely ignore this setup call,
@@ -30,107 +24,45 @@ require('nixCatsUtils').setup {
 }
 -- then load the plugins via pckr
 -- YOU are in charge of putting the plugin
--- urls and build steps in there,
+-- urls and build steps in there, which will only be used when not on nix,
 -- and you should keep any setup functions
 -- OUT of that file, as they are ONLY loaded when this
 -- configuration is NOT loaded via nix.
-require('nixCatsUtils.catPacker').setup({
---[[ ------------------------------------------ ]]
---[[ ### DONT USE CONFIG VARIABLE ###           ]]
---[[ unless you are ok with that instruction    ]]
---[[ not being ran when used via nix,           ]]
---[[ pckr will not be ran when using nix        ]]
---[[ ------------------------------------------ ]]
-  { 'joshdick/onedark.vim', },
-  { 'nvim-tree/nvim-web-devicons', },
-
-  { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate',
-    requires = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-    },
-  },
-  {'nvim-telescope/telescope.nvim',
-    requires = {
-      'nvim-lua/plenary.nvim',
-      { 'nvim-telescope/telescope-fzf-native.nvim', run = 'which make && make', }
-    },
-  },
-
-  { 'neovim/nvim-lspconfig',
-    requires = {
-      { 'williamboman/mason.nvim', },
-      { 'williamboman/mason-lspconfig.nvim', },
-      { 'j-hui/fidget.nvim', },
-      { 'folke/neodev.nvim', },
-      { 'folke/neoconf.nvim', },
-    },
-  },
-
-  { 'hrsh7th/nvim-cmp',
-    requires = {
-      { 'onsails/lspkind.nvim', },
-      { 'L3MON4D3/LuaSnip', },
-      { 'saadparwaiz1/cmp_luasnip', },
-      { 'hrsh7th/cmp-nvim-lsp', },
-      { 'hrsh7th/cmp-nvim-lua', },
-      { 'hrsh7th/cmp-nvim-lsp-signature-help', },
-      { 'hrsh7th/cmp-path', },
-      { 'rafamadriz/friendly-snippets', },
-      { 'hrsh7th/cmp-buffer', },
-      { 'hrsh7th/cmp-cmdline', },
-      { 'dmitmel/cmp-cmdline-history', },
-    },
-  },
-
-  { 'mfussenegger/nvim-dap',
-    requires = {
-      { 'rcarriga/nvim-dap-ui', },
-      { 'theHamsta/nvim-dap-virtual-text', },
-      { 'jay-babu/mason-nvim-dap.nvim', },
-    },
-  },
-
-  { 'm-demare/hlargs.nvim', },
-  { "stevearc/oil.nvim" },
-  { 'mbbill/undotree', },
-  { 'tpope/vim-fugitive', },
-  { 'tpope/vim-rhubarb', },
-  { 'tpope/vim-sleuth', },
-  { 'folke/which-key.nvim', },
-  { 'lewis6991/gitsigns.nvim', },
-  { 'nvim-lualine/lualine.nvim', },
-  { 'lukas-reineke/indent-blankline.nvim', },
-  { 'numToStr/Comment.nvim', },
-  { 'kylechui/nvim-surround',
-    requires = { 'tpope/vim-repeat', },
-  },
-
-  {
-    "iamcco/markdown-preview.nvim",
-    run = function() vim.fn["mkdp#util#install"]() end,
-  },
-
-  -- all the rest of the setup will be done using the normal setup functions later,
-  -- thus working regardless of what method loads the plugins.
-  -- only stuff pertaining to downloading should be added to pckr.
-
-})
-
+require("myLuaConf.non_nix_download")
 -- OK, again, that isnt needed if you load this setup via nix, but it is an option.
 
+--[[
+Using the lazy.nvim wrapper is more integrated with your config.
+It uses lazy for loading even when on nix.
+Instead, when you use the wrapper in luaUtils template,
+You will tell it which plugins nix loaded (dont worry, this is covered in the help)
+and then disable the build steps when not on nix.
+(
+  the help for this feature is at :h nixCats.luaUtils and the kickstart-nvim template at
+  nix flake init -t github:BirdeeHub/nixCats-nvim#kickstart-nvim
+)
+--]]
 
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 
--- I like these. They tell me about tabs vs spaces and help me
--- visually see things. Feel free to disable.
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars:append("space:⋅")
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Set highlight on search
-vim.o.hlsearch = false
+vim.opt.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Minimal number of screen lines to keep above and below the cursor.
+vim.opt.scrolloff = 10
 
 -- Make line numbers default
 vim.wo.number = true
@@ -139,16 +71,18 @@ vim.wo.number = true
 vim.o.mouse = 'a'
 
 -- Indent
--- currently being handled by treesitter
 vim.o.smarttab = true
+-- NOTE: if you dont append to the previous cpoptions, which-key will throw many errors
+vim.o.cpoptions = (vim.o.cpoptions or '') .. 'I'
+vim.o.expandtab = true
+-- this part of indent settings is currently
+-- being handled by treesitter
 -- vim.o.smartindent = true
 -- vim.o.indentexpr = true
 -- vim.o.autoindent = true
-vim.o.cpoptions = 'I'
 -- vim.o.tabstop = 4
 -- vim.o.softtabstop = 4
 -- vim.o.shiftwidth = 4
-vim.o.expandtab = true
 
 -- stops line wrapping from being confusing
 vim.o.breakindent = true
@@ -240,6 +174,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --  See `:help 'clipboard'`
 -- vim.o.clipboard = 'unnamedplus'
 
+-- You should instead use these keybindings so that they are still easy to use, but dont conflict
 vim.keymap.set("n", '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
 vim.keymap.set({"v", "x"}, '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
 vim.keymap.set({"n", "v", "x"}, '<leader>yy', '"+yy', { noremap = true, silent = true, desc = 'Yank line to clipboard' })
@@ -248,24 +183,6 @@ vim.keymap.set({"n", "v", "x"}, '<C-a>', 'gg0vG$', { noremap = true, silent = tr
 vim.keymap.set({'n', 'v', 'x'}, '<leader>p', '"+p', { noremap = true, silent = true, desc = 'Paste from clipboard' })
 vim.keymap.set('i', '<C-p>', '<C-r><C-p>+', { noremap = true, silent = true, desc = 'Paste from clipboard from within insert mode' })
 vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc = 'Paste over selection without erasing unnamed register' })
-
--- so, my normal mode <leader>y randomly didnt accept any motions.
--- I didnt know it was meant to, because that was my first install of neovim.
--- If that ever happens to you, comment out the normal one, then uncomment this keymap and the function below it.
--- A full purge of ALL previous config files and state installed via pacman fixed it for me,
--- as the pacman config was the one that had that problem and it was infecting this one too.
--- I thought I was cool, but apparently I was doing a workaround to restore default behavior.
-
--- vim.keymap.set("n", '<leader>y', [[:set opfunc=Yank_to_clipboard<CR>g@]], { silent = true, desc = 'Yank to clipboard (accepts motions)' })
--- vim.cmd([[
---   function! Yank_to_clipboard(type)
---     silent exec 'normal! `[v`]"+y'
---     silent exec 'let @/=@"'
---   endfunction
---   " This fix would work in vim too if you used the following.
---   " nmap <silent> <leader>y :set opfunc=Yank_to_clipboard<CR>g@
--- ]])
-
 
 -- ok thats enough for 1 file. Off to lua/myLuaConf/init.lua
 require('myLuaConf')

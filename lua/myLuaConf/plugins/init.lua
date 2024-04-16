@@ -160,49 +160,15 @@ require("oil").setup({
     ["gs"] = "actions.change_sort",
     ["gx"] = "actions.open_external",
     ["g."] = "actions.toggle_hidden",
-
-    -- Which-key does not like this keybind AT ALL
-    -- ["g\\"] = "actions.toggle_trash",
-    ["g!"] = "actions.toggle_trash",
-    ["g\\"] = false,
+    ["g\\"] = "actions.toggle_trash",
   },
 })
 vim.keymap.set("n", "-", "<cmd>Oil<CR>", { noremap = true, desc = 'Open Parent Directory' })
 vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Open nvim root directory' })
--- Which key has kind-of a lot of bugs.
--- Nix or not, some things need to be disabled.
-require('which-key').setup({
-  plugins = {
-    marks = true, -- shows a list of your marks on ' and `
-    -- BUGGED registers plugin
-    registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
-    -- the presets plugin, adds help for a bunch of default keybindings in Neovim
-    -- No actual key bindings are created
-    spelling = {
-      enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
-      suggestions = 20, -- how many suggestions should be shown in the list?
-    },
-    presets = {
-      operators = true, -- adds help for operators like d, y, ...
-      motions = true, -- adds help for motions
-      text_objects = true, -- help for text objects triggered after entering an operator
-      -- BUGGED window control keys display
-      windows = false, -- default bindings on <c-w>
-      nav = true, -- misc bindings to work with windows
-      z = true, -- bindings for folds, spelling and others prefixed with z
-      g = true, -- bindings for prefixed with g
-    },
-  },
-  operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
-  disable = {
-    -- filetypes = { "oil" },
-  },
-})
--- I had these errors before nixos, but I fixed them in a dumb way.
--- I simply bound them again myself and it mostly worked...
--- this is the better way to prevent the errors.
 
--- document existing key chains
+require('which-key').setup({
+  operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
+})
 require('which-key').register {
   ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '[d]ocument', _ = 'which_key_ignore' },

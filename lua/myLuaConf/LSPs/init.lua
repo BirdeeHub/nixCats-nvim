@@ -1,10 +1,3 @@
-if not require('nixCatsUtils').isNixCats then
-  -- mason-lspconfig requires that these setup functions are called in this order
-  -- before setting up the servers.
-  require('mason').setup()
-  require('mason-lspconfig').setup()
-end
-
 local servers = {}
 if nixCats('neonixdev') then
   require('neodev').setup({})
@@ -31,7 +24,6 @@ if nixCats('neonixdev') then
         disable = { 'missing-fields' },
       },
     },
-    workspace = { checkThirdParty = true },
     telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
@@ -40,9 +32,6 @@ if nixCats('neonixdev') then
   end
   servers.nil_ls = {}
 
-end
-if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
-  vim.lsp.set_log_level("debug")
 end
 
 -- This is this flake's version of what kickstarter has set up for mason handlers.
@@ -65,33 +54,46 @@ end
 -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
 
 
-if not require('nixCatsUtils').isNixCats then
-  -- Ensure the servers above are installed
-  local mason_lspconfig = require 'mason-lspconfig'
+if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
+  vim.lsp.set_log_level("debug")
+end
+-- If you were to comment out this autocommand
+-- and instead pass the on attach function directly to
+-- nvim-lspconfig, it would do the same thing.
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
+  callback = function(event)
+    require('myLuaConf.LSPs.caps-on_attach').on_attach(vim.lsp.get_client_by_id(event.data.client_id), event.buf)
+  end
+})
 
-  mason_lspconfig.setup {
-    ensure_installed = vim.tbl_keys(servers),
-  }
-
-  mason_lspconfig.setup_handlers {
-    function(server_name)
-      require('lspconfig')[server_name].setup {
-        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
-        on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-        settings = servers[server_name],
-        filetypes = (servers[server_name] or {}).filetypes,
-      }
-    end,
-  }
-else
+if require('nixCatsUtils').isNixCats then
   for server_name,_ in pairs(servers) do
     require('lspconfig')[server_name].setup({
       capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
-      on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
+      -- this line is interchangeable with the above LspAttach autocommand
+      -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
       cmd = (servers[server_name] or {}).cmd,
       root_pattern = (servers[server_name] or {}).root_pattern,
     })
   end
+else
+  require('mason').setup()
+  local mason_lspconfig = require 'mason-lspconfig'
+  mason_lspconfig.setup {
+    ensure_installed = vim.tbl_keys(servers),
+  }
+  mason_lspconfig.setup_handlers {
+    function(server_name)
+      require('lspconfig')[server_name].setup {
+        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+        -- this line is interchangeable with the above LspAttach autocommand
+        -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+      }
+    end,
+  }
 end

@@ -1,14 +1,41 @@
---Init this template into your lsps directory
--- Then add your lsps to the scheme.
--- dont forget to add your on attach and capabilities as well!!
--- you will also need to then edit the location of
--- caps-on_attach.lua in the require statements at the end of this file
+local servers = {}
+if nixCats('neonixdev') then
+  require('neodev').setup({})
+  -- this allows our thing to have plugin library detection
+  -- despite not being in our .config/nvim folder
+  -- NEOCONF REQUIRES .neoconf.json AT PROJECT ROOT
+  require("neoconf").setup({
+    plugins = {
+      lua_ls = {
+        enabled = true,
+        enabled_for_neovim_config = true,
+      },
+    },
+  })
 
-if not require('nixCatsUtils').isNixCats then
-  -- mason-lspconfig requires that these setup functions are called in this order
-  -- before setting up the servers.
-  require('mason').setup()
-  require('mason-lspconfig').setup()
+  servers.lua_ls = {
+    Lua = {
+      formatters = {
+        ignoreComments = true,
+      },
+      signatureHelp = { enabled = true },
+      diagnostics = {
+        globals = { "nixCats" },
+        disable = { 'missing-fields' },
+      },
+    },
+    workspace = { checkThirdParty = true },
+    telemetry = { enabled = false },
+    filetypes = { 'lua' },
+  }
+  if require('nixCatsUtils').isNixCats then servers.nixd = {}
+  else servers.rnix = {}
+  end
+  servers.nil_ls = {}
+
+end
+if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
+  vim.lsp.set_log_level("debug")
 end
 
 -- This is this flake's version of what kickstarter has set up for mason handlers.
@@ -23,8 +50,6 @@ end
 --  define the property 'filetypes' to the map in question.
 --  You may do the same thing with cmd
 
-local servers = {}
-
 -- servers.clangd = {},
 -- servers.gopls = {},
 -- servers.pyright = {},
@@ -32,83 +57,44 @@ local servers = {}
 -- servers.tsserver = {},
 -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} },
 
--- you may also check your categories if you wish
 
--- if nixCats('neonixdev') then
---   require('neodev').setup({})
---     -- this allows our thing to have plugin library detection
---     -- despite not being in our .config/nvim folder
---     -- These need to be loaded after mason setup function
---     -- and before passing to mason lspconfig
---     -- NEOCONF REQUIRES .neoconf.json AT PROJECT ROOT
---   require("neoconf").setup({
---     plugins = {
---       lua_ls = {
---         enabled = true,
---         enabled_for_neovim_config = true,
---       },
---     },
---   })
-
---   servers.lua_ls = {
---     Lua = {
---       formatters = {
---         ignoreComments = true,
---       },
---       signatureHelp = { enabled = true },
---       diagnostics = {
---         globals = { "nixCats" },
---       },
---     },
---     workspace = { checkThirdParty = true },
---     telemetry = { enabled = false },
---     filetypes = { 'lua' },
---   }
---   if require('nixCatsUtils').isNixCats then servers.nixd = {}
---   else servers.rnix = {}
---   end
---   servers.nil_ls = {}
---
--- end
--- if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
---   vim.lsp.set_log_level("debug")
--- end
-
-
-
-
-
-
-
-if not require('nixCatsUtils').isNixCats then
-  -- Ensure the servers above are installed
-  local mason_lspconfig = require 'mason-lspconfig'
-
-  mason_lspconfig.setup {
-    ensure_installed = vim.tbl_keys(servers),
-  }
-
-  mason_lspconfig.setup_handlers {
-    function(server_name)
-      require('lspconfig')[server_name].setup {
-                                -- put the actual path to wherever you have your caps-on_attach
-        capabilities = require('REPLACE.THIS.PATH.caps-on_attach').get_capabilities(),
-        on_attach = require('REPLACE.THIS.PATH.caps-on_attach').on_attach,
-        settings = servers[server_name],
-        filetypes = (servers[server_name] or {}).filetypes,
-      }
-    end,
-  }
-else
+-- If you were to comment out this autocommand
+-- and instead pass the on attach function directly to
+-- nvim-lspconfig, it would do the same thing.
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
+  callback = function(event)
+    require('myLuaConf.LSPs.caps-on_attach').on_attach(vim.lsp.get_client_by_id(event.data.client_id), event.buf)
+  end
+})
+if require('nixCatsUtils').isNixCats then
   for server_name,_ in pairs(servers) do
     require('lspconfig')[server_name].setup({
-                                -- put the actual path to wherever you have your caps-on_attach
-      capabilities = require('REPLACE.THIS.PATH.caps-on_attach').get_capabilities(),
-      on_attach = require('REPLACE.THIS.PATH.caps-on_attach').on_attach,
+      capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+      -- this line is interchangeable with the above LspAttach autocommand
+      -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
       cmd = (servers[server_name] or {}).cmd,
       root_pattern = (servers[server_name] or {}).root_pattern,
     })
   end
+
+else
+  require('mason').setup()
+  local mason_lspconfig = require 'mason-lspconfig'
+  mason_lspconfig.setup {
+    ensure_installed = vim.tbl_keys(servers),
+  }
+  mason_lspconfig.setup_handlers {
+    function(server_name)
+      require('lspconfig')[server_name].setup {
+        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+        -- this line is interchangeable with the above LspAttach autocommand
+        -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+      }
+    end,
+  }
 end

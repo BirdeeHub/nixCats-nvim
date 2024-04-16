@@ -38,15 +38,14 @@ function M.on_attach(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
 
-  vim.keymap.set("n", "<leader>Fm", "<cmd>Format<CR>", { noremap = true, desc = '[F]or[m]at (lsp)' })
-
 end
 
 function M.get_capabilities()
   -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
   -- if you make a package without it, make sure to check if it exists with nixCats!
   local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+  capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+  capabilities.textDocument.completion.completionItem.snippetSupport = true
   return capabilities
 end
 return M

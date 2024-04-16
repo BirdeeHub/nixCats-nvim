@@ -21,6 +21,10 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
+    "plugins-nvim-nio" = {
+      url = "github:nvim-neotest/nvim-nio";
+      flake = false;
+    };
 
     # neovim = {
     #   url = "github:neovim/neovim/nightly";
@@ -104,14 +108,27 @@
           # nix-doc tags will make your tags much better in nix
           # but only if you have nil as well for some reason
         };
+        lint = with pkgs; [
+        ];
+        debug = with pkgs; [
+        ];
+        format = with pkgs; [
+        ];
       };
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
         debug = with pkgs.vimPlugins; [
+          pkgs.neovimPlugins.nvim-nio
           nvim-dap
           nvim-dap-ui
           nvim-dap-virtual-text
+        ];
+        lint = with pkgs.vimPlugins; [
+          nvim-lint
+        ];
+        format = with pkgs.vimPlugins; [
+          conform-nvim
         ];
         neonixdev = with pkgs.vimPlugins; [
           neodev-nvim
@@ -147,6 +164,7 @@
             ];
             general = with pkgs.vimPlugins; [
               telescope-fzf-native-nvim
+              telescope-ui-select-nvim
               plenary-nvim
               telescope-nvim
               # treesitter
@@ -287,6 +305,8 @@
           general.vimPlugins = true;
           general.gitPlugins = true;
           custom = true;
+          lint = true;
+          format = true;
           neonixdev = true;
           test = {
             subtest1 = true;
@@ -330,6 +350,8 @@
           general = true;
           custom = true;
           neonixdev = true;
+          lint = true;
+          format = true;
           test = true;
           lspDebugMode = false;
           themer = true;
