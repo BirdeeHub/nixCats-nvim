@@ -26,9 +26,10 @@
       flake = false;
     };
 
-    # neovim = {
-    #   url = "github:neovim/neovim/nightly";
-    #   flake = false;
+    # neovim-flake = {
+    #   url = "github:neovim/neovim/nightly?dir=contrib";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.flake-utils.follows = "flake-utils";
     # };
 
   };
@@ -297,6 +298,7 @@
           aliases = [ "vim" "vimcat" ];
           # caution: this option must be the same for all packages.
           # nvimSRC = inputs.neovim;
+          # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
         };
         # see :help nixCats.flake.outputs.packageDefinitions
         categories = {

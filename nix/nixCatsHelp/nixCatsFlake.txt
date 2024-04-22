@@ -452,13 +452,11 @@ These are the defaults:
 
       ### CAUTION: These 2 options must be the same for ALL nvim packages!! ###
       # use this to pin a specific neovim version.
-      # import it in flake inputs with flake = false,
-      # then put inputs.neovim (or whatever you called it) here.
-      # It will be used to override the source for neovim-unwrapped.
-      nvimSRC = null;
-      # if just overriding the source and propagatedBuildInputs isnt enough
-      # you can pass this any overrideable version of pkgs.neovim-unwrapped
+      # This one will specify the neovim derivation to use.
       neovim-unwrapped = null;
+      # This one will just override the src value of the neovim in nixpkgs
+      # import it in flake inputs with flake = false,
+      nvimSRC = null;
     };
 <
 

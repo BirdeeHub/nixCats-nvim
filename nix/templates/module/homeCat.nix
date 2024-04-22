@@ -100,7 +100,7 @@ in {
             # your alias may not conflict with your other packages.
             aliases = [ "vim" "homeVim" ];
             # caution: this option must be the same for all packages.
-            # nvimSRC = inputs.neovim;
+            # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
           };
           # and a set of categories that you want
           # (and other information to pass to lua)
