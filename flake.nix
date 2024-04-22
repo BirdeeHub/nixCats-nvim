@@ -297,7 +297,6 @@
           configDirName = "nixCats-nvim";
           aliases = [ "vim" "vimcat" ];
           # caution: this option must be the same for all packages.
-          # nvimSRC = inputs.neovim;
           # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
         };
         # see :help nixCats.flake.outputs.packageDefinitions
@@ -345,6 +344,7 @@
           # will now look for nixCats-nvim within .config and .local and others
           configDirName = "nixCats-nvim";
           aliases = [ "testCat" ];
+          # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
         };
         categories = {
           generalBuildInputs = true;
