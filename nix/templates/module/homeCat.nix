@@ -77,9 +77,6 @@ in {
         extraPython3Packages = {
           test = (_:[]);
         };
-        extraPythonPackages = {
-          test = (_:[]);
-        };
         # populates $LUA_PATH and $LUA_CPATH
         extraLuaPackages = {
           test = [ (_:[]) ];

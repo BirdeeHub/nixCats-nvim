@@ -193,9 +193,6 @@
 
       # lists of the functions you would have passed to
       # python.withPackages or lua.withPackages
-      extraPythonPackages = {
-        test = (_:[]);
-      };
       extraPython3Packages = {
         test = (_:[]);
       };
