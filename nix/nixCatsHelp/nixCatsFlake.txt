@@ -450,9 +450,11 @@ These are the defaults:
       # causes sharedLibraries to be added to the END of
       # LD_LIBRARY_PATH instead of the start
 
-      ### CAUTION: These 2 options must be the same for ALL nvim packages!! ###
+      ### CAUTION: These next 2 options must be the same
+      # for ALL nvim packages that you wish to have simultaneously installed.
+
       # use this to pin a specific neovim version.
-      # This one will specify the neovim derivation to use.
+      # This one will specify the base neovim derivation to use.
       neovim-unwrapped = null;
       # This one will just override the src value of the neovim in nixpkgs
       # import it in flake inputs with flake = false,

@@ -193,6 +193,7 @@
           # your alias may not conflict with your other packages.
           aliases = [ "vim" ];
           # caution: this option must be the same for all packages.
+          # or at least, all packages that are to be installed simultaneously.
           # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
         };
         # and a set of categories that you want
