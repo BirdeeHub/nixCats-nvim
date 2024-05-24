@@ -26,10 +26,8 @@
       flake = false;
     };
 
-    # neovim-flake = {
-    #   url = "github:neovim/neovim/nightly?dir=contrib";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    #   inputs.flake-utils.follows = "flake-utils";
+    # neovim-nightly-overlay = {
+    #   url = "github:nix-community/neovim-nightly-overlay";
     # };
 
   };
@@ -342,7 +340,7 @@
           # will now look for nixCats-nvim within .config and .local and others
           configDirName = "nixCats-nvim";
           aliases = [ "testCat" ];
-          # neovim-unwrapped = inputs.neovim-flake.packages.${pkgs.system}.neovim;
+          # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
         };
         categories = {
           generalBuildInputs = true;
