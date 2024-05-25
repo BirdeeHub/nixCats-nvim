@@ -123,9 +123,9 @@ in
         };
       init = fpkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
-      cats = fpkgs.writeText "cats.lua" ''return ${(import ../utils).luaTablePrinter categoriesPlus}'';
-      settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ../utils).luaTablePrinter settingsPlus}'';
-      depsTable = fpkgs.writeText "included.lua" ''return ${(import ../utils).luaTablePrinter allPluginDeps}'';
+      cats = fpkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
+      settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
+      depsTable = fpkgs.writeText "included.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
       builder = fpkgs.writeText "builder.sh" /* bash */ ''
@@ -181,7 +181,7 @@ in
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
-    filterAndFlatten = (import ../utils).filterAndFlatten categories;
+    filterAndFlatten = (import ./ncTools.nix).filterAndFlatten categories;
 
     buildInputs = [ fpkgs.stdenv.cc.cc.lib ] ++ fpkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
     start = fpkgs.lib.unique (filterAndFlatten startupPlugins);
@@ -192,13 +192,13 @@ in
     # and then maps name and value
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenMapInnerAttrs = (import ../utils)
+    filterAndFlattenMapInnerAttrs = (import ./ncTools.nix)
           .filterAndFlattenMapInnerAttrs categories;
     # This one filters and flattens attrs of lists and then maps value
     # into a list of strings based on the function we provide it.
     # it the same as above but for a mapping function with 1 argument
     # because the inner is a list not a set.
-    filterAndFlattenMapInner = (import ../utils)
+    filterAndFlattenMapInner = (import ./ncTools.nix)
           .filterAndFlattenMapInner categories;
 
     # and then applied to give us a 1 argument function:
