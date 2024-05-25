@@ -252,7 +252,7 @@ in
   # add our lsps and plugins and our config, and wrap it all up!
 (import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
   nixCats_passthru = nixCats_passthru // {
-    keepLuaBuilder = (import ../utils).utils.baseBuilder luaPath;
+    keepLuaBuilder = import ./. luaPath;
     nixCats_packageName = name;
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
