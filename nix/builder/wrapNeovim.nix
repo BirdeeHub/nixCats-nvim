@@ -23,6 +23,7 @@ rec {
     , runB4Config
     , aliases
     , nixCats_passthru ? {}
+    , disablePythonSafePath ? false
   }:
     let
       # although I removed an error that doesnt make sense for my flake.
@@ -83,6 +84,6 @@ rec {
       wrapRc = true;
       customAliases = aliases;
       inherit (nixCats_passthru) nixCats_packageName;
-      inherit nixCats nixCats_passthru;
+      inherit withPerl nixCats nixCats_passthru disablePythonSafePath;
   });
 }

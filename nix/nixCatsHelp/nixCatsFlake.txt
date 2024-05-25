@@ -426,6 +426,10 @@ These are the defaults:
       withRuby = true;
       extraName = "";
       withPython3 = true;
+      # unsets PYTHONSAFEPATH variable.
+      # Can cause issues with reproducibility,
+      # can fix some stuff
+      disablePythonSafePath = false;
 
       # do you want to package the lua from this flake in the store?
       # or would you rather it just read it in your .config/<configDirName>?

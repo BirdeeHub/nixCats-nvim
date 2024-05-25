@@ -91,6 +91,7 @@ let
     neovim-unwrapped = null;
     suffix-path = false;
     suffix-LD = false;
+    disablePythonSafePath = false;
   } // thisPackage.settings;
 
   categories = thisPackage.categories;
@@ -261,7 +262,7 @@ in
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases disablePythonSafePath;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
