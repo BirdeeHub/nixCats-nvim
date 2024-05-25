@@ -315,9 +315,9 @@ I also borrowed a decent amount of code from nixpkgs and made modifications.
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
   It does not use Nix to manage plugins. Use nixCats after this one if you want to move your version of kickstart to nix.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project that, like mine, also holds to a normal neovim config structure. It does not have have categories, exported options, or modules.
-  It starts you at the basics, using the raw, wrapNeovimUnstable function and doesnt do much extra for you.
-   - If mine has too many nix features for you, or you have no ambitions of doing multiple configurations in 1 config file, this is probably your next best starting point.
+  A project that, like this one, also holds to a normal neovim config structure.
+  It starts you at the basics, using the raw, wrapNeovimUnstable function with no modifications.
+   - If the category/messaging system of nixCats isn't for you, this is probably your next best starting point.
 - [`NixVim`](https://github.com/nix-community/nixvim):
   A Neovim distribution configured using a NixOS module.
   Much more comparable to a neovim distribution like lazyVim or astrovim and the like, configuration entirely in nix.
