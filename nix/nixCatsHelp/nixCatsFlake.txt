@@ -232,6 +232,9 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   vim.g.python3_host_prog
   or run from nvim terminal via :!<packagename>-python3
 
+<extraPython3wrapperArgs>
+  the same as extraWrapperArgs but for bundled python3 executable
+
   <optionalLuaAdditions>* It can also take 
     a flexible set of categories, each containing a lua string
     that will be ran after sourcing your init.lua

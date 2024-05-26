@@ -62,18 +62,20 @@ let
   # So you put in a set of categories of lists of them.
     extraPythonPackages = {};
     extraPython3Packages = {};
+    extraPython3wrapperArgs = {};
   # same thing except for lua.withPackages
     extraLuaPackages = {};
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction ({ inherit settings categories name; pkgs = fpkgs; }));
+  } // (categoryDefFunction { inherit settings categories name; pkgs = fpkgs; });
   inherit (catDefs) startupPlugins
   optionalPlugins lspsAndRuntimeDeps
   propagatedBuildInputs environmentVariables
   extraWrapperArgs extraPythonPackages
   extraPython3Packages extraLuaPackages
-  optionalLuaAdditions sharedLibraries;
+  optionalLuaAdditions extraPython3wrapperArgs
+  sharedLibraries;
 
   thisPackage = packageDefinitions.${name} { pkgs = fpkgs; };
   settings = {
@@ -212,7 +214,7 @@ in
     # this is used for the fields in the wrapper where the default value is (_: [])
     combineCatsOfFuncs = section:
       (x: let
-        appliedfunctions = filterAndFlattenMapInner (value: (value) x ) section;
+        appliedfunctions = filterAndFlattenMapInner (value: value x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
         uniquifiedList = fpkgs.lib.unique combinedFuncRes;
       in
@@ -242,6 +244,8 @@ in
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     );
 
+    python3wrapperArgs = fpkgs.lib.unique ((filterAndFlatten extraPython3wrapperArgs) ++ (if settings.disablePythonSafePath then ["--unset PYTHONSAFEPATH"] else []));
+
     # add our propagated build dependencies
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then fpkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = baseNvimUnwrapped.overrideAttrs (prev: {
@@ -262,7 +266,7 @@ in
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases disablePythonSafePath;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
   configure = {
     inherit customRC;
     packages.myVimPackage = {
@@ -275,6 +279,7 @@ in
     /* the function you would have passed to python.withPackages */
   withPython3 = settings.withPython3;
   extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
+  extraPython3wrapperArgs = python3wrapperArgs;
     /* the function you would have passed to lua.withPackages */
   extraLuaPackages = combineCatsOfFuncs extraLuaPackages;
 }
