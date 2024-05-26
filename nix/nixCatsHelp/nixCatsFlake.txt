@@ -473,17 +473,26 @@ It removes the need to stage and rebuild to see your lua changes reflected.
 You will still need to rebuild when making changes to nix regardless of the
 value of wrapRc
 
-However it means that the lua isn't going run if it isn't in the right
+However it also means that the lua isn't going run if it isn't in the right
 folder, i.e. when installed and ran from github with nix run
 
-If the lua is not in `vim.fn.stdpath('config')`, it will not work.
-By default this is ~/.config/nvim on linux systems, although we can
-change nvim to whatever we wish via the configDirName setting.
+If the lua is not in `vim.fn.stdpath('config')`, wrapRc = false will not work.
+By default this is `~/.config/nvim` on linux systems, although we can
+change `nvim` to whatever we wish via the configDirName setting.
 
 The best way to use the wrapRc option is to symlink the correct
 .config directory to wherever your neovim directory in your
-nix config is, and enable it while testing changes,
-then setting it back to true and committing when it works.
+nix config is.
+
+Then, make a second identical packageDefinition, but with wrapRc
+disabled. The nixCats main flake.nix file has an example of this with nixCats
+and regularCats.
+
+Then, when testing lua changes, you run the other package and have a vanilla
+neovim experience, only rebuilding when you install new packages.
+
+When you are satisfied, simply rebuild and go back to using the main package,
+as it was the same except for the single option!
 
 --------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
