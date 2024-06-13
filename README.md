@@ -44,12 +44,10 @@ Want to pass info from nix to lua? Just add it to the same table in nix and then
 
 You will not be backed into any corners using the nixCats scheme, either as a flake or module.
 
-Except 2.
+Except 1. The section below marked [attention](#attention)
 
-1. The module template cannot be ran via nix run. The 3rd template, which is just the output function of the flake template in a default.nix file, can solve that easily if desired later when working on your nix configuration.
-2. The section below marked [attention](#attention)
-
-It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both, including installing multiple versions of neovim to your PATH.
+It is easy to convert between flake and module versions, so do not worry at the start which one to choose, all options will be available to you in both,
+including installing multiple versions of neovim to your PATH.
 
 However the flake can be used without nixos or home manager, so if you don't have that set up or aren't on nixos, you should choose the flake to start with.
 

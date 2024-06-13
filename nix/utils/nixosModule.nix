@@ -36,7 +36,7 @@
           A list of overlays to make available to nixCats but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
-        example = (lib.literalExpression ''
+        example = (literalExpression ''
           addOverlays = [ (self: super: { neovimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '');
       };
@@ -50,11 +50,11 @@
       luaPath = mkOption {
         default = luaPath;
         type = types.str;
-        description = (lib.literalExpression ''
+        description = (literalExpression ''
           The path to your nvim config directory in the store.
           In the base nixCats flake, this is "${./.}".
         '');
-        example = (lib.literalExpression "${./.}/userLuaConfig");
+        example = (literalExpression "${./.}/userLuaConfig");
       };
 
       packageNames = mkOption {
@@ -70,7 +70,7 @@
         replace = mkOption {
           default = null;
           type = types.nullOr (types.functionTo (types.attrsOf types.anything));
-          description = (lib.literalExpression ''
+          description = (literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
@@ -149,6 +149,30 @@
             };
           }
         '';
+      };
+      out.packages = mkOption {
+        type = types.attrsOf types.package;
+        visible = false;
+        readOnly = true;
+        description = "Resulting customized neovim packages.";
+      };
+      out.users = mkOption {
+        description = ''
+          same as system config but per user instead
+          and without addOverlays or nixpkgs_version
+        '';
+        visible = false;
+        readOnly = true;
+        type = with types; attrsOf (submodule {
+          options = {
+            packages = mkOption {
+              type = types.attrsOf types.package;
+              visible = false;
+              readOnly = true;
+              description = "Resulting customized neovim packages.";
+            };
+          };
+        });
       };
 
       users = mkOption {
@@ -305,17 +329,25 @@
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
 
-    in (builtins.map (catName:
-      newLuaBuilder {
+    in (builtins.listToAttrs (builtins.map (catName: let
+        boxedCat = newLuaBuilder {
           pkgs =  import newNixpkgs {
             inherit (pkgs) config system;
             overlays = dependencyOverlays.${pkgs.system};
           };
           inherit dependencyOverlays;
-        } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
+        } newCategoryDefinitions pkgDefs catName;
+      in
+        { name = catName; value = boxedCat; }) options_set.packageNames))
     );
 
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
+      user_options_set = config.${defaultPackageName}.users.${uname};
+      in {
+        packages = lib.mkIf options_set.enable (builtins.attrValues (mapToPackages user_options_set dependencyOverlays));
+      }
+    ) config.${defaultPackageName}.users;
+    newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
         packages = lib.mkIf options_set.enable (mapToPackages user_options_set dependencyOverlays);
@@ -323,10 +355,17 @@
     ) config.${defaultPackageName}.users;
 
     options_set = config.${defaultPackageName};
+    mappedPackageAttrs = mapToPackages options_set dependencyOverlays;
+    mappedSystemPackages = builtins.attrValues mappedPackageAttrs;
+
   in
   {
+    ${defaultPackageName}.out = {
+      users = newUserPackageOutputs;
+      packages = lib.mkIf options_set.enable mappedPackageAttrs;
+    };
     users.users = newUserPackageDefinitions;
-    environment.systemPackages = lib.mkIf options_set.enable (mapToPackages options_set dependencyOverlays);
+    environment.systemPackages = lib.mkIf options_set.enable mappedSystemPackages;
   };
 }
 
