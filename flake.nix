@@ -265,7 +265,11 @@
       };
       # populates $LUA_PATH and $LUA_CPATH
       extraLuaPackages = {
-        test = [ (_:[]) ];
+        # luasnip needs jsregexp.
+        # it is declared as a propagated build input of luasnip
+        # but it is not being propagated automatically.
+        # see: https://github.com/NixOS/nixpkgs/pull/319325
+        general = [ (lpkgs: with lpkgs; [ jsregexp ]) ];
       };
     };
 
