@@ -926,5 +926,15 @@ as the nixos module has for system, but for the user managed by home-manager.
 I have condensed it here, but notice at the end it outputs
 all the same options for each user when in a nixosModule as well?
 
+in addition, there are some config values that can be used to reference the
+configs made in the module
+>nix
+  config.${defaultPackageName}.out.packages.<PACKAGE_NAME>
+<
+
+and if using the nixos module there is ALSO
+>nix
+  config.${defaultPackageName}.out.users.<USER_NAME>.packages.<PACKAGE_NAME>
+<
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

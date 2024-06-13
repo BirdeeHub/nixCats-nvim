@@ -41,6 +41,13 @@
         '');
       };
 
+      out.packages = mkOption {
+        type = types.attrsOf types.package;
+        visible = false;
+        readOnly = true;
+        description = "Resulting customized neovim packages.";
+      };
+
       enable = mkOption {
         default = false;
         type = types.bool;
@@ -50,11 +57,11 @@
       luaPath = mkOption {
         default = luaPath;
         type = types.str;
-        description = (lib.literalExpression ''
+        description = (literalExpression ''
           The path to your nvim config directory in the store.
           In the base nixCats flake, this is "${./.}".
         '');
-        example = (lib.literalExpression "${./.}/userLuaConfig");
+        example = (literalExpression "${./.}/userLuaConfig");
       };
 
       packageNames = mkOption {
@@ -70,7 +77,7 @@
         replace = mkOption {
           default = null;
           type = types.nullOr (types.functionTo (types.attrsOf types.anything));
-          description = (lib.literalExpression ''
+          description = (literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
             just like :help nixCats.flake.outputs.categories
@@ -185,18 +192,23 @@
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
 
-    in (builtins.map (catName:
-      newLuaBuilder {
+    in (builtins.listToAttrs (builtins.map (catName: let
+        boxedCat = newLuaBuilder {
           pkgs =  import newNixpkgs {
             inherit (pkgs) config system;
             overlays = dependencyOverlays.${pkgs.system};
           };
           inherit dependencyOverlays;
-        } newCategoryDefinitions pkgDefs catName) options_set.packageNames)
+        } newCategoryDefinitions pkgDefs catName;
+      in
+        { name = catName; value = boxedCat; }) options_set.packageNames))
     );
+    mappedPackageAttrs = mapToPackages options_set dependencyOverlays;
+    mappedPackages = builtins.attrValues mappedPackageAttrs;
   in
   {
-    home.packages = lib.mkIf options_set.enable (mapToPackages options_set dependencyOverlays);
+    ${defaultPackageName}.out.packages = lib.mkIf options_set.enable mappedPackageAttrs;
+    home.packages = lib.mkIf options_set.enable mappedPackages;
   };
 
 }
