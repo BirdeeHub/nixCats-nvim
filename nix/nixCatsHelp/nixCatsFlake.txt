@@ -91,10 +91,10 @@ Flake Outputs Introduction                              *nixCats.flake.outputs*
 With our inputs to our flake taken care of:
 First, we take care of importing our utils set.
 The reason we are doing this now, is so that it can be defined outside of
-the flake-utils.lib.eachDefaultSystem function, and thus we can export it
+the utils.eachSystem function, and thus we can export it
 without having to include a system variable when we import it somewhere else.
 >nix
-  outputs = { self, nixpkgs, flake-utils, ... }@inputs: let
+  outputs = { self, nixpkgs, ... }@inputs: let
     utils = (import ./nix/utils).utils;
     luaPath = "${./.}";
     extra_pkg_config = {
@@ -107,7 +107,8 @@ set from { mySet = {}; } to { mySet.${system} = {}; }
 Many overlays require being accessed via ${system} variable in this manner,
 and thus there is a method for handling it in nixCats.
 >nix
-  system_resolved = flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
+  system_resolved = utils.eachSystem nixpkgs.lib.platforms.all (system: let
+                  /* utils.eachSystem is just flake-utils.lib.eachSystem */
     # see :help nixCats.flake.outputs.overlays
     dependencyOverlays = (import ./overlays inputs) ++ [
       # This overlay grabs all the inputs named in the format
@@ -119,7 +120,7 @@ and thus there is a method for handling it in nixCats.
       inputs.nixd.overlays.default
     ];
     # these overlays will be wrapped with ${system}
-    # and we will call the same flake-utils function
+    # and we will call the same utils.eachSystem function
     # later on to access them.
   in { inherit dependencyOverlays; });
   inherit (system_resolved) dependencyOverlays;
@@ -521,7 +522,7 @@ That argument is the name of the neovim package to be packaged.
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
-  flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
+  utils.eachSystem nixpkgs.lib.platforms.all (system: let
     inherit (utils) baseBuilder;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
@@ -541,7 +542,7 @@ see :help `nixCats.installation_options`
 They look like this:
 >nix
     # see :help nixCats.flake.outputs.exports
-  flake-utils.lib.eachSystem flake-utils.lib.allSystems (system: let
+  utils.eachSystem nixpkgs.lib.platforms.all (system: let
     # this is how we use the builder:
 
     # first it needs a path to the lua to include
@@ -570,7 +571,7 @@ They look like this:
     # it will make sure pkgs is passed to the categoryDefinitions and packageDefinitions
   in
   {
-    # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
+    # these outputs will be wrapped with ${system} by utils.eachSystem
 
     # this will make a package out of each of the packageDefinitions defined above
     # and set the default package to the one named here.
@@ -726,6 +727,15 @@ which when combined with // make up mkOverlays
             importName: namesIncList:
 Instead of taking a defaultName, it takes an importName and a list of names.
 It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
+
+<eachSystem> systems: f:
+just flake-utils.lib.eachSystem but without the dependency
+
+<bySystem> systems: f:
+similar to flake-utils.lib.eachSystem but for only 1 variable. It adds the
+${system} to the start like ${system}.packages.default and not
+packages.${system}.default so it is used like:
+{ packages = utils.bySystem nixpkgs.lib.platforms.all (system: { default = ...; }) }
 
 
 ---------------------------------------------------------------------------------------

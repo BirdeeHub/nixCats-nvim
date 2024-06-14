@@ -5,10 +5,8 @@
   # (lazy.nvim wrapper only works on unstable)
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
-    nixCats.inputs.flake-utils.follows = "flake-utils";
   };
 
   Then call this file with:
@@ -19,10 +17,10 @@
   The following is just the outputs function from the flake template.
  */
 {inputs, ... }@attrs: let
-  inherit (inputs) flake-utils nixpkgs;
+  inherit (inputs) nixpkgs;
   inherit (inputs.nixCats) utils;
   luaPath = "${./.}";
-  forEachSystem = flake-utils.lib.eachSystem flake-utils.lib.allSystems;
+  forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
   # the following extra_pkg_config contains any values
   # which you want to pass to the config set of nixpkgs
   # import nixpkgs { config = extra_pkg_config; inherit system; }

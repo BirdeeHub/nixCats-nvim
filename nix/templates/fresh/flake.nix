@@ -22,10 +22,9 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
-    nixCats.inputs.flake-utils.follows = "flake-utils";
+
     # neovim-nightly-overlay = {
     #   url = "github:nix-community/neovim-nightly-overlay";
     # };
@@ -43,10 +42,10 @@
   };
 
   # see :help nixCats.flake.outputs
-  outputs = { self, nixpkgs, flake-utils, nixCats, ... }@inputs: let
+  outputs = { self, nixpkgs, nixCats, ... }@inputs: let
     inherit (nixCats) utils;
     luaPath = "${./.}";
-    forEachSystem = flake-utils.lib.eachSystem flake-utils.lib.allSystems;
+    forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
     # the following extra_pkg_config contains any values
     # which you want to pass to the config set of nixpkgs
     # import nixpkgs { config = extra_pkg_config; inherit system; }
@@ -79,7 +78,7 @@
         # add any flake overlays here.
       ];
       # these overlays will be wrapped with ${system}
-      # and we will call the same flake-utils function
+      # and we will call the same utils.eachSystem function
       # later on to access them.
     in { inherit dependencyOverlays; });
     inherit (system_resolved) dependencyOverlays;
@@ -231,7 +230,7 @@
     pkgs = import nixpkgs { inherit system; };
   in
   {
-    # these outputs will be wrapped with ${system} by flake-utils.lib.eachDefaultSystem
+    # these outputs will be wrapped with ${system} by utils.eachSystem
 
     # this will make a package out of each of the packageDefinitions defined above
     # and set the default package to the one named here.

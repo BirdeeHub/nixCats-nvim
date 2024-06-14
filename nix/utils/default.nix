@@ -150,6 +150,38 @@ with builtins; rec {
             }
           )
         );
+
+
+    # flake-utils' main function, because its all I used
+    # Builds a map from <attr>=value to <attr>.<system>=value for each system
+    eachSystem = systems: f:
+      let
+        # Merge together the outputs for all systems.
+        op = attrs: system:
+          let
+            ret = f system;
+            op = attrs: key: attrs //
+                {
+                  ${key} = (attrs.${key} or { })
+                    // { ${system} = ret.${key}; };
+                }
+            ;
+          in
+          foldl' op attrs (attrNames ret);
+      in
+      foldl' op { }
+        (systems
+          ++ # add the current system if --impure is used
+            (if builtins ? currentSystem then
+               if elem currentSystem systems
+               then []
+               else [ currentSystem ]
+            else []));
+
+    # in case someoneone wants flake-utils but for only 1 output.
+    bySystems = systems: f:
+      lib.genAttrs systems (system: f system);
+
   };
 
   # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
@@ -174,6 +206,16 @@ with builtins; rec {
             # otherwise it would squish our single derivation category rather than update.
           (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
         ) lhs rhs;
+
+    genAttrs =
+      names:
+      f:
+      listToAttrs (map (n: lib.nameValuePair n (f n)) names);
+
+    nameValuePair =
+      name:
+      value:
+      { inherit name value; };
   };
 }
 
