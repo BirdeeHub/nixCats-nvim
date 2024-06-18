@@ -2,11 +2,11 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1718149104,
-        "narHash": "sha256-Ds1QpobBX2yoUDx9ZruqVGJ/uQPgcXoYuobBguyKEh8=",
+        "lastModified": 1718470082,
+        "narHash": "sha256-u2F0MMYE+Efc+ocruTbtU/wWHuYHWcJafp5zJ++n/YE=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "e913ae340076bbb73d9f4d3d065c2bca7caafb16",
+        "rev": "3027ba73dfef68eb555fc2fa97aed4e999e74f97",
         "type": "github"
       },
       "original": {
@@ -32,27 +32,10 @@
         "type": "github"
       }
     },
-    "plugins-nvim-nio": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1717951894,
-        "narHash": "sha256-gAbqGPNBYkj+x+wR6WN2x7kqKaxlBzVXPmRXm8sM40Y=",
-        "owner": "nvim-neotest",
-        "repo": "nvim-nio",
-        "rev": "7969e0a8ffabdf210edd7978ec954a47a737bbcc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nvim-neotest",
-        "repo": "nvim-nio",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "plugins-hlargs": "plugins-hlargs",
-        "plugins-nvim-nio": "plugins-nvim-nio"
+        "plugins-hlargs": "plugins-hlargs"
       }
     }
   },

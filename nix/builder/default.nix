@@ -60,7 +60,7 @@ let
   # the source says:
     /* the function you would have passed to python.withPackages */
   # So you put in a set of categories of lists of them.
-    extraPythonPackages = {};
+    # extraPythonPackages = {};
     extraPython3Packages = {};
     extraPython3wrapperArgs = {};
   # same thing except for lua.withPackages
@@ -275,7 +275,7 @@ in
     };
   };
     /* the function you would have passed to python.withPackages */
-  extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
+  # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
     /* the function you would have passed to python.withPackages */
   withPython3 = settings.withPython3;
   extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
