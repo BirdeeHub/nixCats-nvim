@@ -7,7 +7,7 @@ rec {
   legacyWrapper = pkgs: neovim: {
     extraMakeWrapperArgs ? ""
     /* the function you would have passed to python.withPackages */
-    , extraPythonPackages ? (_: [])
+    # , extraPythonPackages ? (_: [])
     /* the function you would have passed to python.withPackages */
     , withPython3 ? true,  extraPython3Packages ? (_: [])
     /* the function you would have passed to lua.withPackages */
@@ -26,10 +26,40 @@ rec {
     , extraPython3wrapperArgs ? []
   }:
     let
-      # although I removed an error that doesnt make sense for my flake.
-      plugins = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPlugin (configure.packages or {}));
-      # and made it be able to include configs to be ran BEFORE customRC is loaded.
-      genPlugin = packageName: {start ? [], opt ? []}:
+      plugins = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPluginList (configure.packages or {}));
+
+      # can parse programs.neovim plugin syntax for both nixos and home module, in addition to just a derivation.
+      # or even another one with config.lua or config.vim
+      parsepluginspec = opt: p: let
+        optional = if p ? optional && builtins.isBool p.optional then p.optional else opt;
+
+        attrsyn = p ? plugin && p ? config && builtins.isAttrs p.config;
+        hmsyn = p ? plugin && p ? config && ! builtins.isAttrs p.config && p ? type;
+        nixossyn = p ? plugin && p ? config && ! builtins.isAttrs p.config && ! p ? type;
+
+        type = if ! p ? config then null else if nixossyn then "viml" else if hmsyn then p.type
+          else if attrsyn then
+            if p.config ? lua then "lua"
+            else if p.config ? vim then "viml"
+            else null
+          else null;
+      in
+        (if nixossyn || hmsyn || attrsyn
+        then (p // { config = let 
+            lua = if type == "lua" then ''
+              lua << EOF
+              ${if attrsyn then p.config.lua else p.config}
+              EOF
+            '' else "";
+            vim = if type == "viml" then
+              if attrsyn then p.config.vim else p.config
+            else "";
+          in
+          (vim + "\n" + lua); inherit optional; })
+        else if p ? plugin then p // { inherit optional; }
+        else { plugin = p; inherit optional; });
+
+      genPluginList = packageName: {start ? [], opt ? []}:
         [ {
           plugin = pkgs.stdenv.mkDerivation {
             name = "empty-derivation";
@@ -40,32 +70,7 @@ rec {
           };
           config = runB4Config;
           optional = false;
-        } ] ++
-        (map (p:
-          if builtins.isAttrs p && (p ? config.lua || p ? config.vim) && p ? plugin
-          then (p // { config = let 
-            lua = if p ? config.lua then ''
-              lua << EOF
-              ${p.config.lua}
-              EOF
-            '' else "";
-            vim = if p ? config.vim then p.config.vim else "";
-          in
-          (vim + "\n" + lua); })
-          else p) start)
-          ++
-          (map (p:
-          if builtins.isAttrs p && (p ? config.lua || p ? config.vim) && p ? plugin
-          then (p // { config = let 
-            lua = if p ? config.lua then ''
-              lua << EOF
-              ${p.config.lua}
-              EOF
-            '' else "";
-            vim = if p ? config.vim then p.config.vim else "";
-          in
-          (vim + "\n" + lua); optional = true; })
-          else (if p ? plugin then p else { plugin = p; optional = true; })) opt);
+        } ] ++ (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
       res = pkgs.neovimUtils.makeNeovimConfig {
         customRC = configure.customRC or "";
@@ -76,7 +81,6 @@ rec {
         inherit extraName;
       };
     in
-    # it uses the new wrapper!!!
     (pkgs.callPackage ./wrapper.nix {}) neovim (res // {
       wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
       # I handle this with customRC 

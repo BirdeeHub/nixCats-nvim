@@ -20,10 +20,6 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
-    "plugins-nvim-nio" = {
-      url = "github:nvim-neotest/nvim-nio";
-      flake = false;
-    };
 
     # neovim-nightly-overlay = {
     #   url = "github:nix-community/neovim-nightly-overlay";
@@ -118,7 +114,7 @@
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
         debug = with pkgs.vimPlugins; [
-          pkgs.neovimPlugins.nvim-nio
+          nvim-nio
           nvim-dap
           nvim-dap-ui
           nvim-dap-virtual-text
