@@ -151,8 +151,7 @@ There is about as much help as there is nix code in this entire project.
 > nix will not package it unless you add it 
 > to your git staging before you build it...
 > So nvim wont be able to find it...
-> So, run git add before you build,
-> especially when using the wrapRc option.
+> So, run git add before you build.
 
 Again, the lua is just [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim), with a couple changes. 
 
@@ -286,16 +285,21 @@ and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.tx
 
 #### Drawbacks:
 
-Specific to my project:
+Specific to this project:
 
 You cannot launch nvim with nvim and must choose an alias.
 This is the trade off for installing multiple versions of nvim to the same user's PATH from a module, something that would normally cause a collision error.
 
 General nix + nvim things:
 
-Some vscode debuggers are not on nixpkgs so you have to build them in customBuildsOverlay. 
-Let me know when you figure it out I'm kinda a noob still. [How to contribute](./CONTRIBUTING.md)
-Mason does not work on nixOS although it does on other OS options.
+Some vscode debuggers are not on nixpkgs so you have to build them (there's a place for it in customBuildsOverlay). 
+Let people know when you figure one out or submit it to nixpkgs.
+
+[Mason](https://github.com/williamboman/mason.nvim) does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose!
+
+[Lazy.nvim](https://github.com/folke/lazy.nvim) works but unless you tell it not to reset the RTP you will lose your treesitter parsers. There is an included wrapper that you can use to set this correctly and stop it from downloading stuff you already downloaded.
+
+[lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for nix based configurations.
 
 #### Special mentions:
 

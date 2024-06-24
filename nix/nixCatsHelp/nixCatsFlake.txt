@@ -457,6 +457,12 @@ These are the defaults:
       # see :help `$NVIM_APPNAME`
       configDirName = "nvim";
 
+      # Only active when wrapRc = false, this option allows you to specify
+      # an absolute path to the unwrapped config directory.
+      # Will not change anything other than config directory, configDirName
+      # is still needed for .local/share or .cache and the like
+      unwrappedCfgPath = null;
+
       # These 2 options are useful for when you want to allow your dev shells
       # to override things such as lsps and shared libraries that you have
       # already in your configuration.

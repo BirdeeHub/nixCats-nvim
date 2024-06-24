@@ -57,10 +57,7 @@ let
     propagatedBuildInputs = {};
     environmentVariables = {};
     extraWrapperArgs = {};
-  # the source says:
     /* the function you would have passed to python.withPackages */
-  # So you put in a set of categories of lists of them.
-    # extraPythonPackages = {};
     extraPython3Packages = {};
     extraPython3wrapperArgs = {};
   # same thing except for lua.withPackages
@@ -72,10 +69,9 @@ let
   inherit (catDefs) startupPlugins
   optionalPlugins lspsAndRuntimeDeps
   propagatedBuildInputs environmentVariables
-  extraWrapperArgs extraPythonPackages
-  extraPython3Packages extraLuaPackages
-  optionalLuaAdditions extraPython3wrapperArgs
-  sharedLibraries;
+  extraWrapperArgs extraPython3Packages
+  extraLuaPackages optionalLuaAdditions
+  extraPython3wrapperArgs sharedLibraries;
 
   thisPackage = packageDefinitions.${name} { pkgs = fpkgs; };
   settings = {
@@ -88,6 +84,7 @@ let
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
+    unwrappedCfgPath = null;
     aliases = null;
     nvimSRC = null;
     neovim-unwrapped = null;
@@ -151,6 +148,8 @@ in
       execute "set runtimepath-=" . configdir . "/after"
     '') + (if settings.wrapRc then /* vim */''
       let configdir = "${LuaConfig}"
+    '' else if settings.unwrappedCfgPath != null then /* vim */''
+      let configdir = "${settings.unwrappedCfgPath}"
     '' else "") + /* vim */ ''
       lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
@@ -168,6 +167,8 @@ in
     in # just in case someone overwrites it.
     (if settings.wrapRc then /* vim */ ''
       let configdir = "${LuaConfig}"
+    '' else if settings.unwrappedCfgPath != null then /* vim */''
+      let configdir = "${settings.unwrappedCfgPath}"
     '' else /* vim */ ''
       let configdir = stdpath('config')
     '') + /* vim */ ''
