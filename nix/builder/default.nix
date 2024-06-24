@@ -85,7 +85,7 @@ let
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
-    unwrappedFakeXDGcfg = null;
+    unwrappedCfgPath = null;
     aliases = null;
     nvimSRC = null;
     neovim-unwrapped = null;
@@ -149,10 +149,8 @@ in
       execute "set runtimepath-=" . configdir . "/after"
     '') + (if settings.wrapRc then /* vim */''
       let configdir = "${LuaConfig}"
-    '' else if settings.unwrappedFakeXDGcfg != null
-         && settings.configDirName != null
-      then /* vim */''
-      let configdir = "${settings.unwrappedFakeXDGcfg}/${settings.configDirName}"
+    '' else if settings.unwrappedCfgPath != null then /* vim */''
+      let configdir = "${settings.unwrappedCfgPath}"
     '' else "") + /* vim */ ''
       lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
