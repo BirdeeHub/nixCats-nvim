@@ -57,10 +57,7 @@ let
     propagatedBuildInputs = {};
     environmentVariables = {};
     extraWrapperArgs = {};
-  # the source says:
     /* the function you would have passed to python.withPackages */
-  # So you put in a set of categories of lists of them.
-    # extraPythonPackages = {};
     extraPython3Packages = {};
     extraPython3wrapperArgs = {};
   # same thing except for lua.withPackages
@@ -88,6 +85,7 @@ let
     extraName = "";
     withPython3 = true;
     configDirName = "nvim";
+    unwrappedFakeXDGcfg = null;
     aliases = null;
     nvimSRC = null;
     neovim-unwrapped = null;
@@ -151,6 +149,10 @@ in
       execute "set runtimepath-=" . configdir . "/after"
     '') + (if settings.wrapRc then /* vim */''
       let configdir = "${LuaConfig}"
+    '' else if settings.unwrappedFakeXDGcfg != null
+         && settings.configDirName != null
+      then /* vim */''
+      let configdir = "${settings.unwrappedFakeXDGcfg}/${settings.configDirName}"
     '' else "") + /* vim */ ''
       lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
