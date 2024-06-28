@@ -7,15 +7,11 @@ end
 function M.getTableNamesOrListValues(pluginTable)
   for key, _ in pairs(pluginTable) do
     if type(key) ~= 'string' then
-      return pluginTable
+      return vim.tbl_values(pluginTable)
     end
     break
   end
-  local patterns = {}
-  for key, _ in pairs(pluginTable) do
-    table.insert(patterns, key)
-  end
-  return patterns
+  return vim.tbl_keys(pluginTable)
 end
 
 function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
@@ -55,10 +51,10 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG = {}
     end
 
-    if lazyCFG.performance == nil then
+    if type(lazyCFG.performance) ~= 'table' then
       lazyCFG.performance = {}
     end
-    if lazyCFG.performance.rtp == nil then
+    if type(lazyCFG.performance.rtp) ~= 'table' then
       lazyCFG.performance.rtp = {}
     end
     lazyCFG.performance.rtp.reset = false
@@ -73,7 +69,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       nixCatsConfigDir .. "/after",
     }
 
-    if lazyCFG.dev == nil then
+    if type(lazyCFG.dev) ~= 'table' then
       lazyCFG.dev = {}
     end
 
@@ -100,7 +96,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       return path
     end
 
-    if lazyCFG.dev.patterns == nil or type(lazyCFG.dev.patterns) ~= 'table' then
+    if type(lazyCFG.dev.patterns) ~= 'table' then
       lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
     else
       local toInclude
