@@ -1,5 +1,8 @@
 local M = {}
 
+-- these 3 files are intended to be independent. You will likely want at least something in this one,
+-- but unless you use lazy.nvm or want to use pckr or rocks when not on nix, you wont need the other 2
+
 M.isNixCats = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil
 
 function M.setup(v)
@@ -13,6 +16,27 @@ function M.setup(v)
         -- if not in nix, just make it return a boolean
         require('_G').nixCats = function(_) return nixCats_default_value end
     end
+end
+
+function M.enableForCategory(v, default)
+  if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil or default == nil then
+    if nixCats(v) then
+      return true
+    else
+      return false
+    end
+  else
+    return default
+  end
+end
+
+-- for conditionally disabling build steps on nix, as they are done via nix
+function M.lazyAdd(v, o)
+  if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
+    return o
+  else
+    return v
+  end
 end
 
 return M

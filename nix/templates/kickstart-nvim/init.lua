@@ -128,11 +128,11 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 --[[ ----------------------------------------- ]]
       {
         'williamboman/mason.nvim',
-        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true, false),
+        enabled = require('nixCatsUtils').lazyAdd(true, false),
       },
       {
         'williamboman/mason-lspconfig.nvim',
-        enabled = require('nixCatsUtils.lazyCat').lazyAdd(true, false),
+        enabled = require('nixCatsUtils').lazyAdd(true, false),
       },
 
       -- Useful status updates for LSP
@@ -322,8 +322,8 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
 --[[ Use the lazyAdd function to       ]]
 --[[ disable build steps on nix.       ]]
 --[[ --------------------------------- ]]
-        build = require('nixCatsUtils.lazyCat').lazyAdd('make'),
-        cond = require('nixCatsUtils.lazyCat').lazyAdd(function()
+        build = require('nixCatsUtils').lazyAdd('make'),
+        cond = require('nixCatsUtils').lazyAdd(function()
           return vim.fn.executable 'make' == 1
         end),
       },
@@ -338,7 +338,7 @@ require('nixCatsUtils.lazyCat').setup( pluginList, nixLazyPath,
         'nvim-treesitter/nvim-treesitter-textobjects',
       },
     },
-    build = require('nixCatsUtils.lazyCat').lazyAdd(':TSUpdate'),
+    build = require('nixCatsUtils').lazyAdd(':TSUpdate'),
   },
   {
     'm-demare/hlargs.nvim',
@@ -640,19 +640,10 @@ require('which-key').register({
 }, { mode = 'v' })
 
 
-
-
-
 --[[ ------------------------------------- ]]
 --[[ Handling mason is covered in the help ]]
 --[[ See :help nixCats.luaUtils.mason      ]]
 --[[ ------------------------------------- ]]
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
-if not require('nixCatsUtils').isNixCats then
-  require('mason').setup()
-  require('mason-lspconfig').setup()
-end
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -719,6 +710,8 @@ if require('nixCatsUtils').isNixCats then
     })
   end
 else
+  require('mason').setup()
+  require('mason-lspconfig').setup()
   -- Ensure the servers above are installed
   local mason_lspconfig = require 'mason-lspconfig'
 

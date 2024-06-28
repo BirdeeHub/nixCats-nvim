@@ -4,27 +4,6 @@ function M.mergePluginTables(table1, table2)
   return vim.tbl_extend('keep', table1, table2)
 end
 
-function M.enableForCategory(v, default)
-  if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil or default == nil then
-    if nixCats(v) then
-      return true
-    else
-      return false
-    end
-  else
-    return default
-  end
-end
-
--- for conditionally disabling build steps on nix, as they are done via nix
-function M.lazyAdd(v, o)
-  if vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil then
-    return o
-  else
-    return v
-  end
-end
-
 function M.getTableNamesOrListValues(pluginTable)
   for key, _ in pairs(pluginTable) do
     if type(key) ~= 'string' then
