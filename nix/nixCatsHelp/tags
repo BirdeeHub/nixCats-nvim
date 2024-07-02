@@ -1,4 +1,6 @@
 nixCats	nixCats.txt	/*nixCats*
+nixCats.LSPs	LSPs.txt	/*nixCats.LSPs*
+nixCats.LSPs.caps-on_attach	LSPs.txt	/*nixCats.LSPs.caps-on_attach*
 nixCats.LSPs.mason	LSPs.txt	/*nixCats.LSPs.mason*
 nixCats.flake	nixCatsFlake.txt	/*nixCats.flake*
 nixCats.flake.inputs	nixCatsFlake.txt	/*nixCats.flake.inputs*
@@ -17,7 +19,6 @@ nixCats.installation_options	installation.txt	/*nixCats.installation_options*
 nixCats.luaUtils	luaUtils.txt	/*nixCats.luaUtils*
 nixCats.luaUtils.intro	luaUtils.txt	/*nixCats.luaUtils.intro*
 nixCats.luaUtils.lazy	luaUtils.txt	/*nixCats.luaUtils.lazy*
-nixCats.luaUtils.mason	luaUtils.txt	/*nixCats.luaUtils.mason*
 nixCats.luaUtils.pckr	luaUtils.txt	/*nixCats.luaUtils.pckr*
 nixCats.luaUtils.setup	luaUtils.txt	/*nixCats.luaUtils.setup*
 nixCats.templates	installation.txt	/*nixCats.templates*
