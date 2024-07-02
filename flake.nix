@@ -125,16 +125,9 @@
         format = with pkgs.vimPlugins; [
           conform-nvim
         ];
-        neonixdev = with pkgs.vimPlugins; [
-          neodev-nvim
-          neoconf-nvim
-        ];
         # yes these category names are arbitrary
         markdown = with pkgs.vimPlugins; [
           markdown-preview-nvim
-        ];
-        lazy = with pkgs.vimPlugins; [
-          lazy-nvim
         ];
         general = {
           gitPlugins = with pkgs.neovimPlugins; [
@@ -213,6 +206,11 @@
       # not loaded automatically at startup.
       # use with packadd and an autocommand in config to achieve lazy loading
       optionalPlugins = {
+        neonixdev = with pkgs.vimPlugins; [
+          # loaded in the same file as the lsps are configured.
+          # see there or at `:h nixCats.LSPs` for more info on lazy loading.
+          lazydev-nvim
+        ];
         custom = with pkgs.nixCatsBuilds; [ ];
         gitPlugins = with pkgs.neovimPlugins; [ ];
         general = with pkgs.vimPlugins; [ ];
@@ -312,9 +310,6 @@
           # this does not have an associated category of plugins, 
           # but lua can still check for it
           lspDebugMode = false;
-          # by default, we dont want lazy.nvim
-          # we could omit this for the same effect
-          lazy = false;
           # you could also pass something else:
           themer = true;
           colorscheme = "onedark";
