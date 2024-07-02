@@ -1,7 +1,7 @@
 =======================================================================================
 NIX CATEGORIES                                                       *nixCats*
 
-For help with the nix flake files, see :help `nixCats.flake`
+For help with the nix flake files, see :help |nixCats.flake|
 
 *******************************************************
 TWO IMPORTANT NOTES:
@@ -61,7 +61,7 @@ a category name in your package definition (example package definition below).
 They will be replaced.
 
 If in your flake, your package definition looked like this:
-  see :help `nixCats.flake.outputs.packaging`
+  see :help |nixCats.flake.outputs.packageDefinitions|
 >nix
 
   packageDefinitions = {

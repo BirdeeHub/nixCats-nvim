@@ -31,7 +31,7 @@ will not be reflected unless you run git add.
 Related:
 For detecting what was included by 
 the flake in your Lua, see:
-:help `nixCats`
+:help |nixCats|
 
 `stdpath('config')` will still point to ~/.config/<configDirName>.
 But your lua config will be in the store.
@@ -158,7 +158,7 @@ It is imported via overlays/default.nix above
 If you need to interact with one of these overlays, it will be this one.
 You should not need to do it much.
 overlays/default.nix imports this overlay and any others like it.
-see :help `nixCats.flake.nixperts.overlays`
+see :help |nixCats.flake.nixperts.overlays|
 
 It is used for defining plugins with build steps that 
 were not well handled by nixpkgs.
@@ -168,7 +168,7 @@ Then, access plugins defined there later
 with 'pkgs.nixCatsBuilds.somepluginname'
 
 If you decide you wish to split your customBuildsOverlay up, 
-see :help `nixCats.flake.nixperts.overlays`
+see :help |nixCats.flake.nixperts.overlays|
 or look at the overlays/default.nix file.
 
 <IMPORTANT> When defining your overlays, they will be
@@ -249,7 +249,7 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
 In essence, the contents of each set listed here are filtered
 based on the packageDefinitions set you provide, 
 where by including categoryname = true; you enable that category.
-:help `nixCats.flake.outputs.packageDefinitions`
+:help |nixCats.flake.outputs.packageDefinitions|
 
 It will remove duplicate items, so feel free to include the same thing in
 multiple categories if it suits your purposes.
@@ -261,7 +261,7 @@ If, inside one of these main sets, you had another set,
 it would consider that a subcategory, and you could enable it
 just like you do with a normal category, by setting a value with the
 corresponding attribute path to true in the category
-set of `nixCats.flake.outputs.packageDefinitions`.
+set of |nixCats.flake.outputs.packageDefinitions|.
 You can nest them as much as you like, or just have a category that is a
 single derivation.
 
@@ -416,10 +416,10 @@ an example package definition:
 You can require('nixCats') for the set you define here in your lua
 It returns a lua table of the same format.
 
-see :help `nixCats`
+see :help |nixCats|
 
 For more nuances on enabling categories and subcategories, see above at
-:help `nixCats.flake.outputs.categoryDefinitions.scheme`
+:help |nixCats.flake.outputs.categoryDefinitions.scheme|
 
 ----------------------------------------------------------------------------------------
 Settings                                       *nixCats.flake.outputs.settings*
@@ -533,7 +533,7 @@ That argument is the name of the neovim package to be packaged.
 3. our function that takes an individual package definition
      and returns a set of categoryDefinitions.
 
-4. our set of packageDefinitions see: `nixCats.flake.outputs.packageDefinitions`
+4. our set of packageDefinitions see: |nixCats.flake.outputs.packageDefinitions|
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
@@ -552,7 +552,7 @@ to change the default package name to whatever the name of
 your default packageDefinition of choice is.
 
 for information on how to use these options when importing your nixCats flake,
-see :help `nixCats.installation_options`
+see :help |nixCats.installation_options|
 
 They look like this:
 >nix
@@ -684,7 +684,7 @@ Pass this set into utils.mkNixosModules and choose a defaultPackageName.
 It will create a nixos module that you can import in configuration.nix
 and will provide all the same import options as the usual flake import would
 provide. If you do not have a luaPath, you may pass it a keepLua builder
-See :help `nixCats.flake.outputs.exports.mkNixosModules`
+See :help |nixCats.flake.outputs.exports.mkNixosModules|
 
 <mkHomeModules>
 The same as mkNixosModules above, but for home manager.
@@ -778,6 +778,8 @@ with lists of overlays in each item. Such that
 the lists would be accessed via dependencyOverlays.${system}
 
 If you do not have a luaPath, you may pass it a keepLua builder.
+
+More information on the modules can be found at :h |nixCats.module|
 
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
