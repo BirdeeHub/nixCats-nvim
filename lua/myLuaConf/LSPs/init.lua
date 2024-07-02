@@ -1,17 +1,29 @@
 local servers = {}
 if nixCats('neonixdev') then
-  require('neodev').setup({})
-  -- this allows our thing to have plugin library detection
-  -- despite not being in our .config/nvim folder
-  -- NEOCONF REQUIRES .neoconf.json AT PROJECT ROOT
-  require("neoconf").setup({
-    plugins = {
-      lua_ls = {
-        enabled = true,
-        enabled_for_neovim_config = true,
-      },
-    },
+  -- NOTE: Lazydev will make your lua lsp stronger for neovim config
+  -- NOTE: we are also using this as an opportunity to show you how to lazy load plugins!
+  -- This plugin was added to the optionalPlugins section of the main flake.nix of this repo.
+  -- Thus, it is not loaded and must be packadded.
+  vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('nixCats-lazydev', { clear = true }),
+    pattern = { 'lua' },
+    callback = function(event)
+      -- NOTE: Use `:NixCatsPawsible` to see the names of all plugins downloaded via nix for packadd
+      vim.cmd.packadd('lazydev.nvim')
+      require('lazydev').setup({
+        -- library = {
+        --   -- See the configuration section for more details
+        --   -- Load luvit types when the `vim.uv` word is found
+        --   -- { path = "luvit-meta/library", words = { "vim%.uv" } },
+        -- },
+      })
+    end
   })
+  -- NOTE: use nvim-neorocks/lz.n to manage the autocommands for you if the above seems tedious.
+  -- Or, use the wrapper for lazy.nvim included in the luaUtils template.
+  -- NOTE: AFTER DIRECTORIES WILL NOT BE SOURCED BY PACKADD!!!!!
+  -- this must be done by you manually if,
+  -- for example, you wanted to lazy load nvim-cmp sources
 
   servers.lua_ls = {
     Lua = {

@@ -44,10 +44,12 @@ require('nixCatsUtils.catPacker').setup({
       { 'williamboman/mason.nvim', },
       { 'williamboman/mason-lspconfig.nvim', },
       { 'j-hui/fidget.nvim', },
-      { 'folke/neodev.nvim', },
-      { 'folke/neoconf.nvim', },
     },
   },
+  --  NOTE:  we take care of lazy loading elsewhere in an autocommand
+    -- so that we can use the same code on and off nix.
+    -- so here we just tell it not to auto load it
+  { 'folke/lazydev.nvim', cond = function(_) end, },
 
   { 'hrsh7th/nvim-cmp',
     requires = {

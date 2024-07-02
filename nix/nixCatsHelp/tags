@@ -1,4 +1,5 @@
 nixCats	nixCats.txt	/*nixCats*
+nixCats.LSPs.mason	LSPs.txt	/*nixCats.LSPs.mason*
 nixCats.flake	nixCatsFlake.txt	/*nixCats.flake*
 nixCats.flake.inputs	nixCatsFlake.txt	/*nixCats.flake.inputs*
 nixCats.flake.nixperts.overlays	overlays.txt	/*nixCats.flake.nixperts.overlays*
