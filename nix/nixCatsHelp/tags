@@ -21,4 +21,7 @@ nixCats.luaUtils.intro	luaUtils.txt	/*nixCats.luaUtils.intro*
 nixCats.luaUtils.lazy	luaUtils.txt	/*nixCats.luaUtils.lazy*
 nixCats.luaUtils.pckr	luaUtils.txt	/*nixCats.luaUtils.pckr*
 nixCats.luaUtils.setup	luaUtils.txt	/*nixCats.luaUtils.setup*
+nixCats.module	nixCatsModules.txt	/*nixCats.module*
+nixCats.module.mkHomeModules	nixCatsModules.txt	/*nixCats.module.mkHomeModules*
+nixCats.module.mkNixosModules	nixCatsModules.txt	/*nixCats.module.mkNixosModules*
 nixCats.templates	installation.txt	/*nixCats.templates*
