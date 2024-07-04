@@ -25,6 +25,11 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
+
+    "plugins-hlargs" = {
+      url = "github:m-demare/hlargs.nvim";
+      flake = false;
+    };
   };
 
   # see :help nixCats.flake.outputs
@@ -52,25 +57,20 @@
 
     # this allows you to use pkgs.${system} whenever you want in those sections
     # without fear.
-    system_resolved = forEachSystem (system: let
+    inherit (forEachSystem (system: let
       # see :help nixCats.flake.outputs.overlays
-      standardPluginOverlay = utils.standardPluginOverlay;
-
-
       # you may define more overlays in the overlays directory, and import them
       # in the default.nix file in that directory.
       # see overlays/default.nix for how to add more overlays in that directory.
       # or see :help nixCats.flake.nixperts.overlays
-      dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system}
-      ((import ./overlays inputs) ++ [
+      dependencyOverlays = [ ((import ./overlays inputs) ++ [
         (utils.standardPluginOverlay inputs)
         # add any flake overlays here.
-      ])) ];
+      ]) ];
       # these overlays will be wrapped with ${system}
       # and we will call the same utils.eachSystem function
       # later on to access them.
-    in { inherit dependencyOverlays; });
-    inherit (system_resolved) dependencyOverlays;
+    in { inherit dependencyOverlays; })) dependencyOverlays;
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme

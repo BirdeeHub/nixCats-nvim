@@ -16,10 +16,14 @@
     # for specific tags, branches and commits, see:
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
 
-    "plugins-hlargs" = {
-      url = "github:m-demare/hlargs.nvim";
-      flake = false;
-    };
+    # No longer fetched to avoid forcing people to import it, but this remains here as a tutorial.
+    # How to import it into your config is shown farther down in the startupPlugins set.
+    # You put it here like this, and then below you would use it with `pkgs.neovimPlugins.hlargs`
+
+    # "plugins-hlargs" = {
+    #   url = "github:m-demare/hlargs.nvim";
+    #   flake = false;
+    # };
 
     # neovim-nightly-overlay = {
     #   url = "github:nix-community/neovim-nightly-overlay";
@@ -53,7 +57,7 @@
 
     # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
-    system_resolved = forEachSystem (system: let
+    inherit (forEachSystem (system: let
       # see :help nixCats.flake.outputs.overlays
       dependencyOverlays = (import ./overlays inputs) ++ [
         # This overlay grabs all the inputs named in the format
@@ -66,8 +70,7 @@
       # these overlays will be wrapped with ${system}
       # and we will call the same utils.eachSystem function
       # later on to access them.
-    in { inherit dependencyOverlays; });
-    inherit (system_resolved) dependencyOverlays;
+    in { inherit dependencyOverlays; })) dependencyOverlays;
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -130,8 +133,10 @@
           markdown-preview-nvim
         ];
         general = {
-          gitPlugins = with pkgs.neovimPlugins; [
-            hlargs
+          gitPlugins = [
+            # If it was included in your flake inputs as plugins-hlargs,
+            # this would be how to add that plugin in your config.
+            # pkgs.neovimPlugins.hlargs
           ];
           vimPlugins = {
             # you can make a subcategory

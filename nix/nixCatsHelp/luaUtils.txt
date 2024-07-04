@@ -184,7 +184,7 @@ The tutorial:
       },
     },
 
-    { 'm-demare/hlargs.nvim', },
+    -- { 'm-demare/hlargs.nvim', },
     { 'mbbill/undotree', },
     { 'tpope/vim-fugitive', },
     { 'tpope/vim-rhubarb', },
