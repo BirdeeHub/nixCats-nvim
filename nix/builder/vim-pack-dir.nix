@@ -12,6 +12,9 @@
 
   findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
 
+  # a function. I will call it in the altered vimUtils.packDir function below
+  # and give it the nixCats plugin function from before and .the various resolved dependencies
+  # so that I can expose the list of installed packages to lua.
   callNixCats = nixCats:
     {
       ts_grammar_plugin
@@ -67,12 +70,15 @@
 
       allPluginsMapped = (map mkEntryFromDrv allPlugins);
 
+      # apparently this is ACTUALLY the standard. Yeah. Strings XD
+      # If its stable enough for nixpkgs I guess I can use it here.
       grammarMatcher = entry: 
         (if entry != null && entry.name != null then 
           (if (builtins.match "^vimplugin-treesitter-grammar-.*" entry.name) != null
           then true else false)
         else false);
 
+      # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
       ts_grammar_plugin = with builtins; stdenv.mkDerivation (let 
         treesitter_grammars = (map (entry: entry.value)
           (filter (entry: grammarMatcher entry) allPluginsMapped));
@@ -99,6 +105,7 @@
         lib.flatten (builtins.map (plugin: (plugin.python3Dependencies or (_: [])) ps) allPlugins);
       python3Env = python3.withPackages allPython3Dependencies;
 
+      # call the function, creating the nixCats plugin (definition in builder/default.nix)
       resolvedCats = callNixCats nixCats {
         inherit ts_grammar_plugin startPlugins opt
         python3link packageName allPython3Dependencies;
@@ -106,6 +113,8 @@
 
       packdirStart = vimFarm "pack/${packageName}/start" "packdir-start"
             ( (builtins.attrValues startPlugins) ++ resolvedCats);
+
+      # ok thats kinda all I changed.
 
       packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
 

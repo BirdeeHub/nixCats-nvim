@@ -30,6 +30,7 @@ rec {
 
       # can parse programs.neovim plugin syntax for both nixos and home module, in addition to just a derivation.
       # or even another one with config.lua or config.vim
+      # especially ugly because I went for "both backwards and cross compatibility" XD
       parsepluginspec = opt: p: let
         optional = if p ? optional && builtins.isBool p.optional then p.optional else opt;
 
@@ -59,6 +60,8 @@ rec {
         else if p ? plugin then p // { inherit optional; }
         else { plugin = p; inherit optional; });
 
+      # this is basically back to what was in nixpkgs except using my parsing function
+      # and also adding the setup script before anything by loading it first with a fake plugin.
       genPluginList = packageName: {start ? [], opt ? []}:
         [ {
           plugin = pkgs.stdenv.mkDerivation {

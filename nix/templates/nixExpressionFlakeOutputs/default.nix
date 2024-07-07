@@ -12,7 +12,10 @@
   Then call this file with:
   myNixCats = import ./path/to/this/dir { inherit inputs; };
   And the new variable myNixCats will contain all outputs of the normal flake format.
-  You can then pass them around, export them from the overall flake, etc.
+  You could put myNixCats.packages.${pkgs.system}.thepackagename in your packages list.
+  You could install them with the module and reconfigure them too if you want.
+  You should definitely re export them under packages.${system}.packagenames
+  from your system flake so that you can still run it via nix run from anywhere.
 
   The following is just the outputs function from the flake template.
  */

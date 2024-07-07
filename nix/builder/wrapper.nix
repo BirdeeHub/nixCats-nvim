@@ -37,6 +37,8 @@ let
     , luaRcContent ? ""
     # entry to load in packpath
     , packpathDirs
+
+    # I added stuff to the one from nixpkgs
     , nixCats
     , nixCats_packageName
     , customAliases ? null
@@ -67,6 +69,7 @@ let
           perl = withPerl;
         };
 
+        # modified to start with packagename instead of nvim to avoid collisions with multiple neovims
         genProviderCommand = prog: withProg:
           if withProg then
             "vim.g.${prog}_host_prog='${placeholder "out"}/bin/${nixCats_packageName}-${prog}'"
@@ -130,6 +133,7 @@ let
       luaRcContent = rcContent;
       # Remove the symlinks created by symlinkJoin which we need to perform
       # extra actions upon
+      # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
       postBuild = lib.optionalString stdenv.isLinux ''
         rm $out/share/applications/nvim.desktop
         substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
@@ -155,10 +159,12 @@ let
       + lib.optionalString finalAttrs.viAlias ''
         ln -s $out/bin/${nixCats_packageName} $out/bin/vi
       ''
+      # also I added this.
       + lib.optionalString (customAliases != null)
       (builtins.concatStringsSep "\n" (builtins.map (alias: ''
         ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
       '') customAliases))
+      # more stuff from nixpkgs
       + lib.optionalString (manifestRc != null) (let
         manifestWrapperArgs =
           [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ finalAttrs.generatedWrapperArgs;
@@ -211,8 +217,11 @@ let
     preferLocalBuild = true;
 
     nativeBuildInputs = [ makeWrapper lndir ];
+
+    # modified to allow users to add passthru
     passthru = nixCats_passthru;
 
+    # modified to have packagename instead of nvim
     meta = neovim-unwrapped.meta // {
       # To prevent builds on hydra
       mainProgram = "${nixCats_packageName}";
