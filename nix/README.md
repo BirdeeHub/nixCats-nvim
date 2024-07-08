@@ -9,7 +9,7 @@ You can initialize them into a directory with `nix flake init -t github:BirdeeHu
 
 This directory is imported from github by the templates under `inputs.nixCats.utils` and does not need to be present in your personal config.
 
-Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix)
+Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix) and documented at [:h nixCats.flake.outputs.exports](./nixCatsHelp/nixCatsFlake.txt)
 
 Everything outside of this directory is the example config of nixCats, runnable with `nix run github:BirdeeHub/nixCats`.
 
