@@ -8,13 +8,9 @@ exporting [home manager modules](./homeManagerModule.nix) and [nixos modules](./
 
 ---
 
-Usage of the things exported in this directory is in the help at [:help nixCats.*](../nixCatsHelp), as well as the rest of this repository.
-
-Yes, everything outside of this directory and the [builder directory](../builder) is either help, example, or templates.
+Usage of the things exported in this directory is in the templates listed in [:h nixCats.installation_options](../nixCatsHelp/installation.txt), the help at [:help nixCats.*](../nixCatsHelp), as well as the rest of this repository.
 
 The utils set in [nix/utils/default.nix](./default.nix) is exported from the main flake of this repo, and contains everything you will need to make a nixCats based config of your own.
-
-This means that the entire nix directory does not need to be included in your personal configuration, everything you need is in the utils set, which is exported by this flake.
 
 The 3 main templates mentioned in [:h nixCats.installation_options](../nixCatsHelp/installation.txt) all consist of a single nix file (or 2 for the modules template, one for home manager and one for nixos), and an empty skeleton of an overlays directory should it ever be required.
 
