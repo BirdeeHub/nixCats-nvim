@@ -144,6 +144,7 @@ in
     # as well as any local pack dir
     runB4Config = (/* vim */ ''
       let configdir = stdpath('config')
+      execute "set packpath-=" . configdir
       execute "set runtimepath-=" . configdir
       execute "set runtimepath-=" . configdir . "/after"
     '') + (if settings.wrapRc then /* vim */''
@@ -153,10 +154,9 @@ in
     '' else "") + /* vim */ ''
       lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
-      let runtimepath_list = split(&runtimepath, ',')
-      call insert(runtimepath_list, configdir, 0)
-      let &runtimepath = join(runtimepath_list, ',')
-      execute "set runtimepath+=" . configdir . "/after"
+      execute 'set packpath^=' . configdir
+      execute 'set rtp^=' . configdir
+      execute 'set runtimepath+=' . configdir . '/after'
     '';
 
     customRC = let
