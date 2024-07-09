@@ -1,4 +1,8 @@
 local M = {}
+-- it literally just only runs it when not on nixCats
+-- all neovim package managers that use the regular plugin loading scheme
+-- can be used this way, just do whatever the plugin manager needs to put it in the
+-- opt directory for lazy loading, and add the build steps so that when theres no nix the steps are ran
 function M.setup(v)
   if not require('nixCatsUtils').isNixCats then
 

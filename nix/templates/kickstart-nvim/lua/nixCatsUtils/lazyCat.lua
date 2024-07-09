@@ -4,6 +4,9 @@ function M.mergePluginTables(table1, table2)
   return vim.tbl_extend('keep', table1, table2)
 end
 
+---used to help provide the list of plugin names for lazy wrapper.
+---@param pluginTable table|string[]
+---@return string[]
 function M.getTableNamesOrListValues(pluginTable)
   for key, _ in pairs(pluginTable) do
     if type(key) ~= 'string' then
@@ -14,6 +17,11 @@ function M.getTableNamesOrListValues(pluginTable)
   return vim.tbl_keys(pluginTable)
 end
 
+---lazy.nvim wrapper
+---@param pluginTable table|string[]
+---@param nixLazyPath string
+---@param lazySpecs any
+---@param lazyCFG table
 function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
 
   local function regularLazyDownload()
@@ -31,6 +39,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     return lazypath
   end
 
+  -- location of the nixCats plugin in the store if loaded via nixCats.
   local nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
   local lazypath
   if nixCatsPath == nil then
@@ -38,6 +47,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     vim.opt.rtp:prepend(lazypath)
   else
 
+    -- if you were wondering where everything was after its built, its all here.
     local grammarDir = require('nixCats').pawsible.allPlugins.ts_grammar_plugin
     local myNeovimPackages = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. "/pack/myNeovimPackages"
     local nixCatsConfigDir = require('nixCats').get([[nixCats_store_config_location]])
@@ -57,7 +67,9 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     if type(lazyCFG.performance.rtp) ~= 'table' then
       lazyCFG.performance.rtp = {}
     end
+    -- disable lazy.nvim rtp reset
     lazyCFG.performance.rtp.reset = false
+    -- do the reset without removing important stuff
     vim.opt.rtp = {
       nixCatsConfigDir,
       nixCatsPath,
@@ -73,6 +85,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       lazyCFG.dev = {}
     end
 
+    -- lazy.nvim can now see all our nix plugins whenever dev is true
     local oldPath = lazyCFG.dev.path
     lazyCFG.dev.path = function(plugin)
       local path = nil
@@ -96,6 +109,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
       return path
     end
 
+    -- locally load the plugin names provided by the user's list
     if type(lazyCFG.dev.patterns) ~= 'table' then
       lazyCFG.dev.patterns = M.getTableNamesOrListValues(pluginTable)
     else

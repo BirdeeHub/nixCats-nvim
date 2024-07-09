@@ -113,15 +113,14 @@ in
     nixCats = { ... }@allPluginDeps:
     fpkgs.stdenv.mkDerivation (let
       categoriesPlus = categories // {
-          nixCats_wrapRc = settings.wrapRc;
-          nixCats_packageName = name;
-          nixCats_store_config_location = "${LuaConfig}";
-        };
+        nixCats_wrapRc = settings.wrapRc;
+        nixCats_packageName = name;
+        nixCats_store_config_location = "${LuaConfig}";
+      };
       settingsPlus = settings // {
-          nixCats_packageName = name;
-          nixCats_store_config_location = "${LuaConfig}";
-        };
-      init = fpkgs.writeText "init.lua" (builtins.readFile ./nixCats.lua);
+        nixCats_packageName = name;
+        nixCats_store_config_location = "${LuaConfig}";
+      };
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = fpkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
       settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
@@ -132,7 +131,8 @@ in
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
-        cp ${init} $out/lua/nixCats/init.lua
+        cp ${./nixCats.lua} $out/lua/nixCats/init.lua
+        cp ${./nixCatsMeta.lua} $out/lua/nixCats/meta.lua
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/included.lua

@@ -1,18 +1,21 @@
+---@type nixCats
 local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.included')
 M.settings = require('nixCats.settings')
 
--- will return the nearest parent category value, unless the nearest
--- parent is a table, in which case that means a different subcategory
--- was enabled but this one was not. In that case it returns nil.
-function M.get(input)
+---will return the nearest parent category value, unless the nearest
+---parent is a table, in which case that means a different subcategory
+---was enabled but this one was not. In that case it returns nil.
+---@param category string|string[]
+---@return any
+function M.get(category)
     local strtable
-    if type(input) == "table" then
-        strtable = input
-    elseif type(input) == "string" then
+    if type(category) == "table" then
+        strtable = category
+    elseif type(category) == "string" then
         local keys = {}
-        for key in input:gmatch("([^%.]+)") do
+        for key in category:gmatch("([^%.]+)") do
             table.insert(keys, key)
         end
         strtable = keys
@@ -20,6 +23,7 @@ function M.get(input)
         print("get function requires a table of strings or a dot separated string")
         return
     end
+    ---@type any
     local cats = require('nixCats.cats')
     for _, key in ipairs(strtable) do
         if type(cats) == "table" then
@@ -45,7 +49,13 @@ function M.addGlobals()
     [[lua print(vim.inspect(require('nixCats.included')))]] ,
     { desc = 'All the plugins' })
 
-    require('_G').nixCats = M.get
+    ---will return the nearest parent category value, unless the nearest
+    ---parent is a table, in which case that means a different subcategory
+    ---was enabled but this one was not. In that case it returns nil.
+    ---@type fun(category: string|string[]): any
+    function _G.nixCats(category)
+        return M.get(category)
+    end
 
     vim.cmd([[
         function! GetNixCat(value)

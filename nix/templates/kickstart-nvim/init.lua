@@ -670,7 +670,8 @@ local servers = {
       },
       signatureHelp = { enabled = true },
       diagnostics = {
-        globals = { "nixCats" },
+        globals = { 'nixCats' },
+        disable = { 'missing-fields' },
       },
     },
     workspace = { checkThirdParty = true },

@@ -47,7 +47,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
         },
         signatureHelp = { enabled = true },
         diagnostics = {
-          globals = { "nixCats" },
+          globals = { 'nixCats' },
           disable = { 'missing-fields' },
         },
       },
