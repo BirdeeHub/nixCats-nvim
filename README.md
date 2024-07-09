@@ -245,24 +245,8 @@ It is made to be customized into your own portable nix neovim distribution
 with as many options as you wish, while requiring you to leave the normal
 nvim configuration scheme as little as possible.
 
-Think of it like, a build-your-own nixVim kit that doesn't
-require you to know all about nix right away to get most of the benefits.
-
 Further info for getting started:
 see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
-
-There are several other templates.
-They are designed to be used as examples for
-importing versions of your nixCats into another existing configuration.
-
-They are not particularly suited to being ran directly in your
-nvim config folder like the first one was.
-They are minimal examples of stuff that you can do.
-
-You could more or less build your own nixVim in your flake by choosing
-your categories carefully and referring to them within your lua.
-And then the options would get automatically exported
-for any way a nix user may want to set them.
 
 All info I could manage to cover is covered in the included help files.
 For this section,
