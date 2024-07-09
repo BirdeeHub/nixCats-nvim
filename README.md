@@ -150,7 +150,7 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 
 In terms of the nix code, you should not have to leave your template's equivalent of [flake.nix](./flake.nix) except OCCASIONALLY [customBuildsOverlay](./overlays/customBuildsOverlay.nix) when the thing you wish to install is not on nixpkgs and the standardPluginOverlay does not work.
 
-All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. (NOTE: PACKADD DOES NOT SOURCE `after` DIRS YOU MUST DO THAT YOURSELF (or use the lazy.nvim wrapper in [luaUtils](./nix/nixCatsHelp/luaUtils.txt))
+All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. (NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](./nix/nixCatsHelp/luaUtils.txt))
 
 It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste.
 If you're not on linux you don't need to care what those last 2 things mean.
