@@ -8,8 +8,8 @@ These are original and drive the category and message passing scheme.
 
 default.nix also passes the nixCats plugin along as a function, to add more info later.
 
-These are modified from nixpkgs to allow multi-installation, and to pass more info to lua:
+It also imports the help files at [nix/nixCatsHelp](../nixCatsHelp) so that all versions of nixCats have help.
+
+These files are modified from nixpkgs to allow multi-installation, and to pass more info to lua:
 
 [./wrapNeovim.nix](./wrapNeovim.nix) which depends on [./wrapper.nix](./wrapper.nix) which depends on [./vim-pack-dir.nix](./vim-pack-dir.nix)
-
-It also imports the help files at [nix/nixCatsHelp](../nixCatsHelp) so that all versions of nixCats have help.
