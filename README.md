@@ -293,7 +293,8 @@ I also borrowed a decent amount of code from nixpkgs and made modifications.
 - [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
   A project that, like this one, also holds to a normal neovim config structure.
   It starts you at the basics, using the raw, wrapNeovimUnstable function with no modifications.
-  If nixCats feels like it is too far from the metal for you and you want to build from the ground up, this is the way to go.
+  If nixCats feels like it is too far from the metal for you and you want to build from the ground up,
+  and you still want to be able to run it in nix shells, this is the way to go.
 - [`NixVim`](https://github.com/nix-community/nixvim):
   A Neovim module scheme semi-comparable to home manager for neovim.
   They try to have a module for as many packages as they can and do a great job,
