@@ -139,19 +139,24 @@ in
         cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });
-    # doing it this way makes nixCats command and
+
+    setconfigdir = if settings.wrapRc then /* vim */''
+      let configdir = "${LuaConfig}"
+    '' else if settings.unwrappedCfgPath != null then /* vim */''
+      let configdir = "${settings.unwrappedCfgPath}"
+    '' else /*vim*/''
+      let configdir = stdpath('config')
+    '';
+
+    # doing it as 2 parts, before this and then after init.lua makes nixCats command and
     # configdir variable available even with new plugin scheme
     # as well as any local pack dir
-    runB4Config = (/* vim */ ''
+    runB4Config = (/* vim */''
       let configdir = stdpath('config')
       execute "set packpath-=" . configdir
       execute "set runtimepath-=" . configdir
       execute "set runtimepath-=" . configdir . "/after"
-    '') + (if settings.wrapRc then /* vim */''
-      let configdir = "${LuaConfig}"
-    '' else if settings.unwrappedCfgPath != null then /* vim */''
-      let configdir = "${settings.unwrappedCfgPath}"
-    '' else "") + /* vim */ ''
+    '') + setconfigdir + /* vim */ ''
       lua require('nixCats').addGlobals()
       lua require('nixCats.saveTheCats')
       execute 'set packpath^=' . configdir
@@ -164,14 +169,7 @@ in
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
           (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
-    in # just in case someone overwrites it.
-    (if settings.wrapRc then /* vim */ ''
-      let configdir = "${LuaConfig}"
-    '' else if settings.unwrappedCfgPath != null then /* vim */''
-      let configdir = "${settings.unwrappedCfgPath}"
-    '' else /* vim */ ''
-      let configdir = stdpath('config')
-    '') + /* vim */ ''
+    in setconfigdir + /* vim */''
       if filereadable(configdir . "/init.lua")
         execute "source " . configdir . "/init.lua"
       elseif filereadable(configdir . "/init.vim")
