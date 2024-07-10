@@ -49,31 +49,9 @@ let
 
     dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
   '';
-  catDefs = {
-    startupPlugins = {};
-    optionalPlugins = {};
-    lspsAndRuntimeDeps = {};
-    sharedLibraries = {};
-    propagatedBuildInputs = {};
-    environmentVariables = {};
-    extraWrapperArgs = {};
-    /* the function you would have passed to python.withPackages */
-    extraPython3Packages = {};
-    extraPython3wrapperArgs = {};
-  # same thing except for lua.withPackages
-    extraLuaPackages = {};
-  # only for use when importing flake in a flake 
-  # and need to only add a bit of lua for an added plugin
-    optionalLuaAdditions = {};
-  } // (categoryDefFunction { inherit settings categories name; pkgs = fpkgs; });
-  inherit (catDefs) startupPlugins
-  optionalPlugins lspsAndRuntimeDeps
-  propagatedBuildInputs environmentVariables
-  extraWrapperArgs extraPython3Packages
-  extraLuaPackages optionalLuaAdditions
-  extraPython3wrapperArgs sharedLibraries;
 
   thisPackage = packageDefinitions.${name} { pkgs = fpkgs; };
+  categories = thisPackage.categories;
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -93,7 +71,28 @@ let
     disablePythonSafePath = false;
   } // thisPackage.settings;
 
-  categories = thisPackage.categories;
+  inherit ({
+    startupPlugins = {};
+    optionalPlugins = {};
+    lspsAndRuntimeDeps = {};
+    sharedLibraries = {};
+    propagatedBuildInputs = {};
+    environmentVariables = {};
+    extraWrapperArgs = {};
+    /* the function you would have passed to python.withPackages */
+    extraPython3Packages = {};
+    extraPython3wrapperArgs = {};
+  # same thing except for lua.withPackages
+    extraLuaPackages = {};
+  # only for use when importing flake in a flake 
+  # and need to only add a bit of lua for an added plugin
+    optionalLuaAdditions = {};
+  } // (categoryDefFunction { inherit settings categories name; pkgs = fpkgs; }))
+  startupPlugins optionalPlugins lspsAndRuntimeDeps
+  propagatedBuildInputs environmentVariables
+  extraWrapperArgs extraPython3Packages
+  extraLuaPackages optionalLuaAdditions
+  extraPython3wrapperArgs sharedLibraries;
 
 in
   let
