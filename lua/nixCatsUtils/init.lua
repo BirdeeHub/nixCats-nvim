@@ -9,7 +9,7 @@ M.isNixCats = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil
 ---@class nixCatsSetupOpts
 ---@field non_nix_value boolean|nil
 
--- defaults to true if non_nix_value is not provided or is not a boolean.
+---defaults to true if non_nix_value is not provided or is not a boolean.
 ---@param v nixCatsSetupOpts
 function M.setup(v)
     if not M.isNixCats then
@@ -24,8 +24,8 @@ function M.setup(v)
     end
 end
 
--- allows you to guarantee a boolean is returned, and also declare a different
--- default value than specified in setup when not using nix to load the config
+---allows you to guarantee a boolean is returned, and also declare a different
+---default value than specified in setup when not using nix to load the config
 ---@overload fun(v: string|table): boolean
 ---@overload fun(v: string|table, o: boolean): boolean
 function M.enableForCategory(v, default)
@@ -40,8 +40,8 @@ function M.enableForCategory(v, default)
   end
 end
 
--- for conditionally disabling build steps on nix, as they are done via nix
--- I should probably have named it dontAddIfCats or something.
+---for conditionally disabling build steps on nix, as they are done via nix
+---I should probably have named it dontAddIfCats or something.
 ---@overload fun(v: any): any|nil
 ---@overload fun(v: any, o: any): any
 function M.lazyAdd(v, o)
