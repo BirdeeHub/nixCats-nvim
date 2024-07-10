@@ -4,6 +4,7 @@ M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.included')
 M.settings = require('nixCats.settings')
 
+---:h nixCats
 ---will return the nearest parent category value, unless the nearest
 ---parent is a table, in which case that means a different subcategory
 ---was enabled but this one was not. In that case it returns nil.
@@ -49,6 +50,7 @@ function M.addGlobals()
     [[lua print(vim.inspect(require('nixCats.included')))]] ,
     { desc = 'All the plugins' })
 
+    ---:h nixCats
     ---will return the nearest parent category value, unless the nearest
     ---parent is a table, in which case that means a different subcategory
     ---was enabled but this one was not. In that case it returns nil.

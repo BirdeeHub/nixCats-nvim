@@ -12,8 +12,6 @@ luaPath:
 }:
 categoryDefFunction:
 packageDefinitions: name:
-  # for a more extensive guide to this file
-  # see :help nixCats.flake.nixperts.nvimBuilder
 let
   fpkgs = if pkgs == null && !(nixpkgs == null || system == null)
   then import nixpkgs ({
@@ -87,7 +85,10 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
-  } // (categoryDefFunction { inherit settings categories name; pkgs = fpkgs; }))
+  } // (categoryDefFunction {
+    pkgs = fpkgs;
+    inherit settings categories name;
+  }))
   startupPlugins optionalPlugins lspsAndRuntimeDeps
   propagatedBuildInputs environmentVariables
   extraWrapperArgs extraPython3Packages
@@ -253,6 +254,7 @@ in
 
   in
   # add our lsps and plugins and our config, and wrap it all up!
+  # nothing goes past this file that hasnt been sorted
 (import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
   nixCats_passthru = nixCats_passthru // {
     keepLuaBuilder = import ./. luaPath;
