@@ -11,6 +11,8 @@
 neovim-unwrapped:
 
 let
+  lua = neovim-unwrapped.lua;
+
   wrapper = {
     extraName ? ""
     # should contain all args but the binary. Can be either a string or list
@@ -206,7 +208,18 @@ let
       + /* bash */ ''
         rm $out/bin/nvim
         touch $out/rplugin.vim
-        makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr}
+        echo "Looking for lua dependencies..."
+        source ${lua}/nix-support/utils.sh
+        if which _addToLuaPath > /dev/null 2>&1; then
+          _addToLuaPath "${finalPackDir}"
+          echo "propagated dependency path for plugins: $LUA_PATH"
+          echo "propagated dependency cpath for plugins: $LUA_CPATH"
+          makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
+              --prefix LUA_PATH ';' "$LUA_PATH" \
+              --prefix LUA_CPATH ';' "$LUA_CPATH"
+        else
+          makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr}
+        fi
       '';
 
     buildPhase = ''
