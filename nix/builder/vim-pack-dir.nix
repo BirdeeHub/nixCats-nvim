@@ -1,9 +1,7 @@
-{ lib, stdenv, vim, vimPlugins, buildEnv, writeText, writeTextFile
-  , runCommand, makeWrapper
+{ lib, stdenv, buildEnv, writeText, writeTextFile
+  , runCommand
   , python3
-  , callPackage, makeSetupHook
   , linkFarm
-  , vimUtils
 }: let
   transitiveClosure = plugin:
     [ plugin ] ++ (
@@ -40,7 +38,7 @@
     nixCatsDir = nixCatsDRV: (writeTextFile {
       name = "nixCats-special-rtp-entry-nixCats-pathfinder";
       text = /* lua */''
-          vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[ ${nixCatsDRV} ]]
+          vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsDRV}]]
       '';
       executable = false;
       destination = "/lua/nixCats/saveTheCats.lua";
