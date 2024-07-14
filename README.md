@@ -112,7 +112,7 @@ and then the nixExpressionFlakeOutputs is literally just the outputs function, a
 
 Both allow you to export everything this repo does, but with your config as the base.
 
-The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing machine if a separate nixos config is required. However they can only install and export the finished packages, so they do not output overlays or modules of their own like the flake templates do.
+The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However the modules can only install and export the finished packages, so they do not output overlays or modules of their own like the flake templates do.
 
 Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
 
