@@ -148,9 +148,9 @@ in
       let configdir = stdpath('config')
     '';
 
-    # doing it as 2 parts, before this and then after init.lua makes nixCats command and
-    # configdir variable available even with new plugin scheme
-    # as well as any local pack dir
+    # doing it as 2 parts, this before any nix included plugin config,
+    # and then running init.lua after makes nixCats command and
+    # configdir variable available even for lua written in nix
     runB4Config = (/* vim */''
       let configdir = stdpath('config')
       execute "set packpath-=" . configdir
@@ -164,21 +164,12 @@ in
       execute 'set runtimepath+=' . configdir . '/after'
     '';
 
-    customRC = let
-      LuaAdditions = if builtins.isString optionalLuaAdditions
-          then optionalLuaAdditions
-          else builtins.concatStringsSep "\n"
-          (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
-    in setconfigdir + /* vim */''
+    customRC = setconfigdir + /* vim */''
       if filereadable(configdir . "/init.lua")
         execute "source " . configdir . "/init.lua"
       elseif filereadable(configdir . "/init.vim")
         execute "source " . configdir . "/init.vim"
       endif
-
-      lua << EOF
-      ${LuaAdditions}
-      EOF
     '';
 
     # this is what allows for dynamic packaging in flake.nix
@@ -218,6 +209,11 @@ in
         uniquifiedList = fpkgs.lib.unique combinedFuncRes;
       in
       uniquifiedList);
+
+    optLuaAdditions = if builtins.isString optionalLuaAdditions
+        then optionalLuaAdditions
+        else builtins.concatStringsSep "\n"
+        (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
 
     # cat our args
     extraMakeWrapperArgs = let 
@@ -262,7 +258,7 @@ in
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
     packageDefinitions = packageDefinitions;
-    inherit dependencyOverlays;
+    inherit dependencyOverlays optLuaAdditions;
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;

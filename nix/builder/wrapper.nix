@@ -1,11 +1,10 @@
-{ stdenv, symlinkJoin, lib, makeWrapper
+{ stdenv
+, lib
+, makeWrapper
 , writeText
 , nodePackages
 , python3
-, python3Packages
 , callPackage
-, neovimUtils
-, vimUtils
 , perl
 , lndir
 }:
@@ -32,9 +31,7 @@ let
     # (e.g., in ~/.config/init.vim or project/.nvimrc)
     , wrapRc ? true
     # vimL code that should be sourced as part of the generated init.lua file
-    , neovimRcContent ? null
-    # lua code to put into the generated init.lua file
-    , luaRcContent ? ""
+    , neovimRcContent ? ""
     # entry to load in packpath
     , packpathDirs
 
@@ -43,8 +40,13 @@ let
     , nixCats_packageName
     , customAliases ? null
     , nixCats_passthru ? {}
+    , runB4Config ? ""
+    , runConfigInit ? ""
+    , optLuaAdditions ? ""
     , luaEnv
     , extraPython3wrapperArgs ? []
+    , luaPluginConfigs ? ""
+    , vimlPluginConfigs ? ""
     , ...
   }:
   assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
@@ -80,31 +82,33 @@ let
     in
         (lib.concatStringsSep ";" hostProviderLua) + ";vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]";
 
+    finalPackDir = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
+
     rcContent = ''
-      ${luaRcContent}
-    '' + lib.optionalString (!isNull neovimRcContent) ''
-      vim.cmd.source "${writeText "init.vim" neovimRcContent}"
+      vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
+      vim.cmd([[${runB4Config}]])
+      ${luaPluginConfigs}
+      vim.cmd.source "${writeText "init.vim" (vimlPluginConfigs + "\n" + neovimRcContent)}"
+      vim.cmd([[${runConfigInit}]])
+      ${optLuaAdditions}
     '';
-
-    wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
-
-    generatedWrapperArgs =
-      # vim accepts a limited number of commands so we join them all
-          [
-            "--add-flags" ''--cmd "lua ${providerLuaRc}"''
-            # (lib.intersperse "|" hostProviderViml)
-          ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
-          (let packDir = (callPackage ./vim-pack-dir.nix {}).packDir nixCats packpathDirs;
-            in [
-            "--add-flags" ''--cmd "set packpath^=${packDir}"''
-            "--add-flags" ''--cmd "set rtp^=${packDir}"''
-            "--add-flags" ''--cmd "lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${packDir}]]"''
-          ]);
 
     providerLuaRc = generateProviderRc {
       inherit withPython3 withNodeJs withPerl luaEnv;
       withRuby = rubyEnv != null;
     };
+
+    generatedWrapperArgs =
+      # vim accepts a limited number of commands so we join them all
+          [
+            "--add-flags" ''--cmd "lua ${providerLuaRc}"''
+          ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
+          [
+            "--add-flags" ''--cmd "set packpath^=${finalPackDir}"''
+            "--add-flags" ''--cmd "set rtp^=${finalPackDir}"''
+          ];
+
+    wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
 
     # If configure != {}, we can't generate the rplugin.vim file with e.g
     # NVIM_SYSTEM_RPLUGIN_MANIFEST *and* NVIM_RPLUGIN_MANIFEST env vars set in
