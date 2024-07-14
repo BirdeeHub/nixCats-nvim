@@ -132,6 +132,12 @@
   buildEnv {
     name = "vim-pack-dir";
     paths = (lib.flatten (lib.mapAttrsToList packageLinks packages));
+    postBuild = ''
+      mkdir $out/nix-support
+      for i in $(find -L $out -name propagated-build-inputs ); do
+        cat "$i" >> $out/nix-support/propagated-build-inputs
+      done
+    '';
   };
 
 in {
