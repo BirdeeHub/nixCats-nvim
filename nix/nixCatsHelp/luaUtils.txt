@@ -76,8 +76,9 @@ it also has 2 other functions that may prove handy
                                                        *nixCats.luaUtils.lazy*
 For instructions on using the lazy wrapper, check out this template example!
 Disclaimer, it uses a new lazy option only
-in pkgs.lazy-nvim from the unstable branch
-So you must either use unstable, or use an overlay to use the lazy wrapper
+in pkgs.lazy-nvim from the unstable branch.
+So if you are using nixpkgs stable for your neovim you will
+need to download a newer version of lazy-nvim.
 
 Use the following command in a new directory and check it out!
 >bash

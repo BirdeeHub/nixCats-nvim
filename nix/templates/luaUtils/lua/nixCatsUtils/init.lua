@@ -27,7 +27,7 @@ end
 ---allows you to guarantee a boolean is returned, and also declare a different
 ---default value than specified in setup when not using nix to load the config
 ---@overload fun(v: string|table): boolean
----@overload fun(v: string|table, o: boolean): boolean
+---@overload fun(v: string|table, default: boolean): boolean
 function M.enableForCategory(v, default)
   if M.isNixCats or default == nil then
     if nixCats(v) then
@@ -43,6 +43,7 @@ end
 ---for conditionally disabling build steps on nix, as they are done via nix
 ---I should probably have named it dontAddIfCats or something.
 ---@overload fun(v: any): any|nil
+---Will return the second value if nix, otherwise the first
 ---@overload fun(v: any, o: any): any
 function M.lazyAdd(v, o)
   if M.isNixCats then
