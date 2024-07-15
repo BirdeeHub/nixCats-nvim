@@ -277,6 +277,9 @@
           # but we can still send the info from nix to lua that we want it!
           kickstart-gitsigns = true;
 
+          # we can pass whatever we want actually.
+          have_nerd_font = false;
+
           example = {
             youCan = "add more than just booleans";
             toThisSet = [
@@ -284,6 +287,7 @@
               "will be accessible to your lua with"
               "nixCats('path.to.value')"
               "see :help nixCats"
+              "and type :NixCats to see the categories set in nvim"
             ];
           };
         };
