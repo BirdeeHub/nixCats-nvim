@@ -40,6 +40,19 @@ function M.enableForCategory(v, default)
   end
 end
 
+---if nix, return value of nixCats(v) else return default
+---Exists to specify a different non_nix_value than the one in setup()
+---@param v string|table
+---@param default any
+---@return any
+function M.getCatOrDefault(v, default)
+  if M.isNixCats then
+    return nixCats(v)
+  else
+    return default
+  end
+end
+
 ---for conditionally disabling build steps on nix, as they are done via nix
 ---I should probably have named it dontAddIfCats or something.
 ---@overload fun(v: any): any|nil

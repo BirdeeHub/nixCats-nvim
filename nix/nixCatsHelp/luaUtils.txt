@@ -56,7 +56,7 @@ But it cant hurt to include anyway.
     print('using nixCats')
   end
 <
-it also has 2 other functions that may prove handy
+it also has 3 other functions that may prove handy
 >lua
   require('nixCatsUtils').lazyAdd(v, o)
   -- if not nix, return the first thing.
@@ -71,6 +71,10 @@ it also has 2 other functions that may prove handy
   -- if not loaded by nix, return the default value,
   -- or fall back on the nixCats default value provided by
   -- the require("nixCatsUtils").setup function mentioned above
+
+  function M.getCatOrDefault(v, default)
+  ---if nix, return value of nixCats(v) else return default
+  ---Exists to specify a different non_nix_value than the one in setup()
 <
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
