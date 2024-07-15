@@ -52,8 +52,8 @@
   kickstart-nvim = {
     path = ./kickstart-nvim;
     description = ''
-      The entirety of the main init.lua file implemented as a nixCats flake.
-      With additional nix items for sanity.
+      The entirety of kickstart.nvim implemented as a nixCats flake.
+      With additional nix lsps for editing the nix part.
       This is to serve as the tutorial for using the nixCats lazy wrapper.
     '';
   };
