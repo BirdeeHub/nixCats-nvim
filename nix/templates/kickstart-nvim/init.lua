@@ -226,13 +226,14 @@ if require('nixCatsUtils').isNixCats then
   -- it is called pluginList because we only need to pass in the names
   -- this list literally just tells lazy.nvim not to download the plugins in the list.
   pluginList = require('nixCatsUtils.lazyCat').mergePluginTables( allPlugins.start, allPlugins.opt)
+
   -- it wasnt detecting that these were already added
   -- because the names are slightly different from the url.
   -- when that happens, add them to the list, then also specify the new name in the lazySpec
-  -- alternatively you can do it all in the plugins spec instead of modifying this list.
-  -- just set the name and then add dev = require('nixCatsUtils').lazyAdd(true)
   pluginList[ [[Comment.nvim]] ] = ""
   pluginList[ [[LuaSnip]] ] = ""
+  -- alternatively you can do it all in the plugins spec instead of modifying this list.
+  -- just set the name and then add `dev = require('nixCatsUtils').lazyAdd(false, true)` to the spec
 
   -- we also want to pass in lazy.nvim's path
   -- so that the wrapper can add it to the runtime path
