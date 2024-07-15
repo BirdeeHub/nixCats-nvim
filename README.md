@@ -62,7 +62,7 @@ If you use lazy, consider using the lazy.nvim wrapper [in luaUtils](./nix/templa
 - blank module template that can be initialized into your existing neovim config directory and moved to a home/system configuration
 - blank template that is called as a nix expression from any other flake. It is simply the outputs function of the flake template but as its own file, callable with your system's flake inputs.
 - `luaUtils` template containing the tools for detecting if nix loaded your config or not, and integrating with lazy or other plugin managers.
-- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of kickstart.nvim! (for a full list see [:help nixCats.templates](./nix/nixCatsHelp/installation.txt))
+- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](./nix/templates/kickstart-nvim)! (for a full list see [:help nixCats.templates](./nix/nixCatsHelp/installation.txt))
 - Extensive in-editor help.
 - I mentioned the templates already but if you want to see them all on github they are here: [templates](./nix/templates)
 
