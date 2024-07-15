@@ -12,3 +12,5 @@ and the result will be found at `./result/bin/nixCats` (or with a different name
 
 It also can work without any nix whatsoever.
 It has been adapted such that it works either way!
+
+All notes about the lazy wrapper are in comments that begin with the string: `NOTE: nixCats:` so to find all of the info, search for that.
