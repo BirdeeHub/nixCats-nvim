@@ -235,6 +235,8 @@ if require('nixCatsUtils').isNixCats then
   -- alternatively you can do it all in the plugins spec instead of modifying this list.
   -- just set the name and then add `dev = require('nixCatsUtils').lazyAdd(false, true)` to the spec
 
+  -- HINT: to view the names of all plugins downloaded via nix, use the `:NixCatsPawsible` command.
+
   -- we also want to pass in lazy.nvim's path
   -- so that the wrapper can add it to the runtime path
   -- as the normal lazy installation instructions dictate
