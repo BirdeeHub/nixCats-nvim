@@ -94,13 +94,13 @@ let
 
     finalPackDir = (callPackage ./vim-pack-dir.nix {}) nixCats packpathDirs;
 
-    # modified to allow more control over running things FIRST
+    # modified to allow more control over running things FIRST and also in which language.
     rcContent = ''
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
       vim.cmd([[${runB4Config}]])
       ${luaPluginConfigs}
       vim.cmd.source "${writeText "init.vim" vimlPluginConfigs}"
-      vim.cmd([[${runConfigInit}]])
+      ${runConfigInit}
       ${optLuaAdditions}
     '';
 

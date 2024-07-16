@@ -164,12 +164,13 @@ in
       execute 'set runtimepath+=' . configdir . '/after'
     '';
 
-    customRC = setconfigdir + /* vim */''
-      if filereadable(configdir . "/init.lua")
-        execute "source " . configdir . "/init.lua"
-      elseif filereadable(configdir . "/init.vim")
-        execute "source " . configdir . "/init.vim"
-      endif
+    customRC = "vim.cmd([["+setconfigdir+"]])" + /* lua */''
+      if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
+        vim.cmd.source(vim.g.configdir .. "/init.vim")
+      end
+      if vim.fn.filereadable(vim.g.configdir .. "/init.lua") == 1 then
+        dofile(vim.g.configdir .. "/init.lua")
+      end
     '';
 
     # this is what allows for dynamic packaging in flake.nix
