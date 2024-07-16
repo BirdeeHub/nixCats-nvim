@@ -169,14 +169,23 @@ vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Ope
 require('which-key').setup({
   operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
 })
-require('which-key').register {
-  ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[d]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[g]it', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[r]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
-  ['<leader>m'] = { name = '[m]arkdown', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[t]oggles', _ = 'which_key_ignore' },
-  ['<leader><leader>'] = { name = 'buffer commands', _ = 'which_key_ignore' },
-}
+require('which-key').add {
+    { "<leader><leader>", group = "buffer commands" },
+    { "<leader><leader>_", hidden = true },
+    { "<leader>c", group = "[c]ode" },
+    { "<leader>c_", hidden = true },
+    { "<leader>d", group = "[d]ocument" },
+    { "<leader>d_", hidden = true },
+    { "<leader>g", group = "[g]it" },
+    { "<leader>g_", hidden = true },
+    { "<leader>m", group = "[m]arkdown" },
+    { "<leader>m_", hidden = true },
+    { "<leader>r", group = "[r]ename" },
+    { "<leader>r_", hidden = true },
+    { "<leader>s", group = "[s]earch" },
+    { "<leader>s_", hidden = true },
+    { "<leader>t", group = "[t]oggles" },
+    { "<leader>t_", hidden = true },
+    { "<leader>w", group = "[w]orkspace" },
+    { "<leader>w_", hidden = true },
+  }
