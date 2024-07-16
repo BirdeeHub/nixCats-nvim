@@ -251,7 +251,7 @@ in
   in
   # add our lsps and plugins and our config, and wrap it all up!
   # nothing goes past this file that hasnt been sorted
-(import ./wrapNeovim.nix).wrapNeovim fpkgs myNeovimUnwrapped {
+import ./wrapNeovim.nix fpkgs myNeovimUnwrapped {
   nixCats_passthru = nixCats_passthru // {
     keepLuaBuilder = import ./. luaPath;
     nixCats_packageName = name;

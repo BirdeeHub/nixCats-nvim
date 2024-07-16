@@ -1,3 +1,5 @@
+# derived from:
+# https://github.com/NixOS/nixpkgs/blob/ae5d2af73efa5e25bf9bf43672cd3d8d99c613d0/pkgs/applications/editors/vim/plugins/vim-utils.nix#L136-L207
 { lib, stdenv, buildEnv, writeText, writeTextFile
   , runCommand
   , python3
@@ -13,7 +15,7 @@
   findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
 
   # a function. I will call it in the altered vimUtils.packDir function below
-  # and give it the nixCats plugin function from before and .the various resolved dependencies
+  # and give it the nixCats plugin function from before and the various resolved dependencies
   # so that I can expose the list of installed packages to lua.
   callNixCats = nixCats:
     {
@@ -40,7 +42,7 @@
     nixCatsDir = nixCatsDRV: (writeTextFile {
       name = "nixCats-special-rtp-entry-nixCats-pathfinder";
       text = /* lua */''
-          vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsDRV}]]
+        vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsDRV}]]
       '';
       executable = false;
       destination = "/lua/nixCats/saveTheCats.lua";
@@ -128,6 +130,7 @@
   buildEnv {
     name = "vim-pack-dir";
     paths = (lib.flatten (lib.mapAttrsToList packageLinks packages));
+    # gather all propagated build inputs from packDir
     postBuild = ''
       mkdir $out/nix-support
       for i in $(find -L $out -name propagated-build-inputs ); do
@@ -136,6 +139,4 @@
     '';
   };
 
-in {
-  inherit packDir;
-}
+in packDir

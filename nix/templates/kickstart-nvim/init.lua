@@ -688,7 +688,7 @@ require('nixCatsUtils.lazyCat').setup(pluginList, nixLazyPath,
 
       -- NOTE: nixCats: if nix, use lspconfig instead of mason
       -- You could MAKE it work, using lspsAndRuntimeDeps and sharedLibraries in nixCats
-      -- but don't.. its not worth it. Just add the lsp to lspsAndRuntimeDeps.
+      -- but don't... its not worth it. Just add the lsp to lspsAndRuntimeDeps.
       if require('nixCatsUtils').isNixCats then
         for server_name,_ in pairs(servers) do
           require('lspconfig')[server_name].setup({
