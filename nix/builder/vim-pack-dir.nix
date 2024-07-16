@@ -7,6 +7,8 @@
     [ plugin ] ++ (
       lib.unique (builtins.concatLists (map transitiveClosure plugin.dependencies or []))
     );
+  # gets plugin.dependencies from
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
 
   findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
 
@@ -56,10 +58,6 @@
   let
     packageLinks = packageName: {start ? [], opt ? []}:
     let
-      # `nativeImpl` expects packages to be derivations, not strings (as
-      # opposed to older implementations that have to maintain backwards
-      # compatibility). Therefore we don't need to deal with "knownPlugins"
-      # and can simply pass `null`.
       depsOfOptionalPlugins = lib.subtractLists opt (findDependenciesRecursively opt);
       startWithDeps = findDependenciesRecursively start;
       allPlugins = lib.unique (startWithDeps ++ depsOfOptionalPlugins);

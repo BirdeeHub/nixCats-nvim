@@ -32,8 +32,6 @@ let
     # set to false if you want to control where to save the generated config
     # (e.g., in ~/.config/init.vim or project/.nvimrc)
     , wrapRc ? true
-    # vimL code that should be sourced as part of the generated init.lua file
-    , neovimRcContent ? ""
     # entry to load in packpath
     , packpathDirs
 
@@ -90,7 +88,7 @@ let
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
       vim.cmd([[${runB4Config}]])
       ${luaPluginConfigs}
-      vim.cmd.source "${writeText "init.vim" (vimlPluginConfigs + "\n" + neovimRcContent)}"
+      vim.cmd.source "${writeText "init.vim" vimlPluginConfigs}"
       vim.cmd([[${runConfigInit}]])
       ${optLuaAdditions}
     '';
@@ -208,18 +206,20 @@ let
       + /* bash */ ''
         rm $out/bin/nvim
         touch $out/rplugin.vim
+        # see:
+        # https://github.com/NixOS/nixpkgs/issues/318925
         echo "Looking for lua dependencies..."
-        source ${lua}/nix-support/utils.sh
-        if which _addToLuaPath > /dev/null 2>&1; then
-          _addToLuaPath "${finalPackDir}"
-          echo "propagated dependency path for plugins: $LUA_PATH"
-          echo "propagated dependency cpath for plugins: $LUA_CPATH"
-          makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
-              --prefix LUA_PATH ';' "$LUA_PATH" \
-              --prefix LUA_CPATH ';' "$LUA_CPATH"
-        else
-          makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr}
-        fi
+        # some older versions of nixpkgs do not have this file (23.11)
+        # so ignore errors if it doesnt exist.
+        # makeWrapper will still behave if the variables are not set
+        source ${lua}/nix-support/utils.sh || true
+        # added after release 24.05 so also ignore errors on this function
+        _addToLuaPath "${finalPackDir}" || true
+        echo "propagated dependency path for plugins: $LUA_PATH"
+        echo "propagated dependency cpath for plugins: $LUA_CPATH"
+        makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
+            --prefix LUA_PATH ';' "$LUA_PATH" \
+            --prefix LUA_CPATH ';' "$LUA_CPATH"
       '';
 
     buildPhase = ''

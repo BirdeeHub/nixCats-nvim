@@ -264,8 +264,7 @@
       };
       # populates $LUA_PATH and $LUA_CPATH
       extraLuaPackages = {
-        # luasnip needs jsregexp.
-        general = [ (lpkgs: with lpkgs; [ jsregexp ]) ];
+        general = [ (_:[]) ];
       };
     };
 
