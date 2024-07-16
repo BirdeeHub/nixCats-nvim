@@ -124,7 +124,7 @@ in
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = fpkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
       settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
-      depsTable = fpkgs.writeText "included.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
+      depsTable = fpkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
       builder = fpkgs.writeText "builder.sh" /* bash */ ''
@@ -135,7 +135,7 @@ in
         cp ${./nixCatsMeta.lua} $out/lua/nixCats/meta.lua
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
-        cp ${depsTable} $out/lua/nixCats/included.lua
+        cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });

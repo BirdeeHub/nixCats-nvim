@@ -8,7 +8,7 @@ if nixCats('neonixdev') then
     group = vim.api.nvim_create_augroup('nixCats-lazydev', { clear = true }),
     pattern = { 'lua' },
     callback = function(event)
-      -- NOTE: Use `:NixCatsPawsible` to see the names of all plugins downloaded via nix for packadd
+      -- NOTE: Use `:NixCats pawsible` to see the names of all plugins downloaded via nix for packadd
       vim.cmd.packadd('lazydev.nvim')
       require('lazydev').setup({
         -- library = {
