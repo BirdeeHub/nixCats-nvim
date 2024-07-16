@@ -41,7 +41,7 @@
     };
     nixCatsDir = nixCatsDRV: (writeTextFile {
       name = "nixCats-special-rtp-entry-nixCats-pathfinder";
-      text = /* lua */''
+      text = ''
         vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsDRV}]]
       '';
       executable = false;

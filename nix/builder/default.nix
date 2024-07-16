@@ -140,31 +140,31 @@ in
       '';
     });
 
-    setconfigdir = if settings.wrapRc then /* vim */''
-      let configdir = "${LuaConfig}"
-    '' else if settings.unwrappedCfgPath != null then /* vim */''
-      let configdir = "${settings.unwrappedCfgPath}"
-    '' else /*vim*/''
-      let configdir = stdpath('config')
+    setconfigdir = if settings.wrapRc then ''
+      vim.g.configdir = [[${LuaConfig}]]
+    '' else if settings.unwrappedCfgPath != null then ''
+      vim.g.configdir = [[${settings.unwrappedCfgPath}]]
+    '' else /*lua*/''
+      vim.g.configdir = vim.fn.stdpath('config')
     '';
 
     # doing it as 2 parts, this before any nix included plugin config,
     # and then running init.lua after makes nixCats command and
     # configdir variable available even for lua written in nix
-    runB4Config = (/* vim */''
-      let configdir = stdpath('config')
-      execute "set packpath-=" . configdir
-      execute "set runtimepath-=" . configdir
-      execute "set runtimepath-=" . configdir . "/after"
-    '') + setconfigdir + /* vim */ ''
-      lua require('nixCats').addGlobals()
-      lua require('nixCats.saveTheCats')
-      execute 'set packpath^=' . configdir
-      execute 'set rtp^=' . configdir
-      execute 'set runtimepath+=' . configdir . '/after'
+    runB4Config = (/* lua */''
+      vim.g.configdir = vim.fn.stdpath('config')
+      vim.opt.packpath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
+    '') + setconfigdir + /* lua */ ''
+      require('nixCats').addGlobals()
+      require('nixCats.saveTheCats')
+      vim.opt.packpath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
     '';
 
-    customRC = "vim.cmd([["+setconfigdir+"]])" + /* lua */''
+    customRC = setconfigdir + /* lua */''
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
         vim.cmd.source(vim.g.configdir .. "/init.vim")
       end

@@ -97,9 +97,9 @@ let
     # modified to allow more control over running things FIRST and also in which language.
     rcContent = ''
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
-      vim.cmd([[${runB4Config}]])
+      ${runB4Config}
       ${luaPluginConfigs}
-      vim.cmd.source "${writeText "init.vim" vimlPluginConfigs}"
+      vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])
       ${runConfigInit}
       ${optLuaAdditions}
     '';
