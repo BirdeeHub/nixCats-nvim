@@ -137,7 +137,7 @@ in
       depsTable = fpkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
-      builder = fpkgs.writeText "builder.sh" (/*bash*/ ''
+      builder = fpkgs.writeText "builder.sh" ((/*bash*/ ''
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
@@ -147,7 +147,7 @@ in
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
-      '' + (if isStdCfgPath then /* bash */ ''
+      '') + (if isStdCfgPath then /* bash */ ''
         cd $out
         ${replaceWithStdPath "lua/nixCats/settings.lua"}
         ${replaceWithStdPath "lua/nixCats/cats.lua"}
