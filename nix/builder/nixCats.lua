@@ -60,13 +60,13 @@ function M.addGlobals()
                 print(vim.inspect(require('nixCats.cats')))
                 return require('nixCats.cats')
             elseif opts.fargs[1] == 'vimPackDir' then
-                print(vim.inspect(vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]))
+                print(vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ])
                 return vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
             elseif opts.fargs[1] == 'configDir' then
-                print(vim.inspect(require('nixCats').get([[nixCats_store_config_location]])))
+                print(require('nixCats').get([[nixCats_store_config_location]]))
                 return require('nixCats').get([[nixCats_store_config_location]])
             elseif opts.fargs[1] == 'nixCatsPath' then
-                print(vim.inspect(vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]))
+                print(vim.g[ [[nixCats-special-rtp-entry-nixCats]] ])
                 return vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
             end
         end
