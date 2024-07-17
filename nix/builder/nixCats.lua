@@ -130,7 +130,6 @@ function M.addGlobals()
                 else
                     return matches
                 end
-                print(CmdLine:sub(CursorPos, CursorPos))
                 -- Walk table till end of argsSoFar,
                 -- and offer matching completion options
                 local cats = require('nixCats.cats')

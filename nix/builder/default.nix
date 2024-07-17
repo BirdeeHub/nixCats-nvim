@@ -112,14 +112,24 @@ in
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = { ... }@allPluginDeps:
     fpkgs.stdenv.mkDerivation (let
+      isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
+      isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
+      replaceWithStdPath = file: /*bash*/''
+        substituteInPlace ${file} \
+          --replace-fail '[ [[nixCats_store_config_location]] ] = [[${LuaConfig}]]' \
+          '[ [[nixCats_store_config_location]] ] = vim.fn.stdpath("config")'
+      '';
+      nixCats_store_config_location = if isUnwrappedCfgPath
+        then "${settings.unwrappedCfgPath}" else "${LuaConfig}";
+
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
         nixCats_packageName = name;
-        nixCats_store_config_location = "${LuaConfig}";
+        inherit nixCats_store_config_location;
       };
       settingsPlus = settings // {
         nixCats_packageName = name;
-        nixCats_store_config_location = "${LuaConfig}";
+        inherit nixCats_store_config_location;
       };
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = fpkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
@@ -127,7 +137,7 @@ in
       depsTable = fpkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
-      builder = fpkgs.writeText "builder.sh" /* bash */ ''
+      builder = fpkgs.writeText "builder.sh" (/*bash*/ ''
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
@@ -137,26 +147,22 @@ in
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
-      '';
+      '' + (if isStdCfgPath then /* bash */ ''
+        cd $out
+        ${replaceWithStdPath "lua/nixCats/settings.lua"}
+        ${replaceWithStdPath "lua/nixCats/cats.lua"}
+      '' else ""));
     });
-
-    setconfigdir = if settings.wrapRc then ''
-      vim.g.configdir = [[${LuaConfig}]]
-    '' else if settings.unwrappedCfgPath != null then ''
-      vim.g.configdir = [[${settings.unwrappedCfgPath}]]
-    '' else /*lua*/''
-      vim.g.configdir = vim.fn.stdpath('config')
-    '';
 
     # doing it as 2 parts, this before any nix included plugin config,
     # and then running init.lua after makes nixCats command and
     # configdir variable available even for lua written in nix
-    runB4Config = (/* lua */''
+    runB4Config = /* lua */''
       vim.g.configdir = vim.fn.stdpath('config')
       vim.opt.packpath:remove(vim.g.configdir)
       vim.opt.runtimepath:remove(vim.g.configdir)
       vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
-    '') + setconfigdir + /* lua */ ''
+      vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
       require('nixCats').addGlobals()
       require('nixCats.saveTheCats')
       vim.opt.packpath:prepend(vim.g.configdir)
@@ -164,7 +170,8 @@ in
       vim.opt.runtimepath:append(vim.g.configdir .. "/after")
     '';
 
-    customRC = setconfigdir + /* lua */''
+    customRC = /* lua */''
+      vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
         vim.cmd.source(vim.g.configdir .. "/init.vim")
       end
