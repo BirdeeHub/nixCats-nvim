@@ -115,7 +115,7 @@ with builtins; rec {
     # These were deprecated due to needing to be wrapped with ${system} and thus failing flake check
     mkOverlays = finalBuilder: packageDefinitions: defaultName:
       let
-        warn = trace "WARNING: utils.mkOverlays is deprecated. Use utils.makeOverlays instead.";
+        warn = trace "WARNING: utils.mkOverlays is deprecated. Use utils.makeOverlays instead. Will be removed on 2024-09-01.";
       in (warn (
           (utils.mkDefaultOverlay finalBuilder defaultName) 
           //
@@ -125,17 +125,17 @@ with builtins; rec {
 
     mkDefaultOverlay = finalBuilder: defaultName:
       let
-        warn = trace "WARNING: utils.mkDefaultOverlay is deprecated. It may be removed in the future.";
+        warn = trace "WARNING: utils.mkDefaultOverlay is deprecated. Will be removed on 2024-09-01.";
       in warn { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); };
 
     mkExtraOverlays = finalBuilder: packageDefinitions:
       let
-        warn = trace "WARNING: utils.mkExtraOverlays is deprecated. It may be removed in the future.";
+        warn = trace "WARNING: utils.mkExtraOverlays is deprecated. Will be removed on 2024-09-01.";
       in warn (mapAttrs (name: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
 
     mkMultiOverlay = finalBuilder: importName: namesIncList:
       let
-        warn = trace "WARNING: utils.mkMultiOverlay is deprecated. Use utils.makeMultiOverlay instead.";
+        warn = trace "WARNING: utils.mkMultiOverlay is deprecated. Use utils.makeMultiOverlay instead. Will be removed on 2024-09-01.";
       in (warn 
           (self: super: {
             ${importName} = listToAttrs (
