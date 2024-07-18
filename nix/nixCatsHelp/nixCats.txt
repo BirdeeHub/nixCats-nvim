@@ -167,7 +167,7 @@ If theBestCat says meow, and you use this syntax,
 theBestCat will evaluate as true if 
 it contains something that isnt false (or nil).
 >lua
-    if nixCats('theBestCat' == true) then
+    if nixCats('theBestCat') == true then
       print("true")
     else
       print("false")
