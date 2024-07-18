@@ -114,13 +114,15 @@ in
     fpkgs.stdenv.mkDerivation (let
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
-      replaceWithStdPath = file: /*bash*/''
-        substituteInPlace ${file} \
-          --replace-fail '[ [[nixCats_store_config_location]] ] = [[${LuaConfig}]]' \
-          '[ [[nixCats_store_config_location]] ] = vim.fn.stdpath("config")'
-      '';
+
+      # command injection. The user can just straight up pass lua code
+      # in categoryDefinitions so users have no reason to use this.
+      # however, for our purposes, this is the cleanest and most 
+      # performant way to replace the config location with a lua function value.
       nixCats_store_config_location = if isUnwrappedCfgPath
-        then "${settings.unwrappedCfgPath}" else "${LuaConfig}";
+        then "${settings.unwrappedCfgPath}" else if isStdCfgPath then '']] .. vim.fn.stdpath("config") .. [['' else "${LuaConfig}";
+      # I wish I named it nixCats_config_location but its used in the lazy wrapper so... too late for that.
+      # I cant change the lazy wrapper in THEIR configs. I could have them pull the template again but I deemed that too annoying for them.
 
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
@@ -137,7 +139,7 @@ in
       depsTable = fpkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
-      builder = fpkgs.writeText "builder.sh" ((/*bash*/ ''
+      builder = fpkgs.writeText "builder.sh" /*bash*/ ''
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
@@ -147,11 +149,7 @@ in
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
-      '') + (if isStdCfgPath then /* bash */ ''
-        cd $out
-        ${replaceWithStdPath "lua/nixCats/settings.lua"}
-        ${replaceWithStdPath "lua/nixCats/cats.lua"}
-      '' else ""));
+      '';
     });
 
     # doing it as 2 parts, this before any nix included plugin config,
