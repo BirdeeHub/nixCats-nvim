@@ -7,3 +7,6 @@ error("Cannot import a meta module")
 ---@field settings table
 ---@field get fun(category: string|string[]): any
 ---@field addGlobals fun()
+---@field nixCatsPath string
+---@field vimPackDir string
+---@field configDir string

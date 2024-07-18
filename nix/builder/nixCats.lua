@@ -3,6 +3,11 @@ local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.pawsible')
 M.settings = require('nixCats.settings')
+M.configDir = M.settings.nixCats_store_config_location
+-- NOTE: nixCats is inside of these and thus they could not be written into nixCats
+-- due to infinite recursion, so they are variables instead.
+M.nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
+M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
 
 package.preload["nixCats.included"] = function()
     vim.notify_once("require('nixCats.included') will be removed in favor of require('nixCats.pawsible') on 2024-09-01", vim.log.levels.WARN, { title = "NixCats Deprecation Warning" })
@@ -47,43 +52,37 @@ function M.addGlobals()
     vim.api.nvim_create_user_command('NixCats', function(opts)
         if #opts.fargs == 0 then
             print(vim.inspect(require('nixCats.cats')))
-            return require('nixCats.cats')
-        end
-        if #opts.fargs == 1 then
+            return
+        elseif #opts.fargs == 1 then
             if opts.fargs[1] == 'settings' then
-                print(vim.inspect(require('nixCats.settings')))
-                return require('nixCats.settings')
+                print(vim.inspect(M.settings))
+                return
             elseif opts.fargs[1] == 'pawsible' then
-                print(vim.inspect(require('nixCats.pawsible')))
-                return require('nixCats.pawsible')
+                print(vim.inspect(M.pawsible))
+                return
             elseif opts.fargs[1] == 'cats' then
-                print(vim.inspect(require('nixCats.cats')))
-                return require('nixCats.cats')
+                print(vim.inspect(M.cats))
+                return
             elseif opts.fargs[1] == 'vimPackDir' then
-                print(vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ])
-                return vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
+                print(M.vimPackDir)
+                return
             elseif opts.fargs[1] == 'configDir' then
-                print(require('nixCats').get([[nixCats_store_config_location]]))
-                return require('nixCats').get([[nixCats_store_config_location]])
+                print(M.settings.nixCats_store_config_location)
+                return
             elseif opts.fargs[1] == 'nixCatsPath' then
-                print(vim.g[ [[nixCats-special-rtp-entry-nixCats]] ])
-                return vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
+                print(M.nixCatsPath)
+                return
             end
-        end
-        if #opts.fargs == 2 then
+        elseif #opts.fargs == 2 then
             if opts.fargs[1] == 'cat' then
-                local tosplit = {}
-                for v in opts.fargs[2]:gmatch("([^%.]+)") do
-                    table.insert(tosplit, v)
-                end
-                print(vim.inspect(nixCats(tosplit)))
-                return nixCats(tosplit)
+                print(vim.inspect(nixCats(opts.fargs[2])))
+                return
             end
         elseif #opts.fargs > 2 then
             local first = table.remove(opts.fargs, 1)
             if first == 'cat' then
                 print(vim.inspect(nixCats(opts.fargs)))
-                return nixCats(opts.fargs)
+                return
             end
         end
     end, {
