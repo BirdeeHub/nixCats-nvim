@@ -796,6 +796,7 @@ a derivation, or something not a set is reached.
 makes each package and also a default one
 
 <mkExtraPackages> finalBuilder: packageDefinitions:
+mkPackages just calls this and adds a default one.
 
 <makeOverlays> luaPath: {
         nixpkgs
