@@ -24,8 +24,8 @@ TWO IMPORTANT NOTES:
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 Using wrapRc = true would mean this also applies to lua files.
-In fact, when wrapRc = true, even changes within a lua file
-will not be reflected unless you run git add.
+Only tracked files will recieve their updates when
+rebuilt without git add being ran first. New files need to be added.
 *******************************************************
 
 Related:
@@ -38,10 +38,12 @@ But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
 it would be to find something outside the directory. 
 Inside is mostly handled by vim.
-You could use vim.g.configdir,
-which I make when I load the config folder,
+You could use `require('nixCats').configDir`,
 to get current config directory for your uses, if ever necessary.
 It will be present and correct regardless of settings.
+However if you did not use nix at all, it may not be available so
+you may want to use `require('nixCatsUtils').isNixCats` to default to
+`vim.fn.stdpath('config')` if needed.
 You could also use debug.getinfo(1, "S").source:sub(2) or something similar.
 Keep in mind they will be read-only if in the store!
 
@@ -56,34 +58,62 @@ you may use this format to import them, replacing the fields marked with <>
       flake = false;
     };
 <
-If the plugin has a dot in it's name, you should name it something else.
-The name here only affects the filename of the overall plugin, and should
-only affect things like vim.cmd("packadd <filename>") that refer to
-the actual filename of the plugin. Usually I would replace it with _
-You will then add it to categoryDefinitions later with the NEW name.
-You may also use this to pin the version of a plugin.
 More info on flake url syntax at:
 https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
+You may also use this syntax to pin the version of a plugin regardless of if
+you ran nix flake update or not.
+You may choose the directory, branch, commit, tag, or even directory imported.
 
+If the plugin has a dot `.` character in it's name, you should name it something else.
+Because . is not a valid character in an identifier in nix.
+
+The name here only affects the filename of the overall plugin, and should
+only affect things like vim.cmd("packadd <filename>") that refer to
+the actual filename of the plugin. Usually I would replace it with _ or -
+You will then add it to categoryDefinitions later with the NEW name.
+
+If you use this method to import a plugin, and really dont
+want to change the filename of the plugin when they have a
+dot in their name, you may use the following syntax:
+
+If in your inputs you had:
+>nix
+  "plugins-<plugin-name>" = {
+    url = "github:<userName>/<repository.name>";
+    flake = false;
+  };
+<
+Where you put plugins in your categoryDefinitions, instead of:
+>nix
+  pkgs.neovimPlugins.<plugin-name>
+<
+You would put this:
+>nix
+  (pkgs.neovimPlugins.<plugin-name>.overrideAttrs { pname = "<plugin.name>"; })
+<
+overrideAttrs can be used for a lot more than just fixing the name of the
+imported plugin. See:
+https://ryantm.github.io/nixpkgs/using/overrides/
 
 If they have a build step or are not a plugin, 
-i.e. an lsp, dont name them in that format.
+i.e. an lsp, or if they are a plugin from a flake,
+dont name them in that format.
+If they are a plugin from a flake, they can be added directly,
+or they may be added as an overlay if offered.
+If they are anything else they arent a plugin at all and obviously
+should thus not be added as a plugin via plugins-<pluginName>
 
-If they are on nixpkgs, you dont necessarily need to put them in inputs,
-because you will be able to access them through pkgs.vimPlugins variable later.
-
-Most plugins will not require you to use this section due to being on nixpkgs.
+If they are on nixpkgs, you dont need to put them in inputs,
+because you will be able to access them through pkgs.vimPlugins variable.
+Most plugins will not require you to use the inputs section due to being on nixpkgs.
 But you may still use it to pin the plugin to a specific version.
 
-Context for later:
-
-If they have a build step, you will deal with them in overlays/customBuildsOverlay.nix
+If they have a build step and are not on nixpkgs,
+you will deal with them in overlays/customBuildsOverlay.nix
 then import them into a category of the builder. 
-(assuming nixpkgs hasn't already done it!!)
-
-If they are not a plugin:
-You will import them into a category of the builder under lspsAndDeps, 
-unless they are for build time, then put them under propagatedBuildInputs
+Alternatively you may use overrideAttrs as mentioned above instead of an
+overlay for these sorts of packages, but this would possibly get messy if the
+build step were complex.
 
 =======================================================================================
 Flake Outputs Introduction                              *nixCats.flake.outputs*
@@ -107,9 +137,9 @@ set from { mySet = {}; } to { mySet.${system} = {}; }
 Many overlays require being accessed via ${system} variable in this manner,
 and thus there is a method for handling it in nixCats.
 >nix
-  system_resolved = utils.eachSystem nixpkgs.lib.platforms.all (system: let
+  inherit (utils.eachSystem nixpkgs.lib.platforms.all (system: let
                   /* utils.eachSystem is just flake-utils.lib.eachSystem */
-    # see :help nixCats.flake.outputs.overlays
+         /* list of overlays from ./overlays is added to the rest of the list */
     dependencyOverlays = (import ./overlays inputs) ++ [
       # This overlay grabs all the inputs named in the format
       # `plugins-<pluginName>`
@@ -118,12 +148,13 @@ and thus there is a method for handling it in nixCats.
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
       inputs.nixd.overlays.default
+      # stuff like this is why this part is done this way.
+      inputs.codeium.overlays.${system}.default
     ];
     # these overlays will be wrapped with ${system}
     # and we will call the same utils.eachSystem function
     # later on to access them.
-  in { inherit dependencyOverlays; });
-  inherit (system_resolved) dependencyOverlays;
+  in { inherit dependencyOverlays; })) dependencyOverlays;
 <
 This will allow us to pass system independent overlays to our module options.
 And also allow more outputs to be outside of the 2nd and final flake utils,
@@ -136,12 +167,16 @@ of passing the correct pkgs instance to the categoryDefinitions for use in
 defining your plugins.
 
                                                *nixCats.flake.outputs.overlays*
-We now define our overlays.
-We have 2 main overlays to discuss.
-
+The two major things of note in this overlays section. >nix
+  (utils.standardPluginOverlay inputs) # return type: a single overlay
+  # and
+  (import ./overlays inputs) # type: List of Overlays
+<
 <1>
--- The first is utils.standardPluginOverlay:
+-- The first to explain is utils.standardPluginOverlay:
 You do not need to edit it to use it.
+Usage of this overlay is described in:
+:h |nixCats.flake.inputs|
 
 It takes all the inputs named in the format
 'plugins-somepluginname' and makes them into plugins. 
@@ -236,14 +271,13 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
 <extraPython3wrapperArgs>
   the same as extraWrapperArgs but for bundled python3 executable
 
-  <optionalLuaAdditions>* It can also take 
-    a flexible set of categories, each containing a lua string
-    that will be ran after sourcing your init.lua
-    Yes it can access nixCats.
-    It is not the recommended way to create lua for this flake, 
-    but it may be useful in some edge cases of editing flake imports 
-    of other already configured setups following the nixCats format.
-    Therefore, I have included this option.
+<optionalLuaAdditions> It can also take 
+  a flexible set of categories, each containing a lua string
+  that will be ran after sourcing your init.lua
+  Yes it can access nixCats.
+  It is not the recommended way to create lua for this flake, 
+  but it may be useful in editing flake imports 
+  of other already configured setups following the nixCats format.
 }
 
 In essence, the contents of each set listed here are filtered
@@ -351,13 +385,16 @@ This applies in many situations. Take this one for example.
   to do this, you may use the following syntax in opt or start sections: >nix
     [
       # you may add a plugin to a category list in any of these ways
-      { plugin = derivation; config.vim = ""; config.lua = ""; }
+      { plugin = derivation; config.lua = ""; config.vim = "";}
       { plugin = derivation; config = ""; type = "<viml or lua>"; }
       { plugin = derivation; config = ""; } # defaults to viml
       { plugin = derivation; }
       # all the above options can accept an optional = bool;
       # to override its presence in either startupPlugins or optionalPlugins
       derivation
+      # plain derivation does not need to be in a list, but it should be
+      # anyway. It could be on its own though and would act as its own
+      # category.
     ]
 <
 ---------------------------------------------------------------------------------------
@@ -369,8 +406,8 @@ Place them in the packageDefinitions set.
 First, pick the set of settings you wish to include.
 
 Then, pass it a set of named boolean values like this:
-{ categoryname1 = true; categoryname2 = false; etc... }
-False may be omitted. True may not be omitted.
+`{ categoryname1 = true; categoryname2 = false; etc... }`
+False may be omitted. True may not.
 Only true matters for what plugins will be added.
 
 These categories are defined in the Builder function above 
@@ -413,7 +450,7 @@ an example package definition:
     };
   };
 <
-You can require('nixCats') for the set you define here in your lua
+You can use the nixCats plugin for the set you define here in your lua
 It returns a lua table of the same format.
 
 see :help |nixCats|
@@ -499,12 +536,18 @@ If the lua is not in `vim.fn.stdpath('config')`, wrapRc = false will not work.
 By default this is `~/.config/nvim` on linux systems, although we can
 change `nvim` to whatever we wish via the configDirName setting.
 
-The best way to use the wrapRc option is to symlink the correct
-.config directory to wherever your neovim directory in your
-nix config is.
+Alternatively, you can set the `unwrappedCfgPath` option to allow the
+configuration to be set to an absolute path. You still may want to set
+the configDirName option anyway to change the data directories,
+or explicitly keep it the same on both so that they share stuff like auths.
 
-Then, make a second identical packageDefinition, but with wrapRc
-disabled. The nixCats main flake.nix file has an example of this with nixCats
+The most convenient way to use this is the following:
+Make a second identical packageDefinition, but with wrapRc disabled.
+Then install both the wrapped one and unwrapped one with different aliases.
+When you want to hack in lua, use unwrapped! When you're done, just rebuild
+and go back to the wrapped one.
+
+The nixCats main flake.nix file has an example of this with nixCats
 and regularCats.
 
 Then, when testing lua changes, you run the other package and have a vanilla
@@ -537,13 +580,43 @@ That argument is the name of the neovim package to be packaged.
 
 It is now a function that takes a name, and returns your chosen neovim package.
 >nix
+  # It requires the system variable to build a package.
   utils.eachSystem nixpkgs.lib.platforms.all (system: let
+    # create our builder for our exports
     inherit (utils) baseBuilder;
     customPackager = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions;
+    # takes the name of a package definition, builds the package:
     nixCatsBuilder = customPackager packageDefinitions;
+    # ... rest of the outputs section explained
+    # below in :h nixCats.flake.outputs.exports ...
 <
+If you use it wrong, you will most likely get this error message:
+
+  Arguments accepted:
+>nix
+  luaPath:
+  {
+    pkgs ? null                 # <-- either pkgs with everything included
+    , nixpkgs ? null            # <-- or include nixpkgs,
+    , system ? null             # <-- and system
+    , dependencyOverlays ? null # <-- and the overlays
+    , extra_pkg_config ? {}     # <-- extra config such as allowUnfree
+    , nixCats_passthru ? {}     # <-- extra things to add to passthru attribute of derivation
+    , ...
+  }:
+  categoryDefFunction:
+  packageDefinitions:
+  packageName:
+<
+  # Note:
+  You must provide nixpkgs and system along with any dependencyOverlays,
+  OR a pkgs attribute to the nixCats builder function,
+  in the set recieved as the second argument
+
+  dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
+  
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
 
@@ -700,22 +773,7 @@ In total, the <utils> set contains 11 functions and then the templates set.
 
 First, the ones mentioned above.
 Then, we also have:
-
-<mkPackages> finalBuilder: packageDefinitions: defaultName:
-makes each package and also a default one
-<mkExtraPackages> finalBuilder: packageDefinitions:
 same as mkPackages but without the default one
-
-<makeOverlays> luaPath: {
-        nixpkgs
-        , extra_pkg_config ? {}
-        , dependencyOverlays ? null
-        , nixCats_passthru ? {}
-        , ...
-      }@pkgsParams: categoryDefFunction: packageDefinitions:
-      defaultName:
-makes an overlay for each package and also a default one
-These are basically the same as the arguments to utils.baseBuilder
 
 <standardPluginOverlay> inputs:
 allows for inputs named plugins-something to be
@@ -734,11 +792,23 @@ that updates to avoid naming conflicts between overlays in different nixCats fla
 within overlays that are sets, will recursively update until
 a derivation, or something not a set is reached.
 
-<mkDefaultOverlay> finalBuilder: defaultName:
-<mkExtraOverlays> finalBuilder: packageDefinitions:
-which when combined with // make up mkOverlays
+<mkPackages> finalBuilder: packageDefinitions: defaultName:
+makes each package and also a default one
 
-<mkMultiOverlay> <same args as makeOverlays but with the following 2 args instead of defaultName>:
+<mkExtraPackages> finalBuilder: packageDefinitions:
+
+<makeOverlays> luaPath: {
+        nixpkgs
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }@pkgsParams: categoryDefFunction: packageDefinitions:
+      defaultName:
+makes an overlay for each package and also a default one
+These are basically the same as the arguments to utils.baseBuilder
+
+<makeMultiOverlay> <same args as makeOverlays but with the following 2 args instead of defaultName>:
             importName: namesIncList:
 Instead of taking a defaultName, it takes an importName and a list of names.
 It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
@@ -778,6 +848,14 @@ with lists of overlays in each item. Such that
 the lists would be accessed via dependencyOverlays.${system}
 
 If you do not have a luaPath, you may pass it a keepLua builder.
+
+IMPORTANT
+By default, the module inherits your system's pkgs object,
+and its overlays. If you use stable channel for your system,
+consider passing an `inputs.nixpkgs-unstable` from your inputs
+to the `nixpkgs_version` module option.
+It will still inherit your system overlays,
+but your system will not inherit overlays from nixCats.
 
 More information on the modules can be found at :h |nixCats.module|
 

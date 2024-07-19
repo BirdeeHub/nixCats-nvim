@@ -38,14 +38,25 @@ let
       else if nixossyn then "viml"
       else if hmsyn then p.type
       else if attrsyn then
-        if p.config ? lua then "lua"
-        else if p.config ? vim then "viml"
+        if p.config ? vim then "viml"
+        else if p.config ? lua then "lua"
         else null
       else null;
 
     config =
       if attrsyn then
-        if type == "lua" then p.config.lua else p.config.vim
+        if type == "viml"
+        then if !(p.config ? lua)
+          then
+            p.config.vim
+          else 
+            (p.config.vim + ''
+
+              lua << NIXCATSVIMLUA
+                ${p.config.lua}
+              NIXCATSVIMLUA
+            '')
+        else p.config.lua
       else if hmsyn || nixossyn then p.config
       else null;
   in
