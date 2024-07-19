@@ -48,6 +48,15 @@ function M.get(category)
 end
 
 function M.addGlobals()
+    ---:h nixCats
+    ---will return the nearest parent category value, unless the nearest
+    ---parent is a table, in which case that means a different subcategory
+    ---was enabled but this one was not. In that case it returns nil.
+    ---@type fun(category: string|string[]): any
+    function _G.nixCats(category)
+        return M.get(category)
+    end
+
     -- command with debug info for nixCats setups
     vim.api.nvim_create_user_command('NixCats', function(opts)
         if #opts.fargs == 0 then
@@ -170,15 +179,6 @@ function M.addGlobals()
         print(vim.inspect(require('nixCats.pawsible')))
     end,
     { desc = 'All the pawsible plugins' })
-
-    ---:h nixCats
-    ---will return the nearest parent category value, unless the nearest
-    ---parent is a table, in which case that means a different subcategory
-    ---was enabled but this one was not. In that case it returns nil.
-    ---@type fun(category: string|string[]): any
-    function _G.nixCats(category)
-        return M.get(category)
-    end
 
     vim.cmd([[
         function! GetNixCat(value)
