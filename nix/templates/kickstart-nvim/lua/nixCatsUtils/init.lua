@@ -26,8 +26,8 @@ end
 
 ---allows you to guarantee a boolean is returned, and also declare a different
 ---default value than specified in setup when not using nix to load the config
----@overload fun(v: string|table): boolean
----@overload fun(v: string|table, default: boolean): boolean
+---@overload fun(v: string|string[]): boolean
+---@overload fun(v: string|string[], default: boolean): boolean
 function M.enableForCategory(v, default)
   if M.isNixCats or default == nil then
     if nixCats(v) then
@@ -42,7 +42,7 @@ end
 
 ---if nix, return value of nixCats(v) else return default
 ---Exists to specify a different non_nix_value than the one in setup()
----@param v string|table
+---@param v string|string[]
 ---@param default any
 ---@return any
 function M.getCatOrDefault(v, default)
@@ -65,5 +65,10 @@ function M.lazyAdd(v, o)
     return v
   end
 end
+
+---Useful for things such as vim-startuptime which must reference the wrapper's actual path
+---If not using nix, this will simply return vim.v.progpath
+---@type string
+M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
 
 return M

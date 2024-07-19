@@ -130,7 +130,7 @@ let
     finalMakeWrapperArgs =
       [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
       ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-      ++ lib.optionals finalAttrs.wrapRc [ "--add-flags" "-u ${writeText "init.lua" rcContent}" ]
+      ++ lib.optionals finalAttrs.wrapRc [ "--add-flags" ''-u ${writeText "init.lua" rcContent}'' ]
       ++ finalAttrs.generatedWrapperArgs
       ;
 
@@ -234,6 +234,19 @@ let
         makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
             --prefix LUA_PATH ';' "$LUA_PATH" \
             --prefix LUA_CPATH ';' "$LUA_CPATH"
+
+        # add wrapper path to an environment variable
+        # so that configuration may easily reference the path of the wrapper
+        # for things like vim-startuptime
+        export BASHCACHE=$(mktemp)
+        # Grab the shebang
+        head -1 ${placeholder "out"}/bin/${nixCats_packageName} > $BASHCACHE
+        # add the code to set the environment variable
+        echo 'export NVIM_WRAPPER_PATH_NIX="$(realpath "$''+''{BASH_SOURCE[0]}")"' >> $BASHCACHE
+        # add the rest of the file back
+        tail +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
+        cat $BASHCACHE > ${placeholder "out"}/bin/${nixCats_packageName}
+        rm $BASHCACHE
       '';
 
     buildPhase = ''
