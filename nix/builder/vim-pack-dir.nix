@@ -43,6 +43,7 @@
       name = "nixCats-special-rtp-entry-nixCats-pathfinder";
       text = ''
         vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsDRV}]]
+        return [[${nixCatsDRV}]]
       '';
       executable = false;
       destination = "/lua/nixCats/saveTheCats.lua";

@@ -6,7 +6,7 @@ M.settings = require('nixCats.settings')
 M.configDir = M.settings.nixCats_store_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
-M.nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
+M.nixCatsPath = require('nixCats.saveTheCats')
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
 
 package.preload["nixCats.included"] = function()

@@ -160,7 +160,6 @@ in
       vim.opt.packpath:remove(vim.g.configdir)
       vim.opt.runtimepath:remove(vim.g.configdir)
       vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
-      require('nixCats.saveTheCats')
       vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
       require('nixCats').addGlobals()
       vim.opt.packpath:prepend(vim.g.configdir)
