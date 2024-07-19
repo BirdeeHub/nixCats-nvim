@@ -11,11 +11,13 @@ if nixCats('neonixdev') then
       -- NOTE: Use `:NixCats pawsible` to see the names of all plugins downloaded via nix for packadd
       vim.cmd.packadd('lazydev.nvim')
       require('lazydev').setup({
-        -- library = {
+        library = {
         --   -- See the configuration section for more details
         --   -- Load luvit types when the `vim.uv` word is found
         --   -- { path = "luvit-meta/library", words = { "vim%.uv" } },
-        -- },
+          -- adds type hints for nixCats global
+          require('nixCats').nixCatsPath .. '/lua',
+        },
       })
     end
   })

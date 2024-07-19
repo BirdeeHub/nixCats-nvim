@@ -514,7 +514,14 @@ require('nixCatsUtils.lazyCat').setup(pluginList, nixLazyPath,
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/lazydev.nvim', ft = "lua", opts = {} },
+      { 'folke/lazydev.nvim', ft = "lua",
+        opts = {
+          library = {
+            -- adds type hints for nixCats global
+            require('nixCats').nixCatsPath .. '/lua',
+          },
+        }
+      },
       -- kickstart.nvim was still on neodev. lazydev is the new version of neodev
     },
     config = function()
