@@ -85,6 +85,7 @@ let
   # only for use when importing flake in a flake 
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
+    optionalLuaPreInit = {};
   } // (categoryDefFunction {
     pkgs = fpkgs;
     inherit settings categories name;
@@ -93,7 +94,7 @@ let
   propagatedBuildInputs environmentVariables
   extraWrapperArgs extraPython3Packages
   extraLuaPackages optionalLuaAdditions
-  extraPython3wrapperArgs sharedLibraries;
+  extraPython3wrapperArgs sharedLibraries optionalLuaPreInit;
 
 in
   let
@@ -168,11 +169,16 @@ in
     '';
 
     customRC = let
+      optLuaPre = if builtins.isString optionalLuaPreInit
+          then optionalLuaPreInit
+          else builtins.concatStringsSep "\n"
+          (fpkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
       optLuaAdditions = if builtins.isString optionalLuaAdditions
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
           (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in/* lua */''
+      ${optLuaPre}
       vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
         vim.cmd.source(vim.g.configdir .. "/init.vim")

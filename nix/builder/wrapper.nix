@@ -97,10 +97,11 @@ let
     rcContent = ''
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
       ${runB4Config}
-      ${luaPluginConfigs}
-      vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])
       ${runConfigInit}
-    '';
+      ${luaPluginConfigs}
+    '' + (lib.optionalString (vimlPluginConfigs != "") ''
+      vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])
+    '');
 
     providerLuaRc = generateProviderRc {
       inherit withPython3 withNodeJs withPerl luaEnv;
