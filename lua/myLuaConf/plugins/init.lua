@@ -167,7 +167,6 @@ vim.keymap.set("n", "-", "<cmd>Oil<CR>", { noremap = true, desc = 'Open Parent D
 vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Open nvim root directory' })
 
 require('which-key').setup({
-  operators = { gc = "Comments", [ "<leader>y" ] = "yank to clipboard", },
 })
 require('which-key').add {
     { "<leader><leader>", group = "buffer commands" },
