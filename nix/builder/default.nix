@@ -258,7 +258,7 @@ in
     preWrapperShellCode = if builtins.isString bashBeforeWrapper
       then bashBeforeWrapper
       else builtins.concatStringsSep "\n" ([(''
-        export NVIM_WRAPPER_PATH_NIX="$(realpath "$''+''{BASH_SOURCE[0]}")"
+        export NVIM_WRAPPER_PATH_NIX="$(${fpkgs.coreutils}/bin/realpath "$''+''{BASH_SOURCE[0]}")"
       '')] ++ (fpkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
 
     # add our propagated build dependencies
