@@ -23,6 +23,7 @@ pkgs: neovim:
   aliases,
   nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
+  preWrapperShellCode ? "",
 }:
 let
   # accepts 4 different plugin syntaxes, specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
@@ -103,6 +104,6 @@ in
     runConfigInit = configure.customRC;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru
-      runB4Config luaPluginConfigs vimlPluginConfigs;
+      runB4Config luaPluginConfigs vimlPluginConfigs preWrapperShellCode;
   }
 )

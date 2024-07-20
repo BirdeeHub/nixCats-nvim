@@ -86,6 +86,7 @@ let
   # and need to only add a bit of lua for an added plugin
     optionalLuaAdditions = {};
     optionalLuaPreInit = {};
+    bashBeforeWrapper = {};
   } // (categoryDefFunction {
     pkgs = fpkgs;
     inherit settings categories name;
@@ -94,7 +95,8 @@ let
   propagatedBuildInputs environmentVariables
   extraWrapperArgs extraPython3Packages
   extraLuaPackages optionalLuaAdditions
-  extraPython3wrapperArgs sharedLibraries optionalLuaPreInit;
+  extraPython3wrapperArgs sharedLibraries
+  optionalLuaPreInit bashBeforeWrapper;
 
 in
   let
@@ -253,6 +255,12 @@ in
 
     python3wrapperArgs = fpkgs.lib.unique ((filterAndFlatten extraPython3wrapperArgs) ++ (if settings.disablePythonSafePath then ["--unset PYTHONSAFEPATH"] else []));
 
+    preWrapperShellCode = if builtins.isString bashBeforeWrapper
+      then bashBeforeWrapper
+      else builtins.concatStringsSep "\n" ([(''
+        export NVIM_WRAPPER_PATH_NIX="$(realpath "$''+''{BASH_SOURCE[0]}")"
+      '')] ++ (fpkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
+
     # add our propagated build dependencies
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then fpkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = baseNvimUnwrapped.overrideAttrs (prev: {
@@ -273,7 +281,7 @@ import ./wrapNeovim.nix fpkgs myNeovimUnwrapped {
     inherit dependencyOverlays;
   };
 
-  inherit extraMakeWrapperArgs nixCats runB4Config;
+  inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
   configure = {
     inherit customRC;

@@ -52,6 +52,7 @@ let
     , nixCats_packageName
     , customAliases ? null
     , nixCats_passthru ? {}
+    , preWrapperShellCode ? ""
     , runB4Config ? ""
     , runConfigInit ? ""
     , luaEnv
@@ -64,6 +65,7 @@ let
 
   stdenv.mkDerivation (finalAttrs:
   let
+    preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
     generateProviderRc = {
         withPython3 ? true
       , withNodeJs ? false
@@ -239,7 +241,7 @@ let
         # Grab the shebang
         head -1 ${placeholder "out"}/bin/${nixCats_packageName} > $BASHCACHE
         # add the code to set the environment variable
-        echo 'export NVIM_WRAPPER_PATH_NIX="$(realpath "$''+''{BASH_SOURCE[0]}")"' >> $BASHCACHE
+        cat ${preWrapperShellFile} >> $BASHCACHE
         # add the rest of the file back
         tail +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
         cat $BASHCACHE > ${placeholder "out"}/bin/${nixCats_packageName}
