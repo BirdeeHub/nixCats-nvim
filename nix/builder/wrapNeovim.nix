@@ -20,7 +20,6 @@ pkgs: neovim:
   # I passed some more stuff in
   nixCats,
   runB4Config,
-  optLuaAdditions ? "",
   aliases,
   nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
@@ -104,6 +103,6 @@ in
     runConfigInit = configure.customRC;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru
-      runB4Config optLuaAdditions luaPluginConfigs vimlPluginConfigs;
+      runB4Config luaPluginConfigs vimlPluginConfigs;
   }
 )

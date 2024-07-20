@@ -167,7 +167,12 @@ in
       vim.opt.runtimepath:append(vim.g.configdir .. "/after")
     '';
 
-    customRC = /* lua */''
+    customRC = let
+      optLuaAdditions = if builtins.isString optionalLuaAdditions
+          then optionalLuaAdditions
+          else builtins.concatStringsSep "\n"
+          (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+    in/* lua */''
       vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
         vim.cmd.source(vim.g.configdir .. "/init.vim")
@@ -175,6 +180,7 @@ in
       if vim.fn.filereadable(vim.g.configdir .. "/init.lua") == 1 then
         dofile(vim.g.configdir .. "/init.lua")
       end
+      ${optLuaAdditions}
     '';
 
     # this is what allows for dynamic packaging in flake.nix
@@ -214,11 +220,6 @@ in
         uniquifiedList = fpkgs.lib.unique combinedFuncRes;
       in
       uniquifiedList);
-
-    optLuaAdditions = if builtins.isString optionalLuaAdditions
-        then optionalLuaAdditions
-        else builtins.concatStringsSep "\n"
-        (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
 
     # cat our args
     extraMakeWrapperArgs = let 
@@ -263,7 +264,7 @@ import ./wrapNeovim.nix fpkgs myNeovimUnwrapped {
     utils = (import ../utils).utils;
     categoryDefinitions = categoryDefFunction;
     packageDefinitions = packageDefinitions;
-    inherit dependencyOverlays optLuaAdditions;
+    inherit dependencyOverlays;
   };
 
   inherit extraMakeWrapperArgs nixCats runB4Config;

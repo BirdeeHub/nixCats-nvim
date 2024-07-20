@@ -54,7 +54,6 @@ let
     , nixCats_passthru ? {}
     , runB4Config ? ""
     , runConfigInit ? ""
-    , optLuaAdditions ? ""
     , luaEnv
     , extraPython3wrapperArgs ? []
     , luaPluginConfigs ? ""
@@ -101,7 +100,6 @@ let
       ${luaPluginConfigs}
       vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])
       ${runConfigInit}
-      ${optLuaAdditions}
     '';
 
     providerLuaRc = generateProviderRc {
