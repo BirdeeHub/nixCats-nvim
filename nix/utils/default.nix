@@ -48,8 +48,9 @@ with builtins; rec {
       }@pkgsParams:
       categoryDefFunction:
       packageDefinitions: defaultName: let
+        keepLuaBuilder = if builtins.isFunction luaPath then luaPath else utils.baseBuilder luaPath;
         makeOverlay = name: final: prev: {
-          ${name} = utils.baseBuilder luaPath (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+          ${name} = keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
         };
         overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // { default = (makeOverlay defaultName); };
       in overlays;
@@ -72,10 +73,12 @@ with builtins; rec {
       (self: super: {
         ${importName} = listToAttrs (
           map
-            (name:
+            (name: let
+              keepLuaBuilder = if builtins.isFunction luaPath then luaPath else utils.baseBuilder luaPath;
+            in
               {
                 inherit name;
-                value =  utils.baseBuilder luaPath (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+                value =  keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
               }
             ) namesIncList
           );

@@ -179,8 +179,6 @@ let
       (builtins.concatStringsSep "\n" (builtins.map (alias: ''
         ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
       '') customAliases))
-
-      # more stuff from nixpkgs. I still dont entirely understand the rplugin manifest generation.
       + lib.optionalString (manifestRc != null) (let
         manifestWrapperArgs =
           [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ finalAttrs.generatedWrapperArgs;
@@ -214,7 +212,7 @@ let
           exit 1
         fi
         rm "${placeholder "out"}/bin/nvim-wrapper"
-        # ok, again, I dont entirely understand the above part, if anyone knows, let me know.
+        # I only mostly understand the above 10 lines. They are from nixpkgs.
       '')
 
       + /* bash */ ''
