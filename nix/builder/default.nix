@@ -257,9 +257,10 @@ in
 
     preWrapperShellCode = if builtins.isString bashBeforeWrapper
       then bashBeforeWrapper
-      else builtins.concatStringsSep "\n" ([(''
-        export NVIM_WRAPPER_PATH_NIX="$(${fpkgs.coreutils}/bin/realpath "$''+''{BASH_SOURCE[0]}")"
-      '')] ++ (fpkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
+      else builtins.concatStringsSep "\n" ([/*bash*/''
+        NVIM_WRAPPER_PATH_NIX="$(${fpkgs.coreutils}/bin/readlink -f "$0")"
+        export NVIM_WRAPPER_PATH_NIX
+      ''] ++ (fpkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
 
     # add our propagated build dependencies
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then fpkgs.neovim-unwrapped else settings.neovim-unwrapped;
