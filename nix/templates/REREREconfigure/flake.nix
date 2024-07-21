@@ -125,7 +125,7 @@
 
   forEachSystem (system: let
     # NOTE: since the luaPath is not hosted here, to include it from the main nixCats example config,
-    # we instead pass a keepLuaBuilder to these functions instead of a luaPath.
+    # we use the exported keepLuaBuilder instead of a baseBuilder plus a luaPath.
     customPackager = nixCats.keepLuaBuilder {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions;
@@ -156,6 +156,7 @@
   }) // {
     # NOTE: replace luaPath with keepLuaBuilder in this section,
     # because we do not have our own luaPath here.
+    # These functions will accept either one.
     overlays = utils.makeOverlays nixCats.keepLuaBuilder {
       inherit nixpkgs dependencyOverlays extra_pkg_config;
     } categoryDefinitions packageDefinitions defaultPackageName;
@@ -171,6 +172,7 @@
     };
     inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
     inherit (utils) templates baseBuilder;
+    # and also re-export the keepLuaBuilder we used.
     inherit (nixCats) keepLuaBuilder;
     # because we export all the same things as the original,
     # we can repeat this reconfiguration process as many times as we like.
