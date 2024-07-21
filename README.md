@@ -271,7 +271,7 @@ Let people know when you figure one out or submit it to nixpkgs.
 
 [Lazy.nvim](https://github.com/folke/lazy.nvim) works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers. There is an included wrapper that you can use to do this reset correctly and also optionally stop it from downloading stuff you already downloaded via nix.
 
-[lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for nix based configurations.
+[lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations.
 
 #### Special mentions:
 
