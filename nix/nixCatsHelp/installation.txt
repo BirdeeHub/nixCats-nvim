@@ -129,6 +129,18 @@ The following is nix/templates/default.nix
         This is to serve as the tutorial for using the nixCats lazy wrapper.
       '';
     };
+    REREREconfigure = {
+      path = ./REREREconfigure;
+      description = ''
+        How to import an ALREADY CONFIGURED nixCats-based configuration into a new flake,
+        then modify it with new packages and configuration, and export the result.
+
+        In addition, it is also a demonstration of how to export a nixCats configuration
+        as an AppImage.
+
+        It is a 2 for 1 example of 2 SEPARATE things one could do.
+      '';
+    };
   }
 <
 ---------------------------------------------------------------------------------------
