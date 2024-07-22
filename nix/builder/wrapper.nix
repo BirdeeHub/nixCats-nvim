@@ -243,7 +243,7 @@ let
         # add the code to set the environment variable
         cat ${preWrapperShellFile} >> $BASHCACHE
         # add the rest of the file back
-        tail +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
+        tail -n +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
         cat $BASHCACHE > ${placeholder "out"}/bin/${nixCats_packageName}
         rm $BASHCACHE
       '';
