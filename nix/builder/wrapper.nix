@@ -114,8 +114,6 @@ let
       # vim accepts a limited number of commands so we join them all
           [
             "--add-flags" ''--cmd "lua ${providerLuaRc}"''
-          ] ++ lib.optionals (packpathDirs.myNeovimPackages.start != [] || packpathDirs.myNeovimPackages.opt != [])
-          [
             "--add-flags" ''--cmd "set packpath^=${finalPackDir}"''
             "--add-flags" ''--cmd "set rtp^=${finalPackDir}"''
           ];
