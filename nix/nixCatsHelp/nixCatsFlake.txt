@@ -826,6 +826,11 @@ These are basically the same as the arguments to utils.baseBuilder
 Instead of taking a defaultName, it takes an importName and a list of names.
 It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
 
+<makeOverlaysWithMultiDefault> utils.makeOverlays but the default overlay
+uses makeMultiOverlay. So that after adding it, all your packages from packageDefinitions will
+be accessible at pkgs.${defaultPackageName}.${packageName}
+Can be swapped out 1 for 1 with utils.makeOverlays if preferred
+
 <eachSystem> systems: f:
 just flake-utils.lib.eachSystem but without the dependency
 

@@ -48,11 +48,31 @@ with builtins; rec {
       }@pkgsParams:
       categoryDefFunction:
       packageDefinitions: defaultName: let
-        keepLuaBuilder = if builtins.isFunction luaPath then luaPath else utils.baseBuilder luaPath;
+        keepLuaBuilder = if isFunction luaPath then luaPath else utils.baseBuilder luaPath;
         makeOverlay = name: final: prev: {
           ${name} = keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
         };
         overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // { default = (makeOverlay defaultName); };
+      in overlays;
+
+    makeOverlaysWithMultiDefault = 
+      luaPath:
+      {
+        nixpkgs
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }@pkgsParams:
+      categoryDefFunction:
+      packageDefinitions: defaultName: let
+        keepLuaBuilder = if isFunction luaPath then luaPath else utils.baseBuilder luaPath;
+        makeOverlay = name: final: prev: {
+          ${name} = keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+        };
+        overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // {
+          default = (utils.makeMultiOverlay luaPath pkgsParams categoryDefFunction packageDefinitions defaultName (attrNames packageDefinitions));
+        };
       in overlays;
 
     # maybe you want multiple nvim packages in the same system and want
@@ -70,7 +90,7 @@ with builtins; rec {
       packageDefinitions:
       importName:
       namesIncList:
-      (self: super: {
+      (final: prev: {
         ${importName} = listToAttrs (
           map
             (name: let
