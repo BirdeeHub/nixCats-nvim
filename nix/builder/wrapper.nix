@@ -265,6 +265,7 @@ let
     # modified to have packagename instead of nvim
     meta = neovim-unwrapped.meta // {
       mainProgram = "${nixCats_packageName}";
+      maintainers = neovim-unwrapped.meta.maintainers ++ (if lib.maintainers ? birdee then [ lib.maintainers.birdee ] else []);
     };
   });
 in
