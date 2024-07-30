@@ -9,7 +9,11 @@ with builtins; rec {
     templates = import ../templates;
 
     # allows for inputs named plugins-something to be turned into plugins automatically
-    standardPluginOverlay = import ./standardPluginOverlay.nix;
+    standardPluginOverlay = (import ./autoPluginOverlay.nix).standardPluginOverlay;
+
+  # same as standardPluginOverlay except if you give it `plugins-foo.bar`
+  # you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
+    sanitizedPluginOverlay = (import ./autoPluginOverlay.nix).sanitizedPluginOverlay;
 
     # returns a merged set of definitions, with new overriding old.
     # updates anything it finds that isn't another set.

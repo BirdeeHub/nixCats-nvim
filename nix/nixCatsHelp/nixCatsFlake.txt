@@ -50,7 +50,7 @@ Keep in mind they will be read-only if in the store!
 =======================================================================================
 Flake Inputs:                                            *nixCats.flake.inputs*
 
-If they dont have an extra build step, and are not on nixpkgs,
+If a plugin does not have an extra build step, and are not on nixpkgs,
 you may use this format to import them, replacing the fields marked with <>
 >nix
     "plugins-<pluginName>" = {
@@ -62,38 +62,27 @@ More info on flake url syntax at:
 https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples
 You may also use this syntax to pin the version of a plugin regardless of if
 you ran nix flake update or not.
-You may choose the directory, branch, commit, tag, or even directory imported.
+You may choose the directory, branch, commit, tag, or even directory
+imported.
+
+All inputs named in the `plugins-<pluginName>` format will be added to pkgs
+at `pkgs.neovimPlugins.<pluginName>` for you to add to your configuration.
 
 If the plugin has a dot `.` character in it's name, you should name it something else.
 Because . is not a valid character in an identifier in nix.
 
 The name here only affects the filename of the overall plugin, and should
 only affect things like vim.cmd("packadd <filename>") that refer to
-the actual filename of the plugin. Usually I would replace it with _ or -
+the actual filename of the plugin. Usually I would replace it with -
 You will then add it to categoryDefinitions later with the NEW name.
 
 If you use this method to import a plugin, and really dont
 want to change the filename of the plugin when they have a
-dot in their name, you may use the following syntax:
-
-If in your inputs you had:
->nix
-  "plugins-<plugin-name>" = {
-    url = "github:<userName>/<repository.name>";
-    flake = false;
-  };
-<
-Where you put plugins in your categoryDefinitions, instead of:
->nix
-  pkgs.neovimPlugins.<plugin-name>
-<
-You would put this:
->nix
-  (pkgs.neovimPlugins.<plugin-name>.overrideAttrs { pname = "<plugin.name>"; })
-<
-overrideAttrs can be used for a lot more than just fixing the name of the
-imported plugin. See:
-https://ryantm.github.io/nixpkgs/using/overrides/
+dot in their name, you may
+swap the call to `(utils.standardPluginOverlay inputs)`
+with `(utils.sanitizedPluginOverlay inputs)`
+and then `plugins-plugin.name` would become `pkgs.neovimPlugins.plugin-name`
+but neovim would see it as `vim.cmd("packadd plugin.name")` still
 
 If they have a build step or are not a plugin, 
 i.e. an lsp, or if they are a plugin from a flake,
@@ -107,6 +96,27 @@ If they are on nixpkgs, you dont need to put them in inputs,
 because you will be able to access them through pkgs.vimPlugins variable.
 Most plugins will not require you to use the inputs section due to being on nixpkgs.
 But you may still use it to pin the plugin to a specific version.
+
+If you decided not to use utils.sanitizedPluginOverlay
+and wanted to do it with utils.standardPluginOverlay:
+If in your inputs you had:
+>nix
+  "plugins-<plugin-name>" = {
+    url = "github:<userName>/<repository.name>";
+    flake = false;
+  };
+<
+Where you put plugins in your categoryDefinitions, instead of:
+>nix
+  pkgs.neovimPlugins.<plugin-name>
+
+You would put this:
+>nix
+  (pkgs.neovimPlugins.<plugin-name>.overrideAttrs { pname = "<plugin.name>"; })
+<
+overrideAttrs can be used for a lot more than just fixing the name of the
+imported plugin. See:
+https://ryantm.github.io/nixpkgs/using/overrides/
 
 If they have a build step and are not on nixpkgs,
 you will deal with them in overlays/customBuildsOverlay.nix
@@ -821,24 +831,36 @@ mkPackages just calls this and adds a default one.
 makes an overlay for each package and also a default one
 These are basically the same as the arguments to utils.baseBuilder
 
-<makeMultiOverlay> <same args as makeOverlays but with the following 2 args instead of defaultName>:
-            importName: namesIncList:
+<makeMultiOverlay> <same args as makeOverlays BUT with the following 2 args INSTEAD of `defaultName`>:
+            `importName:` `namesIncList:`
 Instead of taking a defaultName, it takes an importName and a list of names.
 It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
 
 <makeOverlaysWithMultiDefault> utils.makeOverlays but the default overlay
 uses makeMultiOverlay. So that after adding it, all your packages from packageDefinitions will
-be accessible at pkgs.${defaultPackageName}.${packageName}
+be accessible at `pkgs.${defaultPackageName}.${packageName}`
 Can be swapped out 1 for 1 with utils.makeOverlays if preferred
 
 <eachSystem> systems: f:
 just flake-utils.lib.eachSystem but without the dependency
 
 <bySystem> systems: f:
-similar to flake-utils.lib.eachSystem but for only 1 variable. It adds the
-${system} to the start like ${system}.packages.default and not
-packages.${system}.default so it is used like:
-{ packages = utils.bySystem nixpkgs.lib.platforms.all (system: { default = ...; }) }
+similar to flake-utils.lib.eachSystem but for only 1 variable. If used for the
+whole outputs section instead of eachSystem, it would add the
+`${system}` to the start like `${system}.packages.default` and not
+`packages.${system}.default` so instead it is used for only a single output like:
+`{ packages = utils.bySystem nixpkgs.lib.platforms.all (system: { default = ...; }) }`
+
+It is the same thing as `nixpkgs.lib.genAttrs`
+
+<sanitizedPluginOverlay> inputs:
+optional replacement for `utils.standardPluginOverlay`.
+If you give it an input named `plugins-foo.bar`
+you can get it at `pkgs.neovimPlugins.foo-bar`
+and still `packadd foo.bar` because it keeps the folder name the same.
+To use, in your overlays section:
+Replace `(utils.standardPluginOverlay inputs)`
+with `(utils.sanitizedPluginOverlay inputs)`
 
 
 ---------------------------------------------------------------------------------------
