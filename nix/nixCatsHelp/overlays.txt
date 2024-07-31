@@ -39,7 +39,34 @@
 
     };
   in
+  # calls the functions from the overlay files to create the overlays,
+  # then puts them in a list.
   builtins.attrValues (builtins.mapAttrs (name: value: (value name inputs)) overlaySet)
+<
+---------------------------------------------------------------------------------------
+Example overlays without the comments:
+The value in importName is the name in the set from overlaySet
+You dont need to use it, but it helps in avoiding naming conflicts.
+>nix
+  */
+  # Example overlay:
+  /*
+  importName: inputs: let
+    overlay = self: super: { 
+      ${importName} = {
+        # define your overlay derivations here
+      };
+    };
+  in
+  overlay
 
+  # Example overlay 2:
+  importName: inputs: let
+    overlay = self: super: { 
+      ${importName} = some.derivation.here;
+    };
+  in
+  overlay
+<
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

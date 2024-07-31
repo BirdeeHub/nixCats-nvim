@@ -39,6 +39,9 @@ This is ok, because most of the reason for a plugin to use
 it would be to find something outside the directory. 
 Inside is mostly handled by vim.
 You could use `require('nixCats').configDir`,
+or `nixCats('nixCats_store_config_location')`
+(yes its called store location, but it actually always
+points to the actual one being used)
 to get current config directory for your uses, if ever necessary.
 It will be present and correct regardless of settings.
 However if you did not use nix at all, it may not be available so
@@ -129,14 +132,25 @@ build step were complex.
 Flake Outputs Introduction                              *nixCats.flake.outputs*
 
 With our inputs to our flake taken care of:
-First, we take care of importing our utils set.
+First, we take care of importing our utils set from nixCats.
 The reason we are doing this now, is so that it can be defined outside of
 the utils.eachSystem function, and thus we can export it
 without having to include a system variable when we import it somewhere else.
+
+We also define our luaPath, which is the path to be loaded into the store as
+your new neovim config directory. (see :help |'rtp'| for the directories
+available for you to use!)
+
+We also define our extra_pkg_config, which is used when initializing the
+nixpkgs instance that will build your neovim! Its the same one from
+pkgs = import nixpkgs { inherit system; overlays = []; config = {}; }
 >nix
   outputs = { self, nixpkgs, ... }@inputs: let
+    # In the templates, this is inherit (inputs.nixCats) utils;
     utils = (import ./nix/utils).utils;
+    # path the the store path to be loaded as neovim config directory
     luaPath = "${./.}";
+    # used when initializing the nixpkgs instance
     extra_pkg_config = {
       # allowUnfree = true;
     };
@@ -166,9 +180,8 @@ and thus there is a method for handling it in nixCats.
     # later on to access them.
   in { inherit dependencyOverlays; })) dependencyOverlays;
 <
-This will allow us to pass system independent overlays to our module options.
-And also allow more outputs to be outside of the 2nd and final flake utils,
-allowing us to avoid mapping certain things in this manner.
+This will allow us to pass system independent overlays to our module options,
+even for improperly formed flakes.
 
 Managing the system variable in combination with overlays
 can be one of the harder parts of flake usage.
@@ -189,11 +202,11 @@ Usage of this overlay is described in:
 :h |nixCats.flake.inputs|
 
 It takes all the inputs named in the format
-'plugins-somepluginname' and makes them into plugins. 
+`plugins-somepluginname` and makes them into plugins. 
 If the plugin doesn't have a build step,
 and it wasnt on nixpkgs, then use this method.
 Access them to add them to a category of the builder function 
-with 'pkgs.neovimPlugins.somepluginname'
+with `pkgs.neovimPlugins.somepluginname`
 
 <2>
 -- The second is overlays/customBuildsOverlay.nix:
@@ -250,6 +263,7 @@ These are the things you can return:
 <optionalPlugins>
   a flexible set of categories, each containing optional plugins.
   Optional plugins need to be added with packadd before being required.
+  Use :NixCats pawsible to see the names to use for packadd
 
 <sharedLibraries>
   a flexible set of categories, each containing a derivation for
@@ -785,34 +799,43 @@ See :help |nixCats.flake.outputs.exports.mkNixosModules|
 The same as mkNixosModules above, but for home manager.
 
 
-Then last, the <utils> set, which we imported from ./builder/utils.nix
-We export the <utils> set, along with some items inside it.
-Those are <templates> and <baseBuilder>
+We export the <utils> set, along with <templates> and <baseBuilder> which are
+inside it.
 Then we also define a <keepLuaBuilder>, which is a <baseBuilder> with our config path
 passed into it.
 
-In total, the <utils> set contains 11 functions and then the templates set.
+The <utils> set contains the <templates> and <baseBuilder>
+It also contains all the other functions used in creating the format in the
+template! If not for needing to export a module, this repo could output just
+the utils set and just function.
 
-First, the ones mentioned above.
-Then, we also have:
-same as mkPackages but without the default one
+In addition to the above, the utils set contains:
 
 <standardPluginOverlay> inputs:
 allows for inputs named plugins-something to be
 turned into an overlay containing them as plugins automatically
 
-In addition to those, there is also 5 convenience functions:
+<sanitizedPluginOverlay> inputs:
+optional replacement for `utils.standardPluginOverlay`.
+If you give it an input named `plugins-foo.bar`
+you can get it at `pkgs.neovimPlugins.foo-bar`
+and still `packadd foo.bar` because it keeps the folder name the same.
+To use, in your overlays section:
+Replace `(utils.standardPluginOverlay inputs)`
+with `(utils.sanitizedPluginOverlay inputs)`
 
 <mergeCatDefs> oldCats: newCats:
-for merging category definitions (and individual packages in packageDefinitions),
+for merging `categoryDefinitions` and individual packages in `packageDefinitions`,
 will recursively update up to the first thing not an attrset.
 For our purposes, we do not consider derivations to be attrsets.
+It takes 2 functions that return sets and returns
+a function which calls them both and merges the result as desired above.
 
-<mergeOverlayLists> oldOverlist: newOverlist: self: super: let
-for merging lists of overlays like those in otherOverlays in a way 
-that updates to avoid naming conflicts between overlays in different nixCats flakes imported.
-within overlays that are sets, will recursively update until
-a derivation, or something not a set is reached.
+<mergeOverlayLists> oldOverlist: newOverlist: self: super:
+for merging lists of overlays together properly
+to avoid naming conflict issues.
+Takes 2 lists of overlays, returns a single merged overlay.
+Merging logic is the same as mergeCatDefs
 
 <mkPackages> finalBuilder: packageDefinitions: defaultName:
 makes each package and also a default one
@@ -839,10 +862,11 @@ It will output them in an overlay where they will be accessible by pkgs.${import
 <makeOverlaysWithMultiDefault> utils.makeOverlays but the default overlay
 uses makeMultiOverlay. So that after adding it, all your packages from packageDefinitions will
 be accessible at `pkgs.${defaultPackageName}.${packageName}`
-Can be swapped out 1 for 1 with utils.makeOverlays if preferred
+Can be swapped out 1 for 1 with `utils.makeOverlays` if preferred
 
 <eachSystem> systems: f:
-just flake-utils.lib.eachSystem but without the dependency
+just flake-utils.lib.eachSystem copied here to remove the final input outside
+of nixpkgs itself.
 
 <bySystem> systems: f:
 similar to flake-utils.lib.eachSystem but for only 1 variable. If used for the
@@ -851,16 +875,8 @@ whole outputs section instead of eachSystem, it would add the
 `packages.${system}.default` so instead it is used for only a single output like:
 `{ packages = utils.bySystem nixpkgs.lib.platforms.all (system: { default = ...; }) }`
 
-It is the same thing as `nixpkgs.lib.genAttrs`
-
-<sanitizedPluginOverlay> inputs:
-optional replacement for `utils.standardPluginOverlay`.
-If you give it an input named `plugins-foo.bar`
-you can get it at `pkgs.neovimPlugins.foo-bar`
-and still `packadd foo.bar` because it keeps the folder name the same.
-To use, in your overlays section:
-Replace `(utils.standardPluginOverlay inputs)`
-with `(utils.sanitizedPluginOverlay inputs)`
+It is the same thing as `nixpkgs.lib.genAttrs`, renamed so that people know
+how to use it.
 
 
 ---------------------------------------------------------------------------------------
@@ -868,6 +884,7 @@ Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*
                                   *nixCats.flake.outputs.exports.mkHomeModules*
 
 We create the module by exporting the following in our flake outputs.
+More information on the modules can be found at :h |nixCats.module|
 
 <mkNixosModules> {
     defaultPackageName = "nixCats";

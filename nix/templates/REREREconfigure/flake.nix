@@ -84,6 +84,17 @@
       #     }
       #   ];
       # };
+      # NOTE: you could also do the following and source the current directory
+      # ON TOP of the old one:
+      # optionalLuaAdditions = {
+      #   appimage = ''
+      #     vim.opt.packpath:prepend("${./.}")
+      #     vim.opt.runtimepath:prepend("${./.}")
+      #     vim.opt.runtimepath:append("${./.}/after")
+      #     dofile("${./.}/init.lua")
+      #   '';
+      # };
+      # and yes you can do that in optionalLuaPreInit as well.
 
       # NOTE:
       # all the normal options here work.
