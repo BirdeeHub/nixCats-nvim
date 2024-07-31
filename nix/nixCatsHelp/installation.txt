@@ -87,7 +87,7 @@ with as many options as you wish, while requiring you to leave the normal
 nvim configuration scheme as little as possible.
 
 ---------------------------------------------------------------------------------------
-How it works in under 100 lines:                            *nixCats.overview*
+How it works in 100 lines:                                  *nixCats.overview*
 
 First choose a path for luaPath as your new neovim directory to be loaded into
 the store.
@@ -187,7 +187,9 @@ to download stuff in an easy to use fashion.
 The goal of the starter templates is so that the usage at the start can be as simple
 as adding plugins to lists and calling `require('theplugin').setup()`
 Most further complexity is optional, and very complex things can be achieved
-with only minor changes in nix, and some `if nixCats('the.category') then` statements
+with only minor changes in nix, and some `nixCats('something')` calls.
+Please refer to the rest of the help at :h nixCats.* and the example config in
+the main repo for more guidance and examples!
 
 ---------------------------------------------------------------------------------------
                                                            *nixCats.templates*
