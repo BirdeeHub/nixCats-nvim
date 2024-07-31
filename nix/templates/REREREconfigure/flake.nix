@@ -94,7 +94,7 @@
       #     dofile("${./.}/init.lua")
       #   '';
       # };
-      # and yes you can do that in optionalLuaPreInit as well.
+      # and yes you can do that in optionalLuaPreInit as well, although not recommended.
 
       # NOTE:
       # all the normal options here work.

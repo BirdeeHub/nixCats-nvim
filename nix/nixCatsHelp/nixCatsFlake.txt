@@ -907,12 +907,10 @@ the lists would be accessed via dependencyOverlays.${system}
 If you do not have a luaPath, you may pass it a keepLua builder.
 
 IMPORTANT
-By default, the module inherits your system's pkgs object,
-and its overlays. If you use stable channel for your system,
-consider passing an `inputs.nixpkgs-unstable` from your inputs
-to the `nixpkgs_version` module option.
-It will still inherit your system overlays,
-but your system will not inherit overlays from nixCats.
+By default, the module inherits your flake or nixExpressionFlakeOutputs nixpkgs object,
+and its overlays, and everything else.
+It will still inherit your system overlays and config set and system value,
+but your system will not inherit overlays added to the nixCats module option.
 
 More information on the modules can be found at :h |nixCats.module|
 
