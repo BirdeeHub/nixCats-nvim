@@ -101,7 +101,7 @@ Then in `categoryDefinitions`:
 
 You have a SET to add LISTS of plugins to the packpath (both pack/*/start and
 pack/*/opt), a SET to add LISTS of things to add to the path,
-a set to add lists of things to add shared libraries,
+a set to add lists of shared libraries,
 a set of lists to add... pretty much anything.
 Full list of these sets is at :h |nixCats.flake.outputs.categories|
 
