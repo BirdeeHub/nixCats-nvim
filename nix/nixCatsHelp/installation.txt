@@ -68,7 +68,8 @@ inputs to your main system inputs, and retrieve all the normal flake outputs
 with yournvim = import ./the/dir/with/template { inherit inputs; };
 You can then install them with yournvim.packages.${system}.nvimpackagename,
 use the modules they export to modify them further before installing them,
-install them via overlay, etc...
+install them via overlay, export them from your system flake so you can still
+access them from anywhere via nix run, etc...
 
 Use the help and the example config in nixCats-nvim itself that you just ran as an example.
 The help will still be accessible in your version of the editor.
