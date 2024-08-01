@@ -54,8 +54,12 @@ and migrate your plugins into the flake.nix file provided.
 Then configure in lua.
 
 It is suggested to start with the default template so that you can mess around with it in
-a separate repository/directory, and easily use nix repl to see what it exports,
-and then move to the nixExpressionFlakeOutputs template to
+a separate repository/directory,
+and easily use nix repl to see what it exports.
+Just use `nix repl` in the directory, `:lf .` and type `outputs.` and
+autocomplete to see the exported items!
+
+Then move to the nixExpressionFlakeOutputs template to
 integrate it with your main nix config when you are happy with it!
 
 This is because the nixExpressionFlakeOutputs template

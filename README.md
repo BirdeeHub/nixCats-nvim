@@ -124,6 +124,8 @@ You should make use of the in-editor help at:
 
 [:help nixCats](./nix/nixCatsHelp/nixCats.txt)
 
+[:help nixCats.overview](./nix/nixCatsHelp/installation.txt)
+
 [:help nixCats.flake](./nix/nixCatsHelp/nixCatsFlake.txt)
 
 [:help nixCats.*](./nix/nixCatsHelp)
@@ -179,26 +181,37 @@ first exit neovim. (but not the nix shell!)
 
 In a terminal, navigate to your nvim directory and run the following command:
 ```bash
-  # Choose one of the following 3:
+  # Choose one of the following to run at the top level of your neovim config:
   # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
-  # module template:
-  nix flake init -t github:BirdeeHub/nixCats-nvim#module
   # the outputs function of the flake template but as its own file
   # callable with import ./the/dir { inherit inputs; }
   # to recieve all normal flake outputs
+  # best used after the default template to integrate your new neovim config
+  # into an existing flake-based configuration's repository
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
+  # module template:
+  # module template is best used for modifying
+  # an existing configuration further upon installation,
+  # but you could still start with it if you want.
+  # Again, the templates are # VERY similar, swapping is an easy copy paste.
+  nix flake init -t github:BirdeeHub/nixCats-nvim#module
 
-  # for package manager integration utilities for functionality without nix
-  # added at lua/nixCatsUtils also run:
+  # for utilities for functionality without nix
+  # added at lua/nixCatsUtils also run the following
+  # at the top level of your neovim config:
   nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
+  # contains things like "is this nix?" "do this if not nix, else do that"
+  # needs to be in your config at lua/nixCatsUtils,
+  # because if you dont use nix to load neovim,
+  # nixCats (obviously) can't provide you with anything from nix!
 
   # If using zsh with extra regexing, be sure to escape the #
 ```
 This will create an empty version of flake.nix (or default.nix or systemCat.nix and homeCat.nix) for you to fill in,
 along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the utils set and thus also the builder and
-help from nixCats-nvim itself.
+help from nixCats-nvim itself. If you wanted luaUtils, you should have that now too.
 
 Re-enter the nixCats nvim version by typing `nixCats .` and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
