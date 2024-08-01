@@ -249,10 +249,11 @@ There are *MANY*, thanks to the virtues of the category scheme of this flake.
 (full usage covered in included help files, accessible here and inside neovim, but *much better viewed in-editor*)
 
 You may need to add their link to the flake inputs if they are not on nixpkgs already.
+If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
+See [:h nixCats.flake.inputs](./nix/nixCatsHelp/nixCatsFlake.txt) for
+how to use the auto plugin import helper in your inputs for plugins not on nixpkgs.
 
-For specific tags or branches look at [this nix documentation](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples) and use that format in your flake input for it.
-
-It is made to be customized into your own portable nix neovim distribution 
+It is made to be customized into your own portable nix neovim distribution
 with as many options as you wish, while requiring you to leave the normal
 nvim configuration scheme as little as possible.
 
