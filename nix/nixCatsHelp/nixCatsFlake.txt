@@ -160,6 +160,8 @@ It simply calls the function with each system value, and maps the resulting
 set from { mySet = {}; } to { mySet.${system} = {}; }
 Many overlays require being accessed via ${system} variable in this manner,
 and thus there is a method for handling it in nixCats.
+No overlays SHOULD be exported requiring the ${system} variable to access.
+However, some are (such as codeium, a free ai plugin) and thus, we will wrap this anyway.
 >nix
   inherit (utils.eachSystem nixpkgs.lib.platforms.all (system: let
                   /* utils.eachSystem is just flake-utils.lib.eachSystem */
