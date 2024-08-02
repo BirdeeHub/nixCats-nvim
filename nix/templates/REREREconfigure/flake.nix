@@ -95,6 +95,9 @@
       #   '';
       # };
       # and yes you can do that in optionalLuaPreInit as well, although not recommended.
+      # Keep in mind, this will not respect wrapRc setting! You could do that yourself though,
+      # you have been provided the settings given to the current nixCats package in the argument
+      # to the categoryDefinitions function!
 
       # NOTE:
       # all the normal options here work.
