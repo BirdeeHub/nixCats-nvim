@@ -41,10 +41,12 @@ if nixCats('neonixdev') then
     telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
-  if require('nixCatsUtils').isNixCats then servers.nixd = {}
-  else servers.rnix = {}
+  if require('nixCatsUtils').isNixCats then
+    servers.nixd = {}
+  else
+    servers.rnix = {}
+    servers.nil_ls = {}
   end
-  servers.nil_ls = {}
 
 end
 

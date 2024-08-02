@@ -102,9 +102,8 @@
         ];
         neonixdev = {
           # also you can do this.
-          inherit (pkgs) nix-doc nil lua-language-server nixd;
-          # nix-doc tags will make your tags much better in nix
-          # but only if you have nil as well for some reason
+          inherit (pkgs) nix-doc lua-language-server nixd;
+          # and each will be its own sub category
         };
         lint = with pkgs; [
         ];

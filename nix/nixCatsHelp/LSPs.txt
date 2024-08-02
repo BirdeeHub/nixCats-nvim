@@ -56,10 +56,12 @@ The stuff added to servers table is what is passed to lspconfig/mason
       telemetry = { enabled = false },
       filetypes = { 'lua' },
     }
-    if require('nixCatsUtils').isNixCats then servers.nixd = {}
-    else servers.rnix = {}
-    end
+  if require('nixCatsUtils').isNixCats then
+    servers.nixd = {}
+  else
+    servers.rnix = {}
     servers.nil_ls = {}
+  end
 
   end
 

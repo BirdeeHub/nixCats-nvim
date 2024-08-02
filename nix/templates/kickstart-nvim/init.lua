@@ -679,8 +679,13 @@ require('nixCatsUtils.lazyCat').setup(pluginList, nixLazyPath,
         -- servers.tsserver = {},
         --
 
-      servers.nil_ls = {}
-      servers.nixd = {}
+      -- NOTE: nixCats: nixd is not available on mason.
+      if require('nixCatsUtils').isNixCats then
+        servers.nixd = {}
+      else
+        servers.rnix = {}
+        servers.nil_ls = {}
+      end
       servers.lua_ls = {
         -- cmd = {...},
         -- filetypes = { ...},

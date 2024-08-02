@@ -110,7 +110,6 @@
           fd
           stdenv.cc.cc
           nix-doc
-          nil
           lua-language-server
           nixd
           stylua
