@@ -330,10 +330,9 @@
 
     in (builtins.listToAttrs (builtins.map (catName: let
         boxedCat = newLuaBuilder {
-          pkgs =  import newNixpkgs {
-            inherit (pkgs) config system;
-            overlays = dependencyOverlays.${pkgs.system};
-          };
+          nixpkgs = newNixpkgs;
+          extra_pkg_config = pkgs.config;
+          inherit (pkgs) system;
           inherit dependencyOverlays;
         } newCategoryDefinitions pkgDefs catName;
       in

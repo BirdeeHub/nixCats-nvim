@@ -12,4 +12,4 @@ It also imports the help files at [nix/nixCatsHelp](../nixCatsHelp) so that all 
 
 These files are modified from nixpkgs to allow multi-installation, and to pass more info to lua:
 
-[./wrapNeovim.nix](./wrapNeovim.nix) which depends on [./wrapper.nix](./wrapper.nix) which depends on [./vim-pack-dir.nix](./vim-pack-dir.nix)
+[./wrapNeovim.nix](./wrapNeovim.nix) which depends on [./wrapenvs.nix](./wrapenvs.nix) and [./wrapper.nix](./wrapper.nix) which depends on [./vim-pack-dir.nix](./vim-pack-dir.nix)

@@ -1,7 +1,9 @@
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L126-L164
-pkgs: neovim:
 {
+  pkgs,
+  nixpkgs,
+  neovim-unwrapped,
   extraMakeWrapperArgs ? "",
   # the function you would have passed to python.withPackages
   # , extraPythonPackages ? (_: [])
@@ -15,8 +17,10 @@ pkgs: neovim:
   withRuby ? true,
   vimAlias ? false,
   viAlias ? false,
-  configure ? { },
   extraName ? "",
+  # I changed this so that they are separate
+  customRC ? "",
+  pluginsOG ? { },
   # I passed some more stuff in
   nixCats,
   runB4Config,
@@ -72,7 +76,7 @@ let
   genPluginList = packageName: { start ? [ ], opt ? [ ], }:
     (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
-  pluginsWithConfig = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPluginList (configure.packages or { }));
+  pluginsWithConfig = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPluginList pluginsOG);
 
   # we process plugin spec style configurations here ourselves rather than using makeNeovimConfig for that.
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
@@ -81,27 +85,27 @@ let
   luaPluginConfigs = builtins.concatStringsSep "\n" lcfgs;
   vimlPluginConfigs = builtins.concatStringsSep "\n" vcfgs;
 
-  # this is basically back to what was in nixpkgs
-  # except we didnt pass in customRC or any config included in plugin specs from nix.
-  # this means the neovimRcContent variable it generates will always be empty
-  # source for this function at:
-  # https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L26-L122
-  res = pkgs.neovimUtils.makeNeovimConfig {
+  # was once neovimUtils.makeNeovimConfig
+  res = import ./wrapenvs.nix {
     inherit withPython3 extraPython3Packages;
     inherit withNodeJs withRuby viAlias vimAlias;
     inherit extraLuaPackages;
     inherit plugins;
     inherit extraName;
+    # but now it gets the luaEnv from the actual neovim-unwrapped you used
+    # instead of the one in the neovim-unwrapped from the nixpkgs you used
+    inherit neovim-unwrapped;
+    inherit nixpkgs pkgs;
   };
 in
-(pkgs.callPackage ./wrapper.nix { }) neovim ( res // {
+(pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {
     wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     # I handle this with customRC 
     # otherwise it will get loaded in at the wrong time after startup plugins.
     wrapRc = true;
     # Then I pass a bunch of stuff through
     customAliases = aliases;
-    runConfigInit = configure.customRC;
+    runConfigInit = customRC;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru
       runB4Config luaPluginConfigs vimlPluginConfigs preWrapperShellCode;

@@ -2,38 +2,35 @@
 # Licensed under the MIT license 
 luaPath:
 {
-  pkgs ? null # <-- either this with everything included,
-  , nixpkgs ? null # <-- or this one
+  nixpkgs
+  , system
   , extra_pkg_config ? {}
-  , system ? null # <-- and this one
-  , dependencyOverlays ? null # <-- and this one
+  , dependencyOverlays ? null
   , nixCats_passthru ? {}
   , ...
 }:
 categoryDefFunction:
 packageDefinitions: name:
 let
-  fpkgs = if pkgs == null && !(nixpkgs == null || system == null)
-  then import nixpkgs ({
+  pkgs = if !(nixpkgs == null || system == null)
+  then import nixpkgs {
     inherit system;
+    config = extra_pkg_config;
     overlays = if builtins.isList dependencyOverlays
       then dependencyOverlays
       else if builtins.isAttrs dependencyOverlays && builtins.hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
       else [];
-  } // { config = extra_pkg_config; })
-  else if pkgs != null then pkgs
-  else builtins.throw ''
+  } else builtins.throw ''
     Arguments accepted:
 
     luaPath:
     {
-      pkgs ? null                 # <-- either pkgs with everything included
-      , nixpkgs ? null            # <-- or include nixpkgs,
-      , system ? null             # <-- and system
-      , dependencyOverlays ? null # <-- and the overlays
-      , extra_pkg_config ? {}     # <-- extra config such as allowUnfree
-      , nixCats_passthru ? {}     # <-- extra things to add to passthru attribute of derivation
+      , nixpkgs # <-- required
+      , system # <-- required
+      , dependencyOverlays ? null
+      , extra_pkg_config ? {}
+      , nixCats_passthru ? {}
       , ...
     }:
     categoryDefFunction:
@@ -41,14 +38,10 @@ let
     packageName:
 
     # Note:
-    You must provide nixpkgs and system along with any dependencyOverlays,
-    or a pkgs attribute to the nixCats builder function
-    in the set recieved as the second argument
-
     dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
   '';
 
-  thisPackage = packageDefinitions.${name} { pkgs = fpkgs; };
+  thisPackage = packageDefinitions.${name} { inherit pkgs; };
   categories = thisPackage.categories;
   settings = {
     wrapRc = true;
@@ -88,8 +81,7 @@ let
     optionalLuaPreInit = {};
     bashBeforeWrapper = {};
   } // (categoryDefFunction {
-    pkgs = fpkgs;
-    inherit settings categories name;
+    inherit settings categories pkgs name;
   }))
   startupPlugins optionalPlugins lspsAndRuntimeDeps
   propagatedBuildInputs environmentVariables
@@ -101,9 +93,9 @@ let
 in
   let
     # copy entire flake to store directory
-    LuaConfig = fpkgs.stdenv.mkDerivation {
+    LuaConfig = pkgs.stdenv.mkDerivation {
       name = "nixCats-special-rtp-entry-LuaConfig";
-      builder = fpkgs.writeText "builder.sh" /* bash */ ''
+      builder = pkgs.writeText "builder.sh" /* bash */ ''
         source $stdenv/setup
         mkdir -p $out
         cp -r ${luaPath}/* $out/
@@ -114,7 +106,7 @@ in
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = { ... }@allPluginDeps:
-    fpkgs.stdenv.mkDerivation (let
+    pkgs.stdenv.mkDerivation (let
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
 
@@ -137,12 +129,12 @@ in
         inherit nixCats_store_config_location;
       };
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
-      cats = fpkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
-      settingsTable = fpkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
-      depsTable = fpkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
+      cats = pkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
+      settingsTable = pkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
+      depsTable = pkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
     in {
       name = "nixCats";
-      builder = fpkgs.writeText "builder.sh" /*bash*/ ''
+      builder = pkgs.writeText "builder.sh" /*bash*/ ''
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
@@ -174,11 +166,11 @@ in
       optLuaPre = if builtins.isString optionalLuaPreInit
           then optionalLuaPreInit
           else builtins.concatStringsSep "\n"
-          (fpkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
+          (pkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
       optLuaAdditions = if builtins.isString optionalLuaAdditions
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
-          (fpkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+          (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in/* lua */''
       ${optLuaPre}
       vim.g.configdir = require('nixCats').get([[nixCats_store_config_location]])
@@ -195,9 +187,9 @@ in
     # It includes categories marked as true, then flattens to a single list
     filterAndFlatten = (import ./ncTools.nix).filterAndFlatten categories;
 
-    buildInputs = [ fpkgs.stdenv.cc.cc.lib ] ++ fpkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
-    start = fpkgs.lib.unique (filterAndFlatten startupPlugins);
-    opt = fpkgs.lib.unique (filterAndFlatten optionalPlugins);
+    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    start = pkgs.lib.unique (filterAndFlatten startupPlugins);
+    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
 
     # For wrapperArgs:
     # This one filters and flattens like above but for attrs of attrs 
@@ -225,14 +217,14 @@ in
       (x: let
         appliedfunctions = filterAndFlattenMapInner (value: value x ) section;
         combinedFuncRes = builtins.concatLists appliedfunctions;
-        uniquifiedList = fpkgs.lib.unique combinedFuncRes;
+        uniquifiedList = pkgs.lib.unique combinedFuncRes;
       in
       uniquifiedList);
 
     # cat our args
     extraMakeWrapperArgs = let 
-      linkables = fpkgs.lib.unique (filterAndFlatten sharedLibraries);
-      pathEnv = fpkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
+      linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
+      pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
       preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
       preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
     in builtins.concatStringsSep " " (
@@ -243,27 +235,27 @@ in
         then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
       # and these are our other now sorted args
       ++ (if pathEnv != [] 
-            then [ ''--${preORpostPATH} PATH : "${fpkgs.lib.makeBinPath pathEnv }"'' ]
+            then [ ''--${preORpostPATH} PATH : "${pkgs.lib.makeBinPath pathEnv }"'' ]
           else [])
       ++ (if linkables != []
-            then [ ''--${preORpostLD} LD_LIBRARY_PATH : "${fpkgs.lib.makeLibraryPath linkables }"'' ]
+            then [ ''--${preORpostLD} LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath linkables }"'' ]
           else [])
-      ++ (fpkgs.lib.unique (FandF_envVarSet environmentVariables))
-      ++ (fpkgs.lib.unique (filterAndFlatten extraWrapperArgs))
+      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
+      ++ (pkgs.lib.unique (filterAndFlatten extraWrapperArgs))
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     );
 
-    python3wrapperArgs = fpkgs.lib.unique ((filterAndFlatten extraPython3wrapperArgs) ++ (if settings.disablePythonSafePath then ["--unset PYTHONSAFEPATH"] else []));
+    python3wrapperArgs = pkgs.lib.unique ((filterAndFlatten extraPython3wrapperArgs) ++ (if settings.disablePythonSafePath then ["--unset PYTHONSAFEPATH"] else []));
 
     preWrapperShellCode = if builtins.isString bashBeforeWrapper
       then bashBeforeWrapper
       else builtins.concatStringsSep "\n" ([/*bash*/''
-        NVIM_WRAPPER_PATH_NIX="$(${fpkgs.coreutils}/bin/readlink -f "$0")"
+        NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
         export NVIM_WRAPPER_PATH_NIX
-      ''] ++ (fpkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
+      ''] ++ (pkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
 
     # add our propagated build dependencies
-    baseNvimUnwrapped = if settings.neovim-unwrapped == null then fpkgs.neovim-unwrapped else settings.neovim-unwrapped;
+    baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
@@ -272,7 +264,7 @@ in
   in
   # add our lsps and plugins and our config, and wrap it all up!
   # nothing goes past this file that hasnt been sorted
-import ./wrapNeovim.nix fpkgs myNeovimUnwrapped {
+import ./wrapNeovim.nix {
   nixCats_passthru = nixCats_passthru // {
     keepLuaBuilder = import ./. luaPath;
     nixCats_packageName = name;
@@ -281,15 +273,13 @@ import ./wrapNeovim.nix fpkgs myNeovimUnwrapped {
     packageDefinitions = packageDefinitions;
     inherit dependencyOverlays;
   };
-
-  inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode;
+  inherit pkgs nixpkgs;
+  neovim-unwrapped = myNeovimUnwrapped;
+  inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
-  configure = {
-    inherit customRC;
-    packages.myVimPackage = {
-      start = start;
-      inherit opt;
-    };
+  pluginsOG.myVimPackage = {
+    start = start;
+    inherit opt;
   };
     /* the function you would have passed to python.withPackages */
   # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;

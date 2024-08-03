@@ -631,30 +631,25 @@ It is now a function that takes a name, and returns your chosen neovim package.
     # below in :h nixCats.flake.outputs.exports ...
 <
 If you use it wrong, you will most likely get this error message:
-
-  Arguments accepted:
 >nix
+  Arguments accepted:
+
   luaPath:
   {
-    pkgs ? null                 # <-- either pkgs with everything included
-    , nixpkgs ? null            # <-- or include nixpkgs,
-    , system ? null             # <-- and system
-    , dependencyOverlays ? null # <-- and the overlays
-    , extra_pkg_config ? {}     # <-- extra config such as allowUnfree
-    , nixCats_passthru ? {}     # <-- extra things to add to passthru attribute of derivation
+    , nixpkgs # <-- required
+    , system # <-- required
+    , dependencyOverlays ? null
+    , extra_pkg_config ? {}
+    , nixCats_passthru ? {}
     , ...
   }:
   categoryDefFunction:
   packageDefinitions:
   packageName:
-<
-  # Note:
-  You must provide nixpkgs and system along with any dependencyOverlays,
-  OR a pkgs attribute to the nixCats builder function,
-  in the set recieved as the second argument
 
+  # Note:
   dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
-  
+<
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
 
