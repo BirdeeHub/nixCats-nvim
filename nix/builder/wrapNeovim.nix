@@ -28,6 +28,7 @@
   nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
   preWrapperShellCode ? "",
+  gem_path ? null,
 }:
 let
   # accepts 4 different plugin syntaxes, specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
@@ -96,6 +97,7 @@ let
     # instead of the one in the neovim-unwrapped from the nixpkgs you used
     inherit neovim-unwrapped;
     inherit nixpkgs pkgs;
+    inherit gem_path;
   };
 in
 (pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {

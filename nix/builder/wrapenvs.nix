@@ -5,6 +5,7 @@
 , extraPython3Packages ? (_: [ ])
 , withNodeJs ? false
 , withRuby ? true
+, gem_path ? null
 /* the function you would have passed to lua.withPackages */
 , extraLuaPackages ? (_: [ ])
 
@@ -26,7 +27,7 @@ let
       ln -sf ${pkgs.ruby}/bin/* $out/bin
     '';
   } // (if builtins.pathExists gemPath then {
-    gemdir = gemPath;
+    gemdir = if gem_path != null then gem_path else gemPath;
   } else {}));
 
   requiredPluginsForPackage = { start ? [], opt ? []}:

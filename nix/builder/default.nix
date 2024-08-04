@@ -49,6 +49,7 @@ let
     vimAlias = false;
     withNodeJs = false;
     withRuby = true;
+    gem_path = null;
     withPerl = false;
     extraName = "";
     withPython3 = true;
@@ -276,7 +277,7 @@ import ./wrapNeovim.nix {
   inherit pkgs nixpkgs;
   neovim-unwrapped = myNeovimUnwrapped;
   inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode customRC;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path;
   pluginsOG.myVimPackage = {
     start = start;
     inherit opt;
