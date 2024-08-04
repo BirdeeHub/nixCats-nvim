@@ -20,15 +20,17 @@
 }@args:
 let
   inherit (pkgs) lib;
-  gemPath = "${nixpkgs}/pkgs/applications/editors/neovim/ruby_provider";
+  gemPath = if gem_path != null then gem_path else "${nixpkgs}/pkgs/applications/editors/neovim/ruby_provider";
   rubyEnv = pkgs.bundlerEnv ({
     name = "neovim-ruby-env";
     postBuild = ''
       ln -sf ${pkgs.ruby}/bin/* $out/bin
     '';
   } // (if builtins.pathExists gemPath then {
-    gemdir = if gem_path != null then gem_path else gemPath;
-  } else {}));
+    gemdir = gemPath;
+  } else (
+    builtins.trace "WARNING: gem_path does not exist: ${gemPath}" {}
+  )));
 
   requiredPluginsForPackage = { start ? [], opt ? []}:
     start ++ opt;
