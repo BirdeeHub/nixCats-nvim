@@ -99,13 +99,13 @@ the store.
 
 Then in `categoryDefinitions`:
 
-You have a SET to add LISTS of plugins to the packpath (both pack/*/start and
-pack/*/opt), a SET to add LISTS of things to add to the path,
+You have a SET to add LISTS of plugins to the packpath (one for both
+pack/*/start and pack/*/opt), a SET to add LISTS of things to add to the path,
 a set to add lists of shared libraries,
 a set of lists to add... pretty much anything.
 Full list of these sets is at :h |nixCats.flake.outputs.categories|
 
-Those lists are in a set, and thus have names.
+Those lists are in sets, and thus have names.
 
 You do this in `categoryDefintions`, which is a function provided a pkgs set.
 It also recieves the values from `packageDefintions` of the package it is being called with.
@@ -147,7 +147,8 @@ you could have:
 They also return a set of settings, for the full list see :h |nixCats.flake.outputs.settings|
 
 Then, a package is exported and built based on that using the nixCats builder
-function, and various flake exports are made using utility functions provided.
+function, and various flake exports such as modules based on your config
+are made using utility functions provided.
 The templates take care of that part for you, just add stuff to lists.
 
 But the cool part. That set of settings and categories is translated verbatim
@@ -158,8 +159,7 @@ in nix. Passing extra info is rarely necessary outside of including categories
 and setting settings, but it can be useful, and anything other than nix
 functions may be passed. You then have access to the contents of these tables
 anywhere in your neovim, because they are literally a set hardcoded into a
-file. In addition, the full list of plugins and their store paths are also
-made available in a table.
+lua file on your runtimpath.
 
 You may use the :NixCats user command to view these
 tables for your debugging. There is a global function defined that
