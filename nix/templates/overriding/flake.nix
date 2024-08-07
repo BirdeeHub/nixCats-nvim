@@ -21,7 +21,6 @@
     # This is because I decided to only demonstrate outputting packages for this template,
     # to keep the focus on the overriding.
     forSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
-    # This technique works ANYWHERE you can get a nixCats based package.
   in {
     # you could fill out the rest of the flake spec, here we are only exporting packages.
     # as you can see, thats really all you need anyway.
@@ -30,6 +29,7 @@
       let
 
       # NOTE: we will be using only this 1 package from the nixCats repo from here on.
+      # This technique works ANYWHERE you can get a nixCats based package.
       OGpkg = nixCats.packages.${system}.default;
 
       # we can even get our utils from it.
@@ -37,7 +37,9 @@
 
       withExtraOverlays = OGpkg.override (prev: {
         # These next lines could be omitted. They are here for illustration
-        inherit (prev) luaPath; # <-- we could overide them, but we did not here. 
+        # you COULD overide them, but we did not here.
+        # we chose to inherit them from the main example config.
+        inherit (prev) luaPath;
         inherit (prev) nixpkgs;
         inherit (prev) system;
         inherit (prev) extra_pkg_config;
@@ -127,6 +129,7 @@
         name = "nixCats";
       });
 
+    # the final outputs
     in {
       # every stage above produces a package you could output.
       # you dont have to export them all, again, this is for demonstration.
