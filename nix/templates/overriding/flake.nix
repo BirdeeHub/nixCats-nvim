@@ -21,28 +21,35 @@
     # This is because I decided to only demonstrate outputting packages for this template,
     # to keep the focus on the overriding.
     forSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
-    # also, this could be done just the same in a module with the final package added straight to home.packages
-    # you could add the nixCats default overlay to your pkgs, and configure it entirely from pkgs.nixCats
-    # you just need a nixCats package, any way you get it is fine.
+    # This technique works ANYWHERE you can get a nixCats based package.
   in {
     # you could fill out the rest of the flake spec, here we are only exporting packages.
     # as you can see, thats really all you need anyway.
     # the following will output to packages.${system}.{ our packages }
-    packages = forSystems (system: let
+    packages = forSystems (system:
+      let
+
       # NOTE: we will be using only this 1 package from the nixCats repo from here on.
       OGpkg = nixCats.packages.${system}.default;
+
       # we can even get our utils from it.
       inherit (OGpkg.passthru) utils;
 
       withExtraOverlays = OGpkg.override (prev: {
-        # This line is unnecessary and simply for demonstration.
-        inherit (prev) luaPath; # <-- we could overide it, but we did not here. 
-        # The reason I did not is I didnt want to write yet another full lua config.
+        # These next lines could be omitted. They are here for illustration
+        inherit (prev) luaPath; # <-- we could overide them, but we did not here. 
+        inherit (prev) nixpkgs;
+        inherit (prev) system;
+        inherit (prev) extra_pkg_config;
+        inherit (prev) nixCats_passthru;
 
         # and our dependencyOverlays by system.
         # we didnt add any extra here but this is to demonstrate
-        # that it is the same as any other template.
+        # that it is the same as any other templates,
+        # we are just using a different function to iterate over systems
+        # to show more possibilities. it outputs to:
         # dependencyOverlays.${system} = somelistofoverlays;
+        # just like normal.
         dependencyOverlays = forSystems (system: [
           (utils.mergeOverlayLists prev.dependencyOverlays.${system} [
             (utils.standardPluginOverlay inputs)
@@ -57,8 +64,10 @@
 
       # you can call override many times. We could have also have done this all in 1 call.
       withExtraCats = withExtraOverlays.override (prev: {
-        # add some new stuff.
+        # add some new stuff, we update into the old categoryDefinitions our new values
         categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, ... }@packageDef: {
+          # We do this with utils.mergeCatDefs
+          # and now we can add some more stuff.
           lspsAndRuntimeDeps = with pkgs; {
             newcat = [ hello ];
           };
@@ -85,31 +94,42 @@
           #     dofile("${./.}/init.lua")
           #   '';
           # };
-          # see :h nixCats.flake.outputs.categories for the available sets
+          # see :h nixCats.flake.outputs.categories for the available sets in categoryDefinitions
         });
       });
+      # and we can override again and add packageDefinitions this time
       withExtraPkgDefs = withExtraCats.override (prev: {
+        # we merge the previous packageDefinitions here
+        # If you were starting from scratch, you would replace instead.
         packageDefinitions = prev.packageDefinitions // {
           newvim = (utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
             settings = {
+              # we update these into the old packageDefinitions
+              # so these ones override the old ones
               aliases = [ "nvi" ];
             };
             categories = {
+              # enable our new category
               newcat = true;
+              # remember, the others are still here!
+              # We merged, rather than overwriting them.
+              # You can see all of them with `:NixCats cats` in your editor!
             };
           }));
         };
       });
-
+      # and choose the name of the package you want to build
       finalPackageNew = withExtraPkgDefs.override (prev: {
         name = "newvim";
       });
+      # we merged so this one is still available too!
       finalPackageOld = withExtraPkgDefs.override (prev: {
         name = "nixCats";
       });
 
     in {
       # every stage above produces a package you could output.
+      # you dont have to export them all, again, this is for demonstration.
       default = finalPackageNew;
       newvim = finalPackageNew;
       nixCats = finalPackageOld;
@@ -119,5 +139,8 @@
     # built by running `nix build .#newvim` or `nix build .`
     # you now have a copy of the nixCats example config,
     # but with an added mini-nvim and gnu hello!
+    # as well as some other packages at varying stages of being overridden XD
+    # again we could have done it all in 1 big override
+    # or only overrode some of the things above.
   };
 }
