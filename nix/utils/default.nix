@@ -4,7 +4,23 @@ with builtins; rec {
   # These are to be exported in flake outputs
   utils = {
     # The big function that does everything
-    baseBuilder = import ../builder;
+    baseBuilder =
+      luaPath:
+      {
+        nixpkgs
+        , system
+        , extra_pkg_config ? {}
+        , dependencyOverlays ? null
+        , nixCats_passthru ? {}
+        , ...
+      }:
+      categoryDefinitions:
+      packageDefinitions: name:
+      nixpkgs.lib.makeOverridable (import ../builder) {
+        inherit luaPath categoryDefinitions packageDefinitions name
+        nixpkgs system extra_pkg_config dependencyOverlays nixCats_passthru;
+      };
+
 
     templates = import ../templates;
 

@@ -1,30 +1,33 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-luaPath:
-{
-  nixpkgs
-  , system
-  , extra_pkg_config ? {}
-  , dependencyOverlays ? null
-  , nixCats_passthru ? {}
-  , ...
+{ luaPath
+, categoryDefinitions
+, packageDefinitions
+, name
+, nixpkgs
+, system
+, extra_pkg_config ? {}
+, dependencyOverlays ? null
+, nixCats_passthru ? {}
 }:
-categoryDefFunction:
-packageDefinitions: name:
 let
-  pkgs = if !(nixpkgs == null || system == null)
+  pkgs = with builtins; if isAttrs nixCats_passthru && isAttrs extra_pkg_config &&
+      (isList dependencyOverlays || isAttrs dependencyOverlays || isNull dependencyOverlays)
   then import nixpkgs {
     inherit system;
     config = extra_pkg_config;
-    overlays = if builtins.isList dependencyOverlays
+    overlays = if isList dependencyOverlays
       then dependencyOverlays
-      else if builtins.isAttrs dependencyOverlays && builtins.hasAttr system dependencyOverlays
+      else if isAttrs dependencyOverlays && hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
-      else [];
-  } else builtins.throw ''
+      else if isNull dependencyOverlays
+      then []
+      else throw error_message;
+  } else throw error_message;
+  error_message = ''
     Arguments accepted:
 
-    luaPath:
+    luaPath: # <-- must be a store path
     {
       , nixpkgs # <-- required
       , system # <-- required
@@ -33,12 +36,15 @@ let
       , nixCats_passthru ? {}
       , ...
     }:
-    categoryDefFunction:
+    categoryDefinitions:
     packageDefinitions:
     packageName:
 
     # Note:
     dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
+
+    # Note:
+    When using override, all values shown above will be top level attributes, none will be nested.
   '';
 
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
@@ -81,7 +87,7 @@ let
     optionalLuaAdditions = {};
     optionalLuaPreInit = {};
     bashBeforeWrapper = {};
-  } // (categoryDefFunction {
+  } // (categoryDefinitions {
     inherit settings categories pkgs name;
   }))
   startupPlugins optionalPlugins lspsAndRuntimeDeps
@@ -266,14 +272,24 @@ in
   # add our lsps and plugins and our config, and wrap it all up!
   # nothing goes past this file that hasnt been sorted
 import ./wrapNeovim.nix {
-  nixCats_passthru = nixCats_passthru // {
-    keepLuaBuilder = import ./. luaPath;
-    nixCats_packageName = name;
+  nixCats_passthru = nixCats_passthru // (let
     utils = (import ../utils).utils;
-    categoryDefinitions = categoryDefFunction;
-    packageDefinitions = packageDefinitions;
-    inherit dependencyOverlays;
-  };
+  in {
+    keepLuaBuilder = utils.baseBuilder luaPath;
+    nixCats_packageName = name;
+    inherit categoryDefinitions packageDefinitions dependencyOverlays utils;
+    nixosModule = utils.mkNixosModules {
+      defaultPackageName = name;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
+    };
+    # and the same for home manager
+    homeModule = utils.mkHomeModules {
+      defaultPackageName = name;
+      inherit dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions nixpkgs;
+    };
+  });
   inherit pkgs nixpkgs;
   neovim-unwrapped = myNeovimUnwrapped;
   inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode customRC;
