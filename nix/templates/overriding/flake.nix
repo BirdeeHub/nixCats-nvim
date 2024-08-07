@@ -21,6 +21,9 @@
     # This is because I decided to only demonstrate outputting packages for this template,
     # to keep the focus on the overriding.
     forSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
+    # also, this could be done just the same in a module with the final package added straight to home.packages
+    # you could add the nixCats default overlay to your pkgs, and configure it entirely from pkgs.nixCats
+    # you just need a nixCats package, any way you get it is fine.
   in {
     # you could fill out the rest of the flake spec, here we are only exporting packages.
     # as you can see, thats really all you need anyway.
