@@ -78,7 +78,7 @@
           };
           # you could also source the current directory ON TOP of the old one:
           # optionalLuaAdditions = {
-          #   appimage = ''
+          #   newcat = ''
           #     vim.opt.packpath:prepend("${./.}")
           #     vim.opt.runtimepath:prepend("${./.}")
           #     vim.opt.runtimepath:append("${./.}/after")
