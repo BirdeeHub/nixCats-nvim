@@ -69,4 +69,11 @@
       It is a 2 for 1 example of 2 SEPARATE things one could do.
     '';
   };
+  overriding = {
+    path = ./overriding;
+    description = ''
+      How to configure or reconfigure nixCats given only an existing nixCats package,
+      achieved via the override function.
+    '';
+  };
 }
