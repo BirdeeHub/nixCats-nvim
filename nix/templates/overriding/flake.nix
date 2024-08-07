@@ -29,8 +29,9 @@
     # as you can see, thats really all you need anyway.
     # the following will output to packages.${system}.{ our packages }
     packages = forSystems (system: let
-      # we will be using only this 1 package from the nixCats repo from here on.
+      # NOTE: we will be using only this 1 package from the nixCats repo from here on.
       OGpkg = nixCats.packages.${system}.default;
+      # we can even get our utils from it.
       inherit (OGpkg.passthru) utils;
 
       withExtraOverlays = OGpkg.override (prev: {
@@ -40,7 +41,7 @@
 
         # and our dependencyOverlays by system.
         # we didnt add any extra here but this is to demonstrate
-        # that it is the same as in the REREREconfigure template.
+        # that it is the same as any other template.
         # dependencyOverlays.${system} = somelistofoverlays;
         dependencyOverlays = forSystems (system: [
           (utils.mergeOverlayLists prev.dependencyOverlays.${system} [
@@ -75,6 +76,16 @@
 
             ];
           };
+          # you could also source the current directory ON TOP of the old one:
+          # optionalLuaAdditions = {
+          #   appimage = ''
+          #     vim.opt.packpath:prepend("${./.}")
+          #     vim.opt.runtimepath:prepend("${./.}")
+          #     vim.opt.runtimepath:append("${./.}/after")
+          #     dofile("${./.}/init.lua")
+          #   '';
+          # };
+          # see :h nixCats.flake.outputs.categories for the available sets
         });
       });
       withExtraPkgDefs = withExtraCats.override (prev: {
