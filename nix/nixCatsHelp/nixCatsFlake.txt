@@ -12,15 +12,9 @@ Download in flake.nix and then, simply pretend the root of the flake
 is the root of your Lua config. 
 
 *******************************************************
-TWO IMPORTANT NOTES:
+AN IMPORTANT NOTE:
 
-<1> YOU CANNOT LAUNCH THIS VIA nvim COMMAND
-      IT HAS THE NAME OF THE PACKAGE YOU SET,
-      AND WHATEVER ALIASES YOU GAVE IT.
-      This is due to the ability to install multiple nvims via home manager
-      or per single user on nixos.
-
-<2> When editing the files within the flake directory,
+<1> When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 Using wrapRc = true would mean this also applies to lua files.
@@ -535,9 +529,6 @@ These are the defaults:
       # Will not change anything other than config directory, configDirName
       # is still needed for .local/share or .cache and the like
       unwrappedCfgPath = null;
-
-      ### CAUTION: These next 2 options must be the same
-      # for ALL nvim packages that you wish to have simultaneously installed.
 
       # use this to pin a specific neovim version.
       # This one will specify the base neovim derivation to use.

@@ -21,20 +21,18 @@ When you are ready, start [with](./nix/templates/nixExpressionFlakeOutputs) a [t
 
 If you use lazy, consider using the lazy.nvim wrapper [in luaUtils](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](./nix/nixCatsHelp/luaUtils.txt) and [demonstrated here.](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
 
-##### (just remember to change your $EDITOR variable, the reason why is explained below in the section marked [Attention](#attention))
+##### (just remember to change your $EDITOR variable, the reason why is explained below)
 
 ## Attention: <a name="attention"></a>
-> You cannot launch nixCats with the nvim command. You may, however, launch it with anything else you would like to choose.
-
-> This is a side effect of being able to install multiple simultaneous versions of the same version of nvim to the same user's PATH via a module such as home manager, something that would normally cause a collision error.
+> You may launch your nixCats via any name you would like to choose.
 
 > The default launch name is the package name in the packageDefinitions set in flake.nix for that package. You may then make any other aliases that you please as long as they do not conflict.
 
-> This also means that your $EDITOR variable should match the name in your packageDefinitions set in flake.nix so that stuff like git opens the right thing.
+> This means that your $EDITOR variable should match the name in your packageDefinitions set in flake.nix so that stuff like git opens the right thing, because that is what the desktop file is called.
+
+> If your aliases conflict and you try to install them both to your path via home.packages or environment.systemPackages, it will throw a collision error.
 
 > Nvim does not know about the wrapper script. Nvim is named `nvim` and is in a file in the store. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any other issues beyond the way nvim is normally wrapped via the wrappers in nixpkgs.
-
-> Because it is still at `<store_path>/bin/nvim`, you also may only have 1 version of neovim itself per user. This particular requirement however might be possible to fix because this version is not in your PATH, the wrappers are. I am honestly unsure why this is not possible, but it wasn't solved by nixpkgs either and hasn't been an issue.
 
 ## Table of Contents
 1. [Features](#features)
@@ -117,8 +115,6 @@ The modules can optionally inherit category definitions from the flake you impor
 Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
 
 You will not be backed into any corners using the nixCats scheme, either as a flake or module.
-
-Except 1. The section above marked [attention](#attention)
 
 You should make use of the in-editor help at:
 
@@ -271,15 +267,10 @@ and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.tx
 
 #### Drawbacks:
 
-Specific to this project:
-
-You cannot launch nvim with nvim and must choose an alias.
-This is the trade off for installing multiple versions of nvim to the same user's PATH from a module, something that would normally cause a collision error.
-
 General nix + nvim things:
 
 Some vscode debuggers are not on nixpkgs so you have to build them (there's a place for it in customBuildsOverlay). 
-Let people know when you figure one out or submit it to nixpkgs.
+Let people know when you figure one out or submit it to nixpkgs. Sometimes you can extract them from vscode plugins.
 
 [Mason](https://github.com/williamboman/mason.nvim) does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose!
 

@@ -132,11 +132,12 @@ stdenv.mkDerivation {
   # extra actions upon
   # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
   postBuild = lib.optionalString stdenv.isLinux ''
-    rm $out/share/applications/nvim.desktop
+    mkdir -p $out/share/applications
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
       --replace 'Name=Neovim' 'Name=${nixCats_packageName}'\
       --replace 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
-      --replace 'Exec=nvim %F' 'Exec=${nixCats_packageName} %F'
+      --replace 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'\
+      --replace 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
   ''
   + lib.optionalString (python3Env != null && withPython3) ''
     makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 --unset PYTHONPATH ${builtins.concatStringsSep " " extraPython3wrapperArgs}
@@ -166,6 +167,9 @@ stdenv.mkDerivation {
     manifestWrapperArgs =
       [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generatedWrapperArgs;
   in /* bash */ ''
+    mkdir -p $out/nix-support
+    cp -r ${neovim-unwrapped}/nix-support/* $out/nix-support
+
     echo "Generating remote plugin manifest"
     export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim
     makeWrapper ${lib.escapeShellArgs manifestWrapperArgs} ${wrapperArgsStr}
@@ -199,7 +203,7 @@ stdenv.mkDerivation {
   '')
 
   + /* bash */ ''
-    rm $out/bin/nvim
+    # rm $out/bin/nvim # <-- we no longer copy everything and no longer need this.
     touch $out/rplugin.vim
     # see:
     # https://github.com/NixOS/nixpkgs/issues/318925
@@ -230,14 +234,25 @@ stdenv.mkDerivation {
     rm $BASHCACHE
   '';
 
-  buildPhase = ''
-    runHook preBuild
-    mkdir -p $out
-    for i in ${neovim-unwrapped}; do
-      lndir -silent $i $out
-    done
-    runHook postBuild
-  '';
+  # we dont need to copy everything!!!!
+  # we can hardcode the icon path in the desktop file.
+  # neovim knows about vim.env.VIMRUNTIME
+  # neovim knows about vim.fn.fnamemodify(vim.v.progpath, ":p:h:h") .. "/lib/nvim/parser"
+  # gettext uses the c version of vim.v.progpath as well for locales and translation.
+
+  # so all we need is a desktop file, and nix-support
+
+  # buildPhase = ''
+  #   runHook preBuild
+  #   mkdir -p $out
+  #   for i in ${neovim-unwrapped}; do
+  #     lndir -silent $i $out
+  #   done
+  #   runHook postBuild
+  # '';
+
+  # This was the cause of the collision error preventing multiple
+  # versions of nvim being installed to the same user's path, and it wasnt needed!
 
   preferLocalBuild = true;
 

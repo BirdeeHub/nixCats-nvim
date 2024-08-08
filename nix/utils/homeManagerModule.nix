@@ -113,18 +113,10 @@
         description = ''
           VERY IMPORTANT when setting aliases for each package,
           they must not be the same as ANY other neovim package for that user.
-          YOU MAY NOT ALIAS TO NVIM ITSELF
           It will cause a build conflict.
-          again, YOU MAY NOT ALIAS TO NVIM ITSELF
-
-          You also cannot install nixCats via
-          multiple nixCats modules from different repos per user.
-          This should not be an issue as a single module can output multiple packages.
 
           You can have as many nixCats installed per user as you want,
-          as long as you obey those rules.
-          This is a big step up from only being able to have 1 neovim
-          at all per user, so excuse me for the inconvenience.
+          as long as you obey that rule.
 
           for information on the values you may return,
           see :help nixCats.flake.outputs.settings

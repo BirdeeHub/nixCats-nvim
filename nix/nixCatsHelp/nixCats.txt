@@ -4,15 +4,9 @@ NIX CATEGORIES                                                       *nixCats*
 For help with the nix flake files, see :help |nixCats.flake|
 
 *******************************************************
-TWO IMPORTANT NOTES:
+AN IMPORTANT NOTE:
 
-<1> YOU CANNOT LAUNCH THIS VIA nvim COMMAND
-      IT HAS THE NAME OF THE PACKAGE YOU SET,
-      AND WHATEVER ALIASES YOU GAVE IT.
-      This is due to the ability to install multiple nvims via home manager
-      or per single user on nixos.
-
-<2> When editing the files within the flake directory,
+<1> When editing the files within the flake directory,
 nix will not package a new file if it isn't staged in git.
 run git add before rebuilding it whenever adding a new file.
 Using wrapRc = true would mean this also applies to lua files.
