@@ -301,9 +301,13 @@ But you are free to do as you wish.
 
 There is an included wrapper that you can use to do this reset correctly and also optionally stop it from downloading stuff you already downloaded via nix.
 
-You call that instead, it takes 2 extra arguments. The first is the path to lazy.nvim downloaded from nix, the second is a list of url matches not to download.
+You call that instead. It takes 2 extra arguments, and then the 2 standard lazy.setup arguments.
 
-Then simply fix any names that were different (see `:NixCats pawsible` for the new values) and disable build statements while on nix with the `require('nixCatsUtils').lazyAdd` function
+The first is a list of url repo name matches not to download. You can get the full set of your plugins to pass in here from nixCats.
+
+The second is the path to lazy.nvim downloaded from nix
+
+Then in your specs, simply fix any names that were different from nix (see `:NixCats pawsible` for the new values) and disable build statements while on nix with the `require('nixCatsUtils').lazyAdd` function
 
 Obviously if you chose to still download the plugins via lazy you would want to keep the build statements and instead add any non-plugin dependencies they need to your nix.
 
