@@ -69,13 +69,13 @@ if nixCats('neonixdev') then
         -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
         nixos = {
           expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") ..  [[.nixosConfigurations."]] ..
+            nixCats("nixdExtras.flake-path") ..  [[").nixosConfigurations."]] ..
             nixCats("nixdExtras.systemCFGname") .. [[".options]]
         },
         -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
         ["home-manager"] = {
           expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") .. [[.homeConfigurations."]] ..
+            nixCats("nixdExtras.flake-path") .. [[").homeConfigurations."]] ..
             nixCats("nixdExtras.homeCFGname") .. [[".options]]
         }
       }
@@ -121,15 +121,15 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 if require('nixCatsUtils').isNixCats then
-  for server_name,_ in pairs(servers) do
+  for server_name, cfg in pairs(servers) do
     require('lspconfig')[server_name].setup({
-      capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+      capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
       -- this line is interchangeable with the above LspAttach autocommand
       -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-      cmd = (servers[server_name] or {}).cmd,
-      root_pattern = (servers[server_name] or {}).root_pattern,
+      settings = cfg,
+      filetypes = (cfg or {}).filetypes,
+      cmd = (cfg or {}).cmd,
+      root_pattern = (cfg or {}).root_pattern,
     })
   end
 else
@@ -141,7 +141,7 @@ else
   mason_lspconfig.setup_handlers {
     function(server_name)
       require('lspconfig')[server_name].setup {
-        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
         -- this line is interchangeable with the above LspAttach autocommand
         -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
         settings = servers[server_name],

@@ -40,7 +40,7 @@ function M.on_attach(_, bufnr)
 
 end
 
-function M.get_capabilities()
+function M.get_capabilities(server_name)
   -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
   -- if you make a package without it, make sure to check if it exists with nixCats!
   local capabilities = vim.lsp.protocol.make_client_capabilities()

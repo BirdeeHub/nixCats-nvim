@@ -78,19 +78,26 @@ The stuff added to servers table is what is passed to lspconfig/mason
     -- you should pass inputs.self.outPath as nixdExtras.flake-path
     -- that way it will ALWAYS work, regardless
     -- of where your config actually was.
+
+    -- If you are using a standalone flake, but installed it in your system
+    -- config, you may use override to add these values as well.
+    -- for more info on that, cd to an empty directory and run:
+    -- nix flake init -t github:BirdeeHub/nixCats-nvim#overriding
+    -- for a walkthrough of useage.
+
     -- otherwise flake-path could be an absolute path to your system flake, or nil or false
     if nixCats("nixdExtras.flake-path") and nixCats("nixdExtras.systemCFGname") and nixCats("nixdExtras.homeCFGname") then
       servers.nixd.nixd.options = {
         -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
         nixos = {
           expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") ..  [[.nixosConfigurations."]] ..
+            nixCats("nixdExtras.flake-path") ..  [[").nixosConfigurations."]] ..
             nixCats("nixdExtras.systemCFGname") .. [[".options]]
         },
         -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
         ["home-manager"] = {
           expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") .. [[.homeConfigurations."]] ..
+            nixCats("nixdExtras.flake-path") .. [[").homeConfigurations."]] ..
             nixCats("nixdExtras.homeCFGname") .. [[".options]]
         }
       }
@@ -136,15 +143,15 @@ The stuff added to servers table is what is passed to lspconfig/mason
     end
   })
   if require('nixCatsUtils').isNixCats then
-    for server_name,_ in pairs(servers) do
+    for server_name, cfg in pairs(servers) do
       require('lspconfig')[server_name].setup({
-        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
         -- this line is interchangeable with the above LspAttach autocommand
         -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-        settings = servers[server_name],
-        filetypes = (servers[server_name] or {}).filetypes,
-        cmd = (servers[server_name] or {}).cmd,
-        root_pattern = (servers[server_name] or {}).root_pattern,
+        settings = cfg,
+        filetypes = (cfg or {}).filetypes,
+        cmd = (cfg or {}).cmd,
+        root_pattern = (cfg or {}).root_pattern,
       })
     end
 
@@ -157,7 +164,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
     mason_lspconfig.setup_handlers {
       function(server_name)
         require('lspconfig')[server_name].setup {
-          capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(),
+          capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
           -- this line is interchangeable with the above LspAttach autocommand
           -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
           settings = servers[server_name],
@@ -222,7 +229,10 @@ It looks like this:
 
   end
 
-  function M.get_capabilities()
+  function M.get_capabilities(server_name)
+    -- you may wish to know which server you're using to set different capabilities
+    -- if server_name is omitted, it will be nil
+
     -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
     -- if you make a package without it, make sure to check if it exists with nixCats!
     local capabilities = vim.lsp.protocol.make_client_capabilities()
