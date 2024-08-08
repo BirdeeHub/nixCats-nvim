@@ -649,24 +649,51 @@ It is now a function that takes a name, and returns your chosen neovim package.
     # below in :h nixCats.flake.outputs.exports ...
 <
 If you use it wrong, you will most likely get this error message:
->nix
-  Arguments accepted:
 
-  luaPath:
-  {
+  The following arguments are accepted:
+>nix
+  # -------------------------------------------------------- #
+
+  # the path to your ~/.config/nvim replacement within your nix config.
+  luaPath: # <-- must be a store path
+
+  { # set of items for building the pkgs that builds your neovim
+
     , nixpkgs # <-- required
     , system # <-- required
-    , dependencyOverlays ? null
-    , extra_pkg_config ? {}
-    , nixCats_passthru ? {}
-    , ...
-  }:
-  categoryDefFunction:
-  packageDefinitions:
-  packageName:
 
+    # type: (attrsOf listOf overlays) or (listOf overlays) or null
+    , dependencyOverlays ? null 
+
+    # import nixpkgs { config = extra_pkg_config; inherit system; }
+    , extra_pkg_config ? {} # type: attrs
+
+    # any extra stuff for finalPackage.passthru
+    , nixCats_passthru ? {} # type: attrs
+  }:
+
+  # type: function with args { pkgs, settings, categories, name, ... }:
+  # returns: set of sets of categories
+  # see :h nixCats.flake.outputs.categories
+  categoryDefinitions: 
+
+  # type: function with args { pkgs, ... }:
+  # returns: { settings = {}; categories = {}; }
+  packageDefinitions: 
+  # see :h nixCats.flake.outputs.packageDefinitions
+  # see :h nixCats.flake.outputs.settings
+
+  # name of the package to built from packageDefinitions
+  name: 
+
+  # -------------------------------------------------------- #
+<
   # Note:
-  dependencyOverlays can recieve either a list of overlays, or a set of dependencyOverlays.''${system}
+  When using override, all values shown above will
+  be top level attributes of prev, none will be nested.
+  i.e. >nix
+  finalPackage.override (prev: { inherit (prev) dependencyOverlays; })
+<      NOT prev.pkgsargs.dependencyOverlays or something like that
 <
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
