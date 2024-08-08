@@ -10,7 +10,7 @@ enter a new directory then run:
 
 then to build, `nix build .`
 
-and the result will be found at `./result/bin/nixCats` (or with a different name if you changed it before building)
+and the result will be found at `./result/bin/nvim`
 
 It also can work without any nix whatsoever.
 It has been adapted such that it works either way!

@@ -309,20 +309,12 @@
           # but lua can still check for it
           lspDebugMode = false;
           # you could also pass something else:
+          # see :help nixCats
           themer = true;
           colorscheme = "onedark";
-          theBestCat = "says meow!!";
-          theWorstCat = {
-            thing'1 = [ "MEOW" "HISSS" ];
-            thing2 = [
-              {
-                thing3 = [ "give" "treat" ];
-              }
-              "I LOVE KEYBOARDS"
-            ];
-            thing4 = "couch is for scratching";
+          nixdExtras = {
+            nixpkgs = nixpkgs.outPath;
           };
-          # see :help nixCats
         };
       };
       regularCats = { pkgs, ... }@misc: {
@@ -347,7 +339,14 @@
           lspDebugMode = false;
           themer = true;
           colorscheme = "catppuccin";
+          nixdExtras = {
+            # note, use outPath here instead of just
+            # putting the derivation. otherwise,
+            # nix would try to evaluate the entire nixpkgs.
+            nixpkgs = nixpkgs.outPath;
+          };
           theBestCat = "says meow!!";
+          # yes even tortured inputs work.
           theWorstCat = {
             thing'1 = [ "MEOW" "HISSS" ];
             thing2 = [
@@ -362,11 +361,19 @@
       };
     };
 
-  # In this section, the main thing you will need to do is change the default package name
-  # to the name of the packageDefinitions entry you wish to use as the default.
     defaultPackageName = "nixCats";
-  in
+    # I did not here, but you might want to create a package named nvim.
+    # If you make one of these packages be named nvim, you will get an nvim.desktop file
+    # regardless of if it is the default or not.
 
+    # defaultPackageName is also passed to utils.mkNixosModules and utils.mkHomeModules
+    # and it controls the name of the top level option set.
+    # If you made a package named `nvim` your default package,
+    # the modules generated would be set at:
+    # config.nvim = { enable = true; <see :h nixCats.module for options> }
+  in
+  # you shouldnt need to change much past here, but you can if you wish.
+  # but you should at least eventually try to figure out whats going on here!
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
     # get our base builder
