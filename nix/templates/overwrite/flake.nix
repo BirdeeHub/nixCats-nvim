@@ -20,20 +20,16 @@
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = { nixpkgs, nixCats, ... }@inputs: let
-    # I decided to only demonstrate outputting packages for this template,
+  outputs = { self, nixpkgs, nixCats, ... }@inputs: let
     forSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
   in {
-    # You could fill out the rest of the flake spec, here we are only exporting packages.
-    # as you can see, thats really all you need anyway.
-    # the following will output to
     # packages.${system} = { default = finalPackage, nvim = finalPackage; }
     packages = forSystems (system: let
 
       # NOTE: we will be using only this 1 package from the nixCats repo from here on.
       # This technique works ANYWHERE you can get a nixCats based package.
       OGpkg = nixCats.packages.${system}.default;
-      # You could, for example, add the overlay from nixCats to your pkgs in your system flake.nix
+      # NOTE: You could, for example, add the overlay from nixCats to your pkgs in your system flake.nix
       # and then grab pkgs.nixCats in a module and reconfigure this same way.
       # then put it in home.packages instead of exporting from the flake like this.
 
@@ -94,7 +90,8 @@
             };
           };
         };
-        
+
+        # NOTE:
         # the package from packageDefinitions to build.
         name = "nvim";
         # we can call override as many times as we want.
@@ -109,6 +106,7 @@
       # config.${packageName} = { enable = true; <see :help nixCats.module> };
 
     in {
+      # NOTE:
       # here we will export our packages to
       # packages.${system}.default
       # and packages.${system}.nvim
@@ -117,5 +115,20 @@
       # or maybe you did the override in a home module!
       # then you could add to home.packages
     });
+
+    # NOTE: we can still also export everything relevant from before!
+    homeModule = self.packages.x86_64-linux.default.passthru.homeModule;
+    nixosModules.default = self.packages.x86_64-linux.default.passthru.nixosModule;
+
+    overlays = (let
+      package = self.packages.x86_64-linux.default;
+      inherit (package.passthru) utils;
+    in {
+      default = utils.easyMultiOverlay package;
+    } // (utils.easyNamedOvers package));
+    # NOTE: The system we choose here doesnt matter.
+    # the modules recieve it on import,
+    # and in the overlay packages it
+    # will be overridden by prev.system
   };
 }

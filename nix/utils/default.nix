@@ -95,6 +95,22 @@ with builtins; rec {
         };
       in overlays;
 
+    easyMultiOverlay = package: let
+      allnames = builtins.attrNames package.passthru.packageDefinitions;
+    in
+    (final: prev: listToAttrs (map (name:
+      lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+    ) allnames));
+
+    easyNamedOvers = package: let
+      allnames = builtins.attrNames package.passthru.packageDefinitions;
+      mapfunc = map (name:
+        lib.nameValuePair name (final: prev: {
+          ${name} = package.override { inherit (prev) system; };
+        }));
+    in
+    listToAttrs (mapfunc allnames);
+
     # maybe you want multiple nvim packages in the same system and want
     # to add them like pkgs.MyNeovims.packageName when you install them?
     # both to keep it organized and also to not have to worry about naming conflicts with programs?
