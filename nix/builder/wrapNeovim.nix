@@ -102,10 +102,6 @@ let
 in
 (pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {
     wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
-    # I handle this with customRC 
-    # otherwise it will get loaded in at the wrong time after startup plugins.
-    wrapRc = true;
-    # Then I pass a bunch of stuff through
     customAliases = aliases;
     runConfigInit = customRC;
     inherit (nixCats_passthru) nixCats_packageName;
