@@ -47,9 +47,6 @@ neovim-unwrapped:
 }:
 assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
 let
-  manifestRc = "set nocompatible";
-  lua = neovim-unwrapped.lua;
-  preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
   generateProviderRc = {
       withPython3 ? true
     , withNodeJs ? false
@@ -75,13 +72,14 @@ let
 
     hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
   in
-      (lib.concatStringsSep ";" hostProviderLua) + ";vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]";
+    lib.concatStringsSep ";" hostProviderLua;
 
   finalPackDir = (callPackage ./vim-pack-dir.nix {}) nixCats packpathDirs;
 
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
     vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
+    vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
     ${runB4Config}
     ${runConfigInit}
     ${luaPluginConfigs}
@@ -90,9 +88,11 @@ let
   '');
 
   providerLuaRc = generateProviderRc {
-    inherit withPython3 withNodeJs withPerl luaEnv;
+    inherit withPython3 withNodeJs withPerl;
     withRuby = rubyEnv != null;
   };
+
+  preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 
   generatedWrapperArgs =
     # vim accepts a limited number of commands so we join them all
@@ -118,6 +118,8 @@ let
     ;
 
   perlEnv = perl.withPackages (p: [ p.NeovimExt p.Appcpanminus ]);
+
+  manifestRc = "set nocompatible";
 in
 stdenv.mkDerivation {
   name = "neovim-${lib.getVersion neovim-unwrapped}${extraName}";
@@ -205,7 +207,7 @@ stdenv.mkDerivation {
     # some older versions of nixpkgs do not have this file (23.11)
     # so ignore errors if it doesnt exist.
     # makeWrapper will still behave if the variables are not set
-    source ${lua}/nix-support/utils.sh || true
+    source ${neovim-unwrapped.lua}/nix-support/utils.sh || true
     # added after release 24.05 so also ignore errors on this function
     _addToLuaPath "${finalPackDir}" || true
     echo "propagated dependency path for plugins: $LUA_PATH"
