@@ -186,7 +186,8 @@ of the options suggested by the auto-complete.
 Now that you have access to the help and a nix lsp, to get started,
 first exit neovim. (but not the nix shell!)
 
-In a terminal, navigate to your nvim directory and run the following command:
+In a terminal, navigate to your nvim directory and
+run your choice of the following commands (don't worry! It doesnt overwrite):
 ```bash
   # Choose one of the following to run at the top level of your neovim config:
   # flake template:
