@@ -4,9 +4,8 @@
     luaPath categoryDefinitions packageDefinitions name
     nixpkgs system extra_pkg_config dependencyOverlays nixCats_passthru;
 
-    While this template shows how to reconfigure an already configured package,
-    To define an entirely new config, you would simply need to overwrite the values,
-    rather than merging from the values from prev
+    This template shows how to reconfigure an already configured package
+    without simply overwriting it and starting from scratch.
 
     Any package based on nixCats is a full nixCats.
   '';

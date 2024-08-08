@@ -198,12 +198,6 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
   # best used after the default template to integrate your new neovim config
   # into an existing flake-based configuration's repository
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
-  # module template:
-  # module template is best used for modifying
-  # an existing configuration further upon installation,
-  # but you could still start with it if you want.
-  # Again, the templates are # VERY similar, swapping is an easy copy paste.
-  nix flake init -t github:BirdeeHub/nixCats-nvim#module
 
   # for utilities for functionality without nix
   # added at lua/nixCatsUtils also run the following
