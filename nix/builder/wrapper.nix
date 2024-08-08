@@ -8,7 +8,6 @@
 , python3
 , callPackage
 , perl
-, lndir
 }:
 neovim-unwrapped:
 {
@@ -256,7 +255,7 @@ stdenv.mkDerivation {
 
   preferLocalBuild = true;
 
-  nativeBuildInputs = [ makeWrapper lndir ];
+  nativeBuildInputs = [ makeWrapper ];
 
   # modified to allow users to add passthru
   passthru = nixCats_passthru;
