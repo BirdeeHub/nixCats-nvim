@@ -37,7 +37,7 @@
       # and then grab pkgs.nixCats in a module and reconfigure this same way.
       # then put it in home.packages instead of exporting from the flake like this.
 
-      # we can even get our utils from it (and even modules based on the config).
+      # we can even get our utils from it
       inherit (OGpkg.passthru) utils;
 
       # the result of this override will be your new package
@@ -79,6 +79,8 @@
             general = [ (_:[]) ];
           };
         };
+
+        # see :help nixCats.flake.outputs.packageDefinitions
         packageDefinitions = {
           nvim = { pkgs, ... }: {
             settings = {
@@ -104,7 +106,7 @@
       # Ok, we have our package. We could override it again, add it to home.packages
       # or export it from a flake, or even grab finalPackage.passthru.homeModule
       # and reconfigure it in that home module, which will be in the namespace
-      # config.${packageName} = { enable = true; <see :h nixCats.module> };
+      # config.${packageName} = { enable = true; <see :help nixCats.module> };
 
     in {
       # here we will export our packages to
