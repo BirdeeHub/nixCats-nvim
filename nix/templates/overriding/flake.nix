@@ -58,7 +58,7 @@
             # any other flake overlays here.
           ])
         ]);
-        # or to replace
+        # NOTE: or to replace:
         # dependencyOverlays = forSystems (system: [
         #   (utils.standardPluginOverlay inputs)
         # ]);
@@ -67,6 +67,7 @@
       # you can call override many times. We could have also have done this all in 1 call.
       withExtraCats = withExtraOverlays.override (prev: {
         # add some new stuff, we update into the old categoryDefinitions our new values
+        # to replace all, just dont call utils.mergeCatDefs
         categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, ... }@packageDef: {
           # We do this with utils.mergeCatDefs
           # and now we can add some more stuff.
@@ -87,27 +88,42 @@
 
             ];
           };
-          # you could also source the current directory ON TOP of the old one:
+          # you could also source the current directory ON TOP of the one in luaPath.
+          # if you want to make it also respect wrapRc, you can access the value
+          # of wrapRc in the settings set provided to the function.
           # optionalLuaAdditions = {
-          #   newcat = ''
-          #     vim.opt.packpath:prepend("${./.}")
-          #     vim.opt.runtimepath:prepend("${./.}")
-          #     vim.opt.runtimepath:append("${./.}/after")
-          #     dofile("${./.}/init.lua")
+          #   newcat = let
+          #     newDir = if settings.wrapRc then
+          #       "${./.}" else
+          #       "/path/to/here";
+          #   in /*lua*/''
+          #     local newCfgDir = [[${newDir}]]
+          #     vim.opt.packpath:prepend(newCfgDir)
+          #     vim.opt.runtimepath:prepend(newCfgDir)
+          #     vim.opt.runtimepath:append(newCfgDir .. "/after")
+          #     if vim.fn.filereadable(newCfgDir .. "/init.vim") == 1 then
+          #       vim.cmd.source(newCfgDir .. "/init.vim")
+          #     end
+          #     if vim.fn.filereadable(newCfgDir .. "/init.lua") == 1 then
+          #       dofile(newCfgDir .. "/init.lua")
+          #     end
           #   '';
           # };
           # see :h nixCats.flake.outputs.categories for the available sets in categoryDefinitions
         });
       });
       # and we can override again and add packageDefinitions this time
+      # If we already had the categories we wanted defined, and only wanted to enable them,
+      # we could override just the package definitions and enable them!
       withExtraPkgDefs = withExtraCats.override (prev: {
-        # we merge the previous packageDefinitions here
         # If you were starting from scratch, you would replace instead.
         packageDefinitions = prev.packageDefinitions // {
+          # we merge the new definitions into
+          # the prev.packageDefinitions.nixCats package 
+          # which was in the original packageDefinitions set.
           newvim = (utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
             settings = {
-              # we update these into the old packageDefinitions
-              # so these ones override the old ones
+              # these ones override the old ones
               aliases = [ "nvi" ];
             };
             categories = {
@@ -136,14 +152,13 @@
       default = finalPackageNew;
       newvim = finalPackageNew;
       nixCats = finalPackageOld;
-      inherit withExtraCats withExtraOverlays withExtraPkgDefs;
+      inherit withExtraCats withExtraOverlays withExtraPkgDefs OGpkg;
     });
     # as you can see, from running :NixCats pawsible and :!hello in the newvim package,
     # built by running `nix build .#newvim` or `nix build .`
     # you now have a copy of the nixCats example config,
     # but with an added mini-nvim and gnu hello!
-    # as well as some other packages at varying stages of being overridden XD
-    # again we could have done it all in 1 big override
-    # or only overrode some of the things above.
+    # You also have some other packages at varying stages of being overridden.
+    # each override call produces a new package with the new changes.
   };
 }

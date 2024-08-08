@@ -84,14 +84,25 @@
       #     }
       #   ];
       # };
-      # NOTE: you could also do the following and source the current directory
-      # ON TOP of the old one:
+      # NOTE: you could also source the current directory ON TOP of the one we inherited.
+      # if you want to make it also respect wrapRc, you can access the value
+      # of wrapRc in the settings set provided to the function.
       # optionalLuaAdditions = {
-      #   appimage = ''
-      #     vim.opt.packpath:prepend("${./.}")
-      #     vim.opt.runtimepath:prepend("${./.}")
-      #     vim.opt.runtimepath:append("${./.}/after")
-      #     dofile("${./.}/init.lua")
+      #   newcat = let
+      #     newDir = if settings.wrapRc then
+      #       "${./.}" else
+      #       "/path/to/here";
+      #   in /*lua*/''
+      #     local newCfgDir = [[${newDir}]]
+      #     vim.opt.packpath:prepend(newCfgDir)
+      #     vim.opt.runtimepath:prepend(newCfgDir)
+      #     vim.opt.runtimepath:append(newCfgDir .. "/after")
+      #     if vim.fn.filereadable(newCfgDir .. "/init.vim") == 1 then
+      #       vim.cmd.source(newCfgDir .. "/init.vim")
+      #     end
+      #     if vim.fn.filereadable(newCfgDir .. "/init.lua") == 1 then
+      #       dofile(newCfgDir .. "/init.lua")
+      #     end
       #   '';
       # };
       # and yes you can do that in optionalLuaPreInit as well, although not recommended.
