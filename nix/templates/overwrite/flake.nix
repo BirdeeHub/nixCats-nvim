@@ -46,6 +46,7 @@
         };
         nixCats_passthru = {};
 
+        # dependencyOverlays.${system} = [ (final: prev: {}) ];
         dependencyOverlays = forSystems (system: (
           (import ./overlays inputs) ++ [
             (utils.standardPluginOverlay inputs)

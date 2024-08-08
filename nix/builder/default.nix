@@ -20,9 +20,7 @@ let
       then dependencyOverlays
       else if isAttrs dependencyOverlays && hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
-      else if isNull dependencyOverlays
-      then []
-      else throw error_message;
+      else [];
   } else throw error_message;
   error_message = ''
     The following arguments are accepted:
