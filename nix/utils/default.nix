@@ -49,6 +49,19 @@ with builtins; rec {
     in
     mergedOvers;
 
+    # Simple helper function for mergeOverlayLists
+    # If dependencyOverlays is an attrset, system string is required.
+    # If dependencyOverlays is a list, system string is ignored
+    # if invalid type or system, returns an empty list
+    safeOversList = { dependencyOverlays, system ? null }:
+      if isAttrs dependencyOverlays && system == null then
+        throw "dependencyOverlays is a set, but no system was provided"
+      else if isAttrs dependencyOverlays && dependencyOverlays ? system then
+        dependencyOverlays.${system}
+      else if isList dependencyOverlays then
+        dependencyOverlays
+      else [];
+
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
@@ -94,6 +107,15 @@ with builtins; rec {
           default = (utils.makeMultiOverlay luaPath pkgsParams categoryDefFunction packageDefinitions defaultName (attrNames packageDefinitions));
         };
       in overlays;
+
+    easyMultiOverlayNamespaced = package: importName: let
+      allnames = builtins.attrNames package.passthru.packageDefinitions;
+    in
+    (final: prev: {
+      ${importName} = listToAttrs (map (name:
+          lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+        ) allnames);
+    });
 
     easyMultiOverlay = package: let
       allnames = builtins.attrNames package.passthru.packageDefinitions;

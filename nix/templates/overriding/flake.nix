@@ -51,11 +51,16 @@
         # to show more possibilities. it outputs to:
         # dependencyOverlays.${system} = somelistofoverlays;
         # just like normal.
+        # utils.safeOversList just checks if dependencyOverlays is a list or a set of lists,
+        # and always returns a list
         dependencyOverlays = forSystems (system: [
-          (utils.mergeOverlayLists prev.dependencyOverlays.${system} [
-            (utils.standardPluginOverlay inputs)
-            # any other flake overlays here.
-          ])
+          (utils.mergeOverlayLists
+            (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+            [
+              (utils.standardPluginOverlay inputs)
+              # any other flake overlays here.
+            ]
+          )
         ]);
         # NOTE: or to replace:
         # dependencyOverlays = forSystems (system: [

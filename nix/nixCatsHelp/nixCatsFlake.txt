@@ -870,6 +870,14 @@ to avoid naming conflict issues.
 Takes 2 lists of overlays, returns a single merged overlay.
 Merging logic is the same as mergeCatDefs
 
+<safeOversList> { dependencyOverlays, system ? null }:
+Simple helper function for mergeOverlayLists
+Pass it the inherited `dependencyOverlays`, always recieve a list back.
+Then feed it to `mergeOverlayLists`.
+If dependencyOverlays is an attrset, system string is required.
+If dependencyOverlays is a list, system string is ignored
+If invalid type or system, returns an empty list
+
 <mkPackages> finalBuilder: packageDefinitions: defaultName:
 makes each package and also a default one
 
@@ -896,6 +904,35 @@ It will output them in an overlay where they will be accessible by pkgs.${import
 uses makeMultiOverlay. So that after adding it, all your packages from packageDefinitions will
 be accessible at `pkgs.${defaultPackageName}.${packageName}`
 Can be swapped out 1 for 1 with `utils.makeOverlays` if preferred
+
+<easyMultiOverlay> package:
+i.e. if you had a package named nvim1 and a package named nvim2,
+would output an overlay containing both `pkgs.nvim1` and `pkgs.nvim2`
+
+Takes as its argument only a finished nixCats package.
+Utilizes override to avoid wrapping the overlay with ${system} variable.
+
+Slightly different from makeMultiOverlay in that
+makeMultiOverlay would output at `pkgs.${importName}.nvim1`
+instead of `pkgs.nvim1` like this one does.
+
+<easyMultiOverlayNamespaced> package: importName:
+If you had a package named nvim1 and a package named nvim2,
+would output an overlay containing
+both `pkgs.${importName}.nvim1` and `pkgs.${importName}.nvim2`
+
+Takes as its argument only a finished nixCats package.
+Utilizes override to avoid wrapping the overlay with ${system} variable.
+
+identical output to `makeMultiOverlay`
+
+<easyNamedOvers> package:
+Same output as makeOverlays except without a default package.
+i.e. if you had a package named nvim1 and a package named nvim2,
+would make an overlay named nvim1 and an overlay named nvim2
+
+Takes as its argument only a finished nixCats package.
+Utilizes override to avoid wrapping the overlay with ${system} variable
 
 <eachSystem> systems: f:
 just flake-utils.lib.eachSystem copied here to remove the final input outside

@@ -37,7 +37,9 @@
     inherit (forEachSystem (system: let
       # NOTE: we use mergeOverlayLists to merge the list of overlays from the main nixCats example config
       # into any new overlays we provide here.
-      dependencyOverlays = [ (utils.mergeOverlayLists nixCats.dependencyOverlays.${system} (/* import ./overlays inputs ++ */[
+      dependencyOverlays = [ (utils.mergeOverlayLists
+      (utils.safeOversList { inherit system; inherit (nixCats) dependencyOverlays; }) # <-- makes sure we get a list
+      (/* import ./overlays inputs ++ */[
         # I also deleted the overlays directory and thus commented out the import call for it (but left the parenthesis for demonstration).
         (utils.standardPluginOverlay inputs)
       ])) ];
