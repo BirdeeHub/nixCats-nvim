@@ -205,7 +205,7 @@
         configured to be ran via
         `videv` or `configNotIncluded` commands.
 
-        While the main package export by our flake
+        While the main package exported by our flake
         bundles its config, this one did not due to wrapRc = false!
         It will look in ~/.config/nvim by default
         but this can be changed in settings to anywhere.

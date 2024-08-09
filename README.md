@@ -342,10 +342,7 @@ I also borrowed code from nixpkgs and made modifications and improvements to bet
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
 - [`nv`](https://github.com/NicoElbers/nv):
-  Focused specifically for lazy.nvim, has a set of settings and fields loosely modeled
-  after the settings set and the sets in categoryDefinitions in nixCats,
-  but without categories, multiple packages, or reconfiguration upon import.
-
-  A cool unique concept, uses a zig program to parse lazy.nvim definitions to replace urls with the plugins you put in your nix lists at build time.
+  Focused specifically for lazy.nvim. A cool unique concept, uses a zig program to parse lazy.nvim definitions to replace urls with the plugins you put in your nix lists at build time.
   Useage is somewhat similar to the lazy.nvim wrapper of nixCats in a standalone flake template,
   but without needing to explicitly pass in a nix-provided ignore list to the wrapper in your lua code itself.
+  It obviously also does not have the categories, modules, multiple packages, the overriding scheme, etc.
