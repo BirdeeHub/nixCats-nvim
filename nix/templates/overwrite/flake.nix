@@ -8,8 +8,6 @@
 
     This is akin to the fresh flake template,
     but using the override function.
-    It also only outputs the package. But that is
-    all you need anyway
 
     all available arguments to override:
     luaPath categoryDefinitions packageDefinitions name
