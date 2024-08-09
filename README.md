@@ -65,7 +65,8 @@ If you use lazy, consider using the lazy.nvim wrapper [in luaUtils template](./n
 - blank [template](./nix/templates/nixExpressionFlakeOutputs) that is called as a nix expression from any other flake.
   - It is simply the outputs function of the flake template above but as its own file, callable with your system's flake inputs, and returning all the normal flake outputs the other would have.
   - great for integrating into a system config and still being able to output the finished packages from your system flake.
-- blank module [template](./nix/templates/module), best used to reconfigure an existing nix expression or flake template, because they can inherit values from the config that exports them, but could be used to configure from scratch as well.
+- blank override [template](./nix/templates/overwrite) that achieves functionality the same as the above two, but entirely via using the override function on the example nvim package from the nixCats flake.
+- blank module [template](./nix/templates/module) that exports the configuration of your packages in module form, inherits values from your other template and can be reconfigured. Similar to override, but as a module.
 - luaUtils [template](./nix/templates/luaUtils) template containing the tools for detecting if nix loaded your config or not, and integrating with lazy.nvim or other plugin managers.
   - this is an optional, additional template.
   - proper useage of this template can yield a configuration that you can use both with or without nix.
