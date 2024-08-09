@@ -285,13 +285,12 @@
   };
 
   config = let
-    dependencyOverlays = if builtins.isAttrs oldDependencyOverlays
-      then
+    dependencyOverlays = if builtins.isAttrs oldDependencyOverlays then
         lib.genAttrs (builtins.attrNames oldDependencyOverlays)
-          (system: oldDependencyOverlays.${system} ++ pkgs.overlays ++ options_set.addOverlays)
+          (system: pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays.${system} options_set.addOverlays)])
       else if builtins.isList oldDependencyOverlays then
-      [ (utils.mergeOverlayLists oldDependencyOverlays (pkgs.overlays ++ options_set.addOverlays))
-      ] else pkgs.overlays ++ options_set.addOverlays;
+      pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays)]
+      else pkgs.overlays ++ options_set.addOverlays;
 
     mapToPackages = options_set: dependencyOverlays: (let
       newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
