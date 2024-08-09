@@ -34,11 +34,11 @@
       # then put it in home.packages instead of exporting from the flake like this.
       # we can even get our utils from it:
       # inherit (OGpkg.passthru) utils;
-      # no reason to do that though.
+      # no reason to do that though here.
       inherit (nixCats) utils;
 
 
-      # the result of this override will be your new package
+      # NOTE: the result of this override will be your new package
       # after you put your items into it.
       finalPackage = OGpkg.override {
         luaPath = "${./.}";
@@ -76,6 +76,11 @@
           };
           extraLuaPackages = {
             general = [ (_:[]) ];
+          };
+          environmentVariables = {
+            general = {
+              TESTVAR = "It worked!";
+            };
           };
         };
 
@@ -132,9 +137,23 @@
       ${defaultPackageName} = finalPackage;
     });
 
+    # NOTE: we can still also export everything relevant from before!
+    homeModule = self.packages.x86_64-linux.default.passthru.homeModule;
+    nixosModules.default = self.packages.x86_64-linux.default.passthru.nixosModule;
+    # NOTE: The system we chose here doesnt matter.
+    # the modules recieve it on import,
+    # and in the overlay packages below it
+    # will be overridden by prev.system
+    overlays = (let
+      package = self.packages.x86_64-linux.default;
+      inherit (package.passthru) utils;
+    in {
+      default = utils.easyMultiOverlay package;
+    } // (utils.easyNamedOvers package));
+
     # NOTE: outputting a dev shell. to devShells.${system}.default
     devShells = forSystems (system: (let
-      # this pkgs is only for using pkgs.mkShell
+      # NOTE: this pkgs is only for using pkgs.mkShell
       # and adding various other programs.
       pkgs = import nixpkgs { inherit system; };
       # if you chose to override your nixCats package
@@ -159,20 +178,5 @@
         '';
       };
     }));
-
-    # NOTE: we can still also export everything relevant from before!
-    homeModule = self.packages.x86_64-linux.default.passthru.homeModule;
-    nixosModules.default = self.packages.x86_64-linux.default.passthru.nixosModule;
-
-    overlays = (let
-      package = self.packages.x86_64-linux.default;
-      inherit (package.passthru) utils;
-    in {
-      default = utils.easyMultiOverlay package;
-    } // (utils.easyNamedOvers package));
-    # NOTE: The system we choose here doesnt matter.
-    # the modules recieve it on import,
-    # and in the overlay packages it
-    # will be overridden by prev.system
   };
 }
