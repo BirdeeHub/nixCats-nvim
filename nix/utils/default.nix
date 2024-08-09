@@ -49,6 +49,13 @@ with builtins; rec {
     in
     mergedOvers;
 
+    # if your dependencyOverlays is a list rather than a system-wrapped set,
+    # to deal with when other people output an overlay wrapped in a system variable
+    # you may call the following function on it.
+    fixSystemizedOverlay = overlaysSet: outfunc:
+      (final: prev: if !(overlaysSet ? prev.system) then {}
+        else (outfunc prev.system) final prev);
+
     # Simple helper function for mergeOverlayLists
     # If dependencyOverlays is an attrset, system string is required.
     # If dependencyOverlays is a list, system string is ignored

@@ -290,10 +290,7 @@
         lib.genAttrs (builtins.attrNames oldDependencyOverlays)
           (system: oldDependencyOverlays.${system} ++ pkgs.overlays ++ options_set.addOverlays)
       else if builtins.isList oldDependencyOverlays then
-      [
-          (utils.mergeOverlayLists oldDependencyOverlays
-            [(utils.mergeOverlayLists pkgs.overlays options_set.addOverlays)]
-          )
+      [ (utils.mergeOverlayLists oldDependencyOverlays (pkgs.overlays ++ options_set.addOverlays))
       ] else pkgs.overlays ++ options_set.addOverlays;
 
     mapToPackages = options_set: dependencyOverlays: (let

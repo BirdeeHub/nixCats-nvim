@@ -149,11 +149,13 @@ pkgs = import nixpkgs { inherit system; overlays = []; config = {}; }
       # allowUnfree = true;
     };
 <
+                                           *nixCats.flake.outputs.getOverlays*
 We call flake utils to get system variable for all default systems.
 It simply calls the function with each system value, and maps the resulting
 set from { mySet = {}; } to { mySet.${system} = {}; }
 Many overlays require being accessed via ${system} variable in this manner,
 and thus there is a method for handling it in nixCats.
+
 No overlays SHOULD be exported requiring the ${system} variable to access.
 However, some are (such as codeium, a free ai plugin) and thus, we will wrap this anyway.
 >nix
@@ -167,7 +169,8 @@ However, some are (such as codeium, a free ai plugin) and thus, we will wrap thi
       # use `pkgs.neovimPlugins`, which is a set of our plugins.
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
-      inputs.nixd.overlays.default
+      inputs.neorg-overlay.overlays.default
+      inputs.lz-n.overlays.default
       # stuff like this is why this part is done this way.
       inputs.codeium.overlays.${system}.default
     ];
@@ -177,16 +180,37 @@ However, some are (such as codeium, a free ai plugin) and thus, we will wrap thi
   in { inherit dependencyOverlays; })) dependencyOverlays;
 <
 This will allow us to pass system independent overlays to our module options,
-even for improperly formed flakes.
+even when importing overlays from improperly formed flakes.
 
 Managing the system variable in combination with overlays
-can be one of the harder parts of flake usage.
-This flake resolves our pkgs instance later to help with this, and takes care
-of passing the correct pkgs instance to the categoryDefinitions for use in
-defining your plugins.
+can be one of the hardest parts of flake usage.
+This flake resolves our pkgs instance for neovim itself to help with this,
+and takes care of passing the correct pkgs instance
+to the categoryDefinitions for use in defining your plugins.
+
+ALTERNATIVELY
+
+They could also just be a list of overlays!
+>nix
+  dependencyOverlays = (import ./overlays inputs) ++ [
+    (utils.standardPluginOverlay inputs)
+    inputs.neorg-overlay.overlays.default
+    inputs.lz-n.overlays.default
+
+    # when other people mess up their overlays by wrapping them,
+    # you may instead call this function on their overlay.
+    # it will check if it has the system in it.
+    # if so, it will call the function with the system
+    # and return the desired overlay
+    (utils.fixSystemizedOverlay inputs.codeium.overlays
+      (system: inputs.codeium.overlays.${system}.default)
+    )
+  ];
+<
 
                                                *nixCats.flake.outputs.overlays*
-The two major things of note in this overlays section. >nix
+The two major things of note in this overlays section.
+Regardless of which above method you choose. >nix
   (utils.standardPluginOverlay inputs) # return type: a single overlay
   # and
   (import ./overlays inputs) # type: List of Overlays
@@ -196,6 +220,7 @@ The two major things of note in this overlays section. >nix
 You do not need to edit it to use it.
 Usage of this overlay is described in:
 :h |nixCats.flake.inputs|
+along with its friend, utils.sanitizedPluginOverlay
 
 It takes all the inputs named in the format
 `plugins-somepluginname` and makes them into plugins. 
@@ -617,7 +642,8 @@ That argument is the name of the neovim package to be packaged.
      this path and wrap the lua when wrapRc = true)
 
 2. A set containing:
-  The dependencyOverlays set, extra_pkg_config, nixpkgs, and system so it can
+  The dependencyOverlays set or list,
+  extra_pkg_config, nixpkgs, and system so it can
   resolve pkgs and pass it where it needs to go.
 
 3. our function that takes an individual package definition
@@ -856,6 +882,12 @@ and still `packadd foo.bar` because it keeps the folder name the same.
 To use, in your overlays section:
 Replace `(utils.standardPluginOverlay inputs)`
 with `(utils.sanitizedPluginOverlay inputs)`
+
+<fixSystemizedOverlay> overlaysSet: outfunc:
+takes 2 arguments.
+a set of system-wrapped overlays,
+and a function (system: overlays.${system}.<desired_overlay>)
+returns the desired overlay, with the system resolved.
 
 <mergeCatDefs> oldCats: newCats:
 for merging `categoryDefinitions` and individual packages in `packageDefinitions`,
