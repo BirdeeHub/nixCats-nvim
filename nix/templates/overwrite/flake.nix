@@ -106,6 +106,25 @@
               # are also made available via the nixCats plugin
             };
           };
+          configNotIncluded = { pkgs, ... }: {
+            settings = {
+              # NOTE: see :help nixCats.flake.outputs.settings
+              # This one wont bundle config.
+              # it will look in ~/.config/nvim by default
+              wrapRc = false;
+              aliases = [ "videv" ];
+            };
+            categories = {
+              # NOTE: here, we will have the same categories as the main package
+              # because this one will be used to have quick iteration
+              # while editing lua, and we want all the same things available
+              # for that purpose. Feel free to factor these out if you wish.
+              general = true;
+              # NOTE:
+              # see :help nixCats
+            };
+          };
+          # NOTE: remember, you can have as many as you want with different things in each
         };
 
         # NOTE:
@@ -148,7 +167,9 @@
       package = self.packages.x86_64-linux.default;
       inherit (package.passthru) utils;
     in {
+      # default contains all the packages
       default = utils.easyMultiOverlay package;
+      # the named ones each contain one of them on its own.
     } // (utils.easyNamedOvers package));
 
     # NOTE: outputting a dev shell. to devShells.${system}.default
@@ -156,22 +177,46 @@
       # NOTE: this pkgs is only for using pkgs.mkShell
       # and adding various other programs.
       pkgs = import nixpkgs { inherit system; };
-      # if you chose to override your nixCats package
-      # again here, it has its own pkgs object in
-      # packageDefinitions and categoryDefinitions
-      # for you to use (see above).
-      # You could also use this one though
-      # but its better to not mix them for sanity purposes.
+
+      # NOTE: We are going to instead choose the unwrapped config
+      # for our dev shell, which will find the lua locally for fast iteration
+      configNotIncludedVim = self.packages.${system}.default.override (prev: {
+        name = "configNotIncluded";
+        # NOTE: if you chose to override more things here,
+        # It has its own pkgs object in
+        # packageDefinitions and categoryDefinitions
+        # for you to use (see above, its the same).
+        # You could also use the dev shell one, but
+        # its better to not mix them for sanity purposes.
+        
+        # NOTE: There are helper functions in utils for merging
+        # the previous definitions when overriding so that
+        # you do not need to redefine everything in a package definition
+        # or in the categoryDefinitions.
+        # :h nixCats.flake.outputs.exports
+        # contains a list of functions in the utils set.
+        # and there are templates that demonstrate this in depth
+      });
       greeting = ''
         Welcome to nixCats!
         (short for nix categories)
-        To launch your neovim package,
-        use ${defaultPackageName} command!
+
+        This particular package has been
+        configured to be ran via
+        `videv` or `configNotIncluded` commands.
+
+        While the main package export by our flake
+        bundles its config, this one did not due to wrapRc = false!
+        It will look in ~/.config/nvim by default
+        but this can be changed in settings to anywhere.
+        This is great for iterating on your lua changes as normal.
+        When you are done, rebuild and go back to the normal package
+        with the bundled config that can be ran via nix run from anywhere!
       '';
     in {
       default = pkgs.mkShell {
         name = defaultPackageName;
-        packages = [ self.packages.${system}.default ];
+        packages = [ configNotIncludedVim ];
         inputsFrom = [ ];
         shellHook = ''
           ${pkgs.charasay}/bin/chara say -c kitten '${greeting}'
