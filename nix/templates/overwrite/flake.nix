@@ -20,6 +20,8 @@
   };
   outputs = { self, nixpkgs, nixCats, ... }@inputs: let
     forSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
+    # We could hardcode this but this is nice and good for demonstration as well
+    defaultPackageName = "nvim";
   in {
     # packages.${system} = { default = finalPackage, nvim = finalPackage; }
     packages = forSystems (system: let
@@ -30,9 +32,11 @@
       # NOTE: You could, for example, add the overlay from nixCats to your pkgs in your system flake.nix
       # and then grab pkgs.nixCats in a module and reconfigure this same way.
       # then put it in home.packages instead of exporting from the flake like this.
+      # we can even get our utils from it:
+      # inherit (OGpkg.passthru) utils;
+      # no reason to do that though.
+      inherit (nixCats) utils;
 
-      # we can even get our utils from it
-      inherit (OGpkg.passthru) utils;
 
       # the result of this override will be your new package
       # after you put your items into it.
@@ -53,8 +57,8 @@
         ));
 
         categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
-          # for all available fields, see:
-          # see :help nixCats.flake.outputs.categories
+          # NOTE: for all available fields, see:
+          # :help nixCats.flake.outputs.categories
           startupPlugins = with pkgs.vimPlugins; {
             general = [ ];
           };
@@ -77,28 +81,43 @@
 
         # see :help nixCats.flake.outputs.packageDefinitions
         packageDefinitions = {
-          nvim = { pkgs, ... }: {
+          ${defaultPackageName} = { pkgs, ... }: {
             settings = {
-              # see :help nixCats.flake.outputs.settings
+              # NOTE: see :help nixCats.flake.outputs.settings
               aliases = [ "vi" "vim" ];
             };
             categories = {
-              # see :help nixCats.flake.outputs.packageDefinitions
+              # NOTE: see :help nixCats.flake.outputs.packageDefinitions
               general = true;
-              # and :help nixCats
+              # NOTE:
+              # see :help nixCats
+              # you can pass anything that isnt an uncalled nix function
+              # into this set, and it will be accessible via the
+              # nixCats global command. For this flake,
+              # nixCats('general') would equal true.
+              # but you can, again, pass in ANYTHING that isnt an
+              # uncalled nix function.
+              # the settings set and list of installed plugins
+              # are also made available via the nixCats plugin
             };
           };
         };
 
         # NOTE:
         # the package from packageDefinitions to build.
-        name = "nvim";
-        # we can call override as many times as we want.
-        # so if we define multiple items in packageDefinitions,
-        # we can build this one, and then override it with the other name
-        # which will leave you with both packages.
+        name = defaultPackageName;
       };
+      # NOTE: we can call override as many times as we want.
+      # so if we define multiple items in packageDefinitions,
+      # we can build this one, and then override it with the other name after
+      # which will leave you with both packages.
+      # i.e. otherPackage = finalPackage.override { name = "otherPackageName"; };
+      # and then both finalPackage and otherPackage will be useable and installable
+      # you can do this with any of the fields above, and utility functions
+      # are provided for easily merging old values with new ones if desired.
 
+      # NOTE: we could have done all of this overriding in our main config,
+      # in a separate module, in a dev shell, etc. This one is in a flake.
       # Ok, we have our package. We could override it again, add it to home.packages
       # or export it from a flake, or even grab finalPackage.passthru.homeModule
       # and reconfigure it in that home module, which will be in the namespace
@@ -108,12 +127,38 @@
       # NOTE:
       # here we will export our packages to
       # packages.${system}.default
-      # and packages.${system}.nvim
+      # and packages.${system}.${defaultPackageName}
       default = finalPackage;
-      nvim = finalPackage;
-      # or maybe you did the override in a home module!
-      # then you could add to home.packages
+      ${defaultPackageName} = finalPackage;
     });
+
+    # NOTE: outputting a dev shell. to devShells.${system}.default
+    devShells = forSystems (system: (let
+      # this pkgs is only for using pkgs.mkShell
+      # and adding various other programs.
+      pkgs = import nixpkgs { inherit system; };
+      # if you chose to override your nixCats package
+      # again here, it has its own pkgs object in
+      # packageDefinitions and categoryDefinitions
+      # for you to use (see above).
+      # You could also use this one though
+      # but its better to not mix them for sanity purposes.
+      greeting = ''
+        Welcome to nixCats!
+        (short for nix categories)
+        To launch your neovim package,
+        use ${defaultPackageName} command!
+      '';
+    in {
+      default = pkgs.mkShell {
+        name = defaultPackageName;
+        packages = [ self.packages.${system}.default ];
+        inputsFrom = [ ];
+        shellHook = ''
+          ${pkgs.charasay}/bin/chara say -c kitten '${greeting}'
+        '';
+      };
+    }));
 
     # NOTE: we can still also export everything relevant from before!
     homeModule = self.packages.x86_64-linux.default.passthru.homeModule;
