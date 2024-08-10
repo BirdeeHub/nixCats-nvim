@@ -15,11 +15,14 @@ buildable separately from your nixos or home-manager config.
 
 It allows you to easily pass arbitrary information from nix to lua, easily reference things installed via nix, and even output multiple neovim packages with different subsets of your configuration without duplication, import and override and re-export your nvim config in dev shells, etc...
 
-The neovim config here (everything outside of the internals at [./nix](./nix)) is just one example of how to use nixCats for yourself.
+The example neovim config here (everything outside of the internals at [./nix](./nix)) is just one example of how to use nixCats for yourself.
+Everything in [./nix/templates](./nix/templates) is also either a starter template, or more examples.
+The [in-editor help](./nix/nixCatsHelp) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the highlighting works.
+There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
-When you are ready, start [with](./nix/templates/nixExpressionFlakeOutputs) a [template](./nix/templates/fresh) and include your normal configuration, and refer back [here](./flake.nix) [or](./init.lua) to the [help](./nix/nixCatsHelp) or the other [templates](./nix/templates) for guidance!
+When you are ready, [start](./nix/templates/overwrite) [with](./nix/templates/nixExpressionFlakeOutputs) a [template](./nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-If you use lazy, consider using the lazy.nvim wrapper [in luaUtils template](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](./nix/nixCatsHelp/luaUtils.txt) and [demonstrated here](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
+If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](./nix/nixCatsHelp/luaUtils.txt) and [demonstrated here](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
 
 ##### (just remember to change your $EDITOR variable, the reason why is explained below)
 
@@ -110,9 +113,9 @@ The category scheme allows you to output many different packages with different 
 
 You need a minimal python3 nvim ide in a shell, and it was a subset of your previous config? Throw some `nixCats("the.category")` at it, and enable only those in a new entry in packageDefinitions.
 
-Want one that actually reflects lua changes without rebuilding for testing? Have 2 of the same `packageDefinitions` with the same categories, except one has wrapRc = false and unwrappedCfgDir set!
+Want one that actually reflects lua changes without rebuilding for testing? Have 2 `packageDefinitions` with the same categories, except one has wrapRc = false and unwrappedCfgPath set. You can install them both!
 
-It is easy to convert between all 3 starter templates, so do not worry at the start which one to choose, all options will be available to you in both,
+It is easy to convert between all starter templates, so do not worry at the start which one to choose, all options will be available to you in any of them,
 including installing multiple versions of neovim to your PATH.
 
 However I suggest starting with the flake standalone and then using the nixExpressionFlakeOutputs template to combine your neovim into your normal system flake when you are ready to do so.
@@ -120,9 +123,9 @@ However I suggest starting with the flake standalone and then using the nixExpre
 This is because the flake standalone is easy to have in its own directory somewhere to test things out, runs without nixos or home manager,
 and then the nixExpressionFlakeOutputs is literally just the outputs function, and you move your inputs to your system inputs. Then you call the function with the inputs, and recieve the normal flake outputs.
 
-Both allow you to export everything this repo does, but with your config as the base.
+They allow you to export everything this repo does, but with your config as the base.
 
-The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However the modules can only install and export the finished packages, so they do not output overlays or modules of their own like the flake templates do.
+The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](./nix/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](./nix/templates/nixExpressionFlakeOutputs) [other](./nix/templates/overwrite) [templates](./nix/templates/fresh).
 
 Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
 
