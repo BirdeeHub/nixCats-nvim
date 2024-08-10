@@ -250,10 +250,10 @@ You also might want a [nerd font](https://www.nerdfonts.com/) for some icons dep
 
 (full usage covered in included help files, accessible here and inside neovim, but *much better viewed in-editor*)
 
-You may need to add their link to the flake inputs if they are not on nixpkgs already.
+If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
 See [:h nixCats.flake.inputs](./nix/nixCatsHelp/nixCatsFlake.txt) for
-how to use the auto plugin import helper in your inputs for plugins not on nixpkgs.
+how to use the auto plugin import helper in your inputs for neovim plugins not on nixpkgs.
 
 It is made to be customized into your own portable nix neovim distribution
 with as many options as you wish, while requiring you to leave the normal

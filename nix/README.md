@@ -19,7 +19,7 @@ You should look through it to see examples of things you may have questions abou
 
 Usage of the things exported in this directory is in the templates listed in [:h nixCats.installation_options](../nixCatsHelp/installation.txt), the help at [:help nixCats.*](../nixCatsHelp), as well as the rest of this repository.
 
-The 3 main templates mentioned in [:h nixCats.installation_options](../nixCatsHelp/installation.txt) all consist of a single nix file (or 2 for the modules template, one for home manager and one for nixos), and an empty skeleton of an overlays directory should it ever be required.
+The starter templates mentioned in [:h nixCats.installation_options](../nixCatsHelp/installation.txt) all consist of a single nix file (or 2 for the modules template, one for home manager and one for nixos), and an empty skeleton of an overlays directory should it ever be required.
 
 There is also an optional [luaUtils template](../templates/luaUtils) containing tools to check if nix was used to load your configuration, as well as a wrapper for lazy.nvim and pckr. There is help for this feature at [:h nixCats.luaUtils](../nixCatsHelp/luaUtils.txt)
 
