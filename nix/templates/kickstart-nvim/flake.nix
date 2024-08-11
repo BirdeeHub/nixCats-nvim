@@ -242,7 +242,7 @@
     packageDefinitions = {
       # These are the names of your packages
       # you can include as many as you wish.
-      nvim = {pkgs , ... }: {
+      nvim = { pkgs , ... }: {
         # they contain a settings set defined above
         # see :help nixCats.flake.outputs.settings
         settings = {
@@ -297,10 +297,10 @@
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
     inherit (utils) baseBuilder;
-    customPackager = baseBuilder luaPath {
+    nixCatsBuilder = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
-    } categoryDefinitions;
-    nixCatsBuilder = customPackager packageDefinitions;
+    } categoryDefinitions packageDefinitions;
+    defaultPackage = nixCatsBuilder defaultPackageName;
     # this is just for using utils such as pkgs.mkShell
     # The one used to build neovim is resolved inside the builder
     # and is passed to our categoryDefinitions and packageDefinitions
@@ -310,24 +310,21 @@
     # these outputs will be wrapped with ${system} by utils.eachSystem
 
     # this will make a package out of each of the packageDefinitions defined above
-    # and set the default package to the one named here.
-    packages = utils.mkPackages nixCatsBuilder packageDefinitions defaultPackageName;
+    # and set the default package to the one passed in here.
+    packages = utils.mkAllWithDefault defaultPackage;
 
     # choose your package for devShell
     # and add whatever else you want in it.
     devShells = {
       default = pkgs.mkShell {
         name = defaultPackageName;
-        packages = [ (nixCatsBuilder defaultPackageName) ];
+        packages = [ defaultPackage ];
         inputsFrom = [ ];
         shellHook = ''
         '';
       };
     };
 
-    # To choose settings and categories from the flake that calls this flake.
-    # and you export overlays so people dont have to redefine stuff.
-    inherit customPackager;
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
@@ -335,12 +332,10 @@
     # this will make an overlay out of each of the packageDefinitions defined above
     # and set the default overlay to the one named here.
     overlays = utils.makeOverlays luaPath {
-      # we pass in the things to make a pkgs variable to build nvim with later
       inherit nixpkgs dependencyOverlays extra_pkg_config;
-      # and also our categoryDefinitions
     } categoryDefinitions packageDefinitions defaultPackageName;
 
-    # we also export a nixos module to allow configuration from configuration.nix
+    # we also export a nixos module to allow reconfiguration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       inherit defaultPackageName dependencyOverlays luaPath
         categoryDefinitions packageDefinitions nixpkgs;
@@ -350,13 +345,7 @@
       inherit defaultPackageName dependencyOverlays luaPath
         categoryDefinitions packageDefinitions nixpkgs;
     };
-    # now we can export some things that can be imported in other
-    # flakes, WITHOUT needing to use a system variable to do it.
-    # and update them into the rest of the outputs returned by the
-    # eachDefaultSystem function.
-    inherit utils categoryDefinitions packageDefinitions dependencyOverlays;
-    inherit (utils) templates baseBuilder;
-    keepLuaBuilder = utils.baseBuilder luaPath;
+    inherit utils;
+    inherit (utils) templates;
   };
-
 }

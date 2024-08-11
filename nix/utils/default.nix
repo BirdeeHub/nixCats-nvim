@@ -124,6 +124,16 @@ with builtins; rec {
         ) allnames);
     });
 
+    mkAllPackages = package: let
+      allnames = builtins.attrNames package.passthru.packageDefinitions;
+    in
+    listToAttrs (map (name:
+      lib.nameValuePair name (package.override { inherit name; })
+    ) allnames);
+
+    mkAllWithDefault = package:
+    { default = package; } // (utils.mkAllPackages package);
+
     easyMultiOverlay = package: let
       allnames = builtins.attrNames package.passthru.packageDefinitions;
     in
@@ -267,8 +277,7 @@ with builtins; rec {
             else []));
 
     # in case someoneone wants flake-utils but for only 1 output.
-    bySystems = systems: f:
-      lib.genAttrs systems (system: f system);
+    bySystems = lib.genAttrs;
 
   };
 
