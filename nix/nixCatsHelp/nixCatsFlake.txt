@@ -30,8 +30,7 @@ the flake in your Lua, see:
 `stdpath('config')` will still point to ~/.config/<configDirName>.
 But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
-it would be to find something outside the directory. 
-Inside is mostly handled by vim.
+it would be to write to it, and we cant write to store paths anyway. 
 You could use `require('nixCats').configDir`,
 or `nixCats('nixCats_store_config_location')`
 (yes its called store location, but it actually always
@@ -643,7 +642,7 @@ That argument is the name of the neovim package to be packaged.
 
 2. A set containing:
   The dependencyOverlays set or list,
-  extra_pkg_config, nixpkgs, and system so it can
+  extra_pkg_config, nixpkgs, nixCats_passthru, and system so it can
   resolve pkgs and pass it where it needs to go.
 
 3. our function that takes an individual package definition
@@ -657,11 +656,12 @@ It is now a function that takes a name, and returns your chosen neovim package.
   utils.eachSystem nixpkgs.lib.platforms.all (system: let
     # create our builder for our exports
     inherit (utils) baseBuilder;
-    customPackager = baseBuilder luaPath {
+    nixCatsBuilder = baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
-    } categoryDefinitions;
-    # takes the name of a package definition, builds the package:
-    nixCatsBuilder = customPackager packageDefinitions;
+    } categoryDefinitions packageDefinitions;
+    # it can take a name of a package in packageDefinitions
+    # and return the package!
+    defaultPackage = nixCatsBuilder defaultPackageName;
     # ... rest of the outputs section explained
     # below in :h nixCats.flake.outputs.exports ...
 <
@@ -715,33 +715,19 @@ If you use it wrong, you will most likely get this error message:
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
 
-The main thing you may need to do in this section is
-to change the default package name to whatever the name of
-your default packageDefinition of choice is.
-
-for information on how to use these options when importing your nixCats flake,
-see :help |nixCats.installation_options|
-
-They look like this:
+They look something like this:
 >nix
-    # see :help nixCats.flake.outputs.exports
+  # this first section is the outputs we
+  # want to wrap with the ${system} variable
   utils.eachSystem nixpkgs.lib.platforms.all (system: let
-    # this is how we use the builder:
-
-    # first it needs a path to the lua to include
-
-    # it takes a set with nixpkgs and system and our overlays
-    # so that it can internally resolve pkgs variable
-    # and avoid issues with system variable in module options for you.
-
+    # this is the builder (see :h nixCats.flake.outputs.builder above):
+    nixCatsBuilder = utils.baseBuilder luaPath {
+      inherit nixpkgs system dependencyOverlays extra_pkg_config;
+    } categoryDefinitions packageDefinitions;
     # then it takes our categoryDefinitions and packageDefinitions
 
-    # then in the next section, we apply the names as the final input
-    inherit (utils) baseBuilder;
-    customPackager = baseBuilder luaPath {
-      inherit nixpkgs system dependencyOverlays extra_pkg_config;
-    } categoryDefinitions;
-    nixCatsBuilder = customPackager packageDefinitions;
+    # then we build a package to serve as the default one by providing its name.
+    defaultPackage = nixCatsBuilder defaultPackageName;
 
     # this is just for using utils in the following section such as pkgs.mkShell
     # The one used to build neovim is resolved inside the builder
@@ -757,24 +743,21 @@ They look like this:
     # these outputs will be wrapped with ${system} by utils.eachSystem
 
     # this will make a package out of each of the packageDefinitions defined above
-    # and set the default package to the one named here.
-    packages = utils.mkPackages nixCatsBuilder packageDefinitions "nixCats";
+    # and set the default package to the one passed in here.
+    packages = utils.mkAllWithDefault defaultPackage;
 
     # choose your package for devShell
     # and add whatever else you want in it.
     devShells = {
       default = pkgs.mkShell {
         name = defaultPackageName;
-        packages = [ (nixCatsBuilder defaultPackageName) ];
+        packages = [ defaultPackage ];
         inputsFrom = [ ];
         shellHook = ''
         '';
       };
     };
 
-    # To choose settings and categories from the flake that calls this flake.
-    # and you export overlays so people dont have to redefine stuff.
-    inherit customPackager;
   }) // {
 
     # these outputs will be NOT wrapped with ${system}
@@ -782,17 +765,9 @@ They look like this:
     # now we can export some things that can be imported in other
     # flakes, WITHOUT needing to use a system variable to do it.
     # and update them into the rest of the outputs returned by the
-    # eachDefaultSystem function.
+    # eachSystem function.
 
-    # this will make an overlay out of each of the packageDefinitions defined above
-    # and set the default overlay to the one named here.
-    overlays = utils.makeOverlays luaPath {
-      # we pass in the things to make a pkgs variable to build nvim with later
-      inherit nixpkgs dependencyOverlays extra_pkg_config;
-      # and also our categoryDefinitions
-    } categoryDefinitions packageDefinitions defaultPackageName;
-
-    # this will make an overlay out of each of the packageDefinitions defined above
+    # this will make an overlay out of each of the packageDefinitions defined
     # and set the default overlay to the one named here.
     overlays = utils.makeOverlays luaPath {
       # we pass in the things to make a pkgs variable to build nvim with later
@@ -801,74 +776,31 @@ They look like this:
     } categoryDefinitions packageDefinitions defaultPackageName;
 
     # we export a nixos module to allow configuration from configuration.nix
+    # allows you to either inherit values from your main flake, or start fresh
     nixosModules.default = utils.mkNixosModules {
-      defaultPackageName = "nixCats";
-      inherit dependencyOverlays luaPath
+      inherit dependencyOverlays luaPath defaultPackageName
         categoryDefinitions packageDefinitions nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
-      defaultPackageName = "nixCats";
-      inherit dependencyOverlays luaPath
+      inherit dependencyOverlays luaPath defaultPackageName
         categoryDefinitions packageDefinitions nixpkgs;
     };
-    inherit utils categoryDefinitions dependencyOverlays packageDefinitions;
-    inherit (utils) templates baseBuilder;
-    keepLuaBuilder = utils.baseBuilder luaPath;
+    inherit utils;
+    inherit (utils) templates;
   };
 <
 
-First, we export all the packages in our package definitions
-as packages and overlays using our utilities, and define a devShell.
+We also export the <utils> set so we can get it easier later,
+along with <templates> which are inside it.
+The <utils> is also exported by the passthru of all packages based on nixCats
+but exporting it separately makes it easier to get again later.
 
-Now for the required exports for nix integration options.
-They allow you to always export all of the same customization options to new
-flakes as the original one has, but for your own flake.
-
-First, <customPackager>. This would allow you to choose what
-settings and categories you wanted in a flake that imports this flake,
-without needing to redefine anything else.
-
-Then <dependencyOverlays>.
-These are all the overlays that you imported.
-You may use utils.mergeOverlayLists to incorporate overlays 
-from other nixCats flakes without worrying about naming conflicts.
-
-Then <categoryDefinitions>
-The function where you set up your categories in flake.nix
-This allows importing flakes to do a lot less copy pasting.
-
-Then <packageDefinitions>
-The set where you chose categories and settings for each package.
-This allows importing flakes to do a lot less copy pasting.
-
-<mkNixosModules> {
-    defaultPackageName = "nixCats";
-    luaPath = "${./.}";
-    inherit nixpkgs dependencyOverlays
-      categoryDefinitions packageDefinitions;
-};
-Pass this set into utils.mkNixosModules and choose a defaultPackageName.
-It will create a nixos module that you can import in configuration.nix
-and will provide all the same import options as the usual flake import would
-provide. If you do not have a luaPath, you may pass it a keepLua builder
-See :help |nixCats.flake.outputs.exports.mkNixosModules|
-
-<mkHomeModules>
-The same as mkNixosModules above, but for home manager.
-
-
-We export the <utils> set, along with <templates> and <baseBuilder> which are
-inside it.
-Then we also define a <keepLuaBuilder>, which is a <baseBuilder> with our config path
-passed into it.
-
-The <utils> set contains the <templates> and <baseBuilder>
 It also contains all the other functions used in creating the format in the
-template! If not for needing to export a module, this repo could output just
-the utils set and just function.
+templates, including the main builder!
+(see :h |nixCats.flake.outputs.builder| for builder explanation)
 
-In addition to the above, the utils set contains:
+In addition to the templates and the builder function, the utils set contains:
 
 <standardPluginOverlay> inputs:
 allows for inputs named plugins-something to be
@@ -910,11 +842,35 @@ If dependencyOverlays is an attrset, system string is required.
 If dependencyOverlays is a list, system string is ignored
 If invalid type or system, returns an empty list
 
+<mkNixosModules> {
+    defaultPackageName = "nixCats";
+    luaPath = "${./.}";
+    inherit nixpkgs dependencyOverlays
+      categoryDefinitions packageDefinitions;
+};
+Will create a nixos module that you can import in configuration.nix
+If you do not have a luaPath, you may pass it a keepLua builder
+See :help |nixCats.flake.outputs.exports.mkNixosModules|
+The packages also export a module with defaultPackageName
+set to THEIR package name via their passthru variable using this function.
+
+<mkHomeModules>
+The same as mkNixosModules above, but for home manager.
+
+<mkAllWithDefault> package:
+makes each package in the packageDefinitions this package was made from
+and also a default one out of the one passed in.
+
+<mkAllPackages> package:
+makes each package in the packageDefinitions this package was made from
+
 <mkPackages> finalBuilder: packageDefinitions: defaultName:
-makes each package and also a default one
+makes each package in packageDefinitions and also a default one
+where finalBuilder is the builder function with all but the name applied
 
 <mkExtraPackages> finalBuilder: packageDefinitions:
 mkPackages just calls this and adds a default one.
+where finalBuilder is the builder function with all but the name applied
 
 <makeOverlays> luaPath: {
         nixpkgs
@@ -926,6 +882,8 @@ mkPackages just calls this and adds a default one.
       defaultName:
 makes an overlay for each package and also a default one
 These are basically the same as the arguments to utils.baseBuilder
+dependencyOverlays may be dependencyOverlays.${system} = [ list of overlays ];
+or simply dependencyOverlays = [ list of overlays ];
 
 <makeMultiOverlay> <same args as makeOverlays BUT with the following 2 args INSTEAD of `defaultName`>:
             `importName:` `namesIncList:`
@@ -1002,11 +960,8 @@ More information on the modules can be found at :h |nixCats.module|
       categoryDefinitions packageDefinitions;
 };
 
-where dependencyOverlays is a set of system names
-with lists of overlays in each item. Such that
-the lists would be accessed via dependencyOverlays.${system}
-
-If you do not have a luaPath, you may pass it a keepLua builder.
+dependencyOverlays may be dependencyOverlays.${system} = [ list of overlays ];
+or simply dependencyOverlays = [ list of overlays ];
 
 IMPORTANT
 By default, the module inherits your flake or nixExpressionFlakeOutputs nixpkgs object,

@@ -378,15 +378,14 @@
   forEachSystem (system: let
     # get our base builder
     inherit (utils) baseBuilder;
-    # give it everything except packageDefinitions
-    customPackager = baseBuilder luaPath {
+    # and this will be our builder! it takes a name from our packageDefinitions as an argument, and builds an nvim.
+    nixCatsBuilder = baseBuilder luaPath {
       # we pass in the things to make a pkgs variable to build nvim with later
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
-      # and also our categoryDefinitions
-    } categoryDefinitions;
+      # and also our categoryDefinitions and packageDefinitions
+    } categoryDefinitions packageDefinitions;
 
-    # and this will be our builder! it takes a name from our packageDefinitions as an argument, and builds an nvim.
-    nixCatsBuilder = customPackager packageDefinitions;
+    defaultPackage = nixCatsBuilder defaultPackageName;
 
     # this pkgs variable is just for using utils such as pkgs.mkShell
     # within this outputs set.
@@ -397,23 +396,21 @@
     # these outputs will be wrapped with ${system} by utils.eachSystem
 
     # this will make a package out of each of the packageDefinitions defined above
-    # and set the default package to the one named here.
-    packages = utils.mkPackages nixCatsBuilder packageDefinitions defaultPackageName;
+    # and set the default package to the one passed in here.
+    packages = utils.mkAllWithDefault defaultPackage;
 
     # choose your package for devShell
     # and add whatever else you want in it.
     devShells = {
       default = pkgs.mkShell {
         name = defaultPackageName;
-        packages = [ (nixCatsBuilder defaultPackageName) ];
+        packages = [ defaultPackage ];
         inputsFrom = [ ];
         shellHook = ''
         '';
       };
     };
 
-    # To set just packageDefinitions from the config that calls this flake.
-    inherit customPackager;
   }) // {
 
     # now we can export some things that can be imported in other
@@ -425,9 +422,7 @@
     # this will make an overlay out of each of the packageDefinitions defined above
     # and set the default overlay to the one named here.
     overlays = utils.makeOverlays luaPath {
-      # we pass in the things to make a pkgs variable to build nvim with later
       inherit nixpkgs dependencyOverlays extra_pkg_config;
-      # and also our categoryDefinitions
     } categoryDefinitions packageDefinitions defaultPackageName;
 
     # we also export a nixos module to allow configuration from configuration.nix
@@ -440,12 +435,22 @@
       inherit defaultPackageName dependencyOverlays luaPath
         categoryDefinitions packageDefinitions nixpkgs;
     };
-    inherit utils categoryDefinitions packageDefinitions;
-    inherit (utils) templates baseBuilder;
+    inherit utils;
+    inherit (utils) templates;
+
+    # override feature makes these following outputs unnecessary,
+    # and I would be surprised if someone was merging categoryDefinitions or packageDefinitions
+    # from the example config into their own. The example config does a good job with lsps
+    # but a bad job with lazy loading for simplicities sake,
+    # only lazy loading 1 plugin for demonstration purposes.
+    # In addition to them being available in override, you can still get them via passthru
+    inherit categoryDefinitions packageDefinitions;
+    inherit (utils) baseBuilder;
     keepLuaBuilder = utils.baseBuilder luaPath;
     inherit dependencyOverlays;
-    # dependencyOverlays was wrapped with the ${system} variable earlier,
-    # so we export that here as well.
+    # But in case people were using them, we will still export them for now.
+    # Will be removed along with the old mkOverlays functions on 2024-09-01
+    # and were already removed from the templates
   };
 
 }

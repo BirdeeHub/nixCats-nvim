@@ -61,9 +61,14 @@
   overriding = {
     path = ./overriding;
     description = ''
-      How to RECONFIGURE nixCats without DUPLICATION,
+      How to RECONFIGURE nixCats WITHOUT DUPLICATION,
       given only an existing nixCats package,
       achieved via the OVERRIDE function.
+
+      In addition, it is also a demonstration of how to export a nixCats configuration
+      as an AppImage.
+
+      It is a 2 for 1 example of 2 SEPARATE things one could do.
     '';
   };
   overlayHub = {
@@ -78,19 +83,6 @@
     description = ''
       A template for an empty overlay file defined as described in
       :help nixCats.flake.nixperts.overlays
-    '';
-  };
-  REREREconfigure = {
-    path = ./REREREconfigure;
-    description = ''
-      How to import an ALREADY CONFIGURED nixCats-based configuration into a new flake,
-      then modify it with new packages and configuration,
-      and export the result in a format matching the original.
-
-      In addition, it is also a demonstration of how to export a nixCats configuration
-      as an AppImage.
-
-      It is a 2 for 1 example of 2 SEPARATE things one could do.
     '';
   };
 }

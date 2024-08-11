@@ -147,14 +147,9 @@
       # and reconfigure it in that home module, which will be in the namespace
       # config.${packageName} = { enable = true; <see :help nixCats.module> };
 
-    in {
-      # NOTE:
-      # here we will export our packages to
-      # packages.${system}.default
-      # and packages.${system}.${defaultPackageName}
-      default = finalPackage;
-      ${defaultPackageName} = finalPackage;
-    });
+    # will make a set containing all the packages by name,
+    # and a default package containing the package we passed in.
+    in utils.mkAllWithDefault finalPackage);
 
     # NOTE: we can still also export everything relevant from before!
     homeModule = self.packages.x86_64-linux.default.passthru.homeModule;

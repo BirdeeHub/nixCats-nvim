@@ -299,7 +299,7 @@ import ./wrapNeovim.nix {
   in {
     keepLuaBuilder = utils.baseBuilder luaPath;
     nixCats_packageName = name;
-    inherit categoryDefinitions packageDefinitions dependencyOverlays utils;
+    inherit categoryDefinitions packageDefinitions dependencyOverlays luaPath utils;
     nixosModule = utils.mkNixosModules {
       defaultPackageName = name;
       inherit dependencyOverlays luaPath

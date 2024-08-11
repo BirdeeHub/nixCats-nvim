@@ -6,15 +6,19 @@
 
     This template shows how to reconfigure an already configured package
     without simply overwriting it and starting from scratch.
-
     Any package based on nixCats is a full nixCats.
+
+    It also shows you how to make an appimage out of a nvim config as a bonus
   '';
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
+    # we are going to modify the example nixCats config to export
+    # an appimage using this bunder tool.
+    nix-appimage.url = "github:ralismark/nix-appimage";
   };
-  outputs = { nixpkgs, nixCats, ... }@inputs: let
+  outputs = { self, nixpkgs, nixCats, nix-appimage, ... }@inputs: let
     # we are using a different forEachSystem for only 1 output.
     # rather than the full flake-utils function.
     # This is because I decided to only demonstrate outputting packages for this template,
@@ -62,10 +66,6 @@
             ]
           )
         ]);
-        # NOTE: or to replace:
-        # dependencyOverlays = forSystems (system: [
-        #   (utils.standardPluginOverlay inputs)
-        # ]);
       });
 
       # you can call override many times. We could have also have done this all in 1 call.
@@ -76,7 +76,21 @@
           # We do this with utils.mergeCatDefs
           # and now we can add some more stuff.
           lspsAndRuntimeDeps = with pkgs; {
-            newcat = [ hello ];
+            appimage = [
+              # We include these extra dependencies so that our AppImage will always have what it needs.
+              # The appimage is not sandboxed from the path.
+              # However it has its own internal /nix directory.
+              # This means it cannot see packages that were installed
+              # globally via nix specifically, but it will find things installed via other package managers.
+              # since the main reason to use the AppImage is when you
+              # cannot use nix at all, this ends up not being an issue.
+              coreutils-full
+              xclip
+              wl-clipboard
+              git
+              nix
+              curl
+            ];
           };
           startupPlugins = with pkgs.vimPlugins; {
             newcat = [
@@ -89,7 +103,6 @@
                   require('mini.surround').setup()
                 '';
               }
-
             ];
           };
           # you could also source the current directory ON TOP of the one in luaPath.
@@ -125,7 +138,7 @@
           # we merge the new definitions into
           # the prev.packageDefinitions.nixCats package 
           # which was in the original packageDefinitions set.
-          newvim = (utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
+          newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
             settings = {
               # these ones override the old ones
               aliases = [ "nvi" ];
@@ -137,7 +150,15 @@
               # We merged, rather than overwriting them.
               # You can see all of them with `:NixCats cats` in your editor!
             };
-          }));
+          });
+          # this is the package we are going to build into an appimage
+          appCats = utils.mergeCatDefs prev.packageDefinitions.nixCats ({pkgs , ... }: {
+            categories = {
+              # include our new category
+              # with the extra dependencies needed for the appimage version.
+              appimage = true;
+            };
+          });
         };
       });
       # and choose the name of the package you want to build
@@ -158,11 +179,17 @@
       nixCats = finalPackageOld;
       inherit withExtraCats withExtraOverlays withExtraPkgDefs OGpkg;
     });
-    # as you can see, from running :NixCats pawsible and :!hello in the newvim package,
+    # as you can see, from running :NixCats pawsible in the newvim package,
     # built by running `nix build .#newvim` or `nix build .`
     # you now have a copy of the nixCats example config,
-    # but with an added mini-nvim and gnu hello!
+    # but with an added mini-nvim!
     # You also have some other packages at varying stages of being overridden.
     # each override call produces a new package with the new changes.
+
+    # nix build .#app-images.x86_64-linux.default
+    app-images = forSystems (system: {
+      # and use the bunder to make an appimage out of the appCats package!
+      default = nix-appimage.bundlers.${system}.default (self.packages.${system}.default.override { name = "appCats"; });
+    });
   };
 }
