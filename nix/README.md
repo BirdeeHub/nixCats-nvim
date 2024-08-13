@@ -1,13 +1,32 @@
 This directory contains the internals of nixCats.
 
+If you do not wish to use packages or modules based on my configuration, and would rather
+have your own config and have modules based on your own configuration, you dont need the main flake.
+
+This directory is imported from github by the templates under `inputs.nixCats.utils` and does not need to be present in your personal config.
+
+Everything you need is in the utils set.
+
+If you used the default, or nixExpressionFlakeOutputs template,
+you can optionally change your nixCats url to the following, and remove the follows statement:
+
+```nix
+inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=nix";
+# or
+inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim/<ref_or_rev>?dir=nix";
+
+# note, this makes the following no longer relevant:
+# inputs.nixCats.inputs.nixpkgs.follows = "nixpkgs";
+```
+
+---
+
 [./builder](./builder) and [./utils](./utils) contain the implementation of the nixCats wrapper.
 
 [./templates](./templates) contains the starter templates, and some examples of various aspects of nix, neovim, or this project.
 You can initialize them into a directory with `nix flake init -t github:BirdeeHub/nixCats#<templatename>`
 
 [./nixCatsHelp](./nixCatsHelp) contains the in-editor documentation.
-
-This directory is imported from github by the templates under `inputs.nixCats.utils` and does not need to be present in your personal config.
 
 Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix) and documented at [:h nixCats.flake.outputs.exports](./nixCatsHelp/nixCatsFlake.txt)
 

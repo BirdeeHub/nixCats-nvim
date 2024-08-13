@@ -30,7 +30,7 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
 
   # If using zsh with extra regexing, be sure to escape the #
 <
-This will create an empty version of flake.nix (or default.nix or systemCat.nix and homeCat.nix) for you to fill in,
+This will create an empty version of flake.nix (or default.nix) for you to fill in,
 along with an empty overlays directory for any custom builds from source
 required, if any. It will directly import the utils and thus also the builder and
 help from nixCats-nvim itself, keeping your configuration clean.
