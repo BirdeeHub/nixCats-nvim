@@ -20,7 +20,7 @@ Everything in [./nix/templates](./nix/templates) is also either a starter templa
 The [in-editor help](./nix/nixCatsHelp) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the highlighting works.
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
-When you are ready, [start](./nix/templates/overwrite) [with](./nix/templates/nixExpressionFlakeOutputs) a [template](./nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
+When you are ready, start [with](./nix/templates/nixExpressionFlakeOutputs) a [template](./nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
 If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](./nix/nixCatsHelp/luaUtils.txt) and [demonstrated here](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
 
