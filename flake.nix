@@ -33,7 +33,7 @@
 
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, ... }@inputs: let
-    utils = (import ./nix/utils).utils;
+    utils = import ./nix;
     luaPath = "${./.}";
     # this is flake-utils eachSystem
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;

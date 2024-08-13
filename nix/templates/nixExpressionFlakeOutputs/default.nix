@@ -5,8 +5,7 @@
   # (lazy.nvim wrapper only works on unstable)
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
-    nixCats.inputs.nixpkgs.follows = "nixpkgs";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=nix";
   };
 
   Then call this file with:
@@ -20,7 +19,7 @@
   The following is just the outputs function from the flake template.
  */
 {inputs, ... }@attrs: let
-  inherit (inputs) nixpkgs;
+  inherit (inputs) nixpkgs; # <-- nixpkgs = inputs.nixpkgsSomething;
   inherit (inputs.nixCats) utils;
   luaPath = "${./.}";
   forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
@@ -38,11 +37,10 @@
     # `plugins-<pluginName>`
     # Once we add this overlay to our nixpkgs, we are able to
     # use `pkgs.neovimPlugins`, which is a set of our plugins.
-    dependencyOverlays = [ (utils.mergeOverlayLists inputs.nixCats.dependencyOverlays.${system}
-    ((import ./overlays inputs) ++ [
+    dependencyOverlays = (import ./overlays inputs) ++ [
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
-    ])) ];
+    ];
   in { inherit dependencyOverlays; })) dependencyOverlays;
 
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
