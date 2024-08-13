@@ -46,7 +46,7 @@
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 
     propagatedBuildInputs = {
-      generalBuildInputs = with pkgs; [
+      general = with pkgs; [
       ];
     };
 
@@ -61,7 +61,6 @@
     };
 
     optionalPlugins = {
-      customPlugins = with pkgs.nixCatsBuilds; [ ];
       gitPlugins = with pkgs.neovimPlugins; [ ];
       general = with pkgs.vimPlugins; [ ];
     };
@@ -119,7 +118,6 @@
       # (and other information to pass to lua)
       categories = {
         general = true;
-        generalBuildInputs = true;
         test = true;
         example = {
           youCan = "add more than just booleans";

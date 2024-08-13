@@ -157,7 +157,6 @@ in {
             };
             # see :help nixCats.flake.outputs.packageDefinitions
             categories = {
-              generalBuildInputs = true;
               markdown = true;
               general.vimPlugins = true;
               general.gitPlugins = true;

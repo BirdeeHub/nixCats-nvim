@@ -94,7 +94,7 @@
       # However, they WILL be available to the shell 
       # and neovim path when using nix develop
       propagatedBuildInputs = {
-        generalBuildInputs = with pkgs; [
+        general = with pkgs; [
         ];
       };
 
@@ -109,7 +109,6 @@
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
-        customPlugins = with pkgs.nixCatsBuilds; [ ];
         gitPlugins = with pkgs.neovimPlugins; [ ];
         general = with pkgs.vimPlugins; [ ];
       };
@@ -117,7 +116,6 @@
       # not loaded automatically at startup.
       # use with packadd and an autocommand in config to achieve lazy loading
       optionalPlugins = {
-        customPlugins = with pkgs.nixCatsBuilds; [ ];
         gitPlugins = with pkgs.neovimPlugins; [ ];
         general = with pkgs.vimPlugins; [ ];
       };
@@ -175,7 +173,7 @@
     packageDefinitions = {
       # These are the names of your packages
       # you can include as many as you wish.
-      nixCats = {pkgs , ... }: {
+      nvim = {pkgs , ... }: {
         # they contain a settings set defined above
         # see :help nixCats.flake.outputs.settings
         settings = {
@@ -191,7 +189,6 @@
           general = true;
           gitPlugins = true;
           customPlugins = true;
-          generalBuildInputs = true;
           test = true;
           example = {
             youCan = "add more than just booleans";
@@ -207,7 +204,7 @@
     };
   # In this section, the main thing you will need to do is change the default package name
   # to the name of the packageDefinitions entry you wish to use as the default.
-    defaultPackageName = "nixCats";
+    defaultPackageName = "nvim";
   in
 
 

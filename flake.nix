@@ -86,7 +86,7 @@
       # However, they WILL be available to the shell 
       # and neovim path when using nix develop
       propagatedBuildInputs = {
-        generalBuildInputs = with pkgs; [
+        general = with pkgs; [
         ];
       };
 
@@ -293,7 +293,6 @@
         };
         # see :help nixCats.flake.outputs.packageDefinitions
         categories = {
-          generalBuildInputs = true;
           markdown = true;
           general.vimPlugins = true;
           general.gitPlugins = true;
@@ -328,7 +327,6 @@
           # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
         };
         categories = {
-          generalBuildInputs = true;
           markdown = true;
           general = true;
           custom = true;

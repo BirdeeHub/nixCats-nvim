@@ -94,7 +94,7 @@
       # However, they WILL be available to the shell 
       # and neovim path when using nix develop
       propagatedBuildInputs = {
-        generalBuildInputs = with pkgs; [
+        general = with pkgs; [
         ];
       };
 
@@ -257,7 +257,6 @@
           general = true;
           gitPlugins = true;
           customPlugins = true;
-          generalBuildInputs = true;
           test = true;
 
           kickstart-autopairs = true;
