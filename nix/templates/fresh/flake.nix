@@ -214,8 +214,7 @@
 
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
-    inherit (utils) baseBuilder;
-    nixCatsBuilder = baseBuilder luaPath {
+    nixCatsBuilder = utils.baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions packageDefinitions;
     defaultPackage = nixCatsBuilder defaultPackageName;

@@ -376,10 +376,8 @@
   # but you should at least eventually try to figure out whats going on here!
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
-    # get our base builder
-    inherit (utils) baseBuilder;
     # and this will be our builder! it takes a name from our packageDefinitions as an argument, and builds an nvim.
-    nixCatsBuilder = baseBuilder luaPath {
+    nixCatsBuilder = utils.baseBuilder luaPath {
       # we pass in the things to make a pkgs variable to build nvim with later
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
       # and also our categoryDefinitions and packageDefinitions
