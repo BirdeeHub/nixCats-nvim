@@ -60,10 +60,10 @@
         dependencyOverlays = forSystems (system: [
           (utils.mergeOverlayLists
             (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
-            [
+            (/* (import ./overlays inputs) ++ */[
               (utils.standardPluginOverlay inputs)
               # any other flake overlays here.
-            ]
+            ])
           )
         ]);
       });

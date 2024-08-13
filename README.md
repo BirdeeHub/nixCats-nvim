@@ -124,10 +124,12 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
 
   # If using zsh with extra regexing, be sure to escape the #
 ```
-This will create an empty version of flake.nix (or default.nix) for you to fill in,
-along with an empty overlays directory for any custom builds from source
-required, if any. It will import the utils set and thus also the builder and
-help from nixCats-nvim itself. If you added the luaUtils template, you should have that now too at [./lua/nixCatsUtils](./lua/nixCatsUtils).
+This will create an empty version of flake.nix (or default.nix) for you to fill in.
+
+It will import the utils set and thus also the builder and
+help from nixCats-nvim itself.
+
+If you added the luaUtils template, you should have that now too at [./lua/nixCatsUtils](./lua/nixCatsUtils).
 
 Re-enter the nixCats nvim version by typing `nixCats .` and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.

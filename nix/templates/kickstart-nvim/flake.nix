@@ -67,7 +67,7 @@
     # without fear.
     inherit (forEachSystem (system: let
       # see :help nixCats.flake.outputs.overlays
-      dependencyOverlays = (import ./overlays inputs) ++ [
+      dependencyOverlays = /* (import ./overlays inputs) ++ */ [
         # This overlay grabs all the inputs named in the format
         # `plugins-<pluginName>`
         # Once we add this overlay to our nixpkgs, we are able to

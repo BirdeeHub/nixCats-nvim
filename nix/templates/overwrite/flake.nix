@@ -50,7 +50,7 @@
 
         # dependencyOverlays.${system} = [ (final: prev: {}) ];
         dependencyOverlays = forSystems (system: (
-          (import ./overlays inputs) ++ [
+          /* (import ./overlays inputs) ++ */ [
             (utils.standardPluginOverlay inputs)
             # other overlays
           ]

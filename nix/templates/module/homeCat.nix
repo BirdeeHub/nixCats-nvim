@@ -16,7 +16,7 @@ in {
       # this will add the overlays from ./overlays and also,
       # add any plugins in inputs named "plugins-pluginName" to pkgs.neovimPlugins
       # It will not apply to overall system, just nixCats.
-      addOverlays = (import ./overlays inputs) ++ [
+      addOverlays = /* (import ./overlays inputs) ++ */ [
         (utils.standardPluginOverlay inputs)
       ];
       packageNames = [ "myHomeModuleNvim" ];
