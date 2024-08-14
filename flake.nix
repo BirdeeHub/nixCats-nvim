@@ -424,12 +424,12 @@
     # we also export a nixos module to allow configuration from configuration.nix
     nixosModules.default = utils.mkNixosModules {
       inherit defaultPackageName dependencyOverlays luaPath
-        categoryDefinitions packageDefinitions nixpkgs;
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       inherit defaultPackageName dependencyOverlays luaPath
-        categoryDefinitions packageDefinitions nixpkgs;
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
     };
     inherit utils;
     inherit (utils) templates;
