@@ -303,13 +303,13 @@ import ./wrapNeovim.nix {
     nixosModule = utils.mkNixosModules {
       defaultPackageName = name;
       inherit dependencyOverlays luaPath
-        categoryDefinitions packageDefinitions nixpkgs;
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = name;
       inherit dependencyOverlays luaPath
-        categoryDefinitions packageDefinitions nixpkgs;
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
     };
   });
   inherit pkgs nixpkgs;

@@ -188,11 +188,12 @@ with builtins; rec {
       , packageDefinitions
       , defaultPackageName
       , nixpkgs
+      , extra_pkg_config ? {}
       , ... }:
       (import ./nixosModule.nix {
         oldDependencyOverlays = dependencyOverlays;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-          packageDefinitions defaultPackageName utils;
+          packageDefinitions defaultPackageName extra_pkg_config utils;
       });
 
     mkHomeModules = {
@@ -203,11 +204,12 @@ with builtins; rec {
       , packageDefinitions
       , defaultPackageName
       , nixpkgs
+      , extra_pkg_config ? {}
       , ... }:
       (import ./homeManagerModule.nix {
         oldDependencyOverlays = dependencyOverlays;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-          packageDefinitions defaultPackageName utils;
+          packageDefinitions defaultPackageName extra_pkg_config utils;
       });
 
     # These were deprecated due to needing to be wrapped with ${system} and thus failing flake check

@@ -9,14 +9,14 @@ We create the module by exporting the following in our flake outputs.
     defaultPackageName = "nixCats";
     luaPath = "${./.}";
     inherit nixpkgs dependencyOverlays
-      categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions extra_pkg_config;
 };
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
     luaPath = "${./.}";
     inherit nixpkgs dependencyOverlays
-      categoryDefinitions packageDefinitions;
+      categoryDefinitions packageDefinitions extra_pkg_config;
 };
 
 where dependencyOverlays is a set of system names

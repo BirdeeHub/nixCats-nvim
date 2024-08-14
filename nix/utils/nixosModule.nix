@@ -9,6 +9,7 @@
   , defaultPackageName
   , utils
   , nixpkgs
+  , extra_pkg_config ? {}
   , ...
 }:
 
@@ -315,7 +316,7 @@
     in (builtins.listToAttrs (builtins.map (catName: let
         boxedCat = newLuaBuilder {
           nixpkgs = newNixpkgs;
-          extra_pkg_config = pkgs.config;
+          extra_pkg_config = extra_pkg_config // pkgs.config;
           inherit (pkgs) system;
           inherit dependencyOverlays;
         } newCategoryDefinitions pkgDefs catName;
