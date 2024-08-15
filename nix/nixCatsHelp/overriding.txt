@@ -251,6 +251,7 @@ This means you could output the following from a flake >nix
   homeModules = nixCats.packages.x86_64-linux.default.passthru.homeModule
 <
 and it would not matter which system you chose to use there.
+The module's options would be at `config.${packageName}`
 
 If you wanted to start over from scratch with just override,
 even easier. Just dont merge anything from prev.
