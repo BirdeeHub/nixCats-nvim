@@ -217,6 +217,7 @@ And we included our `newcat` category alongside the old ones!
         settings = {
           # these ones override the old ones
           aliases = [ "nvi" ];
+          # for available settings, see :h nixCats.flake.outputs.settings
         };
         categories = {
           # enable our new category
