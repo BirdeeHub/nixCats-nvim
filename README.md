@@ -17,7 +17,7 @@ It allows you to easily pass arbitrary information from nix to lua, easily refer
 
 The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the vimdoc links work.
+The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the vimdoc links work.
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
@@ -75,7 +75,7 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
   - contains the lazy.nvim wrapper.
 - other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](https://nixcats.org/nixCats_installation.html))
 - ability to call override as many times as you like to fully recustomize or combine packages
-- [Extensive in-editor help.](https://nixcats.org/)
+- [Extensive in-editor help.](https://nixcats.org/TOC.html)
 - I mentioned the templates already but if you want to see them all on github they are here: [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates)
 
 ---
@@ -224,13 +224,13 @@ You should make use of the in-editor help at:
 
 [:help nixCats.flake](https://nixcats.org/nixCats_format.html)
 
-[:help nixCats.*](https://nixcats.org/)
+[:help nixCats.*](https://nixcats.org/TOC.html)
 
 The help can be viewed here directly but it is adviseable to use a nix shell to view it from within the editor.
 
 Simply run `nix shell github:BirdeeHub/nixCats-nvim` and then run `nixCats` to open nvim and read it.
 
-Or `nix run github:BirdeeHub/nixCats-nvim` to open it directly and type [:h nixCats](https://nixcats.org) without hitting enter to see the help options in the auto-complete.
+Or `nix run github:BirdeeHub/nixCats-nvim` to open it directly and type [:h nixCats](https://nixcats.org/TOC.html) without hitting enter to see the help options in the auto-complete.
 
 This is because the vimdoc links in the help currently only work when viewed within nvim.
 
@@ -252,7 +252,7 @@ It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a cl
 If you're not on linux you don't need to care what those last 2 things mean.
 You also might want a [nerd font](https://www.nerdfonts.com/) for some icons depending on your OS, terminal, and configuration.
 
-(full usage covered in included help files, accessible [here](https://nixcats.org) and in editor, but *much better viewed in-editor* because the vimdoc links work there)
+(full usage covered in included help files, accessible [here](https://nixcats.org/TOC.html) and in editor, but *much better viewed in-editor* because the vimdoc links work there)
 
 If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
