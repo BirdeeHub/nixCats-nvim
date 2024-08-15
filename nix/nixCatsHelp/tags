@@ -12,6 +12,7 @@ nixCats.flake.outputs.categoryDefinitions.scheme	nixCatsFlake.txt	/*nixCats.flak
 nixCats.flake.outputs.exports	nixCatsFlake.txt	/*nixCats.flake.outputs.exports*
 nixCats.flake.outputs.exports.mkHomeModules	nixCatsFlake.txt	/*nixCats.flake.outputs.exports.mkHomeModules*
 nixCats.flake.outputs.exports.mkNixosModules	nixCatsFlake.txt	/*nixCats.flake.outputs.exports.mkNixosModules*
+nixCats.flake.outputs.getOverlays	nixCatsFlake.txt	/*nixCats.flake.outputs.getOverlays*
 nixCats.flake.outputs.overlays	nixCatsFlake.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packageDefinitions	nixCatsFlake.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCatsFlake.txt	/*nixCats.flake.outputs.settings*
@@ -24,5 +25,12 @@ nixCats.luaUtils.setup	luaUtils.txt	/*nixCats.luaUtils.setup*
 nixCats.module	nixCatsModules.txt	/*nixCats.module*
 nixCats.module.mkHomeModules	nixCatsModules.txt	/*nixCats.module.mkHomeModules*
 nixCats.module.mkNixosModules	nixCatsModules.txt	/*nixCats.module.mkNixosModules*
+nixCats.overriding	overriding.txt	/*nixCats.overriding*
+nixCats.overriding.categoryDefinitions	overriding.txt	/*nixCats.overriding.categoryDefinitions*
+nixCats.overriding.dependencyOverlays	overriding.txt	/*nixCats.overriding.dependencyOverlays*
+nixCats.overriding.name	overriding.txt	/*nixCats.overriding.name*
+nixCats.overriding.packageDefinitions	overriding.txt	/*nixCats.overriding.packageDefinitions*
+nixCats.overriding.setupVariables	overriding.txt	/*nixCats.overriding.setupVariables*
+nixCats.overriding.wrap-up	overriding.txt	/*nixCats.overriding.wrap-up*
 nixCats.overview	installation.txt	/*nixCats.overview*
 nixCats.templates	installation.txt	/*nixCats.templates*

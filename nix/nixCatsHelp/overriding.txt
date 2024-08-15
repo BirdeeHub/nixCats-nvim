@@ -1,0 +1,260 @@
+=================================================================================
+OVERRIDING:                                                 *nixCats.overriding*
+---------------------------------------------------------------------------------
+
+When you have already created at least 1 nixCats package, you gain a new
+ability. Overriding. Say we imported the example config from the nixCats repo.
+>nix
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nixCats.inputs.nixpkgs.follows = "nixpkgs";
+  };
+  outputs = { self, nixpkgs, nixCats, ... }@inputs: let
+    OGpackage = nixCats.packages.x86_64-linux.default;
+    inherit (OGpackage.passthru) utils;
+<
+Great. we have a package. It has a config with it, and all the arguments it
+was passed before. We also grabbed the utils set from it.
+
+In the following help, we will override many times. We could combine them all
+together into 1 big override, but it is better to show them separately for
+documentation purposes.
+
+---------------------------------------------------------------------------------
+                                           *nixCats.overriding.setupVariables*
+Here are some various settings you may recognize that you can override if you
+wish by setting their values here.
+You COULD overide them, but we did not here.
+we chose to inherit them from the main example config.
+If you wanted to build for a different system for example,
+you could change that here.
+>nix
+  pkgWithNewSetupVars = OGpackage.override (prev: {
+    inherit (prev) luaPath;
+    inherit (prev) nixpkgs;
+    inherit (prev) system;
+    inherit (prev) extra_pkg_config;
+    inherit (prev) nixCats_passthru;
+  };
+
+---------------------------------------------------------------------------------
+                                                     *nixCats.overriding.name*
+Overriding just the name of a nixCats package is highly effective.
+Overriding the name will cause it to build the name of the package from
+`packageDefinitions` with that name
+>nix
+  regularCats = OGpackage.override {
+    # this one was present in the packageDefinitions of the example config
+    name = "regularCats";
+  };
+<
+if we wanted regularCats but with a different system, we could override
+it in the same set, or chain overrides like so:
+>nix
+  pkgWithNewSetupVars2 = OGpackage.override (prev: {
+    system = "aarch64-linux";
+  })
+  regularCats = pkgWithNewSetupVars2.override {
+    name = "regularCats";
+  };
+<
+---------------------------------------------------------------------------------
+                                       *nixCats.overriding.dependencyOverlays*
+Now we will address the overlays. Overlays can be a list or a set,
+so they are slightly tricky.
+In practice, this is mostly just boilerplate you would get from a template so
+it is not too big of a pain.
+
+This is the same as both of the starter templates,
+we are just using a different function to iterate over systems
+to show more possibilities. It outputs to:
+>nix
+  dependencyOverlays.${system} = somelistofoverlays;
+
+  pkgWithNewOverlays = OGpackage.override (prev: {
+    dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
+      (utils.mergeOverlayLists
+        (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+        (/* (import ./overlays inputs) ++ */[
+          (utils.standardPluginOverlay inputs)
+          # any other flake overlays here.
+          inputs.neorg-overlay.overlays.default
+          inputs.lz-n.overlays.default
+          inputs.codeium.overlays.${system}.default
+        ])
+      )
+    ]);
+  });
+<
+`utils.safeOversList` just checks if `dependencyOverlays` is a list or a set of lists,
+and always returns a list
+
+OR
+as just a list, fixing improper overlays via helper function:
+>nix
+  pkgWithNewOverlays = OGpackage.override (prev: {
+    dependencyOverlays = [ (utils.mergeOverlayLists
+      (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+      (/* (import ./overlays inputs) ++ */[
+        (utils.standardPluginOverlay inputs)
+        # any other flake overlays here.
+        inputs.neorg-overlay.overlays.default
+        inputs.lz-n.overlays.default
+        # to fix systematized overlay sets
+        (utils.fixSystemizedOverlay inputs.codeium.overlays
+          (system: inputs.codeium.overlays.${system}.default)
+        )
+      ])
+    ) ];
+  });
+<
+ If you always choose the list option, it will always be
+a list from then on and thus no need for `utils.safeOversList`,
+but you still will need `utils.mergeOverlayLists` to merge overlays.
+
+---------------------------------------------------------------------------------
+                                      *nixCats.overriding.categoryDefinitions*
+In our `categoryDefinitions`, we most likely also want our new overlays.
+So lets chain it with pkgWithNewOverlays
+We can use `utils.mergeCatDefs` to merge in the previous `categoryDefinitions`
+It will update `prev.categoryDefinitions` with the new values recursively,
+replacing whenever it reaches 2 conflicting items that
+are not a set or a derivation and adding any new values.
+>nix
+  pkgWithExtraCats = pkgWithNewOverlays.override (prev: {
+    categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, ... }@packageDef: {
+      startupPlugins = with pkgs.vimPlugins; {
+        newcat = [
+          lz-n
+        ];
+      };
+      optionalPlugins = with pkgs.vimPlugins; {
+        newcat = [
+          { plugin = neorg;
+            type = "lua";
+            config = /*lua*/''
+              -- use our new lz.n to lazy load it!
+              require('lz.n').load({
+                -- use :NixCats pawsible to see the final name for packadd
+                "neorg",
+                ft = "norg",
+                after = function(_)
+                  require("neorg").setup({
+                    -- your settings here
+                  })
+                end
+              })
+            '';
+          }
+          # the home manager syntax for plugins is supported by nixCats
+          # which is useful for one-off cases like this.
+          # here we use it to lazy load neorg on neorg filetype
+        ];
+      };
+      # in addiion to the home-manager syntax,
+      # you could also source the current directory ON TOP of the one in luaPath.
+      # if you want to make it also respect wrapRc, you can access the value
+      # of wrapRc in the settings set provided to the function.
+      # optionalLuaAdditions = {
+      #   newcat = let
+      #     newDir = if settings.wrapRc then
+      #       "${./.}" else
+      #       "/path/to/here";
+      #   in /*lua*/''
+      #     local newCfgDir = [[${newDir}]]
+      #     vim.opt.packpath:prepend(newCfgDir)
+      #     vim.opt.runtimepath:prepend(newCfgDir)
+      #     vim.opt.runtimepath:append(newCfgDir .. "/after")
+      #     if vim.fn.filereadable(newCfgDir .. "/init.vim") == 1 then
+      #       vim.cmd.source(newCfgDir .. "/init.vim")
+      #     end
+      #     if vim.fn.filereadable(newCfgDir .. "/init.lua") == 1 then
+      #       dofile(newCfgDir .. "/init.lua")
+      #     end
+      #   '';
+      # };
+      # see :h nixCats.flake.outputs.categories for the available sets in categoryDefinitions
+    });
+  });
+<
+Ok so we have a new category. But it isnt enabled!
+
+We need to make a package with the `newcat` category enabled!
+
+---------------------------------------------------------------------------------
+                                       *nixCats.overriding.packageDefinitions*
+To make the package with the `newcat` category enabled,
+lets add a new package definition to our `packageDefinitions` set.
+
+We will call our package `newvim` which will be the default launch name.
+And the name we must set as the name we override with, in order to build it.
+
+It will merge in the `packageDefinitions` from the example nixCats config
+so it will have most of the same settings and categories. We do this using
+`utils.mergeCatDefs` once again, but for the individual package definition
+items, rather than the entire packageDefinitions section.
+
+We have changed the aliases to `nvi` here.
+
+And we included our `newcat` category alongside the old ones!
+>nix
+  withExtraPkgDefs = withExtraCats.override (prev: {
+    # we could set the name here, or in a separate override
+    name = "newvim";
+    packageDefinitions = prev.packageDefinitions // {
+      # we merge the new definitions into
+      # the prev.packageDefinitions.nixCats package 
+      # which was in the original packageDefinitions set.
+      newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
+        settings = {
+          # these ones override the old ones
+          aliases = [ "nvi" ];
+        };
+        categories = {
+          # enable our new category
+          newcat = true;
+          # remember, the others are still here!
+          # We merged, rather than overwriting them.
+          # You can see all of them with `:NixCats cats` in your editor!
+        };
+      });
+    };
+  });
+<
+
+---------------------------------------------------------------------------------
+                                                  *nixCats.overriding.wrap-up*
+All of the overriding you see above can be done ANYWHERE you have an existing
+nixCats package. This means within your ./configuration.nix or ./home.nix or
+within a flake, or a devShell or anywhere else.
+
+You could have a base configuration, with a bunch of categories disabled by
+default, and enable only the ones you need in project shells if you wanted.
+
+You can have a package based on any of your other packages but with wrapRc =
+false for testing lua without rebuild.
+
+The packages themselves also output modules via passthru.
+You can still output modules and overlays from a package built for only a
+single any system, because system is resolved later
+via override or via getting it from the system pkgs object in those cases
+
+This means you could output the following from a flake >nix
+  homeModules = nixCats.packages.x86_64-linux.default.passthru.homeModule
+<
+and it would not matter which system you chose to use there.
+
+If you wanted to start over from scratch with just override,
+even easier. Just dont merge anything from prev.
+
+As you can see, overriding provides a very powerful way to customize your
+packages upon import somewhere else, and works very effectively with the
+nixCats category scheme. Overriding just the packageDefinitions set
+alone can produce wildly different neovim packages, and the more attention
+paid to how you categorize, the better those options become.
+
+Have fun!
+
+=================================================================================
+vim:tw=78:ts=8:ft=help:norl:
