@@ -37,6 +37,11 @@ you could change that here.
     inherit (prev) extra_pkg_config;
     inherit (prev) nixCats_passthru;
   };
+<
+This is the full list of attributes you may override:
+
+luaPath categoryDefinitions packageDefinitions name
+nixpkgs system extra_pkg_config dependencyOverlays nixCats_passthru;
 
 ---------------------------------------------------------------------------------
                                                      *nixCats.overriding.name*

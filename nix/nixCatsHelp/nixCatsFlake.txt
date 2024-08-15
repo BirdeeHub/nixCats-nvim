@@ -140,7 +140,7 @@ pkgs = import nixpkgs { inherit system; overlays = []; config = {}; }
 >nix
   outputs = { self, nixpkgs, ... }@inputs: let
     # In the templates, this is inherit (inputs.nixCats) utils;
-    utils = (import ./nix/utils).utils;
+    utils = import ./nix;
     # path the the store path to be loaded as neovim config directory
     luaPath = "${./.}";
     # used when initializing the nixpkgs instance
