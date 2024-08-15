@@ -29,12 +29,12 @@ and utils.mkHomeModules exports a home-manager module with the SAME EXACT option
 as the nixos module has for system, but for the user managed by home-manager.
 
 IMPORTANT
-By default, the module inherits your system's pkgs object,
-and its overlays. If you use stable channel for your system,
-consider passing an `inputs.nixpkgs-unstable` from your inputs
-to the `nixpkgs_version` module option.
-It will still inherit your system overlays,
-but your system will not inherit overlays from nixCats.
+By default, the module inherits pkgs.config from the system's pkgs object,
+and its overlays AND the flake's overlays and nixCats config,
+as well as the flake's nixpkgs source (by default).
+It will inherit things from your system,
+but your system will not inherit things from nixCats,
+other than the packages themselves in config.${defaultPackageName}.out
 
 >nix
   options = with nixpkgs.lib; {
