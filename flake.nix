@@ -1,5 +1,24 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
+
+# Welcome to the main example config of nixCats!
+# there is a minimal flake the starter templates use
+# within the nix directory without the nixpkgs input,
+# but this one would work too!
+# Every config based on nixCats is a full nixCats.
+
+# This main example config doesnt use lazy.nvim, and
+# it loads everything via nix. This example config
+# consists of everything outside of ./nix
+
+# It has some useful tricks
+# in it, especially for lsps, so if you have any questions,
+# first look through the docs, and then here!
+# It has examples of most of the things you would want to do
+# in your main nvim configuration.
+
+# If there is still not adequate info, ask in discussions
+# on the nixCats repo (or open a PR to add the info to the help!)
 {
   description = "A Lua-natic's neovim flake, with extra cats! nixCats!";
 

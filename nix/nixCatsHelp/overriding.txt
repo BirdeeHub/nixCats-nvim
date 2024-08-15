@@ -76,7 +76,9 @@ we are just using a different function to iterate over systems
 to show more possibilities. It outputs to:
 >nix
   dependencyOverlays.${system} = somelistofoverlays;
-
+<
+and looks like:
+>nix
   pkgWithNewOverlays = OGpackage.override (prev: {
     dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
       (utils.mergeOverlayLists
