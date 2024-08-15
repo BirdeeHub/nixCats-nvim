@@ -15,7 +15,7 @@ buildable separately from your nixos or home-manager config.
 
 It allows you to easily pass arbitrary information from nix to lua, easily reference things installed via nix, and even output multiple neovim packages with different subsets of your configuration without duplication, import and override and re-export your nvim config in dev shells, etc...
 
-The example neovim config here (everything outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
+The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
 The [in-editor help](https://nixcats.org) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the vimdoc links work.
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
