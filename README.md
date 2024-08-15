@@ -17,12 +17,12 @@ It allows you to easily pass arbitrary information from nix to lua, easily refer
 
 The example neovim config here (everything outside of the internals at [./nix](./nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](./nix/templates) is also either a starter template, or more examples.
-The [in-editor help](./nix/nixCatsHelp) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the highlighting works.
+The [in-editor help](https://nixcats.org) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the vimdoc links work.
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
 When you are ready, start [with](./nix/templates/nixExpressionFlakeOutputs) a [template](./nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](./nix/nixCatsHelp/luaUtils.txt) and [demonstrated here](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
+If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](./nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html) and [demonstrated here](./nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
 
 ##### (just remember to change your $EDITOR variable if you named your package something other than nvim!)
 
@@ -52,7 +52,7 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
     - Make a new list in the set in the flake for it (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
     - enable the category for a particular neovim package in packageDefinitions set.
     - check for it in your neovim lua configuration with nixCats('attr.path.to.yourList')
-- the nixCats command is your method of communicating with neovim from nix outside of installing plugins.
+- the [nixCats command](https://nixcats.org/nixCats_plugin.html) is your method of communicating with neovim from nix outside of installing plugins.
   - you can pass any extra info through the same set you define which categories you want to include.
   - it will be printed verbatim to a table in a lua file.
   - Not only will it be easily accessible anywhere from within neovim via the nixCats command, but also from your category definitions within nix as well for even more subcategory control. 
@@ -75,14 +75,14 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
   - contains the lazy.nvim wrapper.
 - other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](./nix/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](./nix/nixCatsHelp/installation.txt))
 - ability to call override as many times as you like to fully recustomize or combine packages
-- Extensive in-editor help.
+- [Extensive in-editor help.](https://nixcats.org/)
 - I mentioned the templates already but if you want to see them all on github they are here: [templates](./nix/templates)
 
 ---
 
 #### Installation: <a name="installation"></a>
-see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
-for more info, including a list of templates available.
+see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
+for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
 ```bash
 # to test:
@@ -139,11 +139,13 @@ You add plugins to the flake.nix, call whatever setup function is required by th
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
 only when that particular category is enabled in the current package by checking `nixCats('your.cats.name')` first.
 
+see [:h nixCats](https://nixcats.org/nixCats_plugin.html) for help with the nixCats lua plugin.
+
 It is a similar process to migrating to a new neovim plugin manager. Because you are.
 
 Use a template and put the plugin names into the main nix file provided.
 
-You can import them from nixpkgs or straight from your inputs via a convenience overlay [:h nixCats.flake.inputs](./nix/nixCatsHelp/nixCatsFlake.txt)
+You can import them from nixpkgs or straight from your inputs via a convenience overlay [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html)
 
 Then configure in lua.
 
@@ -216,13 +218,13 @@ You will not be backed into any corners using the nixCats scheme, either as a fl
 
 You should make use of the in-editor help at:
 
-[:help nixCats](./nix/nixCatsHelp/nixCats.txt)
+[:help nixCats](https://nixcats.org/nixCats_plugin.html)
 
-[:help nixCats.overview](./nix/nixCatsHelp/installation.txt)
+[:help nixCats.overview](https://nixcats.org/nixCats_installation.html)
 
-[:help nixCats.flake](./nix/nixCatsHelp/nixCatsFlake.txt)
+[:help nixCats.flake](https://nixcats.org/nixCats_format.html)
 
-[:help nixCats.*](./nix/nixCatsHelp)
+[:help nixCats.*](https://nixcats.org/)
 
 The help can be viewed here directly but it is adviseable to use a nix shell to view it from within the editor.
 
@@ -230,7 +232,7 @@ Simply run `nix shell github:BirdeeHub/nixCats-nvim` and then run `nixCats` to o
 
 Or `nix run github:BirdeeHub/nixCats-nvim` to open it directly and type [:h nixCats](./nix/nixCatsHelp) without hitting enter to see the help options in the auto-complete.
 
-This is because there is (reasonable) syntax highlighting for the code examples in the help when viewed within nvim.
+This is because the vimdoc links in the help currently only work when viewed within nvim.
 
 > An important note: if you add a file,
 > nix will not package it unless you add it 
@@ -238,7 +240,7 @@ This is because there is (reasonable) syntax highlighting for the code examples 
 > So nvim wont be able to find it...
 > So, run git add before you build.
 
-It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](./nix/nixCatsHelp/luaUtils.txt).
+It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](https://nixcats.org/nixCats_luaUtils.html).
 
 `luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility from before of trying to download all 4 versions of rust, node, ripgrep, and fd for your overcomplicated config on a machine without using nix...
 
@@ -250,11 +252,11 @@ It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a cl
 If you're not on linux you don't need to care what those last 2 things mean.
 You also might want a [nerd font](https://www.nerdfonts.com/) for some icons depending on your OS, terminal, and configuration.
 
-(full usage covered in included help files, accessible here and inside neovim, but *much better viewed in-editor*)
+(full usage covered in included help files, accessible [here](https://nixcats.org) and in editor, but *much better viewed in-editor* because the vimdoc links work there)
 
 If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
-See [:h nixCats.flake.inputs](./nix/nixCatsHelp/nixCatsFlake.txt) for
+See [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html) for
 how to use the auto plugin import helper in your inputs for neovim plugins not on nixpkgs.
 
 It is made to be customized into your own portable nix neovim distribution
@@ -262,12 +264,10 @@ with as many options as you wish, while requiring you to leave the normal
 nvim configuration scheme as little as possible.
 
 Further info for getting started:
-see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
-
 All info I could manage to cover is covered in the included help files.
 For this section,
-see :help [nixCats.installation_options](./nix/nixCatsHelp/installation.txt)
-and also :help [nixCats.flake.outputs.exports](./nix/nixCatsHelp/nixCatsFlake.txt)
+see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
+and also :help [nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html)
 
 ---
 
@@ -285,7 +285,7 @@ Let people know when you figure one out or submit it to nixpkgs. Sometimes you c
 
 [Mason](https://github.com/williamboman/mason.nvim) does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
 
-I would suggest either removing mason, or following the [example config](./lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](./nix/nixCatsHelp/LSPs.txt) by running it only when not on nix.
+I would suggest either removing mason, or following the [example config](./lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) by running it only when not on nix.
 
 That way you can just add the lsp to the list in nix and move on.
 
