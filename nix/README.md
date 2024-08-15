@@ -8,7 +8,7 @@ This directory is imported from github by the templates under `inputs.nixCats.ut
 Everything you need is in the utils set.
 
 If you used the default, or nixExpressionFlakeOutputs template,
-you can optionally change your nixCats url to the following, and remove the follows statement:
+your template will instruct you to use this flake as follows:
 
 ```nix
 inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=nix";
