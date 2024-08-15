@@ -102,7 +102,7 @@ as just a list, fixing improper overlays via helper function:
 >nix
   pkgWithNewOverlays = OGpackage.override (prev: {
     dependencyOverlays = [ (utils.mergeOverlayLists
-      (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+      (utils.safeOversList { inherit (prev) system dependencyOverlays; })
       (/* (import ./overlays inputs) ++ */[
         (utils.standardPluginOverlay inputs)
         # any other flake overlays here.
