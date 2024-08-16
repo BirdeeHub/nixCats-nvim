@@ -118,6 +118,7 @@ run your choice of the following commands at the top level of your neovim config
     to recieve all normal flake outputs.
     Best used after the default template to integrate your new neovim config
     into an existing flake-based configuration's repository
+
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 ```
