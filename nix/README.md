@@ -1,7 +1,12 @@
 This directory contains the internals of nixCats.
 
-If you do not wish to use packages or modules based on my configuration, and would rather
-have your own config and have modules based on your own configuration, you dont need the main flake.
+Packages or modules require nixpkgs to make.
+
+But nixCats is simply a utils set and does not directly depend on nixpkgs.
+
+It contains the nixCats builder function `nixCats.utils.baseBuilder`, and helper functions for using it,
+such as a helper to import plugins automatically from inputs,
+or ones that generate a module based on an existing nixCats configuration.
 
 This directory is imported from github by the templates under `inputs.nixCats.utils` and does not need to be present in your personal config.
 
