@@ -1,6 +1,6 @@
 # This is the help for the nixCats lazy wrapper
 
-Or well, most of the help for it. There is also help for it at [:h nixCats.luaUtils](../../nixCatsHelp/luaUtils.txt)
+Or well, most of the help for it. There is also help for it at [:h nixCats.luaUtils](https://nixcats.org/nixCats_luaUtils.html)
 
 It is the entirety of [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) with very few changes, but uses nixCats to download everything
 
