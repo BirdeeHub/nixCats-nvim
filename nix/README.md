@@ -26,7 +26,7 @@ inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim/<ref_or_rev>?dir=nix";
 [./templates](./templates) contains the starter templates, and some examples of various aspects of nix, neovim, or this project.
 You can initialize them into a directory with `nix flake init -t github:BirdeeHub/nixCats#<templatename>`
 
-[./nixCatsHelp](https://nixcats.org/TOC.html) contains the in-editor documentation.
+[./nixCatsHelp](./nixCatsHelp) contains the in-editor documentation.
 
 Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix) and documented at [:h nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html)
 
