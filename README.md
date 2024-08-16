@@ -84,13 +84,14 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
 see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
 for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
+- to test:
 ```bash
-# to test:
 nix shell github:BirdeeHub/nixCats-nvim
-#or
+# or
 nix shell github:BirdeeHub/nixCats-nvim#nixCats
-# If using zsh with extra regexing, be sure to escape the #
 ```
+> If using zsh with extra regexing, be sure to escape the #
+
 Now, typing `nixCats` will open nixCats until you exit the shell.
 
 Now that you are within an editor outfitted to edit a flake,
@@ -102,29 +103,43 @@ first exit neovim. (but not the nix shell!)
 
 In a terminal, navigate to your nvim directory and
 run your choice of the following commands (don't worry! It doesnt overwrite):
+
+Choose one of the following to run at the top level of your neovim config:
+
+> If using zsh with extra regexing, be sure to escape the #
+
+- standalone flake template:
 ```bash
-  # Choose one of the following to run at the top level of your neovim config:
-  # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
-  # the outputs function of the flake template but as its own file
-  # callable with import ./the/dir { inherit inputs; }
-  # to recieve all normal flake outputs
-  # best used after the default template to integrate your new neovim config
-  # into an existing flake-based configuration's repository
-  nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
-
-  # for utilities for functionality without nix
-  # added at lua/nixCatsUtils also run the following
-  # at the top level of your neovim config:
-  nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
-  # contains things like "is this nix?" "do this if not nix, else do that"
-  # needs to be in your config at lua/nixCatsUtils,
-  # because if you dont use nix to load neovim,
-  # nixCats (obviously) can't provide you with anything from nix!
-
-  # If using zsh with extra regexing, be sure to escape the #
 ```
-This will create an empty version of flake.nix (or default.nix) for you to fill in.
+- nixExpressionFlakeOutputs template:
+  - the outputs function of the flake template but as its own file
+    callable with import ./the/dir { inherit inputs; }
+    to recieve all normal flake outputs.
+    Best used after the default template to integrate your new neovim config
+    into an existing flake-based configuration's repository
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
+```
+Those are the 2 main starter templates.
+
+There are others which _could_ be used to create a new base config,
+but these will be the simplest to start with, and don't inherit any previous config by default.
+
+To add utilities for functionality without nix
+at `lua/nixCatsUtils`, also run the following
+at the top level of your neovim config:
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
+```
+
+> contains things like "is this nix?" "do this if not nix, else do that"
+
+> Needs to be in your config at lua/nixCatsUtils,
+> because if you dont use nix to load neovim,
+> nixCats (obviously) can't provide you with anything from nix!
+
+The starter templates will create an empty version of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh/flake.nix) (or [default.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs/default.nix)) for you to fill in.
 
 It will import the utils set and thus also the builder and
 help from nixCats-nvim itself.
