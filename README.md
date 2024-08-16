@@ -102,9 +102,9 @@ Now that you have access to the help and a nix lsp, to get started,
 first exit neovim. (but not the nix shell!)
 
 In a terminal, navigate to your nvim directory and
-run your choice of the following commands (don't worry! It doesnt overwrite):
+run your choice of the following commands at the top level of your neovim config:
 
-Choose one of the following to run at the top level of your neovim config:
+(don't worry! It doesnt overwrite anything!)
 
 > If using zsh with extra regexing, be sure to escape the #
 
@@ -121,10 +121,11 @@ Choose one of the following to run at the top level of your neovim config:
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 ```
-Those are the 2 main starter templates.
+Those are the 2 main starter templates. Choose one of them.
 
 There are others which _could_ be used to create a new base config,
 but these will be the simplest to start with, and don't inherit any previous config by default.
+All such templates have more or less the same options, so converting between them is easy.
 
 To add utilities for functionality without nix
 at `lua/nixCatsUtils`, also run the following
