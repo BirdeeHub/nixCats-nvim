@@ -126,6 +126,7 @@ Those are the 2 main starter templates. Choose one of them.
 
 There are others which _could_ be used to create a new base config,
 but these will be the simplest to start with, and don't inherit any previous config by default.
+
 All such templates have more or less the same options, so converting between them is easy.
 
 To add utilities for functionality without nix
