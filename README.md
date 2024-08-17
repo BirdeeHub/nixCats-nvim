@@ -1,4 +1,4 @@
-# nixCats-nvim: for the Lua-natic's neovim config on nix!
+# [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's neovim config on nix!
 
 This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
 
@@ -17,12 +17,12 @@ It allows you to easily pass arbitrary information from nix to lua, easily refer
 
 The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the vimdoc links work.
+The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the helptags work.
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way.
+If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
 
 ##### (just remember to change your $EDITOR variable if you named your package something other than nvim!)
 
@@ -43,6 +43,7 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
 3. [Introduction](#introduction)
 5. [Extra Information](#outro)
 6. [Alternative / Similar Projects](#alternatives)
+- [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
 
 ## Features: <a name="features"></a>
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
