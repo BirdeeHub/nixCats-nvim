@@ -103,9 +103,6 @@ Use the following command in a new directory and check it out!
 In that template, all notes about the lazy wrapper are in comments that begin
 with the string: `NOTE: nixCats:` so to find all of the info, search for that.
 
-Once you understand what is going on to use the lazy wrapper util,
-use lazyCat in the lua utils template!
-
 The 3 main utilities at require('nixCatsUtils.lazyCat')
 >lua
   --the main wrapper
