@@ -130,7 +130,7 @@ NOTE: Keep in mind you may need to add a few items for plugins with different
 repo names from their nix plugin names. When you do this, you should also
 set the name field in that plugin's spec to the nix-provided value.
 >lua
-  -- for example of the above warning,
+  -- for example of when the the nix name is different:
   -- this must match the repository name
   pluginTable[ [[Comment.nvim]] ] = ""
   pluginTable[ [[LuaSnip]] ] = ""
@@ -138,12 +138,15 @@ set the name field in that plugin's spec to the nix-provided value.
   -- you must set the name field of comment.nvim and luasnip
   -- to match their nix-provided values.
   -- this will also ensure that it works regardless of if nix or lazy downloads it.
+
+  -- usually, the names match and you do not need to do this.
+  -- you could also override the name of the plugin in nix instead!
 <
 You may view the list of plugin names provided by nix to make
 this easier via `:NixCats pawsible`
 
 If you do not have the correct name for the plugin in the `pluginTable` argument,
-lazy.nvim will attempt to download the plugin normally. This might work anyway.
+lazy.nvim will attempt to download the plugin normally. This will often work anyway.
 
 `nixLazyPath` is the path to lazy.nvim downloaded via nix. You may get it
 via the same table you got the other plugin names from.
