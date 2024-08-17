@@ -195,9 +195,12 @@ without duplication using the override function! see :h |nixCats.overriding|
 
 ---------------------------------------------------------------------------------------
                                                            *nixCats.templates*
-The templates are imported by the utils set.
-They are located at nix/templates in this repo.
-The following is nix/templates/default.nix
+The templates may also imported from the utils set
+via `inputs.nixCats.utils.templates`
+The following is the set where they are defined.
+
+You may initialize them into the current directory via >bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#$TEMPLATE_NAME
 >nix
   {
     default = {
