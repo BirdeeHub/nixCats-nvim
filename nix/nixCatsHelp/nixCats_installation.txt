@@ -46,10 +46,9 @@ only when that particular category is enabled in the current package
 <
 It is a similar process to migrating to a new neovim plugin manager.
 
-Use a template, (or clone or fork the repo if you want)
-and migrate your plugins into the flake.nix file provided.
+Use a template, and migrate your plugins into the flake.nix file provided.
 
-Then configure in lua.
+Then configure in lua with the configuration options provided by the plugin.
 
 It is suggested to start with the default template so that you can mess around with it in
 a separate repository/directory,
@@ -191,8 +190,8 @@ The goal of the starter templates is so that the usage at the start can be as si
 as adding plugins to lists and calling `require('theplugin').setup()`
 Most further complexity is optional, and very complex things can be achieved
 with only minor changes in nix, and some `nixCats('something')` calls.
-Please refer to the rest of the help at :h nixCats.* and the example config in
-the main repo for more guidance and examples!
+You can then import the finished package, and reconfigure it again
+without duplication using the override function! see :h |nixCats.overriding|
 
 ---------------------------------------------------------------------------------------
                                                            *nixCats.templates*
