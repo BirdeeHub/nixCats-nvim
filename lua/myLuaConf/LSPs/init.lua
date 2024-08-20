@@ -21,7 +21,7 @@ if nixCats('neonixdev') then
       })
     end
   })
-  -- NOTE: use nvim-neorocks/lz.n to manage the autocommands for you if the above seems tedious.
+  -- NOTE: use BirdeeHub/lze to manage the autocommands for you if the above seems tedious.
   -- Or, use the wrapper for lazy.nvim included in the luaUtils template.
   -- NOTE: AFTER DIRECTORIES WILL NOT BE SOURCED BY PACKADD!!!!!
   -- this must be done by you manually if,
