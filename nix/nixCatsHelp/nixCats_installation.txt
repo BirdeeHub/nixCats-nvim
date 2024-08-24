@@ -91,11 +91,12 @@ nvim configuration scheme as little as possible.
 ---------------------------------------------------------------------------------------
 How it works in 100 lines:                                  *nixCats.overview*
 
+<tip> For the following 100 lines, it is most effective to cross reference with a template!
+
 First choose a path for luaPath as your new neovim directory to be loaded into
 the store.
 
 Then in `categoryDefinitions`:
-
 You have a SET to add LISTS of plugins to the packpath (one for both
 pack/*/start and pack/*/opt), a SET to add LISTS of things to add to the path,
 a set to add lists of shared libraries,
@@ -166,10 +167,9 @@ because that would mean a different sub category was enabled, but this one was
 not. It is simply a getter function for the table `require('nixCats').cats`
 see :h |nixCats| for more info.
 
-This is why I can confidently say, that unless you are reconfiguring an
-already existing nixCats configuration and want to use their lua directory,
-you never have to write any lua in nix. And if you were to do that, you could
-always just source a new directory in addition and continue as before.
+That is what enables full transparency of your nix configuration
+to your neovim! Everything you could have needed to know from nix
+is now easily passed, or already available, through the nixCats plugin!
 
 It has a shorthand for importing plugins that arent on nixpkgs, covered in
 :h |nixCats.flake.inputs| and the templates set up the outputs for you.
