@@ -314,7 +314,7 @@ But you are free to do as you wish.
 
 [Lazy.nvim](https://github.com/folke/lazy.nvim) works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
 
-There is an included wrapper that you can use to do this reset correctly and also optionally stop it from downloading stuff you already downloaded via nix.
+There is an included wrapper that you can use to do this and also optionally stop it from downloading stuff you already downloaded via nix.
 
 You call that instead. It takes 2 extra arguments, and then the 2 standard lazy.setup arguments.
 
