@@ -101,7 +101,7 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
         patterns = lazypatterns or M.getTableNamesOrListValues(pluginTable),
       }
     }
-    lazyCFG = vim.tbl_extend("force", lazyCFG or {}, newLazyOpts)
+    lazyCFG = vim.tbl_deep_extend("force", lazyCFG or {}, newLazyOpts)
   end
 
   vim.opt.rtp:prepend(lazypath)
