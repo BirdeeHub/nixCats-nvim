@@ -452,20 +452,6 @@
     };
     inherit utils;
     inherit (utils) templates;
-
-    # override feature makes these following outputs unnecessary,
-    # and I would be surprised if someone was merging categoryDefinitions or packageDefinitions
-    # from the example config into their own. The example config does a good job with lsps
-    # but a bad job with lazy loading for simplicities sake,
-    # only lazy loading 1 plugin for demonstration purposes.
-    # In addition to them being available in override, you can still get them via passthru
-    inherit categoryDefinitions packageDefinitions;
-    inherit (utils) baseBuilder;
-    keepLuaBuilder = utils.baseBuilder luaPath;
-    inherit dependencyOverlays;
-    # But in case people were using them, we will still export them for now.
-    # Will be removed along with the old mkOverlays functions on 2024-09-01
-    # and were already removed from the templates
   };
 
 }
