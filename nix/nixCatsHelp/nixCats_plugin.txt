@@ -49,7 +49,7 @@ categories are included in each package in the flake.nix file.
 
 However it also adds a few values for convenience.
   nixCats_packageName
-  nixCats_store_config_location
+  nixCats_config_location
   nixCats_wrapRc
 
 Because it adds these to nixCats, do not use them as

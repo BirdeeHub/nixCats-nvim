@@ -145,16 +145,24 @@ in
       # performant way to replace the config location with a lua function value.
       nixCats_store_config_location = if isUnwrappedCfgPath
         then "${settings.unwrappedCfgPath}" else if isStdCfgPath then '']] .. vim.fn.stdpath("config") .. [['' else "${LuaConfig}";
-      # I wish I named it nixCats_config_location but its used in the lazy wrapper so... too late for that.
-      # I cant change the lazy wrapper in THEIR configs. I could have them pull the template again but I deemed that too annoying for them.
+      # TODO: nixCats_store_config_location is not in the lazy.nvim wrapper anymore....
+      # maybe figure out how to add a deprecation warning to it and get them to pull the new template...
+      # because its name is incorrect....
+      # It should be this...
+      nixCats_config_location = if isUnwrappedCfgPath
+        then "${settings.unwrappedCfgPath}" else if isStdCfgPath then '']] .. vim.fn.stdpath("config") .. [['' else "${LuaConfig}";
 
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
         nixCats_packageName = name;
+        inherit nixCats_config_location;
+        # TODO: deprecate this with a warning
         inherit nixCats_store_config_location;
       };
       settingsPlus = settings // {
         nixCats_packageName = name;
+        inherit nixCats_config_location;
+        # TODO: deprecate this with a warning
         inherit nixCats_store_config_location;
       };
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
