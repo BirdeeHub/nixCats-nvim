@@ -159,7 +159,7 @@ functions may be passed. You then have access to the contents of these tables
 anywhere in your neovim, because they are literally a set hardcoded into a
 lua file on your runtimpath.
 
-You may use the :NixCats user command to view these
+You may use the `:NixCats` user command to view these
 tables for your debugging. There is a global function defined that
 makes checking subcategories easier. Simply call `nixCats('the.category')`!
 It will return the nearest parent category value, but nil if it was a table,
