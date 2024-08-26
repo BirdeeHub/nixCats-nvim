@@ -3,7 +3,7 @@ local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.pawsible')
 M.settings = require('nixCats.settings')
-M.configDir = M.settings.nixCats_store_config_location
+M.configDir = M.settings.nixCats_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
 M.nixCatsPath = require('nixCats.saveTheCats')
