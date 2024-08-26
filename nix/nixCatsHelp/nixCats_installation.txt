@@ -38,7 +38,7 @@ help from nixCats-nvim itself, keeping your configuration clean.
 If you added the luaUtils template, you should also have that at lua/nixCatsUtils
 
 Re-enter the nixCats nvim version by typing nixCats . and take a look!
-Reference the help and nixCats-nvim itself as a guide for importing your setup.
+Reference the `:help nixCats` docs and nixCats-nvim itself as a guide for importing your setup.
 
 You add plugins to the flake.nix, call whatever setup function is required by the plugin,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
@@ -111,7 +111,7 @@ It returns those sets of things mentioned above.
 
 `packageDefintions` is a set, containing functions that also are provided a
 pkgs set. They return a set of categories you wish to include.
-If, from your categoryDefintions, you returned:
+If, from your `categoryDefintions`, you returned:
 >nix
   startupPlugins = {
     general = [
@@ -122,7 +122,7 @@ If, from your categoryDefintions, you returned:
     ];
   };
 <
-In your packageDefintions, you could include it in a package named
+In your `packageDefintions`, if you wanted to include it in a package named
 myCoolNeovimPackage, launched with either myCoolNeovimPackage or vi,
 you could have:
 >nix
