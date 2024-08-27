@@ -332,7 +332,7 @@ Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you als
 
 ##### lz.n
 
-[lz.n](https://github.com/BirdeeHub/lze) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
+[lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
 
 ##### For getting me started:
 
