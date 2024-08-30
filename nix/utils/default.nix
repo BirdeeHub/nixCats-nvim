@@ -212,46 +212,6 @@ with builtins; rec {
           packageDefinitions defaultPackageName extra_pkg_config utils;
       });
 
-    # These were deprecated due to needing to be wrapped with ${system} and thus failing flake check
-    mkOverlays = finalBuilder: packageDefinitions: defaultName:
-      let
-        warn = trace "WARNING: utils.mkOverlays is deprecated. Use utils.makeOverlays instead. Will be removed on 2024-09-01.";
-      in (warn (
-          (utils.mkDefaultOverlay finalBuilder defaultName) 
-          //
-          (utils.mkExtraOverlays finalBuilder packageDefinitions)
-        )
-      );
-
-    mkDefaultOverlay = finalBuilder: defaultName:
-      let
-        warn = trace "WARNING: utils.mkDefaultOverlay is deprecated. Will be removed on 2024-09-01.";
-      in warn { default = (self: super: { ${defaultName} = finalBuilder defaultName; }); };
-
-    mkExtraOverlays = finalBuilder: packageDefinitions:
-      let
-        warn = trace "WARNING: utils.mkExtraOverlays is deprecated. Will be removed on 2024-09-01.";
-      in warn (mapAttrs (name: (self: super: { ${name} = finalBuilder name; })) packageDefinitions);
-
-    mkMultiOverlay = finalBuilder: importName: namesIncList:
-      let
-        warn = trace "WARNING: utils.mkMultiOverlay is deprecated. Use utils.makeMultiOverlay instead. Will be removed on 2024-09-01.";
-      in (warn 
-          (self: super: {
-            ${importName} = listToAttrs (
-              map
-                (name:
-                  {
-                    inherit name;
-                    value = finalBuilder name;
-                  }
-                ) namesIncList
-              );
-            }
-          )
-        );
-
-
     # flake-utils' main function, because its all I used
     # Builds a map from <attr>=value to <attr>.<system>=value for each system
     eachSystem = systems: f:
@@ -278,7 +238,8 @@ with builtins; rec {
                else [ currentSystem ]
             else []));
 
-    # in case someoneone wants flake-utils but for only 1 output.
+    # in case someoneone wants flake-utils but for only 1 output,
+    # and didnt know genAttrs is great as a bySystems
     bySystems = lib.genAttrs;
 
   };

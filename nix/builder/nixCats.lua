@@ -8,11 +8,7 @@ M.configDir = M.settings.nixCats_config_location
 -- due to infinite recursion, so they are variables instead.
 M.nixCatsPath = require('nixCats.saveTheCats')
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
-
-package.preload["nixCats.included"] = function()
-    vim.notify_once("require('nixCats.included') will be removed in favor of require('nixCats.pawsible') on 2024-09-01", vim.log.levels.WARN, { title = "NixCats Deprecation Warning" })
-    return require('nixCats.pawsible')
-end
+M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
 
 ---:h nixCats
 ---will return the nearest parent category value, unless the nearest
@@ -81,6 +77,9 @@ function M.addGlobals()
             elseif opts.fargs[1] == 'nixCatsPath' then
                 print(M.nixCatsPath)
                 return
+            elseif opts.fargs[1] == 'packageBinPath' then
+                print(M.packageBinPath)
+                return
             end
         elseif #opts.fargs == 2 then
             if opts.fargs[1] == 'cat' then
@@ -115,6 +114,7 @@ function M.addGlobals()
                 "vimPackDir",
                 "configDir",
                 "nixCatsPath",
+                "packageBinPath",
             }
             local matches = {}
 
@@ -168,18 +168,6 @@ function M.addGlobals()
         end,
     })
 
-    vim.api.nvim_create_user_command('NixCatsSettings', function ()
-        vim.notify_once("`:NixCatsSettings` will be removed in favor of `:NixCats settings` on 2024-09-01", vim.log.levels.WARN, { title = "NixCats Deprecation Warning" })
-        print(vim.inspect(require('nixCats.settings')))
-    end,
-    { desc = 'All the settings' })
-
-    vim.api.nvim_create_user_command('NixCatsPawsible', function ()
-        vim.notify_once("`:NixCatsPawsible` will be removed in favor of `:NixCats pawsible` on 2024-09-01", vim.log.levels.WARN, { title = "NixCats Deprecation Warning" })
-        print(vim.inspect(require('nixCats.pawsible')))
-    end,
-    { desc = 'All the pawsible plugins' })
-
     vim.cmd([[
         function! GetNixCat(value)
             return luaeval('require("nixCats").get("' . a:value . '")')
@@ -195,13 +183,6 @@ function M.addGlobals()
     vim.cmd([[
         function! GetAllNixCats()
             return v:lua.require('nixCats.cats')
-        endfunction
-    ]])
-
-    vim.cmd([[
-        function! GetNixIncluded()
-            lua vim.notify_once("`GetNixIncluded` will be removed in favor of `GetNixPawsible` on 2024-09-01", vim.log.levels.WARN, { title = "NixCats Deprecation Warning" })
-            return v:lua.require('nixCats.pawsible')
         endfunction
     ]])
 

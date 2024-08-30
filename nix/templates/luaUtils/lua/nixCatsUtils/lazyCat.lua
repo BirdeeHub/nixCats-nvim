@@ -42,13 +42,14 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     return lazypath
   end
 
-  local ok, nixCats = pcall(require,'nixCats')
+  local isNixCats = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil
   local lazypath
-  if not ok then
+  if not isNixCats then
     -- No nixCats? Not nix. Do it normally
     lazypath = regularLazyDownload()
     vim.opt.rtp:prepend(lazypath)
   else
+    local nixCats = require('nixCats')
     -- Else, its nix, so we wrap lazy with a few extra config options
     lazypath = nixLazyPath
     -- and also we probably dont have to download lazy either
@@ -104,11 +105,11 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     }
     lazyCFG = vim.tbl_deep_extend("force", lazyCFG or {}, newLazyOpts)
     -- do the reset we disabled without removing important stuff
-    local cfgdir = require('nixCats').configDir
+    local cfgdir = nixCats.configDir
     vim.opt.rtp = {
       cfgdir,
-      require('nixCats').nixCatsPath,
-      require('nixCats').pawsible.allPlugins.ts_grammar_path,
+      nixCats.nixCatsPath,
+      nixCats.pawsible.allPlugins.ts_grammar_path,
       vim.fn.stdpath("data") .. "/site",
       lazypath,
       vim.env.VIMRUNTIME,

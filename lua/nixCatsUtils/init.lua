@@ -12,16 +12,38 @@ M.isNixCats = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] ~= nil
 ---defaults to true if non_nix_value is not provided or is not a boolean.
 ---@param v nixCatsSetupOpts
 function M.setup(v)
-    if not M.isNixCats then
-        local nixCats_default_value
-        if type(v) == "table" and type(v.non_nix_value) == "boolean" then
-            nixCats_default_value = v.non_nix_value
-        else
-            nixCats_default_value = true
-        end
-        -- if not in nix, just make it return a boolean
-        require('_G').nixCats = function(_) return nixCats_default_value end
+  if not M.isNixCats then
+    local nixCats_default_value
+    if type(v) == "table" and type(v.non_nix_value) == "boolean" then
+      nixCats_default_value = v.non_nix_value
+    else
+      nixCats_default_value = true
     end
+    -- if not in nix, just make it return a boolean
+    require('_G').nixCats = function(_) return nixCats_default_value end
+    -- and define some stuff for the nixCats plugin
+    -- to prevent indexing errors and provide some values
+    package.preload['nixCats'] = function ()
+      return {
+        cats = {},
+        pawsible = {
+          allPlugins = {
+            start = {},
+            opt = {},
+            treesitter_grammars = {},
+            ts_grammar_path = nil,
+          },
+        },
+        settings = {
+          nixCats_config_location = vim.fn.stdpath('config'),
+          configDirName = os.getenv("NVIM_APPNAME") or "nvim",
+          wrapRc = false,
+        },
+        configDir = vim.fn.stdpath('config'),
+        packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
+      }
+    end
+  end
 end
 
 ---allows you to guarantee a boolean is returned, and also declare a different
