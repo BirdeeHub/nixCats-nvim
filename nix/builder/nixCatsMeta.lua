@@ -10,3 +10,4 @@ error("Cannot import a meta module")
 ---@field nixCatsPath string
 ---@field vimPackDir string
 ---@field configDir string
+---@field packageBinPath string

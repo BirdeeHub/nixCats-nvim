@@ -8,6 +8,7 @@ M.configDir = M.settings.nixCats_config_location
 -- due to infinite recursion, so they are variables instead.
 M.nixCatsPath = require('nixCats.saveTheCats')
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
+M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
 
 ---:h nixCats
 ---will return the nearest parent category value, unless the nearest
@@ -76,6 +77,9 @@ function M.addGlobals()
             elseif opts.fargs[1] == 'nixCatsPath' then
                 print(M.nixCatsPath)
                 return
+            elseif opts.fargs[1] == 'packageBinPath' then
+                print(M.packageBinPath)
+                return
             end
         elseif #opts.fargs == 2 then
             if opts.fargs[1] == 'cat' then
@@ -110,6 +114,7 @@ function M.addGlobals()
                 "vimPackDir",
                 "configDir",
                 "nixCatsPath",
+                "packageBinPath",
             }
             local matches = {}
 
