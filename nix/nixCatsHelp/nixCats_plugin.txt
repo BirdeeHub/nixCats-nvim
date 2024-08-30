@@ -124,7 +124,7 @@ will return something like this:
     markdown = true,
     neonixdev = true,
     nixCats_packageName = "nixCats",
-    nixCats_store_config_location = "/nix/store/fazkaci8bravyly4xahs0b69r1xxj4i3-nixCats-special-rtp-entry-LuaConfig",
+    nixCats_config_location = "/nix/store/fazkaci8bravyly4xahs0b69r1xxj4i3-nixCats-special-rtp-entry-LuaConfig",
     nixCats_wrapRc = true,
     test = {
       subtest1 = true

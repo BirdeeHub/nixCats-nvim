@@ -72,7 +72,7 @@ function M.addGlobals()
                 print(M.vimPackDir)
                 return
             elseif opts.fargs[1] == 'configDir' then
-                print(M.settings.nixCats_store_config_location)
+                print(M.settings.nixCats_config_location)
                 return
             elseif opts.fargs[1] == 'nixCatsPath' then
                 print(M.nixCatsPath)

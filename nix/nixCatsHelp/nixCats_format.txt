@@ -32,7 +32,7 @@ But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
 it would be to write to it, and we cant write to store paths anyway. 
 You could use `require('nixCats').configDir`,
-or `nixCats('nixCats_store_config_location')`
+or `nixCats('nixCats_config_location')`
 (yes its called store location, but it actually always
 points to the actual one being used)
 to get current config directory for your uses, if ever necessary.
