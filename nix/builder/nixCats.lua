@@ -53,32 +53,23 @@ function M.addGlobals()
         return M.get(category)
     end
 
+    local attributes = {
+        "cats",
+        "settings",
+        "pawsible",
+        "vimPackDir",
+        "configDir",
+        "nixCatsPath",
+        "packageBinPath",
+    }
     -- command with debug info for nixCats setups
     vim.api.nvim_create_user_command('NixCats', function(opts)
         if #opts.fargs == 0 then
             print(vim.inspect(require('nixCats.cats')))
             return
         elseif #opts.fargs == 1 then
-            if opts.fargs[1] == 'settings' then
-                print(vim.inspect(M.settings))
-                return
-            elseif opts.fargs[1] == 'pawsible' then
-                print(vim.inspect(M.pawsible))
-                return
-            elseif opts.fargs[1] == 'cats' then
-                print(vim.inspect(M.cats))
-                return
-            elseif opts.fargs[1] == 'vimPackDir' then
-                print(M.vimPackDir)
-                return
-            elseif opts.fargs[1] == 'configDir' then
-                print(M.settings.nixCats_config_location)
-                return
-            elseif opts.fargs[1] == 'nixCatsPath' then
-                print(M.nixCatsPath)
-                return
-            elseif opts.fargs[1] == 'packageBinPath' then
-                print(M.packageBinPath)
+            if vim.list_contains(attributes, opts.fargs[1]) then
+                print(vim.inspect(M[opts.fargs[1]]))
                 return
             end
         elseif #opts.fargs == 2 then
@@ -106,16 +97,7 @@ function M.addGlobals()
             for _ in cmdLineBeforeCursor:gmatch("([%s]+)") do
                 numSpaces = numSpaces + 1
             end
-            local candidates = {
-                "cat",
-                "cats",
-                "settings",
-                "pawsible",
-                "vimPackDir",
-                "configDir",
-                "nixCatsPath",
-                "packageBinPath",
-            }
+            local candidates = vim.list_extend({ "cat" }, attributes)
             local matches = {}
 
             if not (#argsTyped > 1) then
