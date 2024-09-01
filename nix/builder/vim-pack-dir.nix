@@ -33,24 +33,15 @@
       , python3link
       , packageName
       , allPython3Dependencies
-      , collected_grammars
       , ...
     }:
   let
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     ts_grammar_path = if isOldGrammarType then ts_grammar_plugin_combined else
       "]] .. vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*";
-    removeGrammarPrefix = name: builtins.substring
-      (builtins.stringLength "vimplugin-treesitter-grammar-")
-      (builtins.stringLength name)
-      name;
     fullDeps = {
       allPlugins = {
         start = startPlugins;
-        treesitter_grammars = with builtins; listToAttrs (map (entry: {
-          name = removeGrammarPrefix entry.name;
-          inherit (entry) value;
-        }) collected_grammars);
         opt = builtins.listToAttrs (map mkEntryFromDrv opt);
         inherit ts_grammar_path;
         ts_grammar_plugin = ts_grammar_path;
@@ -92,7 +83,7 @@
       # If its stable enough for nixpkgs I guess I can use it here.
       grammarMatcher = entry: 
         (if entry != null && entry.name != null then 
-          (if (builtins.match "^vimplugin-treesitter-grammar-.*" entry.name) != null
+          (if (builtins.match "vimplugin-treesitter-grammar.*" entry.name) != null
           then true else false)
         else false);
 
@@ -128,7 +119,7 @@
       resolvedCats = callNixCats nixCats {
         ts_grammar_plugin_combined = ts_grammar_plugin;
         inherit startPlugins opt python3link packageName
-        allPython3Dependencies collected_grammars;
+        allPython3Dependencies;
       };
 
       packdirStart = vimFarm "pack/${packageName}/start" "packdir-start"
