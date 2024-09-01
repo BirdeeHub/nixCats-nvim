@@ -60,7 +60,7 @@
     });
     nixCatsFinal = nixCats fullDeps;
   in
-  [ nixCatsFinal (nixCatsDir nixCatsFinal) ] ++ (lib.optionals isOldGrammarType [ ts_grammar_path ]);
+  [ nixCatsFinal (nixCatsDir nixCatsFinal) ] ++ (lib.optionals isOldGrammarType [ ts_grammar_plugin_combined ]);
 
 
   vimFarm = prefix: name: drvs:
@@ -87,7 +87,7 @@
       collected_grammars = grammarMatcher true allPlugins;
 
       # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
-      ts_grammar_plugin = with builtins; stdenv.mkDerivation (let 
+      ts_grammar_plugin_combined = with builtins; stdenv.mkDerivation (let 
         treesitter_grammars = map (e: e.outPath) collected_grammars;
 
         builderLines = map (grmr: /* bash */''
@@ -113,9 +113,8 @@
 
       # call the function, creating the nixCats plugin (definition in builder/default.nix)
       resolvedCats = callNixCats nixCats {
-        ts_grammar_plugin_combined = ts_grammar_plugin;
         inherit startPlugins opt python3link packageName
-        allPython3Dependencies;
+        allPython3Dependencies ts_grammar_plugin_combined;
       };
 
       packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (startPlugins ++ resolvedCats);
