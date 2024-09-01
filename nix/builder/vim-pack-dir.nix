@@ -41,7 +41,7 @@
       "]] .. vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*";
     fullDeps = {
       allPlugins = {
-        start = startPlugins;
+        start = builtins.listToAttrs (map mkEntryFromDrv startPlugins);
         opt = builtins.listToAttrs (map mkEntryFromDrv opt);
         inherit ts_grammar_path;
         ts_grammar_plugin = ts_grammar_path;
@@ -75,26 +75,23 @@
       startWithDeps = findDependenciesRecursively start;
       allPlugins = lib.unique (startWithDeps ++ depsOfOptionalPlugins);
 
-      mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
+      grammarMatcher = yes: builtins.filter (drv: let
+        # cond = (builtins.match "vimplugin-treesitter-grammar.*" "${lib.getName drv}") != null;
+        new = drv: builtins.pathExists "${drv.outPath}/parser";
+        old = drv: lib.pathIsDirectory "${drv.outPath}/parser";
+        cond = ! isOldGrammarType && new drv || old drv;
+        match = if yes then cond else ! cond;
+      in
+      if drv ? outPath then match else ! yes);
 
-      allPluginsMapped = (map mkEntryFromDrv allPlugins);
-
-      # apparently this is ACTUALLY the standard. Yeah. Strings XD
-      # If its stable enough for nixpkgs I guess I can use it here.
-      grammarMatcher = entry: 
-        (if entry != null && entry.name != null then 
-          (if (builtins.match "vimplugin-treesitter-grammar.*" entry.name) != null
-          then true else false)
-        else false);
-
-      collected_grammars = (builtins.filter (entry: grammarMatcher entry) allPluginsMapped);
+      collected_grammars = grammarMatcher true allPlugins;
 
       # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
       ts_grammar_plugin = with builtins; stdenv.mkDerivation (let 
-        treesitter_grammars = (map (entry: entry.value) collected_grammars);
+        treesitter_grammars = map (e: e.outPath) collected_grammars;
 
         builderLines = map (grmr: /* bash */''
-          cp --no-dereference ${grmr}/parser/*.so $out/parser
+          cp -v -f -L ${grmr}/parser/*.so $out/parser
         '') treesitter_grammars;
 
         builderText = (/* bash */''
@@ -108,8 +105,7 @@
         builder = writeText "builder.sh" builderText;
       });
 
-      startPlugins = builtins.listToAttrs
-        (builtins.filter (entry: ! (grammarMatcher entry)) allPluginsMapped);
+      startPlugins = grammarMatcher false allPlugins;
 
       allPython3Dependencies = ps:
         lib.flatten (builtins.map (plugin: (plugin.python3Dependencies or (_: [])) ps) allPlugins);
@@ -122,12 +118,10 @@
         allPython3Dependencies;
       };
 
-      packdirStart = vimFarm "pack/${packageName}/start" "packdir-start"
-            ( (builtins.attrValues startPlugins) ++ resolvedCats);
+      packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (startPlugins ++ resolvedCats);
 
       packdirGrammar = lib.optionals (! isOldGrammarType) [
-        (vimFarm "pack/${grammarPackName}/start" "packdir-grammar"
-          (builtins.map (v: v.value) collected_grammars))
+        (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" collected_grammars)
       ];
 
       packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
