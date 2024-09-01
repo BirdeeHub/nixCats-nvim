@@ -36,9 +36,11 @@
       , ...
     }:
   let
-    mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
+    # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if isOldGrammarType then ts_grammar_plugin_combined else
       "]] .. vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*";
+
+    mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {
       allPlugins = {
         start = builtins.listToAttrs (map mkEntryFromDrv startPlugins);
@@ -59,7 +61,7 @@
       destination = "/lua/nixCats/saveTheCats.lua";
     });
     nixCatsFinal = nixCats fullDeps;
-  in
+  in # we add the plugin with ALL the parsers if its the old way, if its the new way, it will be in our packpath already
   [ nixCatsFinal (nixCatsDir nixCatsFinal) ] ++ (lib.optionals isOldGrammarType [ ts_grammar_plugin_combined ]);
 
 
@@ -84,10 +86,15 @@
       in
       if drv ? outPath then match else ! yes);
 
-      collected_grammars = grammarMatcher true allPlugins;
+      startPlugins = grammarMatcher false allPlugins;
 
       # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
+      collected_grammars = grammarMatcher true allPlugins;
+      # currently nvim-treesitter vendors queries in SOMEHOW
+      # It ALSO copies them now, so, we actually HAVE to remove them,
+      # because otherwise we get errors....
       ts_grammar_plugin_combined = with builtins; stdenv.mkDerivation (let 
+        # so we make a single plugin with them
         treesitter_grammars = map (e: e.outPath) collected_grammars;
 
         builderLines = map (grmr: /* bash */''
@@ -104,8 +111,10 @@
         name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
         builder = writeText "builder.sh" builderText;
       });
-
-      startPlugins = grammarMatcher false allPlugins;
+      # if the queries stop appearing from nowhere, group them like this instead.
+      packdirGrammar = lib.optionals (! isOldGrammarType) [
+        (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" collected_grammars)
+      ];
 
       allPython3Dependencies = ps:
         lib.flatten (builtins.map (plugin: (plugin.python3Dependencies or (_: [])) ps) allPlugins);
@@ -118,10 +127,6 @@
       };
 
       packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (startPlugins ++ resolvedCats);
-
-      packdirGrammar = lib.optionals (! isOldGrammarType) [
-        (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" collected_grammars)
-      ];
 
       packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
 
