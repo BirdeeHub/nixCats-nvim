@@ -119,6 +119,8 @@ let
   extraPython3wrapperArgs sharedLibraries
   optionalLuaPreInit bashBeforeWrapper;
 
+  ncTools = import ./ncTools.nix;
+
 in
   let
     # copy entire flake to store directory
@@ -139,18 +141,13 @@ in
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
 
-      # command injection. The user can just straight up pass lua code
-      # in categoryDefinitions so users have no reason to use this.
-      # however, for our purposes, this is the cleanest and most 
-      # performant way to replace the config location with a lua function value.
-      nixCats_store_config_location = if isUnwrappedCfgPath
-        then "${settings.unwrappedCfgPath}" else if isStdCfgPath then '']] .. vim.fn.stdpath("config") .. [['' else "${LuaConfig}";
+      nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
+        else if isStdCfgPath then ncTools.mkLuaInline ''vim.fn.stdpath("config")''
+        else "${LuaConfig}";
       # TODO: nixCats_store_config_location is not in the lazy.nvim wrapper anymore....
       # maybe figure out how to add a deprecation warning to it and get them to pull the new template...
       # because its name is incorrect....
-      # It should be this...
-      nixCats_config_location = if isUnwrappedCfgPath
-        then "${settings.unwrappedCfgPath}" else if isStdCfgPath then '']] .. vim.fn.stdpath("config") .. [['' else "${LuaConfig}";
+      nixCats_store_config_location = nixCats_config_location;
 
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
@@ -166,9 +163,9 @@ in
         inherit nixCats_store_config_location;
       };
       # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
-      cats = pkgs.writeText "cats.lua" ''return ${(import ./ncTools.nix).luaTablePrinter categoriesPlus}'';
-      settingsTable = pkgs.writeText "settings.lua" ''return ${(import ./ncTools.nix).luaTablePrinter settingsPlus}'';
-      depsTable = pkgs.writeText "pawsible.lua" ''return ${(import ./ncTools.nix).luaTablePrinter allPluginDeps}'';
+      cats = pkgs.writeText "cats.lua" ''return ${ncTools.toLua categoriesPlus}'';
+      settingsTable = pkgs.writeText "settings.lua" ''return ${ncTools.toLua settingsPlus}'';
+      depsTable = pkgs.writeText "pawsible.lua" ''return ${ncTools.toLua allPluginDeps}'';
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
@@ -222,7 +219,7 @@ in
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
-    filterAndFlatten = (import ./ncTools.nix).filterAndFlatten categories;
+    filterAndFlatten = ncTools.filterAndFlatten categories;
 
     buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
     start = pkgs.lib.unique (filterAndFlatten startupPlugins);
@@ -233,14 +230,12 @@ in
     # and then maps name and value
     # into a list based on the function we provide it.
     # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenMapInnerAttrs = (import ./ncTools.nix)
-          .filterAndFlattenMapInnerAttrs categories;
+    filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
     # This one filters and flattens attrs of lists and then maps value
     # into a list of strings based on the function we provide it.
     # it the same as above but for a mapping function with 1 argument
     # because the inner is a list not a set.
-    filterAndFlattenMapInner = (import ./ncTools.nix)
-          .filterAndFlattenMapInner categories;
+    filterAndFlattenMapInner = ncTools.filterAndFlattenMapInner categories;
 
     # and then applied to give us a 1 argument function:
 

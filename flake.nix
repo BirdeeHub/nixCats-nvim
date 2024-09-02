@@ -365,12 +365,13 @@
           theBestCat = "says meow!!";
           # yes even tortured inputs work.
           theWorstCat = {
-            thing'1 = [ "MEOW" "HISSS" ];
+            thing'1 = [ "MEOW" '']]' ]=][=[HISSS]]"[['' ];
             thing2 = [
               {
                 thing3 = [ "give" "treat" ];
               }
               "I LOVE KEYBOARDS"
+              (utils.mkLuaInline ''[[I am a]] .. [[ lua ]] .. type("value")'')
             ];
             thing4 = "couch is for scratching";
           };

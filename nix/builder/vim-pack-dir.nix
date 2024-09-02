@@ -38,9 +38,10 @@
       , ...
     }:
   let
+    inherit (import ./ncTools.nix) mkLuaInline;
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if isOldGrammarType then ts_grammar_plugin_combined else
-      "]] .. vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*";
+      mkLuaInline "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
 
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {

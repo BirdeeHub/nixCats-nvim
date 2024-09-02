@@ -242,6 +242,11 @@ with builtins; rec {
     # and didnt know genAttrs is great as a bySystems
     bySystems = lib.genAttrs;
 
+    # you can use this to make values in the tables generated
+    # for the nixCats plugin using lua literals.
+    # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
+    mkLuaInline = expr: { __type = "nixCats-lua-inline"; inherit expr; };
+
   };
 
   # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
