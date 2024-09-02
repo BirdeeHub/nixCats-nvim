@@ -42,9 +42,7 @@ with builtins; rec {
     luaTablePrinter = attrSet: let
       luatableformatter = attrSet: let
         nameandstringmap = mapAttrs (n: value: let
-            name = if isLuaInline n
-              then trace (n.expr) (throw "dynamic lua values not allowed in attr names from nix")
-              else "[ " + (luaEnclose "${n}") + " ]";
+            name = "[ " + (luaEnclose "${n}") + " ]";
           in
           "${name} = ${doSingleLuaValue value}") attrSet;
         resultList = attrValues nameandstringmap;
