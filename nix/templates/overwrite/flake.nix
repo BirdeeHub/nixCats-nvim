@@ -33,7 +33,7 @@
       # and then grab pkgs.nixCats in a module and reconfigure this same way.
       # then put it in home.packages instead of exporting from the flake like this.
       # we can even get our utils from it:
-      # inherit (OGpkg.passthru) utils;
+      # inherit (OGpkg) utils;
       # no reason to do that though here.
       inherit (nixCats) utils;
 
@@ -152,15 +152,15 @@
     in utils.mkAllWithDefault finalPackage);
 
     # NOTE: we can still also export everything relevant from before!
-    homeModule = self.packages.x86_64-linux.default.passthru.homeModule;
-    nixosModules.default = self.packages.x86_64-linux.default.passthru.nixosModule;
+    homeModule = self.packages.x86_64-linux.default.homeModule;
+    nixosModules.default = self.packages.x86_64-linux.default.nixosModule;
     # NOTE: The system we chose here doesnt matter.
     # the modules recieve it on import,
     # and in the overlay packages below it
     # will be overridden by prev.system
     overlays = (let
       package = self.packages.x86_64-linux.default;
-      inherit (package.passthru) utils;
+      inherit (package) utils;
     in {
       # default contains all the packages
       default = utils.easyMultiOverlay package;

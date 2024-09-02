@@ -36,7 +36,7 @@
       OGpkg = nixCats.packages.${system}.default;
 
       # we can even get our utils from it.
-      inherit (OGpkg.passthru) utils;
+      inherit (OGpkg) utils;
 
       withExtraOverlays = OGpkg.override (prev: {
         # These next lines could be omitted. They are here for illustration
