@@ -10,6 +10,8 @@ with builtins; rec {
     then toCheck.__type == "nixCats-lua-inline"
     else false;
 
+    LI2STR = LI: "assert(loadstring(${luaEnclose "return ${LI.expr}"}))()";
+
     measureLongBois = inString: let
       normalize_split = list: filter (x: x != null && x != "")
           (concatMap (x: if isList x then x else [ ]) list);
@@ -35,7 +37,7 @@ with builtins; rec {
       else if value == null then "nil"
       else if lib.isDerivation value then luaEnclose "${value}"
       else if isList value then "${luaListPrinter value}"
-      else if isLuaInline value then toString value.expr
+      else if isLuaInline value then LI2STR value
       else if isAttrs value then "${luaTablePrinter value}"
       else luaEnclose (toString value);
 
