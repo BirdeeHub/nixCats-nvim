@@ -17,12 +17,12 @@ with builtins; rec {
       counter = str: map stringLength (splitter str);
       getMax = str: foldl' (max: x: if x > max then x else max) 0 (counter str);
       getEqSigns = str: (getMax str) - 2;
+      longBoiLength = getEqSigns inString;
     in
-    getEqSigns inString;
+    if longBoiLength >= 0 then longBoiLength + 1 else 0;
 
     luaEnclose = inString: let
-      eqInString = measureLongBois inString;
-      eqNum = if eqInString >= 0 then eqInString + 1 else 0;
+      eqNum = measureLongBois inString;
       eqStr = concatStringsSep "" (genList (_: "=") eqNum);
       bL = "[" + eqStr + "[";
       bR = "]" + eqStr + "]";
