@@ -6,16 +6,16 @@ with builtins; rec {
   toLua = input: let
 
     isLuaInline = toCheck:
-    if builtins.isAttrs toCheck && toCheck ? __type
+    if isAttrs toCheck && toCheck ? __type
     then toCheck.__type == "nixCats-lua-inline"
     else false;
 
     measureLongBois = inString: let
-      normalize_split = list: builtins.filter (x: x != null && x != "")
-          (builtins.concatMap (x: if builtins.isList x then x else [ ]) list);
-      splitter = str: normalize_split (builtins.split "(\\[=*\\[)|(]=*])" str);
-      counter = str: builtins.map builtins.stringLength (splitter str);
-      getMax = str: builtins.foldl' (max: x: if x > max then x else max) 0 (counter str);
+      normalize_split = list: filter (x: x != null && x != "")
+          (concatMap (x: if isList x then x else [ ]) list);
+      splitter = str: normalize_split (split "(\\[=*\\[)|(]=*])" str);
+      counter = str: map stringLength (splitter str);
+      getMax = str: foldl' (max: x: if x > max then x else max) 0 (counter str);
       getEqSigns = str: (getMax str) - 2;
     in
     getEqSigns inString;
@@ -23,7 +23,7 @@ with builtins; rec {
     luaEnclose = inString: let
       eqInString = measureLongBois inString;
       eqNum = if eqInString >= 0 then eqInString + 1 else 0;
-      eqStr = builtins.concatStringsSep "" (builtins.genList (_: "=") eqNum);
+      eqStr = concatStringsSep "" (genList (_: "=") eqNum);
       bL = "[" + eqStr + "[";
       bR = "]" + eqStr + "]";
     in
@@ -43,7 +43,7 @@ with builtins; rec {
       luatableformatter = attrSet: let
         nameandstringmap = mapAttrs (n: value: let
             name = if isLuaInline n
-              then builtins.trace (n.expr) (builtins.throw "dynamic lua values not allowed in attr names from nix")
+              then trace (n.expr) (throw "dynamic lua values not allowed in attr names from nix")
               else "[ " + (luaEnclose "${n}") + " ]";
           in
           "${name} = ${doSingleLuaValue value}") attrSet;
