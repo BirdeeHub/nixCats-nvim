@@ -1,74 +1,91 @@
 with builtins; rec {
 # NIX CATS SECTION:
   
-  mkLuaInline = expr: { __type = "nixCats-lua-inline"; inherit expr; };
+  mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
 
-  toLua = input: let
+  toLua = toLuaInternal {};
+
+  toLuaInternal = {
+    pretty ? true,
+    # adds indenting to multiline strings
+    # and multiline lua expressions
+    formatstrings ? false, # <-- only active if pretty is true
+    ...
+  }: input: let
 
     isLuaInline = toCheck:
     if isAttrs toCheck && toCheck ? __type
-    then toCheck.__type == "nixCats-lua-inline"
+    then toCheck.__type == "nix-to-lua-inline"
     else false;
 
-    LI2STR = LI: "assert(loadstring(${luaEnclose "return ${LI.expr}"}))()";
-
-    measureLongBois = inString: let
-      normalize_split = list: filter (x: x != null && x != "")
-          (concatMap (x: if isList x then x else [ ]) list);
-      splitter = str: normalize_split (split "(\\[=*\\[)|(]=*])" str);
-      counter = str: map stringLength (splitter str);
-      getMax = str: foldl' (max: x: if x > max then x else max) 0 (counter str);
-      getEqSigns = str: (getMax str) - 2;
-      longBoiLength = getEqSigns inString;
-    in
-    if longBoiLength >= 0 then longBoiLength + 1 else 0;
+    luaToString = LI: "assert(loadstring(${luaEnclose "return ${LI.expr}"}))()";
 
     luaEnclose = inString: let
+      genStr = str: num: concatStringsSep "" (genList (_: str) num);
+
+      measureLongBois = inString: let
+        normalize_split = list: filter (x: x != null && x != "")
+            (concatMap (x: if isList x then x else [ ]) list);
+        splitter = str: normalize_split (split "(\\[=*\\[)|(]=*])" str);
+        counter = str: map stringLength (splitter str);
+        getMax = str: foldl' (max: x: if x > max then x else max) 0 (counter str);
+        getEqSigns = str: (getMax str) - 2;
+        longBoiLength = getEqSigns inString;
+      in
+      if longBoiLength >= 0 then longBoiLength + 1 else 0;
+
       eqNum = measureLongBois inString;
-      eqStr = concatStringsSep "" (genList (_: "=") eqNum);
+      eqStr = genStr "=" eqNum;
       bL = "[" + eqStr + "[";
       bR = "]" + eqStr + "]";
     in
     bL + inString + bR;
 
-    doSingleLuaValue = value:
+    nl_spc = level: let
+      genStr = str: num: concatStringsSep "" (genList (_: str) num);
+    in
+    if pretty == true then "\n${genStr " " (level * 2)}" else " ";
+
+    doSingleLuaValue = level: value: let
+      replacer = str: if pretty && formatstrings then builtins.replaceStrings [ "\n" ] [ "${nl_spc level}" ] str else str;
+    in
       if value == true then "true"
       else if value == false then "false"
       else if value == null then "nil"
+      else if isList value then "${luaListPrinter value level}"
       else if lib.isDerivation value then luaEnclose "${value}"
-      else if isList value then "${luaListPrinter value}"
-      else if isLuaInline value then LI2STR value
-      else if isAttrs value then "${luaTablePrinter value}"
-      else luaEnclose (toString value);
+      else if isLuaInline value then replacer (luaToString value)
+      else if isAttrs value then "${luaTablePrinter value level}"
+      else replacer (luaEnclose (toString value));
 
-    luaTablePrinter = attrSet: let
+    luaTablePrinter = attrSet: level: let
       luatableformatter = attrSet: let
         nameandstringmap = mapAttrs (n: value: let
             name = "[ " + (luaEnclose "${n}") + " ]";
           in
-          "${name} = ${doSingleLuaValue value}") attrSet;
+          "${name} = ${doSingleLuaValue (level + 1) value}") attrSet;
         resultList = attrValues nameandstringmap;
-        resultString = concatStringsSep ", " resultList;
+        resultString = concatStringsSep ",${nl_spc (level + 1)}" resultList;
       in
       resultString;
       catset = luatableformatter attrSet;
-      LuaTable = "{ " + catset + " }";
+      LuaTable = "{${nl_spc (level + 1)}" + catset + "${nl_spc level}}";
     in
     LuaTable;
 
-    luaListPrinter = theList: let
+    luaListPrinter = theList: level: let
       lualistformatter = theList: let
-        stringlist = map doSingleLuaValue theList;
-        resultString = concatStringsSep ", " stringlist;
+        stringlist = map (doSingleLuaValue (level + 1)) theList;
+        resultString = concatStringsSep ",${nl_spc (level + 1)}" stringlist;
       in
       resultString;
       catlist = lualistformatter theList;
-      LuaList = "{ " + catlist + " }";
+      LuaList = "{${nl_spc (level + 1)}" + catlist + "${nl_spc level}}";
     in
     LuaList;
 
   in
-  doSingleLuaValue input;
+  doSingleLuaValue 0 input;
 
 # NEOVIM BUILDER SECTION:
 
