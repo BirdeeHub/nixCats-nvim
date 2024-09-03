@@ -245,7 +245,7 @@ with builtins; rec {
     # you can use this to make values in the tables generated
     # for the nixCats plugin using lua literals.
     # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
-    mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
+    inherit (import ../builder/ncTools.nix) mkLuaInline;
 
   };
 
