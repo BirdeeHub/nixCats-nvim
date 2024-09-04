@@ -17,7 +17,7 @@ It allows you to easily pass arbitrary information from nix to lua, easily refer
 
 The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, and is best viewed there, where the helptags work.
+The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
