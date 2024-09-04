@@ -33,7 +33,7 @@ You can initialize them into a directory with `nix flake init -t github:BirdeeHu
 
 [./nixCatsHelp](./nixCatsHelp) contains the in-editor documentation.
 
-Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix) and documented at [:h nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html)
+Everything you may need is exported by the utils set within [./utils/default.nix](./utils/default.nix) and documented at [:h nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.exports)
 
 Everything outside of this directory is the example config of nixCats, runnable with `nix run github:BirdeeHub/nixCats`.
 

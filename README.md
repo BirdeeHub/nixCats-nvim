@@ -17,12 +17,12 @@ It allows you to easily pass arbitrary information from nix to lua, easily refer
 
 The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
 Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
+The [in-editor help](https://nixcats.org/nixCats_installation.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
+If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html#nixCats.luaUtils.lazy) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
 
 ##### (just remember to change your $EDITOR variable if you named your package something other than nvim!)
 
@@ -74,7 +74,7 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
   - this is an optional, additional template.
   - proper useage of this template can yield a configuration that you can use both with or without nix.
   - contains the lazy.nvim wrapper.
-- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](https://nixcats.org/nixCats_installation.html))
+- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](https://nixcats.org/nixCats_installation.html#nixCats.templates))
 - ability to call override as many times as you like to fully recustomize or combine packages
 - [Extensive in-editor help.](https://nixcats.org/TOC.html)
 - I mentioned the templates already but if you want to see them all on github they are here: [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates)
@@ -82,7 +82,7 @@ If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template
 ---
 
 #### Installation: <a name="installation"></a>
-see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
+see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html#nixCats.installation_options)
 for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
 - to test:
@@ -164,7 +164,7 @@ It is a similar process to migrating to a new neovim plugin manager. Because you
 
 Use a template and put the plugin names into the main nix file provided.
 
-You can import them from nixpkgs or straight from your inputs via a convenience overlay [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html)
+You can import them from nixpkgs or straight from your inputs via a convenience overlay [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html#nixCats.flake.inputs)
 
 Then configure in lua.
 
@@ -275,7 +275,7 @@ You also might want a [nerd font](https://www.nerdfonts.com/) for some icons dep
 
 If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
-See [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html) for
+See [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html#nixCats.flake.inputs) for
 how to use the auto plugin import helper in your inputs for neovim plugins not on nixpkgs.
 
 It is made to be customized into your own portable nix neovim distribution
@@ -284,9 +284,9 @@ nvim configuration scheme as little as possible.
 
 Further info for getting started:
 All info I could manage to cover is covered in the included help files.
-For this section,
 see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
-and also :help [nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html)
+and also :help [nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.exports)
+for more info about the outputs and util functions available.
 
 ---
 
