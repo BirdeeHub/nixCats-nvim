@@ -1,7 +1,7 @@
 nixCats	nixCats_plugin.txt	/*nixCats*
-nixCats.LSPs	nix_LSPs.txt	/*nixCats.LSPs*
-nixCats.LSPs.caps-on_attach	nix_LSPs.txt	/*nixCats.LSPs.caps-on_attach*
-nixCats.LSPs.mason	nix_LSPs.txt	/*nixCats.LSPs.mason*
+nixCats.LSPs	nix_LSPS.txt	/*nixCats.LSPs*
+nixCats.LSPs.caps-on_attach	nix_LSPS.txt	/*nixCats.LSPs.caps-on_attach*
+nixCats.LSPs.mason	nix_LSPS.txt	/*nixCats.LSPs.mason*
 nixCats.flake	nixCats_format.txt	/*nixCats.flake*
 nixCats.flake.inputs	nixCats_format.txt	/*nixCats.flake.inputs*
 nixCats.flake.nixperts.overlays	nix_overlays.txt	/*nixCats.flake.nixperts.overlays*
