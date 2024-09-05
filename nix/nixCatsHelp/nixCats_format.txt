@@ -27,20 +27,24 @@ For detecting what was included by
 the flake in your Lua, see:
 :help |nixCats|
 
-`stdpath('config')` will still point to ~/.config/<configDirName>.
+`stdpath('config')` will still point to `~/.config/<configDirName>`.
 But your lua config will be in the store.
 This is ok, because most of the reason for a plugin to use
 it would be to write to it, and we cant write to store paths anyway. 
 You could use `require('nixCats').configDir`,
 or `nixCats('nixCats_config_location')`
-(yes its called store location, but it actually always
-points to the actual one being used)
 to get current config directory for your uses, if ever necessary.
 It will be present and correct regardless of settings.
-However if you did not use nix at all, it may not be available so
-you may want to use `require('nixCatsUtils').isNixCats` to default to
-`vim.fn.stdpath('config')` if needed.
-You could also use debug.getinfo(1, "S").source:sub(2) or something similar.
+
+However if you did not use nix at all and did not run the setup
+function, of course the nixCats plugin wont be there to ask.
+
+The setup function from `require('nixCatsUtils').setup`
+will provide a mock nixCats plugin with SOME values
+and empty tables to prevent accidental indexing errors.
+You could instead do `require('nixCatsUtils').isNixCats` to default to
+`vim.fn.stdpath('config')` if all you wanted was this path though.
+
 Keep in mind they will be read-only if in the store!
 
 =======================================================================================
