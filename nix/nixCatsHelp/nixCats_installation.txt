@@ -195,7 +195,7 @@ without duplication using the override function! see :h |nixCats.overriding|
 
 ---------------------------------------------------------------------------------------
                                                            *nixCats.templates*
-The templates may also imported from the utils set
+The templates may also be imported from the utils set
 via `inputs.nixCats.utils.templates`
 The following is the set where they are defined.
 

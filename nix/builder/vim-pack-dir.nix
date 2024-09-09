@@ -17,8 +17,8 @@
 
   grammarMatcher = yes: builtins.filter (drv: let
     # if we get to split them up, we can include even if not a dir
-    new = drv: builtins.pathExists "${drv.outPath}/parser";
-    old = drv: lib.pathIsDirectory "${drv.outPath}/parser";
+    new = drv: builtins.pathExists "${drv.outPath}/parser" && "${lib.getName drv}" != "nvim-treesitter";
+    old = drv: lib.pathIsDirectory "${drv.outPath}/parser" && "${lib.getName drv}" != "nvim-treesitter";
     cond = ! isOldGrammarType && new drv || old drv;
     match = if yes then cond else ! cond;
   in

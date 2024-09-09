@@ -542,6 +542,9 @@ These are the defaults:
       # do you want to package the lua from this flake in the store?
       # or would you rather it just read it in your .config/<configDirName>?
       # nixCats and this help will work either way.
+      # packages with wrapRc = false are for quick changes to lua.
+      # it is not for being ran from anywhere via nix run, because the config
+      # was not wrapped with the program.
       wrapRc = true;
 
       # What should the name of the folder within standard directories
@@ -554,9 +557,12 @@ These are the defaults:
 
       # Only active when wrapRc = false, this option allows you to specify
       # an absolute path to the unwrapped config directory.
+      # This is not a nix path. This is the unwrapped config directory.
+      # This means you are going to need to make
+      # sure that it points the right place on the current machine.
+      unwrappedCfgPath = null;
       # Will not change anything other than config directory, configDirName
       # is still needed for .local/share or .cache and the like
-      unwrappedCfgPath = null;
 
       # use this to pin a specific neovim version.
       # This one will specify the base neovim derivation to use.
