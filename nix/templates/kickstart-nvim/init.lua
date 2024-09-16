@@ -518,7 +518,7 @@ require('nixCatsUtils.lazyCat').setup(pluginList, nixLazyPath,
         opts = {
           library = {
             -- adds type hints for nixCats global
-            { path = require('nixCats').nixCatsPath .. '/lua', words = { "nixCats" } },
+            { path = (require('nixCats').nixCatsPath or "") .. '/lua', words = { "nixCats" } },
           },
         }
       },
