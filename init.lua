@@ -25,7 +25,7 @@ Of course, if you only ever download nvim with nix, this isnt needed.]]
 require('nixCatsUtils').setup {
   non_nix_value = true,
 }
--- then load the plugins via pckr
+-- then load the plugins via paq-nvim
 -- YOU are in charge of putting the plugin
 -- urls and build steps in there, which will only be used when not on nix,
 -- and you should keep any setup functions
@@ -35,12 +35,12 @@ require("myLuaConf.non_nix_download")
 -- OK, again, that isnt needed if you load this setup via nix, but it is an option.
 
 --[[
-NOTE: there is also a lazy.nvim wrapper which you could use instead of the pckr one.
-I have chosen to demonstrate using pckr for non-nix download in the main config,
+NOTE: there is also a lazy.nvim wrapper which you could use instead of the paq-nvim one.
+I have chosen to demonstrate using paq-nvim for non-nix download in the main config,
 because it has much less influence on the rest of your config.
 
 Nix puts the plugins
-into the directories pckr expects them to be in,
+into the directories paq-nvim expects them to be in,
 so you just put the URLs and build steps in there, and use its opt option to do the same
 thing as putting a plugin in nixCat's OptionalPlugins field.
 

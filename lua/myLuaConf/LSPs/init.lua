@@ -16,7 +16,7 @@ if nixCats('neonixdev') then
         --   -- Load luvit types when the `vim.uv` word is found
         --   -- { path = "luvit-meta/library", words = { "vim%.uv" } },
           -- adds type hints for nixCats global
-          { path = require('nixCats').nixCatsPath .. '/lua', words = { "nixCats" } },
+          { path = (require('nixCats').nixCatsPath or nil) .. '/lua', words = { "nixCats" } },
         },
       })
     end
