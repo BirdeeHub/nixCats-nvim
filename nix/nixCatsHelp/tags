@@ -20,7 +20,7 @@ nixCats.installation_options	nixCats_installation.txt	/*nixCats.installation_opt
 nixCats.luaUtils	nixCats_luaUtils.txt	/*nixCats.luaUtils*
 nixCats.luaUtils.intro	nixCats_luaUtils.txt	/*nixCats.luaUtils.intro*
 nixCats.luaUtils.lazy	nixCats_luaUtils.txt	/*nixCats.luaUtils.lazy*
-nixCats.luaUtils.pckr	nixCats_luaUtils.txt	/*nixCats.luaUtils.pckr*
+nixCats.luaUtils.paq-nvim	nixCats_luaUtils.txt	/*nixCats.luaUtils.paq-nvim*
 nixCats.luaUtils.setup	nixCats_luaUtils.txt	/*nixCats.luaUtils.setup*
 nixCats.module	nixCats_modules.txt	/*nixCats.module*
 nixCats.module.mkHomeModules	nixCats_modules.txt	/*nixCats.module.mkHomeModules*

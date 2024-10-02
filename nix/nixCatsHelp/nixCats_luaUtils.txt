@@ -179,7 +179,7 @@ In that template, all notes about the lazy wrapper are in comments that begin
 with the string: `NOTE: nixCats:` so to find all of the info, search for that.
 
 ---------------------------------------------------------------------------------
-                                                       *nixCats.luaUtils.pckr*
+                                                       *nixCats.luaUtils.paq-nvim*
 >lua
   -- load the plugins via paq-nvim when not on nix
   -- YOU are in charge of putting the plugin
