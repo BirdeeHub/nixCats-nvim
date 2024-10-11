@@ -290,7 +290,7 @@ in
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
-      propagatedBuildInputs = buildInputs;
+      propagatedBuildInputs = buildInputs ++ (pkgs.lib.optionals (prev ? propagatedBuildInputs) prev.propagatedBuildInputs);
     }) else baseNvimUnwrapped;
 
   in
