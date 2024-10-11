@@ -270,10 +270,6 @@ These are the things you can return:
 >nix
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 <
-<propagatedBuildInputs> 
-  a flexible set of categories, each containing internal
-  BUILD TIME dependencies. Will also be available to the devShell.
-
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSP's or 
   other internal runtime dependencies such as ctags or debuggers
@@ -318,6 +314,11 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
 
 <extraPython3wrapperArgs>
   the same as extraWrapperArgs but for bundled python3 executable
+
+<propagatedBuildInputs> 
+  a flexible set of categories, each containing internal BUILD dependencies.
+  Will not be available to the PATH unless in a devShell.
+  USING THIS OPTION WILL CAUSE NVIM TO BUILD FROM SOURCE.
 
 <optionalLuaPreInit>
   a flexible set of categories, each containing a lua string
@@ -569,6 +570,7 @@ These are the defaults:
       neovim-unwrapped = null;
       # This one will just override the src value of the neovim in nixpkgs
       # import it in flake inputs with flake = false,
+      # It will also obviously cause neovim to build from source.
       nvimSRC = null;
 
       # These 2 options are useful for when you want to allow your dev shells

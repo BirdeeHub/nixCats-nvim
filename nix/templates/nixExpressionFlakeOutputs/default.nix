@@ -45,11 +45,6 @@
 
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
 
-    propagatedBuildInputs = {
-      general = with pkgs; [
-      ];
-    };
-
     lspsAndRuntimeDeps = {
       general = with pkgs; [
       ];

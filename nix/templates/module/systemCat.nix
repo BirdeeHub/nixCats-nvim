@@ -28,10 +28,6 @@ in {
       # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
       categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
-        propagatedBuildInputs = {
-          # add to general or create a new list called whatever
-          general = [];
-        };
         lspsAndRuntimeDeps = {
           general = [];
         };
