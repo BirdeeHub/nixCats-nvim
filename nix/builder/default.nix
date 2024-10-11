@@ -221,7 +221,7 @@ in
     # It includes categories marked as true, then flattens to a single list
     filterAndFlatten = ncTools.filterAndFlatten categories;
 
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+    buildInputs = pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
     start = pkgs.lib.unique (filterAndFlatten startupPlugins);
     opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
 
@@ -288,10 +288,10 @@ in
 
     # add our propagated build dependencies
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
-    myNeovimUnwrapped = baseNvimUnwrapped.overrideAttrs (prev: {
+    myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs;
-    });
+    }) else baseNvimUnwrapped;
 
   in
   # add our lsps and plugins and our config, and wrap it all up!

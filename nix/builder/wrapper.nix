@@ -133,10 +133,10 @@ stdenv.mkDerivation {
   postBuild = lib.optionalString stdenv.isLinux ''
     mkdir -p $out/share/applications
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
-      --replace 'Name=Neovim' 'Name=${nixCats_packageName}'\
-      --replace 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
-      --replace 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'\
-      --replace 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
+      --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
+      --replace-fail 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
+      --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'\
+      --replace-fail 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
   ''
   + lib.optionalString (python3Env != null && withPython3) ''
     makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 --unset PYTHONPATH ${builtins.concatStringsSep " " extraPython3wrapperArgs}
@@ -167,6 +167,7 @@ stdenv.mkDerivation {
       [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generatedWrapperArgs;
   in /* bash */ ''
     mkdir -p $out/nix-support
+    [ -d ${neovim-unwrapped}/nix-support ] && \
     cp -r ${neovim-unwrapped}/nix-support/* $out/nix-support
 
     echo "Generating remote plugin manifest"
