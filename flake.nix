@@ -243,7 +243,7 @@
       # shared libraries to be added to LD_LIBRARY_PATH
       # variable available to nvim runtime
       sharedLibraries = {
-        general = with pkgs; [
+        general = with pkgs; [ # <- this would be included if any of the subcategories of general are
           # libgit2
         ];
       };

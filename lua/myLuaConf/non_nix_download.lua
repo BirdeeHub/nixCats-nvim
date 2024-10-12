@@ -20,22 +20,25 @@ require('nixCatsUtils.catPacker').setup({
 --[[ elsewhere in our configuration, so that    ]]
 --[[ we dont have to write it twice.            ]]
 --[[ ------------------------------------------ ]]
+  { "BirdeeHub/lze", },
+  { "stevearc/oil.nvim", },
   { 'joshdick/onedark.vim', },
   { 'nvim-tree/nvim-web-devicons', },
-
-  { 'nvim-treesitter/nvim-treesitter-textobjects', },
-  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate', },
-
   { 'nvim-lua/plenary.nvim', },
-  { 'nvim-telescope/telescope-fzf-native.nvim', build = ':!which make && make', },
-  { 'nvim-telescope/telescope-ui-select.nvim' },
-  {'nvim-telescope/telescope.nvim', },
+  { 'tpope/vim-repeat', },
+
+  { 'nvim-treesitter/nvim-treesitter-textobjects', opt = true, },
+  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate', opt = true, },
+
+  { 'nvim-telescope/telescope-fzf-native.nvim', build = ':!which make && make', opt = true, },
+  { 'nvim-telescope/telescope-ui-select.nvim', opt = true, },
+  {'nvim-telescope/telescope.nvim', opt = true, },
 
   -- lsp
-  { 'williamboman/mason.nvim', },
-  { 'williamboman/mason-lspconfig.nvim', },
-  { 'j-hui/fidget.nvim', },
-  { 'neovim/nvim-lspconfig', },
+  { 'williamboman/mason.nvim', opt = true, },
+  { 'williamboman/mason-lspconfig.nvim', opt = true, },
+  { 'j-hui/fidget.nvim', opt = true, },
+  { 'neovim/nvim-lspconfig', opt = true, },
 
   --  NOTE:  we take care of lazy loading elsewhere in an autocommand
     -- so that we can use the same code on and off nix.
@@ -43,46 +46,45 @@ require('nixCatsUtils.catPacker').setup({
   { 'folke/lazydev.nvim', opt = true, },
 
   -- completion
-  { 'onsails/lspkind.nvim', },
-  { 'L3MON4D3/LuaSnip', },
-  { 'saadparwaiz1/cmp_luasnip', },
-  { 'hrsh7th/cmp-nvim-lsp', },
-  { 'hrsh7th/cmp-nvim-lua', },
-  { 'hrsh7th/cmp-nvim-lsp-signature-help', },
-  { 'hrsh7th/cmp-path', },
-  { 'rafamadriz/friendly-snippets', },
-  { 'hrsh7th/cmp-buffer', },
-  { 'hrsh7th/cmp-cmdline', },
-  { 'dmitmel/cmp-cmdline-history', },
-  { 'hrsh7th/nvim-cmp', },
+  { 'onsails/lspkind.nvim', opt = true, },
+  { 'L3MON4D3/LuaSnip', opt = true, },
+  { 'saadparwaiz1/cmp_luasnip', opt = true, },
+  { 'hrsh7th/cmp-nvim-lsp', opt = true, },
+  { 'hrsh7th/cmp-nvim-lua', opt = true, },
+  { 'hrsh7th/cmp-nvim-lsp-signature-help', opt = true, },
+  { 'hrsh7th/cmp-path', opt = true, },
+  { 'rafamadriz/friendly-snippets', opt = true, },
+  { 'hrsh7th/cmp-buffer', opt = true, },
+  { 'hrsh7th/cmp-cmdline', opt = true, },
+  { 'dmitmel/cmp-cmdline-history', opt = true, },
+  { 'hrsh7th/nvim-cmp', opt = true, },
 
   -- lint and format
-  { 'mfussenegger/nvim-lint' },
-  { 'stevearc/conform.nvim' },
+  { 'mfussenegger/nvim-lint', opt = true, },
+  { 'stevearc/conform.nvim', opt = true, },
 
   -- dap
-  { 'nvim-neotest/nvim-nio' },
-  { 'rcarriga/nvim-dap-ui', },
-  { 'theHamsta/nvim-dap-virtual-text', },
-  { 'jay-babu/mason-nvim-dap.nvim', },
-  { 'mfussenegger/nvim-dap', },
+  { 'nvim-neotest/nvim-nio', opt = true, },
+  { 'rcarriga/nvim-dap-ui', opt = true, },
+  { 'theHamsta/nvim-dap-virtual-text', opt = true, },
+  { 'jay-babu/mason-nvim-dap.nvim', opt = true, },
+  { 'mfussenegger/nvim-dap', opt = true, },
 
   -- { 'm-demare/hlargs.nvim', },
-  { "stevearc/oil.nvim" },
-  { 'mbbill/undotree', },
-  { 'tpope/vim-fugitive', },
-  { 'tpope/vim-rhubarb', },
-  { 'tpope/vim-sleuth', },
-  { 'folke/which-key.nvim', },
-  { 'lewis6991/gitsigns.nvim', },
-  { 'nvim-lualine/lualine.nvim', },
-  { 'lukas-reineke/indent-blankline.nvim', },
-  { 'numToStr/Comment.nvim', },
-  { 'tpope/vim-repeat', },
-  { 'kylechui/nvim-surround', },
+  { 'mbbill/undotree', opt = true, },
+  { 'tpope/vim-fugitive', opt = true, },
+  { 'tpope/vim-rhubarb', opt = true, },
+  { 'tpope/vim-sleuth', opt = true, },
+  { 'folke/which-key.nvim', opt = true, },
+  { 'lewis6991/gitsigns.nvim', opt = true, },
+  { 'nvim-lualine/lualine.nvim', opt = true, },
+  { 'lukas-reineke/indent-blankline.nvim', opt = true, },
+  { 'numToStr/Comment.nvim', opt = true, },
+  { 'kylechui/nvim-surround', opt = true, },
   {
     "iamcco/markdown-preview.nvim",
     build = ":call mkdp#util#install()",
+    opt = true,
   },
 
   -- all the rest of the setup will be done using the normal setup functions later,
