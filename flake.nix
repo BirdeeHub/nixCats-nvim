@@ -132,18 +132,79 @@
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
-        general = with pkgs.vimPlugins; {
-          # you can make subcategories!!!
-          # (always isnt a special name, just the one I chose for this subcategory)
-          always = [
-            lze
-            vim-repeat
-            plenary-nvim
+        debug = with pkgs.vimPlugins; [
+          nvim-nio
+          nvim-dap
+          nvim-dap-ui
+          nvim-dap-virtual-text
+        ];
+        lint = with pkgs.vimPlugins; [
+          nvim-lint
+        ];
+        format = with pkgs.vimPlugins; [
+          conform-nvim
+        ];
+        # yes these category names are arbitrary
+        markdown = with pkgs.vimPlugins; [
+          markdown-preview-nvim
+        ];
+        general = {
+          gitPlugins = [
+            # If it was included in your flake inputs as plugins-hlargs,
+            # this would be how to add that plugin in your config.
+            # pkgs.neovimPlugins.hlargs
           ];
-          extra = [
-            oil-nvim
-            nvim-web-devicons
-          ];
+          vimPlugins = {
+            # you can make a subcategory
+            cmp = with pkgs.vimPlugins; [
+              # cmp stuff
+              nvim-cmp
+              luasnip
+              friendly-snippets
+              cmp_luasnip
+              cmp-buffer
+              cmp-path
+              cmp-nvim-lua
+              cmp-nvim-lsp
+              cmp-cmdline
+              cmp-nvim-lsp-signature-help
+              cmp-cmdline-history
+              lspkind-nvim
+            ];
+            general = with pkgs.vimPlugins; [
+              telescope-fzf-native-nvim
+              telescope-ui-select-nvim
+              plenary-nvim
+              telescope-nvim
+              # treesitter
+              nvim-treesitter-textobjects
+              nvim-treesitter.withAllGrammars
+              # This is for if you only want some of the grammars
+              # (nvim-treesitter.withPlugins (
+              #   plugins: with plugins; [
+              #     nix
+              #     lua
+              #   ]
+              # ))
+              # other
+              nvim-lspconfig
+              fidget-nvim
+              # lualine-lsp-progress
+              lualine-nvim
+              gitsigns-nvim
+              which-key-nvim
+              comment-nvim
+              vim-sleuth
+              vim-fugitive
+              vim-rhubarb
+              vim-repeat
+              undotree
+              nvim-surround
+              indent-blankline-nvim
+              nvim-web-devicons
+              oil-nvim
+            ];
+          };
         };
         # You can retreive information from the
         # packageDefinitions of the package this was packaged with.
@@ -167,77 +228,11 @@
       # to get the name packadd expects, use the
       # `:NixCats pawsible` command to see them all
       optionalPlugins = {
-        debug = with pkgs.vimPlugins; [
-          nvim-nio
-          nvim-dap
-          nvim-dap-ui
-          nvim-dap-virtual-text
-        ];
-        lint = with pkgs.vimPlugins; [
-          nvim-lint
-        ];
-        format = with pkgs.vimPlugins; [
-          conform-nvim
-        ];
-        markdown = with pkgs.vimPlugins; [
-          markdown-preview-nvim
-        ];
         neonixdev = with pkgs.vimPlugins; [
+          # loaded in the same file as the lsps are configured.
+          # see there or at `:h nixCats.LSPs` for more info on lazy loading.
           lazydev-nvim
         ];
-        general = {
-          cmp = with pkgs.vimPlugins; [
-            # cmp stuff
-            nvim-cmp
-            luasnip
-            friendly-snippets
-            cmp_luasnip
-            cmp-buffer
-            cmp-path
-            cmp-nvim-lua
-            cmp-nvim-lsp
-            cmp-cmdline
-            cmp-nvim-lsp-signature-help
-            cmp-cmdline-history
-            lspkind-nvim
-          ];
-          treesitter = with pkgs.vimPlugins; [
-            nvim-treesitter-textobjects
-            nvim-treesitter.withAllGrammars
-            # This is for if you only want some of the grammars
-            # (nvim-treesitter.withPlugins (
-            #   plugins: with plugins; [
-            #     nix
-            #     lua
-            #   ]
-            # ))
-          ];
-          telescope = with pkgs.vimPlugins; [
-            telescope-fzf-native-nvim
-            telescope-ui-select-nvim
-            telescope-nvim
-          ];
-          always = with pkgs.vimPlugins; [
-            nvim-lspconfig
-            lualine-nvim
-            gitsigns-nvim
-            vim-sleuth
-            vim-fugitive
-            vim-rhubarb
-            nvim-surround
-          ];
-          extra = with pkgs.vimPlugins; [
-            fidget-nvim
-            # lualine-lsp-progress
-            which-key-nvim
-            comment-nvim
-            undotree
-            indent-blankline-nvim
-            # If it was included in your flake inputs as plugins-hlargs,
-            # this would be how to add that plugin in your config.
-            # pkgs.neovimPlugins.hlargs
-          ];
-        };
       };
 
       # shared libraries to be added to LD_LIBRARY_PATH

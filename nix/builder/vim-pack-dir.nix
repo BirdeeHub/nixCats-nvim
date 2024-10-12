@@ -8,7 +8,7 @@
   # NOTE: define helpers for packDir function here:
 
   # TODO:
-  # https://github.com/NixOS/nixpkgs/pull/344849#pullrequestreview-2362893939
+  # https://github.com/NixOS/nixpkgs/pull/344849
   # when this PR is merged, you can set this to false to fix niche grammars.
   # but rn the current version is broken so, dont set it to false yet.
   isOldGrammarType = true;
