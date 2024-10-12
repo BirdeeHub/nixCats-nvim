@@ -32,12 +32,12 @@
     # allowUnfree = true;
   };
   inherit (forEachSystem (system: let
-    # see :help nixCats.flake.outputs.overlays
-    # This overlay grabs all the inputs named in the format
-    # `plugins-<pluginName>`
-    # Once we add this overlay to our nixpkgs, we are able to
-    # use `pkgs.neovimPlugins`, which is a set of our plugins.
     dependencyOverlays = /* (import ./overlays inputs) ++ */ [
+      # see :help nixCats.flake.outputs.overlays
+      # This overlay grabs all the inputs named in the format
+      # `plugins-<pluginName>`
+      # Once we add this overlay to our nixpkgs, we are able to
+      # use `pkgs.neovimPlugins`, which is a set of our plugins.
       (utils.standardPluginOverlay inputs)
       # add any flake overlays here.
     ];

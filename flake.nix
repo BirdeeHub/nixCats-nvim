@@ -64,7 +64,7 @@
     extra_pkg_config = {
       # allowUnfree = true;
     };
-    # management of this variable is one of the harder parts of using flakes.
+    # management of the system variable is one of the harder parts of using flakes.
 
     # so I have done it here in an interesting way to keep it out of the way.
     # It gets resolved within the builder itself, and then passed to your
