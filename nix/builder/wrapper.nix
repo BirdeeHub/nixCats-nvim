@@ -36,8 +36,7 @@ neovim-unwrapped:
   , customAliases ? null
   , nixCats_passthru ? {}
   , preWrapperShellCode ? ""
-  , runB4Config ? ""
-  , runConfigInit ? ""
+  , customRC ? ""
   , luaEnv
   , extraPython3wrapperArgs ? []
   , luaPluginConfigs ? ""
@@ -79,8 +78,7 @@ let
   luaRcContent = ''
     vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
     vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
-    ${runB4Config}
-    ${runConfigInit}
+    ${customRC}
     ${luaPluginConfigs}
   '' + (lib.optionalString (vimlPluginConfigs != "") ''
     vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])

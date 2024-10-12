@@ -181,21 +181,6 @@ in
       '';
     });
 
-    # doing it as 2 parts, this before any nix included plugin config,
-    # and then running init.lua after makes nixCats command and
-    # configdir variable available even for lua written in nix
-    runB4Config = /* lua */''
-      vim.g.configdir = vim.fn.stdpath('config')
-      vim.opt.packpath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
-      vim.g.configdir = require('nixCats').get([[nixCats_config_location]])
-      require('nixCats').addGlobals()
-      vim.opt.packpath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
-    '';
-
     customRC = let
       optLuaPre = if builtins.isString optionalLuaPreInit
           then optionalLuaPreInit
@@ -206,6 +191,15 @@ in
           else builtins.concatStringsSep "\n"
           (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in/* lua */''
+      vim.g.configdir = vim.fn.stdpath('config')
+      vim.opt.packpath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
+      vim.g.configdir = require('nixCats').get([[nixCats_config_location]])
+      require('nixCats').addGlobals()
+      vim.opt.packpath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
       ${optLuaPre}
       vim.g.configdir = require('nixCats').get([[nixCats_config_location]])
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
@@ -317,7 +311,7 @@ import ./wrapNeovim.nix {
   });
   inherit pkgs nixpkgs;
   neovim-unwrapped = myNeovimUnwrapped;
-  inherit extraMakeWrapperArgs nixCats runB4Config preWrapperShellCode customRC;
+  inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path;
   pluginsOG.myVimPackage = {
     start = start;
