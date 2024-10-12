@@ -52,7 +52,7 @@
 
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, ... }@inputs: let
-    utils = import ./nix;
+    utils = import ./nix; # <- in the templates, this comes from inputs.nixCats.utils
     luaPath = "${./.}";
     # this is flake-utils eachSystem
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
@@ -64,7 +64,6 @@
     extra_pkg_config = {
       # allowUnfree = true;
     };
-    # sometimes our overlays require a ${system} to access the overlay.
     # management of this variable is one of the harder parts of using flakes.
 
     # so I have done it here in an interesting way to keep it out of the way.
@@ -74,11 +73,14 @@
     # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
 
-    # Your dependencyOverlays can either be lists
-    # in a set of ${system}, or simply a list.
-    # The default templates wrap them with ${system}
+    # sometimes our overlays require a ${system} to access the overlay.
+    # The default templates wrap the set we add them to with ${system}
     # because using them this way requires
     # least intervention when encountering malformed flakes.
+
+    # Your dependencyOverlays can either be lists
+    # in a set of ${system}, or simply a list.
+    # the nixCats builder function will accept either.
     # see :help nixCats.flake.outputs.overlays
     inherit (forEachSystem (system: let
       dependencyOverlays = (import ./overlays inputs) ++ [
@@ -90,6 +92,7 @@
         # add any other flake overlays here.
       ];
     in { inherit dependencyOverlays; })) dependencyOverlays;
+
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -399,7 +402,7 @@
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
       # and also our categoryDefinitions and packageDefinitions
     } categoryDefinitions packageDefinitions;
-
+    # call it with our defaultPackageName
     defaultPackage = nixCatsBuilder defaultPackageName;
 
     # this pkgs variable is just for using utils such as pkgs.mkShell
@@ -410,8 +413,10 @@
   in {
     # these outputs will be wrapped with ${system} by utils.eachSystem
 
-    # this will make a package out of each of the packageDefinitions defined above
-    # and set the default package to the one passed in here.
+    # this will generate a set of all the packages
+    # in the packageDefinitions defined above
+    # from the package we give it.
+    # and additionally output the original as default.
     packages = utils.mkAllWithDefault defaultPackage;
 
     # choose your package for devShell
