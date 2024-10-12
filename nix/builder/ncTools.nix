@@ -7,6 +7,7 @@ with builtins; rec {
 
   toLuaInternal = {
     pretty ? true,
+    indentSize ? 2,
     # adds indenting to multiline strings
     # and multiline lua expressions
     formatstrings ? false, # <-- only active if pretty is true
@@ -42,7 +43,7 @@ with builtins; rec {
     bL + inString + bR;
 
     nl_spc = level: if pretty == true
-      then "\n${genStr " " (level * 2)}" else " ";
+      then "\n${genStr " " (level * indentSize)}" else " ";
 
     doSingleLuaValue = level: value: let
       replacer = str: if pretty && formatstrings then replaceStrings [ "\n" ] [ "${nl_spc level}" ] str else str;
