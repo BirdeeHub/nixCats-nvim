@@ -18,12 +18,11 @@
   vimAlias ? false,
   viAlias ? false,
   extraName ? "",
-  # I changed this so that they are separate
   customRC ? "",
+  # this used to be called configure, and have customRC in it
   pluginsOG ? { },
-  # I passed some more stuff in
+  # I passed some more stuff in also
   nixCats,
-  runB4Config,
   aliases,
   nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
@@ -103,9 +102,8 @@ in
 (pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {
     wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     customAliases = aliases;
-    runConfigInit = customRC;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru
-      runB4Config luaPluginConfigs vimlPluginConfigs preWrapperShellCode;
+      customRC luaPluginConfigs vimlPluginConfigs preWrapperShellCode;
   }
 )

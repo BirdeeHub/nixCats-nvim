@@ -7,10 +7,10 @@
 }: let
   # NOTE: define helpers for packDir function here:
 
-  # TODO: ?
-  # https://github.com/NixOS/nixpkgs/issues/332580#issuecomment-2307253021
-  # if nvim-treesitter stops vendoring in queries,
-  # make isOldGrammarType check nixpkgs version of when that occurred
+  # TODO:
+  # https://github.com/NixOS/nixpkgs/pull/344849
+  # when this PR is merged, you can set this to false to fix niche grammars.
+  # but rn the current version is broken so, dont set it to false yet.
   isOldGrammarType = true;
 
   grammarPackName = "myNeovimGrammars";
@@ -103,9 +103,8 @@ nixCats: packages: let
 
     # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
     collected_grammars = grammarMatcher true allPlugins;
-    # currently nvim-treesitter vendors queries in SOMEHOW
-    # It ALSO copies them now, so, we actually HAVE to remove them,
-    # because otherwise we get errors....
+
+    # This was added as a fix for errors introduced, but hopefully can be removed one day....
     ts_grammar_plugin_combined = with builtins; stdenv.mkDerivation (let 
       # so we make a single plugin with them
       treesitter_grammars = map (e: e.outPath) collected_grammars;
@@ -124,7 +123,8 @@ nixCats: packages: let
       name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
       builder = writeText "builder.sh" builderText;
     });
-    # if the queries stop appearing from nowhere, group them like this instead.
+
+    # When they get fixed, add them like this instead.
     packdirGrammar = lib.optionals (! isOldGrammarType) [
       (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" collected_grammars)
     ];

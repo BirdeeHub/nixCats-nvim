@@ -52,7 +52,7 @@
 
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, ... }@inputs: let
-    utils = import ./nix;
+    utils = import ./nix; # <- in the templates, this comes from inputs.nixCats.utils
     luaPath = "${./.}";
     # this is flake-utils eachSystem
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
@@ -64,32 +64,35 @@
     extra_pkg_config = {
       # allowUnfree = true;
     };
-    # sometimes our overlays require a ${system} to access the overlay.
     # management of this variable is one of the harder parts of using flakes.
 
     # so I have done it here in an interesting way to keep it out of the way.
-
-    # First, we will define just our overlays per system.
-    # later we will pass them into the builder, and the resulting pkgs set
-    # will get passed to the categoryDefinitions and packageDefinitions
-    # which follow this section.
+    # It gets resolved within the builder itself, and then passed to your
+    # categoryDefinitions and packageDefinitions.
 
     # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
+
+    # sometimes our overlays require a ${system} to access the overlay.
+    # The default templates wrap the set we add them to with ${system}
+    # because using them this way requires
+    # least intervention when encountering malformed flakes.
+
+    # Your dependencyOverlays can either be lists
+    # in a set of ${system}, or simply a list.
+    # the nixCats builder function will accept either.
+    # see :help nixCats.flake.outputs.overlays
     inherit (forEachSystem (system: let
-      # see :help nixCats.flake.outputs.overlays
       dependencyOverlays = (import ./overlays inputs) ++ [
         # This overlay grabs all the inputs named in the format
         # `plugins-<pluginName>`
         # Once we add this overlay to our nixpkgs, we are able to
         # use `pkgs.neovimPlugins`, which is a set of our plugins.
         (utils.standardPluginOverlay inputs)
-        # add any flake overlays here.
+        # add any other flake overlays here.
       ];
-      # these overlays will be wrapped with ${system}
-      # and we will call the same utils.eachSystem function
-      # later on to access them.
     in { inherit dependencyOverlays; })) dependencyOverlays;
+
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
@@ -104,22 +107,27 @@
       # at RUN TIME for plugins. Will be available to PATH within neovim terminal
       # this includes LSPs
       lspsAndRuntimeDeps = {
+        # some categories of stuff.
         general = with pkgs; [
           universal-ctags
           ripgrep
           fd
+        ];
+        # these names are arbitrary.
+        lint = with pkgs; [
+        ];
+        # but you can choose which ones you want
+        # per nvim package you export
+        debug = with pkgs; [
+        ];
+        # and easily check if they are included in lua
+        format = with pkgs; [
         ];
         neonixdev = {
           # also you can do this.
           inherit (pkgs) nix-doc lua-language-server nixd;
           # and each will be its own sub category
         };
-        lint = with pkgs; [
-        ];
-        debug = with pkgs; [
-        ];
-        format = with pkgs; [
-        ];
       };
 
       # This is for plugins that will load at startup without using packadd:
@@ -212,21 +220,19 @@
             }
           );
           # This is obviously a fairly basic usecase for this, but still nice.
-          # Checking packageDefinitions also has the bonus
-          # of being able to be easily set by importing flakes.
       };
 
       # not loaded automatically at startup.
       # use with packadd and an autocommand in config to achieve lazy loading
+      # or a tool for organizing this like lze or lz.n!
+      # to get the name packadd expects, use the
+      # `:NixCats pawsible` command to see them all
       optionalPlugins = {
         neonixdev = with pkgs.vimPlugins; [
           # loaded in the same file as the lsps are configured.
           # see there or at `:h nixCats.LSPs` for more info on lazy loading.
           lazydev-nvim
         ];
-        custom = with pkgs.nixCatsBuilds; [ ];
-        gitPlugins = with pkgs.neovimPlugins; [ ];
-        general = with pkgs.vimPlugins; [ ];
       };
 
       # shared libraries to be added to LD_LIBRARY_PATH
@@ -290,8 +296,10 @@
 
     # see :help nixCats.flake.outputs.packageDefinitions
     packageDefinitions = {
-      # these also recieve our pkgs variable
+      # the name here is the name of the package
+      # and also the default command name for it.
       nixCats = { pkgs, ... }@misc: {
+        # these also recieve our pkgs variable
         # see :help nixCats.flake.outputs.settings
         settings = {
           # will check for config in the store rather than .config
@@ -303,9 +311,7 @@
         # see :help nixCats.flake.outputs.packageDefinitions
         categories = {
           markdown = true;
-          general.vimPlugins = true;
-          general.gitPlugins = true;
-          custom = true;
+          general = true;
           lint = true;
           format = true;
           neonixdev = true;
@@ -338,7 +344,6 @@
         categories = {
           markdown = true;
           general = true;
-          custom = true;
           neonixdev = true;
           lint = true;
           format = true;
@@ -371,14 +376,16 @@
 
     defaultPackageName = "nixCats";
     # I did not here, but you might want to create a package named nvim.
-    # If you make one of these packages be named nvim, you will get an nvim.desktop file
-    # regardless of if it is the default or not.
 
     # defaultPackageName is also passed to utils.mkNixosModules and utils.mkHomeModules
     # and it controls the name of the top level option set.
-    # If you made a package named `nvim` your default package,
+    # If you made a package named `nixCats` your default package as we did here,
     # the modules generated would be set at:
-    # config.nvim = { enable = true; <see :h nixCats.module for options> }
+    # config.nixCats = {
+    #   enable = true;
+    #   packageNames = [ "nixCats" ]; # <- the packages you want installed
+    #   <see :h nixCats.module for options>
+    # }
   in
   # you shouldnt need to change much past here, but you can if you wish.
   # but you should at least eventually try to figure out whats going on here!
@@ -390,7 +397,7 @@
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
       # and also our categoryDefinitions and packageDefinitions
     } categoryDefinitions packageDefinitions;
-
+    # call it with our defaultPackageName
     defaultPackage = nixCatsBuilder defaultPackageName;
 
     # this pkgs variable is just for using utils such as pkgs.mkShell
@@ -401,8 +408,10 @@
   in {
     # these outputs will be wrapped with ${system} by utils.eachSystem
 
-    # this will make a package out of each of the packageDefinitions defined above
-    # and set the default package to the one passed in here.
+    # this will generate a set of all the packages
+    # in the packageDefinitions defined above
+    # from the package we give it.
+    # and additionally output the original as default.
     packages = utils.mkAllWithDefault defaultPackage;
 
     # choose your package for devShell
