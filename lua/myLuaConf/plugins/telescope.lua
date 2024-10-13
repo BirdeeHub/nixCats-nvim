@@ -22,6 +22,7 @@
 return {
   {
     "telescope.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.telescope'),
     cmd = { "Telescope", "LiveGrepGitRoot" },
     dep_of = { "nvim-lspconfig", },
     -- event = "",
