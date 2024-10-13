@@ -37,7 +37,7 @@ vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Ope
 
 require('lze').load {
   { import = "myLuaConf.plugins.telescope", },
-  { import = "myLuaConf.plugins.nestsitter", },
+  { import = "myLuaConf.plugins.treesitter", },
   { import = "myLuaConf.plugins.completion", },
   {
     "markdown-preview.nvim",
