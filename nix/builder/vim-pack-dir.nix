@@ -16,10 +16,9 @@
   grammarPackName = "myNeovimGrammars";
 
   grammarMatcher = yes: builtins.filter (drv: let
-    # if we get to split them up, we can include even if not a dir
-    new = drv: builtins.pathExists "${drv.outPath}/parser";
-    old = drv: lib.pathIsDirectory "${drv.outPath}/parser";
-    cond = ! isOldGrammarType && new drv || old drv;
+    # NOTE: matches if pkgs.neovimUtils.grammarToPlugin was called on it.
+    # This only matters for the lazy.nvim wrapper anyway.
+    cond = (builtins.match "^vimplugin-treesitter-grammar-.*" "${lib.getName drv}") != null;
     match = if yes then cond else ! cond;
   in
   if drv ? outPath then match else ! yes);
