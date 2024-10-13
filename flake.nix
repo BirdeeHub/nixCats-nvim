@@ -354,6 +354,7 @@
           lint = true;
           format = true;
           test = true;
+          debug = false;
           lspDebugMode = false;
           themer = true;
           colorscheme = "catppuccin";
