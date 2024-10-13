@@ -19,6 +19,8 @@ All notes about the lazy wrapper are in comments that begin with the string: `NO
 
 One other note.
 
+If you install your grammars via `lazy.nvim` rather than `nix`, you will need to add a c compiler to your `lspsAndRuntimeDeps` section in your `categoryDefinitions`
+
 If you install your grammars via nix, the only methods supported via the `lazy.nvim` wrapper are the following.
 
 Summary: as long as `pkgs.neovimUtils.grammarToPlugin` is called on it somehow, it will work.
