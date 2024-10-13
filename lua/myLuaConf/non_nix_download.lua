@@ -47,7 +47,7 @@ require('nixCatsUtils.catPacker').setup({
 
   -- completion
   { 'onsails/lspkind.nvim', opt = true, },
-  { 'L3MON4D3/LuaSnip', opt = true, },
+  { 'L3MON4D3/LuaSnip', opt = true, as = "luasnip", },
   { 'saadparwaiz1/cmp_luasnip', opt = true, },
   { 'hrsh7th/cmp-nvim-lsp', opt = true, },
   { 'hrsh7th/cmp-nvim-lua', opt = true, },
@@ -79,7 +79,7 @@ require('nixCatsUtils.catPacker').setup({
   { 'lewis6991/gitsigns.nvim', opt = true, },
   { 'nvim-lualine/lualine.nvim', opt = true, },
   { 'lukas-reineke/indent-blankline.nvim', opt = true, },
-  { 'numToStr/Comment.nvim', opt = true, },
+  { 'numToStr/Comment.nvim', opt = true, as = "comment.nvim", },
   { 'kylechui/nvim-surround', opt = true, },
   {
     "iamcco/markdown-preview.nvim",

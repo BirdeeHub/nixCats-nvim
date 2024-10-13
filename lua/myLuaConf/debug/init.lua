@@ -14,10 +14,15 @@ require('lze').load {
     { "<F7>", desc = "Debug: See last session result." },
   },
   -- colorscheme = "",
-  load = function (name)
-      vim.cmd.packadd(name)
-      vim.cmd.packadd("nvim-dap-ui")
-      vim.cmd.packadd("nvim-dap-virtual-text")
+  load = (require('nixCatsUtils').isNixCats and function(name)
+    vim.cmd.packadd(name)
+    vim.cmd.packadd("nvim-dap-ui")
+    vim.cmd.packadd("nvim-dap-virtual-text")
+  end) or function(name)
+    vim.cmd.packadd(name)
+    vim.cmd.packadd("nvim-dap-ui")
+    vim.cmd.packadd("nvim-dap-virtual-text")
+    vim.cmd.packadd("mason-nvim-dap.nvim")
   end,
   after = function (plugin)
     local dap = require 'dap'

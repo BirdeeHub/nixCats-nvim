@@ -100,7 +100,7 @@ require('lze').load {
     load = (require('nixCatsUtils').isNixCats and nil) or function(name)
       vim.cmd.packadd(name)
       vim.cmd.packadd("mason.nvim")
-      vim.cmd.packadd("mason-lspconfig")
+      vim.cmd.packadd("mason-lspconfig.nvim")
     end,
     after = function(plugin)
       if require('nixCatsUtils').isNixCats then
