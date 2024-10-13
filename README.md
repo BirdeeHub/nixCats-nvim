@@ -334,6 +334,13 @@ Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you als
 
 [lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
 
+##### lze
+
+[lze](https://github.com/BirdeeHub/lze) is my take on what `lz.n` did. I preferred a different design to the management of state and custom handlers,
+and quite like the result. The example configuration in this repo uses it for lazy loading.
+
+But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.nvim` solutions to lazy loading will appeal to you!
+
 ##### For getting me started:
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better.
