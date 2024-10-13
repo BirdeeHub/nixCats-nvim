@@ -4,36 +4,38 @@ if not require('nixCatsUtils').isNixCats then
 end
 vim.cmd.colorscheme(colorschemeName)
 
-vim.g.loaded_netrwPlugin = 1
-require("oil").setup({
-  default_file_explorer = true,
-  columns = {
-    "icon",
-    "permissions",
-    "size",
-    -- "mtime",
-  },
-  keymaps = {
-    ["g?"] = "actions.show_help",
-    ["<CR>"] = "actions.select",
-    ["<C-s>"] = "actions.select_vsplit",
-    ["<C-h>"] = "actions.select_split",
-    ["<C-t>"] = "actions.select_tab",
-    ["<C-p>"] = "actions.preview",
-    ["<C-c>"] = "actions.close",
-    ["<C-l>"] = "actions.refresh",
-    ["-"] = "actions.parent",
-    ["_"] = "actions.open_cwd",
-    ["`"] = "actions.cd",
-    ["~"] = "actions.tcd",
-    ["gs"] = "actions.change_sort",
-    ["gx"] = "actions.open_external",
-    ["g."] = "actions.toggle_hidden",
-    ["g\\"] = "actions.toggle_trash",
-  },
-})
-vim.keymap.set("n", "-", "<cmd>Oil<CR>", { noremap = true, desc = 'Open Parent Directory' })
-vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Open nvim root directory' })
+if nixCats('general.extra') then
+  vim.g.loaded_netrwPlugin = 1
+  require("oil").setup({
+    default_file_explorer = true,
+    columns = {
+      "icon",
+      "permissions",
+      "size",
+      -- "mtime",
+    },
+    keymaps = {
+      ["g?"] = "actions.show_help",
+      ["<CR>"] = "actions.select",
+      ["<C-s>"] = "actions.select_vsplit",
+      ["<C-h>"] = "actions.select_split",
+      ["<C-t>"] = "actions.select_tab",
+      ["<C-p>"] = "actions.preview",
+      ["<C-c>"] = "actions.close",
+      ["<C-l>"] = "actions.refresh",
+      ["-"] = "actions.parent",
+      ["_"] = "actions.open_cwd",
+      ["`"] = "actions.cd",
+      ["~"] = "actions.tcd",
+      ["gs"] = "actions.change_sort",
+      ["gx"] = "actions.open_external",
+      ["g."] = "actions.toggle_hidden",
+      ["g\\"] = "actions.toggle_trash",
+    },
+  })
+  vim.keymap.set("n", "-", "<cmd>Oil<CR>", { noremap = true, desc = 'Open Parent Directory' })
+  vim.keymap.set("n", "<leader>-", "<cmd>Oil .<CR>", { noremap = true, desc = 'Open nvim root directory' })
+end
 
 require('lze').load {
   { import = "myLuaConf.plugins.telescope", },
@@ -55,6 +57,7 @@ require('lze').load {
   },
   {
     "undotree",
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     cmd = { "UndotreeToggle", "UndotreeHide", "UndotreeShow", "UndotreeFocus", "UndotreePersistUndo", },
     keys = { { "<leader>U", "<cmd>UndotreeToggle<CR>", mode = { "n" }, desc = "Undo Tree" }, },
     before = function(_)
@@ -64,6 +67,7 @@ require('lze').load {
   },
   {
     "comment.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     event = "DeferredUIEnter",
     after = function(plugin)
       require('Comment').setup()
@@ -71,6 +75,7 @@ require('lze').load {
   },
   {
     "indent-blankline.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     event = "DeferredUIEnter",
     after = function(plugin)
       require("ibl").setup()
@@ -78,6 +83,7 @@ require('lze').load {
   },
   {
     "nvim-surround",
+    enabled = require('nixCatsUtils').enableForCategory('general.always'),
     event = "DeferredUIEnter",
     -- keys = "",
     after = function(plugin)
@@ -87,6 +93,7 @@ require('lze').load {
   {
     "vim-startuptime",
     cmd = { "StartupTime" },
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     before = function(_)
       vim.g.startuptime_event_width = 0
       vim.g.startuptime_tries = 10
@@ -95,6 +102,7 @@ require('lze').load {
   },
   {
     "fidget.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     event = "DeferredUIEnter",
     -- keys = "",
     dep_of = { "nvim-lspconfig" },
@@ -117,6 +125,7 @@ require('lze').load {
   -- },
   {
     "lualine.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.always'),
     -- cmd = { "" },
     event = "DeferredUIEnter",
     -- ft = "",
@@ -157,6 +166,7 @@ require('lze').load {
   },
   {
     "gitsigns.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.always'),
     event = "DeferredUIEnter",
     -- cmd = { "" },
     -- ft = "",
@@ -240,6 +250,7 @@ require('lze').load {
   },
   {
     "which-key.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     -- cmd = { "" },
     event = "DeferredUIEnter",
     -- ft = "",
