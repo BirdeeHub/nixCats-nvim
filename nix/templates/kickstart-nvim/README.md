@@ -16,3 +16,27 @@ It also can work without any nix whatsoever.
 It has been adapted such that it works either way!
 
 All notes about the lazy wrapper are in comments that begin with the string: `NOTE: nixCats:` so to find all of the info, search for that.
+
+One other note.
+
+If you install your grammars via nix, the only methods supported via the `lazy.nvim` wrapper are the following.
+
+Summary: as long as `pkgs.neovimUtils.grammarToPlugin` is called on it somehow, it will work.
+
+Any other ways will still work in nixCats, but not when using the lazy wrapper, because the lazy wrapper has to add them back to the runtimepath.
+
+```nix
+pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+# or
+pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
+  nix
+  lua
+  # etc...
+]);
+# or
+pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: pkgs.vimPlugins.nvim-treesitter.allGrammars)
+# or
+builtins.attrValues pkgs.vimPlugins.nvim-treesitter.grammarPlugins
+# or
+pkgs.neovimUtils.grammarToPlugin pkgs.tree-sitter-grammars.somegrammar
+```
