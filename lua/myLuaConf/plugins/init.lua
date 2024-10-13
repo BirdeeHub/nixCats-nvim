@@ -4,7 +4,9 @@ if not require('nixCatsUtils').isNixCats then
 end
 vim.cmd.colorscheme(colorschemeName)
 
+vim.g.loaded_netrwPlugin = 1
 require("oil").setup({
+  default_file_explorer = true,
   columns = {
     "icon",
     "permissions",
