@@ -44,7 +44,9 @@ function M.get_capabilities(server_name)
   -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
   -- if you make a package without it, make sure to check if it exists with nixCats!
   local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+  if nixCats('general.cmp') then
+    capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+  end
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   return capabilities
 end

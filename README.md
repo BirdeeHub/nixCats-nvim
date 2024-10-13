@@ -361,7 +361,7 @@ I also borrowed code from nixpkgs and made modifications and improvements to bet
 - [`Luca's super simple`](https://github.com/Quoteme/neovim-flake):
   Definitely the simplest example I have seen thus far. I took it and ran with it, read a LOT of docs and nixpkgs source code and then made this.
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
-- [`nv`](https://github.com/NicoElbers/nv):
+- [`nixPatch-nvim`](https://github.com/NicoElbers/nixPatch-nvim):
   Focused specifically for lazy.nvim. A cool unique concept, uses a zig program to parse lazy.nvim definitions to replace urls with the plugins you put in your nix lists at build time.
   Useage is somewhat similar to the lazy.nvim wrapper of nixCats in a standalone flake template,
   but without needing to explicitly pass in a nix-provided ignore list to the wrapper in your lua code itself.
