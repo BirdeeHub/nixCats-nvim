@@ -122,12 +122,6 @@ require('lze').load {
     -- ft = "",
     -- keys = "",
     -- colorscheme = "",
-    load = function (name)
-      require("birdee.utils").safe_packadd({
-        name,
-        "lualine-lsp-progress",
-      })
-    end,
     after = function (plugin)
 
       require('lualine').setup({

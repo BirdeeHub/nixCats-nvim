@@ -15,11 +15,9 @@ require('lze').load {
   },
   -- colorscheme = "",
   load = function (name)
-    require("birdee.utils").safe_packadd({
-      name,
-      "nvim-dap-ui",
-      "nvim-dap-virtual-text",
-    })
+      vim.cmd.packadd(name)
+      vim.cmd.packadd("nvim-dap-ui")
+      vim.cmd.packadd("nvim-dap-virtual-text")
   end,
   after = function (plugin)
     local dap = require 'dap'
