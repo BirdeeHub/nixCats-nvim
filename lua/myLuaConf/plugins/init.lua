@@ -42,6 +42,19 @@ require('lze').load {
   { import = "myLuaConf.plugins.treesitter", },
   { import = "myLuaConf.plugins.completion", },
   {
+    "lazydev.nvim",
+    enabled = require('nixCatsUtils').enableForCategory('neonixdev'),
+    cmd = { "LazyDev" },
+    ft = "lua",
+    after = function(plugin)
+      require('lazydev').setup({
+        library = {
+          { words = { "nixCats" }, path = (require('nixCats').nixCatsPath or "") .. '/lua' },
+        },
+      })
+    end,
+  },
+  {
     "markdown-preview.nvim",
     enabled = require('nixCatsUtils').enableForCategory('general.markdown'),
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
