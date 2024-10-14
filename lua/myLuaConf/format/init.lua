@@ -14,6 +14,8 @@ require('lze').load {
 
       conform.setup({
         formatters_by_ft = {
+          -- NOTE: download some formatters in lspsAndRuntimeDeps
+          -- and configure them here
           -- lua = { "stylua" },
           -- go = { "gofmt", "golint" },
           -- templ = { "templ" },

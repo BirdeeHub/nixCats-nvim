@@ -24,23 +24,24 @@ return {
     "telescope.nvim",
     enabled = require('nixCatsUtils').enableForCategory('general.telescope'),
     cmd = { "Telescope", "LiveGrepGitRoot" },
-    dep_of = { "nvim-lspconfig", },
+    -- NOTE: our on attach function defines keybinds that call telescope.
+    -- so, the on_require handler will load telescope when we use those.
+    on_require = { "telescope", },
     -- event = "",
     -- ft = "",
     keys = {
-      "<leader>sp",
-      "<leader>sn",
-      "<leader>/",
-      "<leader><leader>s",
-      "<leader>s.",
-      "<leader>sr",
-      "<leader>sd",
-      "<leader>sg",
-      "<leader>sw",
-      "<leader>ss",
-      "<leader>sf",
-      "<leader>sk",
-      "<leader>sh",
+      { "<leader>sp", mode = {"n"}, noremap = true, desc = '[S]earch git [P]roject root', },
+      { "<leader>/", mode = {"n"}, desc = '[/] Fuzzily search in current buffer', },
+      { "<leader><leader>s", mode = {"n"}, desc = '[ ] Find existing buffers', },
+      { "<leader>s.", mode = {"n"}, desc = '[S]earch Recent Files ("." for repeat)', },
+      { "<leader>sr", mode = {"n"}, desc = '[S]earch [R]esume', },
+      { "<leader>sd", mode = {"n"}, desc = '[S]earch [D]iagnostics', },
+      { "<leader>sg", mode = {"n"}, desc = '[S]earch by [G]rep', },
+      { "<leader>sw", mode = {"n"}, desc = '[S]earch current [W]ord', },
+      { "<leader>ss", mode = {"n"}, desc = '[S]earch [S]elect Telescope', },
+      { "<leader>sf", mode = {"n"}, desc = '[S]earch [F]iles', },
+      { "<leader>sk", mode = {"n"}, desc = '[S]earch [K]eymaps', },
+      { "<leader>sh", mode = {"n"}, desc = '[S]earch [H]elp', },
     },
     -- colorscheme = "",
     load = function (name)
@@ -100,11 +101,6 @@ return {
           prompt_title = 'Live Grep in Open Files',
         }
       end, { desc = '[S]earch [/] in Open Files' })
-
-      -- Shortcut for searching your neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.expand('$HOME') .. "/birdeeSystems" }
-      end, { desc = '[S]earch [N]ix config files' })
 
       -- Telescope live_grep in git root
       -- Function to find the git root directory based on the current buffer's path

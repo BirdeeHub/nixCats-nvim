@@ -101,7 +101,7 @@ require('lze').load {
       -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
     }
 
-    -- Install lang specific config
+    -- NOTE: Install lang specific config
     -- if nixCats('go') then
     --   require('dap-go').setup()
     -- end

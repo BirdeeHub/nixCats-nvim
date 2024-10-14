@@ -86,6 +86,8 @@ end
 -- If you were to comment out this autocommand
 -- and instead pass the on attach function directly to
 -- nvim-lspconfig, it would do the same thing.
+-- come to think of it, it might be better because then lspconfig doesnt have to be called before lsp attach?
+-- but you would still end up triggering on a FileType event anyway, so, it makes little difference.
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
   callback = function(event)

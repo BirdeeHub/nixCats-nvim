@@ -1,3 +1,7 @@
+-- NOTE: These 2 need to be set up before any plugins are loaded.
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 if os.getenv('WAYLAND_DISPLAY') and vim.fn.exepath('wl-copy') ~= "" then
   vim.g.clipboard = {
       name = 'wl-clipboard',

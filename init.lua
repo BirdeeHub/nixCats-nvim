@@ -1,7 +1,3 @@
--- NOTE: These 2 need to be set up before any plugins are loaded.
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 --[[
 NOTE:
 if you plan to always load your nixCats via nix,
@@ -41,14 +37,16 @@ because it has much less influence on the rest of your config.
 
 Nix puts the plugins
 into the directories paq-nvim expects them to be in,
-so you just put the URLs and build steps in there, and use its opt option to do the same
-thing as putting a plugin in nixCat's OptionalPlugins field.
+because both follow the normal neovim scheme.
+So you just put the URLs and build steps in there, and use its opt option to do the same
+thing as putting a plugin in nixCat's optionalPlugins field.
 
 Using the lazy.nvim wrapper is more integrated with your config.
 It uses lazy for loading even when on nix.
 Instead, when you use the wrapper in luaUtils template,
-You will tell it which plugins nix loaded (dont worry, this is covered in the help)
+You will tell it which plugins nix loaded and thus, not to download
 and then disable the build steps when not on nix.
+(dont worry, this is covered in the help)
 (
   the help for this feature is at :h nixCats.luaUtils and the kickstart-nvim template at
   nix flake init -t github:BirdeeHub/nixCats-nvim#kickstart-nvim
@@ -63,6 +61,13 @@ and then disable the build steps when not on nix.
 -- you pretty much dont need this file at all, and you also won't need
 -- anything within lua/nixCatsUtils, nor will that be in the default template.
 -- that directory is addable via the luaUtils template
+-- it is not required, but has some useful utility functions
+-- feel free to take what you want from it and delete the other files.
 
--- ok thats enough for 1 file. Off to lua/myLuaConf/init.lua
+-- NOTE: ok thats enough for 1 file. Off to lua/myLuaConf/init.lua
+-- all the config starts there in this example config.
+-- This config is loadable with and without nix due to the above,
+-- and the lua/myLuaConf/non_nix_download.lua file.
+-- the rest is just example of how to configure nvim making use of various
+-- features of nixCats and using the plugin lze for lazy loading.
 require('myLuaConf')

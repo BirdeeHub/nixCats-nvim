@@ -2,6 +2,9 @@
 ---@type fun(names: string[]|string)
 local load_w_after_plugin = require('nixCatsUtils.lzUtils').make_load_with_after({ "plugin" })
 
+-- NOTE: packadd doesnt load after directories.
+-- hence, the above function that you can get from luaUtils that exists to make that easy.
+
 return {
   {
     "cmp-buffer",

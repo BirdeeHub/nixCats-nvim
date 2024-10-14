@@ -2,9 +2,14 @@ local colorschemeName = nixCats('colorscheme')
 if not require('nixCatsUtils').isNixCats then
   colorschemeName = 'onedark'
 end
+-- Could I lazy load on colorscheme with lze?
+-- sure. But I was going to call vim.cmd.colorscheme() during startup anyway
+-- this is just an example, feel free to do a better job!
 vim.cmd.colorscheme(colorschemeName)
 
+-- NOTE: you can check if you included the category with the thing wherever you want.
 if nixCats('general.extra') then
+  -- I didnt want to bother with lazy loading this.
   vim.g.loaded_netrwPlugin = 1
   require("oil").setup({
     default_file_explorer = true,
@@ -56,6 +61,10 @@ require('lze').load {
   },
   {
     "markdown-preview.nvim",
+    -- NOTE: enableForCategory is just a helper function that lets you specify a different default
+    -- value as a second argument if you want for when you arent using nix.
+    -- Totally unnecessary. But hey, might as well use it as a demo since this example config is meant to load without nix too.
+    -- it comes from the optional luaUtils template.
     enabled = require('nixCatsUtils').enableForCategory('general.markdown'),
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
