@@ -30,7 +30,7 @@ return {
     -- event = "",
     -- ft = "",
     keys = {
-      { "<leader>sp", mode = {"n"}, noremap = true, desc = '[S]earch git [P]roject root', },
+      { "<leader>sp", mode = {"n"}, desc = '[S]earch git [P]roject root', },
       { "<leader>/", mode = {"n"}, desc = '[/] Fuzzily search in current buffer', },
       { "<leader><leader>s", mode = {"n"}, desc = '[ ] Find existing buffers', },
       { "<leader>s.", mode = {"n"}, desc = '[S]earch Recent Files ("." for repeat)', },
