@@ -132,7 +132,6 @@ require('lze').load {
     enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     event = "DeferredUIEnter",
     -- keys = "",
-    dep_of = { "nvim-lspconfig" },
     after = function(plugin)
       require('fidget').setup({})
     end,
