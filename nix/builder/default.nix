@@ -314,8 +314,7 @@ import ./wrapNeovim.nix {
   inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path;
   pluginsOG.myVimPackage = {
-    start = start;
-    inherit opt;
+    inherit start opt;
   };
     /* the function you would have passed to python.withPackages */
   # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
