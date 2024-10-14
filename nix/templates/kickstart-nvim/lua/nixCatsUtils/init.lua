@@ -32,7 +32,6 @@ function M.setup(v)
           allPlugins = {
             start = {},
             opt = {},
-            treesitter_grammars = {},
             ts_grammar_path = nil,
           },
         },
