@@ -22,7 +22,13 @@ There is significantly more help and example in this repository than there is ac
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-If you use lazy,nvim, consider using the lazy.nvim wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html#nixCats.luaUtils.lazy) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
+For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The example configuration here uses `lze`.
+
+`lze` and `lz.n`, unlike `lazy.nvim`, are not plugin managers.
+They stick to the task of lazy loading and do it well, with a very similar plugin spec style to `lazy.nvim`
+They fit in much better with all nix solutions for nvim than `lazy.nvim` does.
+
+If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html#nixCats.luaUtils.lazy) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
 
 ##### (just remember to change your $EDITOR variable if you named your package something other than nvim!)
 
