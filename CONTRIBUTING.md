@@ -16,7 +16,7 @@ and the in-editor help in nix/nixCatsHelp
 so updates to the help only need to be made here.
 
 The readme in particular I am welcome to big changes to,
-but if you do, make sure the docs generator at
+but if you do, make sure the site generator at
 [nixCats-doc](https://github.com/BirdeeHub/nixCats-doc) can handle it.
 
 For the readme it just uses pandoc with a github flavored markdown.
