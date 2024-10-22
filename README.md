@@ -43,7 +43,7 @@ If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in 
 
 > Nvim does not know about the wrapper script. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any issues beyond the way nvim is normally wrapped via the wrappers in nixpkgs.
 
-## Table of Contents
+## Table of Contents:
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Introduction](#introduction)
@@ -87,7 +87,7 @@ If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in 
 
 ---
 
-#### Installation: <a name="installation"></a>
+## Installation: <a name="installation"></a>
 see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html#nixCats.installation_options)
 for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
@@ -189,7 +189,7 @@ options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
 There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
-## Introduction <a name="introduction"></a>
+## Introduction: <a name="introduction"></a>
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
