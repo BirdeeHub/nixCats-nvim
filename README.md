@@ -310,15 +310,11 @@ for more info about the outputs and util functions available.
 
 ### Challenges:
 
-#### General nix + nvim things:
-
-Some vscode debuggers are not on nixpkgs so you have to build them (there's a place for it in your overlays directory!) 
-
-Let people know when you figure one out or submit it to nixpkgs. Sometimes you can extract them from vscode plugins.
-
 #### [Mason](https://github.com/williamboman/mason.nvim):
 
-Mason does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
+Mason does not work on nixOS although it does on other OS options.
+
+However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
 
 I would suggest either removing mason, or following the [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) by running it only when not on nix.
 
