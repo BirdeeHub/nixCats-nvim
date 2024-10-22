@@ -343,14 +343,13 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
 
 In essence, the contents of each set listed here are filtered
 based on the packageDefinitions set you provide, 
-where by including categoryname = true; you enable that category.
+whereby including categoryname = true; you enable that category.
 :help |nixCats.flake.outputs.packageDefinitions|
 
 It will remove duplicate items, so feel free to include the same thing in
 multiple categories if it suits your purposes.
 
 It does this recursively. (explained below)
-                            *nixCats.flake.outputs.categoryDefinitions.scheme*
 
 If, inside one of these main sets, you had another set,
 it would consider that a subcategory, and you could enable it
@@ -360,7 +359,41 @@ set of |nixCats.flake.outputs.packageDefinitions|.
 You can nest them as much as you like, or just have a category that is a
 single derivation.
 
-There is a behavior to keep in mind.
+                            *nixCats.flake.outputs.categoryDefinitions.schemas*
+
+ You may also use the variables passed to your categoryDefinitions function
+ to get access to the set of categories and settings that are being
+ used to define the current package being built!
+>nix
+    themer = with pkgs.vimPlugins;
+      (builtins.getAttr packageDef.categories.colorscheme {
+          # Theme switcher without creating a new category
+          "onedark" = onedark-vim;
+          "catppuccin" = catppuccin-nvim;
+        }
+      );
+<
+  In addition to all this, if a plugin is defined within a list, it may
+  instead be defined within an attribute set that also contains config
+  to be ran after sourcing init.lua and optionalLuaAdditions
+  to do this, you may use the following syntax in opt or start sections: >nix
+    [
+      # you may add a plugin to a category list in any of these ways
+      { plugin = derivation; config.lua = ""; config.vim = "";}
+      { plugin = derivation; config = ""; type = "<viml or lua>"; }
+      { plugin = derivation; config = ""; } # defaults to viml
+      { plugin = derivation; }
+      # all the above options can accept an optional = bool;
+      # to override its presence in either startupPlugins or optionalPlugins
+      derivation
+      # plain derivation does not need to be in a list, but it should be
+      # anyway. It could be on its own though and would act as its own
+      # category.
+    ]
+<
+                            *nixCats.flake.outputs.categoryDefinitions.default_values*
+
+First Kind: implicit, when value is in another section of categoryDefinitions
 
 If in your categoryDefinitions you had the following:
 >nix
@@ -421,43 +454,39 @@ This applies in many situations. Take this one for example.
 
 < If you were to put the following in your packageDefinitions: >nix
     neonixdev.nix-doc = true;
+<
+neodev-nvim and neoconf-nvim would still be included.
+However, nil, lua-language-server, and nixd would not be!
+You would need to pick which of those you wanted separately.
+Sometimes this is the desired behavior.
+Sometimes it is not and a list of packages would be better suited.
 
-< neodev-nvim and neoconf-nvim would still be included.
- However, nil, lua-language-server, and nixd would not be!
- You would need to pick which of those you wanted separately.
- Sometimes this is the desired behavior.
- Sometimes it is not and a list of packages would be better suited.
+This leads us to our second way to make a default value:
 
- You may also use the packageDef variable within categoryDefinitions
- to get access to the set of categories and settings that are being
- used to define the current package being built!
+Second Way: explicit, default values within the same section of categoryDefinitions
+
+`utils.catsWithDefault` takes the categories set passed to your
+categoryDefinitions, the attribute path to the current set it is within,
+a list of default values, and a set of subcategories
 >nix
-    themer = with pkgs.vimPlugins;
-      (builtins.getAttr packageDef.categories.colorscheme {
-          # Theme switcher without creating a new category
-          "onedark" = onedark-vim;
-          "catppuccin" = catppuccin-nvim;
-        }
-      );
+  optionalPlugins = {
+    debug = utils.catsWithDefault categories [ "debug" ]
+    (with pkgs.vimPlugins; [
+      nvim-dap
+      nvim-dap-ui
+      nvim-dap-virtual-text
+    ]) (with pkgs.vimPlugins; {
+      go = [ nvim-dap-go ];
+    });
+  };
 <
-  In addition to all this, if a plugin is defined within a list, it may
-  instead be defined within an attribute set that also contains config
-  to be ran after sourcing init.lua and optionalLuaAdditions
-  to do this, you may use the following syntax in opt or start sections: >nix
-    [
-      # you may add a plugin to a category list in any of these ways
-      { plugin = derivation; config.lua = ""; config.vim = "";}
-      { plugin = derivation; config = ""; type = "<viml or lua>"; }
-      { plugin = derivation; config = ""; } # defaults to viml
-      { plugin = derivation; }
-      # all the above options can accept an optional = bool;
-      # to override its presence in either startupPlugins or optionalPlugins
-      derivation
-      # plain derivation does not need to be in a list, but it should be
-      # anyway. It could be on its own though and would act as its own
-      # category.
-    ]
+If you were to put the following in your
+categories set of a packageDefinitions function:
+>nix
+  debug.go = true;
 <
+then it would also include the
+values in the list passed as the 3rd argument.
 ---------------------------------------------------------------------------------------
 Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
 
@@ -517,7 +546,9 @@ It returns a lua table of the same format.
 see :help |nixCats|
 
 For more nuances on enabling categories and subcategories, see above at
-:help |nixCats.flake.outputs.categoryDefinitions.scheme|
+:help |nixCats.flake.outputs.categoryDefinitions.default_values|
+and
+:help |nixCats.flake.outputs.categoryDefinitions.schemas|
 
 ----------------------------------------------------------------------------------------
 Settings                                       *nixCats.flake.outputs.settings*
@@ -959,6 +990,13 @@ is NOT set, nixCats uses this function to make
 your config path default to the value of:
 `nixCats_config_location = utils.mkLuaInline "vim.fn.stdpath('config')"`
 
+<catsWithDefault> categories: attrpath: defaults: subcategories:
+Takes the categories set passed to your
+categoryDefinitions, the attribute path to the attribute you called this
+function in, a list of default values, and a set of subcategories
+
+For a more complete explanation, see:
+:help |nixCats.flake.outputs.categoryDefinitions.default_values|
 
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*

@@ -118,7 +118,14 @@
         ];
         # but you can choose which ones you want
         # per nvim package you export
-        debug = with pkgs; [
+        debug = with pkgs; {
+          go = [ delve ];
+        };
+        go = with pkgs; [
+          gopls
+          gotools
+          go-tools
+          gccgo
         ];
         # and easily check if they are included in lua
         format = with pkgs; [
@@ -132,6 +139,9 @@
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
+        debug = with pkgs.vimPlugins; [
+          nvim-nio
+        ];
         general = with pkgs.vimPlugins; {
           # you can make subcategories!!!
           # (always isnt a special name, just the one I chose for this subcategory)
@@ -167,12 +177,14 @@
       # to get the name packadd expects, use the
       # `:NixCats pawsible` command to see them all
       optionalPlugins = {
-        debug = with pkgs.vimPlugins; [
-          nvim-nio
+        debug = utils.catsWithDefault categories [ "debug" ]
+        (with pkgs.vimPlugins; [
           nvim-dap
           nvim-dap-ui
           nvim-dap-virtual-text
-        ];
+        ]) (with pkgs.vimPlugins; {
+          go = [ nvim-dap-go ];
+        });
         lint = with pkgs.vimPlugins; [
           nvim-lint
         ];
@@ -324,7 +336,9 @@
           test = {
             subtest1 = true;
           };
-          debug = false;
+          # go = true; # <- disabled but you could enable it with override
+          # debug.go = true; # <- disabled but you could enable it with override
+
           # this does not have an associated category of plugins, 
           # but lua can still check for it
           lspDebugMode = false;
@@ -354,7 +368,8 @@
           lint = true;
           format = true;
           test = true;
-          debug = false;
+          # go = true; # <- disabled but you could enable it with override
+          # debug.go = true; # <- disabled but you could enable it with override
           lspDebugMode = false;
           themer = true;
           colorscheme = "catppuccin";

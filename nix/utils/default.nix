@@ -247,6 +247,49 @@ with builtins; rec {
     # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
     inherit (import ../builder/ncTools.nix) mkLuaInline;
 
+    catsWithDefault = categories: attrpath: defaults: subcategories: let
+      include_path = let
+        flattener = cats: let
+          mapper = attrs: map (v: if isAttrs v then mapper v else v) (attrValues attrs);
+          flatten = accum: LoLoS: foldl' (acc: v: if any (i: isList i) v then flatten acc v else acc ++ [ v ]) accum LoLoS;
+        in flatten [] (mapper cats);
+
+        mapToSetOfPaths = cats: let
+          removeNullPaths = attrs: lib.filterAttrsRecursive (n: v: v != null) attrs;
+          mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
+        in removeNullPaths (mapToPaths cats);
+
+
+        result = let
+          final_cats = lib.attrByPath attrpath false categories;
+          allIncPaths = flattener (mapToSetOfPaths final_cats);
+        in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
+          then head allIncPaths
+          else []; 
+      in
+      result;
+
+      toMerge = let
+        firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
+          then lib.attrByPath include_path [] subcategories
+          else if isList subcategories then subcategories else [ subcategories ];
+
+        fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
+          then include_path ++ [ "default" ] else include_path;
+
+        normed = if isAttrs firstGet && ! lib.isDerivation firstGet
+          then lib.attrByPath fIncPath [] subcategories
+          else if isList firstGet then firstGet else [ firstGet ];
+
+        final = lib.setAttrByPath fIncPath (normed ++ defaults);
+      in
+      final;
+
+    in
+    if ! isAttrs subcategories || lib.isDerivation subcategories then
+      toMerge
+    else lib.recursiveUpdateUntilDRV subcategories toMerge;
+
   };
 
   # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
@@ -281,6 +324,65 @@ with builtins; rec {
       name:
       value:
       { inherit name value; };
+
+    filterAttrsRecursive =
+      pred:
+      set:
+      listToAttrs (
+        concatMap (name:
+          let v = set.${name}; in
+          if pred name v then [
+            (lib.nameValuePair name (
+              if isAttrs v then lib.filterAttrsRecursive pred v
+              else v
+            ))
+          ] else []
+        ) (attrNames set)
+      );
+
+    attrByPath =
+      attrPath:
+      default:
+      set:
+      let
+        lenAttrPath = length attrPath;
+        attrByPath' = n: s: (
+          if n == lenAttrPath then s
+          else (
+            let
+              attr = elemAt attrPath n;
+            in
+            if s ? ${attr} then attrByPath' (n + 1) s.${attr}
+            else default
+          )
+        );
+      in
+        attrByPath' 0 set;
+
+    setAttrByPath =
+      attrPath:
+      value:
+      let
+        len = length attrPath;
+        atDepth = n:
+          if n == len
+          then value
+          else { ${elemAt attrPath n} = atDepth (n + 1); };
+      in atDepth 0;
+
+    mapAttrsRecursiveCond =
+      cond:
+      f:
+      set:
+      let
+        recurse = path:
+          mapAttrs
+            (name: value:
+              if isAttrs value && cond value
+              then recurse (path ++ [ name ]) value
+              else f (path ++ [ name ]) value);
+      in
+      recurse [ ] set;
   };
 }
 

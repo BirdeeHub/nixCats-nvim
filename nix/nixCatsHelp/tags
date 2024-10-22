@@ -8,7 +8,8 @@ nixCats.flake.nixperts.overlays	nix_overlays.txt	/*nixCats.flake.nixperts.overla
 nixCats.flake.outputs	nixCats_format.txt	/*nixCats.flake.outputs*
 nixCats.flake.outputs.builder	nixCats_format.txt	/*nixCats.flake.outputs.builder*
 nixCats.flake.outputs.categories	nixCats_format.txt	/*nixCats.flake.outputs.categories*
-nixCats.flake.outputs.categoryDefinitions.scheme	nixCats_format.txt	/*nixCats.flake.outputs.categoryDefinitions.scheme*
+nixCats.flake.outputs.categoryDefinitions.default_values	nixCats_format.txt	/*nixCats.flake.outputs.categoryDefinitions.default_values*
+nixCats.flake.outputs.categoryDefinitions.schemas	nixCats_format.txt	/*nixCats.flake.outputs.categoryDefinitions.schemas*
 nixCats.flake.outputs.exports	nixCats_format.txt	/*nixCats.flake.outputs.exports*
 nixCats.flake.outputs.exports.mkHomeModules	nixCats_format.txt	/*nixCats.flake.outputs.exports.mkHomeModules*
 nixCats.flake.outputs.exports.mkNixosModules	nixCats_format.txt	/*nixCats.flake.outputs.exports.mkNixosModules*
