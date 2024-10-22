@@ -44,7 +44,7 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
 ## Table of Contents:
 1. [Features](#features)
 2. [Installation](#installation)
-3. [Introduction](#introduction)
+3. [Philosophy](#philosophy)
 5. [Extra Information](#outro)
 6. [Alternative / Similar Projects](#alternatives)
 - [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
@@ -191,7 +191,7 @@ There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
 ---
 
-## Introduction: <a name="introduction"></a>
+## Philosophy: <a name="philosophy"></a>
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
