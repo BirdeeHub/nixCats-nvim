@@ -296,17 +296,17 @@ for more info about the outputs and util functions available.
 
 ---
 
-### Extra Information: <a name="outro"></a>
+## Extra Information: <a name="outro"></a>
 
-#### Drawbacks:
+### Challenges:
 
-##### General nix + nvim things:
+#### General nix + nvim things:
 
 Some vscode debuggers are not on nixpkgs so you have to build them (there's a place for it in your overlays directory!) 
 
 Let people know when you figure one out or submit it to nixpkgs. Sometimes you can extract them from vscode plugins.
 
-##### Mason:
+#### Mason:
 
 [Mason](https://github.com/williamboman/mason.nvim) does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
 
@@ -316,7 +316,7 @@ That way you can just add the lsp to the list in nix and move on.
 
 But you are free to do as you wish.
 
-##### lazy.nvim:
+#### lazy.nvim:
 
 [Lazy.nvim](https://github.com/folke/lazy.nvim) works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
 
@@ -334,20 +334,20 @@ Obviously if you chose to still download the plugins via lazy you would want to 
 
 Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you also add it to a lazy plugin spec
 
-#### Special mentions:
+### Special mentions:
 
-##### lz.n
+#### lz.n
 
 [lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
 
-##### lze
+#### lze
 
 [lze](https://github.com/BirdeeHub/lze) is my take on what `lz.n` did. I preferred a different design to the management of state and custom handlers,
 and quite like the result. The example configuration in this repo uses it for lazy loading.
 
 But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.nvim` solutions to lazy loading will appeal to you!
 
-##### For getting me started:
+#### For getting me started:
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better.
 
@@ -357,7 +357,7 @@ Thank you!!! I literally did not even know what an overlay was yet and you taugh
 
 I also borrowed code from nixpkgs and made modifications and improvements to better fit nixCats.
 
-### Alternative / similar projects: <a name="alternatives"></a>
+## Alternative / similar projects: <a name="alternatives"></a>
 
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my neovim journey and I would 100% suggest it over this one to anyone new to neovim.
