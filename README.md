@@ -22,6 +22,10 @@ There is significantly more help and example in this repository than there is ac
 
 When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
+For the most to-the-point intro, only 100 lines, see here instead. [:help nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
+
+You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh/flake.nix).
+
 For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The example configuration here uses `lze`.
 
 However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
