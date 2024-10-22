@@ -277,18 +277,29 @@ with builtins; rec {
         fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
           then include_path ++ [ "default" ] else include_path;
 
-        normed = if isAttrs firstGet && ! lib.isDerivation firstGet
-          then lib.attrByPath fIncPath [] subcategories
-          else if isList firstGet then firstGet else [ firstGet ];
+        normed = let
+          listType = if isAttrs firstGet && ! lib.isDerivation firstGet
+            then lib.attrByPath fIncPath [] subcategories
+            else if isList firstGet then firstGet else [ firstGet ];
+          attrType = let
+            pre = if isAttrs firstGet && ! lib.isDerivation firstGet
+              then lib.attrByPath fIncPath {} subcategories
+              else firstGet;
+            basename = if fIncPath != [] then tail fIncPath else "default";
+            fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
+          in
+          fin;
+        in
+        if isList defaults then listType else if isAttrs defaults then attrType else throw "defaults must be a list or a set";
 
-        final = lib.setAttrByPath fIncPath (normed ++ defaults);
+        final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
       in
       final;
 
     in
-    if ! isAttrs subcategories || lib.isDerivation subcategories then
-      toMerge
-    else lib.recursiveUpdateUntilDRV subcategories toMerge;
+    if isAttrs subcategories && ! lib.isDerivation subcategories then
+      lib.recursiveUpdateUntilDRV subcategories toMerge
+    else toMerge;
 
   };
 

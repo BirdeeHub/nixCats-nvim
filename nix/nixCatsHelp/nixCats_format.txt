@@ -487,6 +487,22 @@ categories set of a packageDefinitions function:
 <
 then it would also include the
 values in the list passed as the 3rd argument.
+
+It also can accept an attrset as its default value:
+>nix
+  environmentVariables = {
+    test = utils.catsWithDefault categories [ "test" ] {
+      CATTESTVARDEFAULT = "It worked!";
+    } {
+      subtest1 = {
+        CATTESTVAR = "It worked!";
+      };
+      subtest2 = {
+        CATTESTVAR3 = "It didn't work!";
+      };
+    };
+  };
+<
 ---------------------------------------------------------------------------------------
 Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
 

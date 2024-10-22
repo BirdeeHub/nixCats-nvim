@@ -265,7 +265,9 @@
       # this section is for environmentVariables that should be available
       # at RUN TIME for plugins. Will be available to path within neovim terminal
       environmentVariables = {
-        test = {
+        test = utils.catsWithDefault categories [ "test" ] {
+          CATTESTVARDEFAULT = "It worked!";
+        } {
           subtest1 = {
             CATTESTVAR = "It worked!";
           };
