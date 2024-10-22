@@ -43,6 +43,8 @@ If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in 
 
 > Nvim does not know about the wrapper script. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any issues beyond the way nvim is normally wrapped via the wrappers in nixpkgs.
 
+---
+
 ## Table of Contents:
 1. [Features](#features)
 2. [Installation](#installation)
@@ -50,6 +52,8 @@ If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in 
 5. [Extra Information](#outro)
 6. [Alternative / Similar Projects](#alternatives)
 - [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
+
+---
 
 ## Features: <a name="features"></a>
 - Allows normal neovim configuration file scheme to be loaded from the nix store.
@@ -189,6 +193,8 @@ options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
 There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
+---
+
 ## Introduction: <a name="introduction"></a>
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
@@ -196,6 +202,7 @@ This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable 
 All loading can be done from [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/flake.nix), with the option of custom overlays for specifc things there should you need it (rare!). Alternatively, you could import it as a module (nixos and/or home-manager)! It works the same way with either method. Then configure in the normal neovim scheme.
 
 For the most to-the-point intro, see here instead:
+
 :help [nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
 
 The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like lazydev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
