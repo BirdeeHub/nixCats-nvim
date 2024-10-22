@@ -195,6 +195,9 @@ This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable 
 
 All loading can be done from [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/flake.nix), with the option of custom overlays for specifc things there should you need it (rare!). Alternatively, you could import it as a module (nixos and/or home-manager)! It works the same way with either method. Then configure in the normal neovim scheme.
 
+For the most to-the-point intro, see here instead:
+:help [nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
+
 The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like lazydev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
 
 Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
@@ -306,9 +309,9 @@ Some vscode debuggers are not on nixpkgs so you have to build them (there's a pl
 
 Let people know when you figure one out or submit it to nixpkgs. Sometimes you can extract them from vscode plugins.
 
-#### Mason:
+#### [Mason](https://github.com/williamboman/mason.nvim):
 
-[Mason](https://github.com/williamboman/mason.nvim) does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
+Mason does not work on nixOS although it does on other OS options. However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
 
 I would suggest either removing mason, or following the [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) by running it only when not on nix.
 
@@ -316,9 +319,9 @@ That way you can just add the lsp to the list in nix and move on.
 
 But you are free to do as you wish.
 
-#### lazy.nvim:
+#### [lazy.nvim](https://github.com/folke/lazy.nvim):
 
-[Lazy.nvim](https://github.com/folke/lazy.nvim) works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
+Lazy.nvim works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
 
 There is an included wrapper that you can use to do this and also optionally stop it from downloading stuff you already downloaded via nix.
 
@@ -336,13 +339,13 @@ Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you als
 
 ### Special mentions:
 
-#### lz.n
+#### [lz.n](https://github.com/nvim-neorocks/lz.n)
 
-[lz.n](https://github.com/nvim-neorocks/lz.n) exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
+`lz.n` exists and due to it working within the normal neovim plugin management scheme is better suited for managining lazy loading on nix-based configurations than lazy.nvim is.
 
-#### lze
+#### [lze](https://github.com/BirdeeHub/lze)
 
-[lze](https://github.com/BirdeeHub/lze) is my take on what `lz.n` did. I preferred a different design to the management of state and custom handlers,
+`lze` is my take on what `lz.n` did. I preferred a different design to the management of state and custom handlers,
 and quite like the result. The example configuration in this repo uses it for lazy loading.
 
 But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.nvim` solutions to lazy loading will appeal to you!
