@@ -1009,7 +1009,7 @@ your config path default to the value of:
 <catsWithDefault> categories: attrpath: defaults: subcategories:
 Takes the categories set passed to your
 categoryDefinitions, the attribute path to the attribute you called this
-function in, a list of default values, and a set of subcategories
+function in, a list or set of default values, and a set of subcategories
 
 For a more complete explanation, see:
 :help |nixCats.flake.outputs.categoryDefinitions.default_values|
