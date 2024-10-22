@@ -247,6 +247,8 @@ with builtins; rec {
     # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
     inherit (import ../builder/ncTools.nix) mkLuaInline;
 
+    # finds an included category in lib.attrByPath false categories
+    # adds defaults to it, returns the resulting set with the added values
     catsWithDefault = categories: attrpath: defaults: subcategories: let
       include_path = let
         flattener = cats: let
