@@ -314,13 +314,17 @@ for more info about the outputs and util functions available.
 
 Mason does not work on nixOS although it does on other OS options.
 
-However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
+Luckily you also don't need it. All mason does is download it to your path, and call lspconfig on the result.
 
-I would suggest either removing mason, or following the [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) by running it only when not on nix.
+You can do this via the lspsAndRuntimeDeps field in nixCats.
+
+I would suggest either removing mason entirely, or following the [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) by running it only when not using nix.
 
 That way you can just add the lsp to the list in nix and move on.
 
-But you are free to do as you wish.
+However you can make it work with SharedLibraries and lspsAndRuntimeDeps options if you choose to not use those fields for their intended purpose! Sometimes it can be hard to tell what dependency the error is even asking for though.
+
+---
 
 #### [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -340,7 +344,7 @@ Obviously if you chose to still download the plugins via lazy you would want to 
 
 Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you also add it to a lazy plugin spec
 
-### Special mentions:
+I highly recommend using one of the following 2 projects for lazy loading instead:
 
 #### [lz.n](https://github.com/nvim-neorocks/lz.n)
 
@@ -352,6 +356,10 @@ Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you als
 and quite like the result. The example configuration in this repo uses it for lazy loading.
 
 But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.nvim` solutions to lazy loading will appeal to you!
+
+---
+
+### Special mentions:
 
 #### For getting me started:
 
