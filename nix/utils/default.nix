@@ -181,13 +181,13 @@ with builtins; rec {
       );
 
     mkNixosModules = {
-      dependencyOverlays
+      dependencyOverlays ? null
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , categoryDefinitions
-      , packageDefinitions
-      , defaultPackageName
-      , nixpkgs
+      , categoryDefinitions ? (_:{})
+      , packageDefinitions ? {}
+      , defaultPackageName ? "nixCats"
+      , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:
       (import ./nixosModule.nix {
@@ -197,13 +197,13 @@ with builtins; rec {
       });
 
     mkHomeModules = {
-      dependencyOverlays
+      dependencyOverlays ? null
       , luaPath ? ""
       , keepLuaBuilder ? null
-      , categoryDefinitions
-      , packageDefinitions
-      , defaultPackageName
-      , nixpkgs
+      , categoryDefinitions ? (_:{})
+      , packageDefinitions ? {}
+      , defaultPackageName ? "nixCats"
+      , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:
       (import ./homeManagerModule.nix {

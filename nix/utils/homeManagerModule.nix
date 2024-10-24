@@ -1,19 +1,33 @@
-# Copyright (c) 2023 BirdeeHub 
-# Licensed under the MIT license 
-{ 
-  oldDependencyOverlays
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
+{
+  oldDependencyOverlays ? null
   , luaPath ? ""
   , keepLuaBuilder ? null
-  , categoryDefinitions
-  , packageDefinitions
-  , defaultPackageName
+  , categoryDefinitions ? (_:{})
+  , packageDefinitions ? {}
+  , defaultPackageName ? "nixCats"
   , utils
-  , nixpkgs
+  , nixpkgs ? null
   , extra_pkg_config ? {}
   , ...
 }:
-
-{ config, pkgs, lib, ... }@misc: {
+{ config, pkgs, lib, ... }: let
+  catDef = lib.mkOptionType {
+    name = "catDef";
+    description = "a function representing categoryDefinitions or a package definition in the packageDefinitions set for nixCats";
+    descriptionClass = "noun";
+    check = v: builtins.isFunction v;
+    merge = loc: defs: let
+      recursiveUpdateUntilDRV = lhs: rhs:
+        lib.recursiveUpdateUntil (path: lhs: rhs:
+            (!((builtins.isAttrs lhs && !lib.isDerivation lhs) && (builtins.isAttrs rhs && !lib.isDerivation rhs)))
+          ) lhs rhs;
+      values = map lib.getValues defs;
+    in
+    arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
+  };
+in {
 
   options = with lib; {
 
@@ -23,7 +37,7 @@
         default = null;
         type = types.nullOr (types.anything);
         description = ''
-          a different nixpkgs import to use. By default will use the one from the flake.
+          a different nixpkgs import to use. By default will use the one from the flake, or throw if none exists.
         '';
         example = ''
           nixpkgs_version = inputs.nixpkgs
@@ -52,7 +66,7 @@
       enable = mkOption {
         default = false;
         type = types.bool;
-        description = "Enable ${defaultPackageName}";
+        description = "Enable the ${defaultPackageName} module";
       };
 
       luaPath = mkOption {
@@ -66,7 +80,7 @@
       };
 
       packageNames = mkOption {
-        default = [ "${defaultPackageName}" ];
+        default = if packageDefinitions ? defaultPackageName then [ "${defaultPackageName}" ] else [];
         type = (types.listOf types.str);
         description = ''A list of packages from packageDefinitions to include'';
         example = ''
@@ -77,7 +91,7 @@
       categoryDefinitions = {
         replace = mkOption {
           default = null;
-          type = types.nullOr (types.functionTo (types.attrsOf types.anything));
+          type = types.nullOr catDef;
           description = (literalExpression ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
@@ -93,7 +107,7 @@
         };
         merge = mkOption {
           default = null;
-          type = types.nullOr (types.functionTo (types.attrsOf types.anything));
+          type = types.nullOr catDef;
           description = ''
             Takes a function that receives the package definition set of this package
             and returns a set of categoryDefinitions,
@@ -124,7 +138,7 @@
           and :help nixCats.flake.outputs.categories
           https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/nixCatsFlake.txt
         '';
-        type = with types; nullOr (attrsOf (functionTo (attrsOf anything)));
+        type = with types; nullOr (attrsOf catDef);
         example = ''
           nixCats.packages = { 
             nixCats = { pkgs, ... }: {
@@ -165,12 +179,11 @@
       else pkgs.overlays ++ options_set.addOverlays;
 
     mapToPackages = options_set: dependencyOverlays: (let
-      newCategoryDefinitions = if options_set.categoryDefinitions.replace != null
-        then options_set.categoryDefinitions.replace
-        else (
-          if options_set.categoryDefinitions.merge != null
-            then (utils.mergeCatDefs categoryDefinitions options_set.categoryDefinitions.merge)
-            else categoryDefinitions);
+      newCategoryDefinitions = (
+        if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else categoryDefinitions
+      ) // (
+        if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
+      );
 
       pkgDefs = if (options_set.packages != null)
         then packageDefinitions // options_set.packages else packageDefinitions;
@@ -179,10 +192,10 @@
         else 
           (if keepLuaBuilder != null
             then keepLuaBuilder else 
-            builtins.throw "no lua or keepLua builder supplied to mkNixosModules"));
+            builtins.throw "no luaPath or builder with applied luaPath supplied to mkNixosModules or luaPath module option"));
 
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
-        then config.${defaultPackageName}.nixpkgs_version else nixpkgs;
+        then config.${defaultPackageName}.nixpkgs_version else if nixpkgs != null then nixpkgs else builtins.throw "module not based on existing nixCats package, and ${defaultPackageName}.nixpkgs_version is not defined";
 
     in (builtins.listToAttrs (builtins.map (catName: let
         boxedCat = newLuaBuilder {
@@ -203,4 +216,3 @@
   };
 
 }
-

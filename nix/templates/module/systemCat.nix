@@ -115,75 +115,84 @@ in {
 
 
 
+      # you can do it per user as well
       users.REPLACE_ME = {
         enable = true;
         packageNames = [ "REPLACE_MEs_VIM" ];
-        # this will be the base nixCats but with eyeliner-nvim and tokyonight
-        # this one imports the lua from nixCats and adds the plugin.
-        # categoryDefinitions.merge will recursively update them
-        # such that you can redefine only particular categories.
-        # or add new ones, as we do here.
-        # For environmentVariables, it will update them individually rather than by category.
-        # this is because each category of environmentVariables is a set rather than a list.
-        categoryDefinitions.merge = ({ pkgs, settings, categories, name, ... }@packageDef: {
+        categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
+          lspsAndRuntimeDeps = {
+            general = [];
+          };
           startupPlugins = {
-            eyeliner = with pkgs.vimPlugins; [
-              eyeliner-nvim
+            general = [];
+            # themer = with pkgs; [
+            #   # you can even make subcategories based on categories and settings sets!
+            #   (builtins.getAttr packageDef.categories.colorscheme {
+            #       "onedark" = onedark-vim;
+            #       "catppuccin" = catppuccin-nvim;
+            #       "catppuccin-mocha" = catppuccin-nvim;
+            #       "tokyonight" = tokyonight-nvim;
+            #       "tokyonight-day" = tokyonight-nvim;
+            #     }
+            #   )
+            # ];
+          };
+          optionalPlugins = {
+            general = [];
+          };
+          # shared libraries to be added to LD_LIBRARY_PATH
+          # variable available to nvim runtime
+          sharedLibraries = {
+            general = with pkgs; [
+              # libgit2
             ];
           };
-          optionalLuaAdditions = {
-            eyeliner = ''
-              if nixCats('eyeliner') then
-                require'eyeliner'.setup {
-                  highlight_on_key = true,
-                  dim = true
-                }
-              end
-            '';
+          environmentVariables = {
+            test = {
+              CATTESTVAR = "It worked!";
+            };
+          };
+          extraWrapperArgs = {
+            test = [
+              '' --set CATTESTVAR2 "It worked again!"''
+            ];
+          };
+          # lists of the functions you would have passed to
+          # python.withPackages or lua.withPackages
+
+          # get the path to this python environment
+          # in your lua config via
+          # vim.g.python3_host_prog
+          # or run from nvim terminal via :!<packagename>-python3
+          extraPython3Packages = {
+            test = (_:[]);
+          };
+          # populates $LUA_PATH and $LUA_CPATH
+          extraLuaPackages = {
+            test = [ (_:[]) ];
           };
         });
         packages = {
           REPLACE_MEs_VIM = {pkgs, ...}: {
             settings = {
-              # will check for config in the store rather than .config
               wrapRc = true;
-              configDirName = "nixCats-nvim";
-              aliases = [ "REPLACE_MY_VIM" ];
+              # IMPORTANT:
+              # your alias may not conflict with your other packages.
+              aliases = [ "vim" "systemVim" ];
               # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
             };
-            # see :help nixCats.flake.outputs.packageDefinitions
             categories = {
-              markdown = true;
-              general.vimPlugins = true;
-              general.gitPlugins = true;
-              custom = true;
-              neonixdev = true;
-              test = {
-                subtest1 = true;
-              };
-              debug = false;
-              # this does not have an associated category of plugins, 
-              # but lua can still check for it
-              lspDebugMode = false;
-              # by default, we dont want lazy.nvim
-              # we could omit this for the same effect
-              lazy = false;
-              eyeliner = true;
-              # you could also pass something else:
-              themer = true;
-              colorscheme = "tokyonight";
-              theBestCat = "says meow!!";
-              theWorstCat = {
-                thing'1 = [ "MEOW" "HISSS" ];
-                thing2 = [
-                  {
-                    thing3 = [ "give" "treat" ];
-                  }
-                  "I LOVE KEYBOARDS"
+              general = true;
+              test = true;
+              example = {
+                youCan = "add more than just booleans";
+                toThisSet = [
+                  "and the contents of this categories set"
+                  "will be accessible to your lua with"
+                  "nixCats('path.to.value')"
+                  "see :help nixCats"
                 ];
-                thing4 = "couch is for scratching";
               };
-              # see :help nixCats
             };
           };
         };
