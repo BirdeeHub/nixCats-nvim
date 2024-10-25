@@ -181,7 +181,7 @@ You can import them from nixpkgs or straight from your inputs via a convenience 
 
 Then configure in lua.
 
-Use the help, and the example config [here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example)
+Use the help, and the example config [here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example).
 The help will still be accessible in your version of the editor.
 
 When you have your plugins added, you can build it using nix build and it
