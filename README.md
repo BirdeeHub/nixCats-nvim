@@ -253,7 +253,7 @@ Then you call the function with the inputs, and recieve the normal flake outputs
 
 These templates allow you to export everything this repo does, but with your config as the base, meaning you can then [override](https://nixpkgs.org/nixCats_overriding.html) it, and it will export its own [modules](https://nixpkgs.org/nixCats_modules.html), just like you can with the example config in the top level of the repo.
 
-The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) [other](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite) [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh).
+The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) [other](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite) [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh).
 
 Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
 
@@ -279,7 +279,7 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 
 In terms of the nix code, you should not really have to leave your template's equivalent of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/flake.nix)
 
-All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/luaUtils.txt))
+All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](https://nixcats.org/nixCats_luaUtils.html))
 
 It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste.
 If you're not on linux you don't need to care what those last 2 things mean.
@@ -316,7 +316,7 @@ Luckily you also don't need it. All mason does is download it to your path, and 
 
 You can do this via the lspsAndRuntimeDeps field in nixCats, and then calling lspconfig yourself.
 
-The [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) show examples of this, and the examples still run mason when nix wasn't used to load the config!
+The [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) show examples of this, and the examples still run mason when nix wasn't used to load the config!
 
 That way you can just add the lsp to the list in nix, add the same lua config you would have for mason, and move on.
 
