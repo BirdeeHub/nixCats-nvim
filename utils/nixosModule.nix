@@ -307,9 +307,9 @@ in {
       else pkgs.overlays ++ options_set.addOverlays;
 
     mapToPackages = options_set: dependencyOverlays: (let
-      newCategoryDefinitions = (
+      newCategoryDefinitions = utils.mergeCatDefs (
         if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else categoryDefinitions
-      ) // (
+      ) (
         if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
       );
 
