@@ -34,7 +34,7 @@ This will create an empty version of flake.nix (or default.nix) for you to fill 
 
 If you have never used nvim and want a ready-made starter config, you should instead use the following template:
 >bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim
+  nix flake init -t github:BirdeeHub/nixCats-nvim#example
 <
 If you added the luaUtils template, you should also have that at lua/nixCatsUtils
 
