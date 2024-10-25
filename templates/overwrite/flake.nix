@@ -15,7 +15,7 @@
   '';
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=templates/example";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = { self, nixpkgs, nixCats, ... }@inputs: let

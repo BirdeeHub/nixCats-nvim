@@ -677,8 +677,8 @@ Then install both the wrapped one and unwrapped one with different aliases.
 When you want to hack in lua, use unwrapped! When you're done, just rebuild
 and go back to the wrapped one.
 
-The nixCats main flake.nix file has an example of this with nixCats
-and regularCats.
+The templates/example/flake.nix file from the example config template
+has an example of this with nixCats and regularCats.
 
 Then, when testing lua changes, you run the other package and have a vanilla
 neovim experience, only rebuilding when you install new packages.

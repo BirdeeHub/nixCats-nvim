@@ -6,7 +6,7 @@
 # and then add plugins to categories here,
 # and call the plugins with their default functions
 # within your lua, rather than through the nvim package manager's method.
-# Use the help, and the example repository https://github.com/BirdeeHub/nixCats-nvim
+# Use the help, and the example config github:BirdeeHub/nixCats-nvim?dir=templates/example
 
 # It allows for easy adoption of nix,
 # while still providing all the extra nix features immediately.

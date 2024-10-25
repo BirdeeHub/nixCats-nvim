@@ -12,7 +12,7 @@
   '';
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=templates/example";
     nixCats.inputs.nixpkgs.follows = "nixpkgs";
     # we are going to modify the example nixCats config to export
     # an appimage using this bunder tool.
