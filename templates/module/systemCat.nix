@@ -13,6 +13,7 @@ in {
       # you do not need to use every option here, anything you do not define
       # will be pulled from the flake instead.
       enable = true;
+      nixpkgs_version = inputs.nixpkgs;
       # this will add the overlays from ./overlays and also,
       # add any plugins in inputs named "plugins-pluginName" to pkgs.neovimPlugins
       # It will not apply to overall system, just nixCats.
