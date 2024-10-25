@@ -5,7 +5,7 @@
     A neovim-on-nix config framework for Lua-natic's, with extra cats! nixCats!
   '';
   outputs = { self, ... }: let
-    # everything is in utils.
+    # everything you will need is in utils.
     utils = import ./.;
   in {
     inherit utils;
