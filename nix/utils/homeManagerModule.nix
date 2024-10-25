@@ -23,7 +23,7 @@
         lib.recursiveUpdateUntil (path: lhs: rhs:
             (!((builtins.isAttrs lhs && !lib.isDerivation lhs) && (builtins.isAttrs rhs && !lib.isDerivation rhs)))
           ) lhs rhs;
-      values = map lib.getValues defs;
+      values = map (v: v.value) defs;
     in
     arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
   };
