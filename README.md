@@ -122,6 +122,7 @@ run your choice of the following commands at the top level of your neovim config
   nix flake init -t github:BirdeeHub/nixCats-nvim
 ```
 - nixExpressionFlakeOutputs template:
+  - for more advanced nix users
   - the outputs function of the flake template but as its own file
     callable with import ./the/dir { inherit inputs; }
     to recieve all normal flake outputs.
@@ -131,7 +132,6 @@ run your choice of the following commands at the top level of your neovim config
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 ```
-Those are the 2 main starter templates. Choose one of them.
 
 There are others which _could_ be used to create a new base config,
 but these will be the simplest to start with, and don't inherit any previous config by default.
@@ -153,7 +153,7 @@ at the top level of your neovim config:
 
 The starter templates will create an empty version of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix) (or [default.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs/default.nix)) for you to fill in.
 
-If you have never used nvim and want a ready-made starter config, you should instead use the following template:
+If you are unfamiliar with neovim and want a ready-made starter config, you should instead use the following template:
 
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim
