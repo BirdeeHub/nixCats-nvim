@@ -29,16 +29,9 @@ I wont make you work with my bespoke nvim-based site-gen, but it works quite wel
 
 ---
 
-Any other contributions and fixes are also welcome!
-
-The core of the code for nixCats, along with the templates and help,
-is in the nix directory, and the READMEs within should help explain things somewhat.
-
-Thank you!!!
-
----
-
 Direction:
+
+- help:
 
 The modules are now nicer.
 
@@ -69,3 +62,21 @@ I welcome any help in making this happen.
 The kickstart-nvim template should remain as is until someone
 comes up with a better way to explain the lazy wrapper other than
 "grep for this and read about the 10 places its different"
+
+- tests:
+
+I plan to add tests for utils.catsWithDefault under conditions of multiple merges.
+
+I plan to do this in a separate internal flake so as to not add a dependency to the main one.
+
+I will slowly add more after I do that and would love test
+contributions once I have a clear place for people to put them.
+
+---
+
+Any other contributions and fixes are also welcome!
+
+The core of the code for nixCats is in the utils and builder directories,
+and the READMEs within should help explain things somewhat.
+
+Thank you!!!
