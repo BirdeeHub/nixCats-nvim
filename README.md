@@ -15,8 +15,8 @@ buildable separately from your nixos or home-manager config.
 
 It allows you to easily pass arbitrary information from nix to lua, easily reference things installed via nix, and even output multiple neovim packages with different subsets of your configuration without duplication, import and override and re-export your nvim config in dev shells, etc...
 
-The example neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/templates/example) is a great example of how to use nixCats for yourself.
-Everything in [./templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates) is also either a starter template, or more examples.
+The example neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) is a great example of how to use nixCats for yourself.
+Everything in [./templates](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) is also either a starter template, or more examples.
 The [in-editor help](https://nixcats.org/nixCats_installation.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
@@ -26,7 +26,7 @@ For the most to-the-point intro, only 100 lines, see here instead. [:help nixCat
 
 You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix).
 
-For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/templates/example) uses `lze`.
+For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) uses `lze`.
 
 However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
 
