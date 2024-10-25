@@ -97,9 +97,7 @@ for more info, including a list of templates available (as well as a 100 line ov
 
 - to test:
 ```bash
-nix shell github:BirdeeHub/nixCats-nvim
-# or
-nix shell github:BirdeeHub/nixCats-nvim#nixCats
+nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
 ```
 > If using zsh with extra regexing, be sure to escape the #
 

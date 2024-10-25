@@ -2,7 +2,7 @@
 INSTALLATION:                                                   *nixCats.installation_options*
 
 >bash
-  nix shell github:BirdeeHub/nixCats-nvim
+  nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
   # then launch with
   nixCats
 <
