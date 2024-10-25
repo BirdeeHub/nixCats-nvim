@@ -11,6 +11,12 @@
     path = ./example;
     description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
   };
+  module = {
+    path = ./module;
+    description = ''
+      starting point for creating a nixCats module for your system and home-manager
+    '';
+  };
   nixExpressionFlakeOutputs = {
     path = ./nixExpressionFlakeOutputs;
     description = ''
@@ -22,8 +28,6 @@
       It creates a new one instead to use, just like the flake template does.
 
       Call it from your system flake and call it with inputs as arguments.
-
-      In my opinion, this is the best one, but probably not the best one to start with if new to nix.
     '';
   };
   overwrite = {
@@ -38,13 +42,6 @@
       for using overrides
 
       every nixCats package is a full nixCats-nvim
-    '';
-  };
-  module = {
-    path = ./module;
-    description = ''
-      starting point for creating a nixCats module for your system and home-manager
-      Inherits config from the source that imported it, best for reconfiguring an existing configuration
     '';
   };
   luaUtils = {
