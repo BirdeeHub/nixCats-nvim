@@ -99,7 +99,6 @@ for more info, including a list of templates available (as well as a 100 line ov
 ```bash
 nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
 ```
-> If using zsh with extra regexing, be sure to escape the #
 
 Now, typing `nixCats` will open nixCats until you exit the shell.
 
@@ -114,8 +113,6 @@ In a terminal, navigate to your nvim directory and
 run your choice of the following commands at the top level of your neovim config:
 
 (don't worry! It doesnt overwrite anything!)
-
-> If using zsh with extra regexing, be sure to escape the #
 
 - standalone flake template:
 ```bash
@@ -132,6 +129,8 @@ run your choice of the following commands at the top level of your neovim config
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 ```
+
+> If using zsh with extra regexing, be sure to escape the #
 
 There are others which _could_ be used to create a new base config,
 but these will be the simplest to start with, and don't inherit any previous config by default.
