@@ -16,8 +16,8 @@
     homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
     };
-    nixosModules.default = self.nixosModules.default;
-    homeModules.default = self.homeModules.default;
+    nixosModules.default = self.nixosModule;
+    homeModules.default = self.homeModule;
   };
 
 }
