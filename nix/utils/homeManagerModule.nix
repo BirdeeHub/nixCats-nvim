@@ -27,7 +27,6 @@
     in
     arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
   };
-  checkCats = val: builtins.trace config.${defaultPackageName}.categoryDefinitions.replace val;
 in {
 
   options = with lib; {

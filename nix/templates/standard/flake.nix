@@ -24,6 +24,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
@@ -52,7 +53,7 @@
 
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, ... }@inputs: let
-    utils = import ./nix; # <- in the templates, this comes from inputs.nixCats.utils
+    inherit (inputs.nixCats) utils;
     luaPath = "${./.}";
     # this is flake-utils eachSystem
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
