@@ -1,36 +1,23 @@
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
 {
   description = ''
-    This flake can be imported with the flake reference
-
-    inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=nix";
-
-    inputs.nixCats.url = "github:BirdeeHub/nixCats-nvim/<ref_or_rev>?dir=nix";
-
-    If you want to drop even the nixpkgs input of nixCats,
-    you may import this instead.
-
-    It does not export modules or packages of its own because those need nixpkgs.
-
-    However, it exports everything required for the default template,
-    and the nixExpressionFlakeOutputs template.
-    Which will still be able to output everything,
-    including its own modules, overlays and packages.
+    A neovim-on-nix config framework for Lua-natic's, with extra cats! nixCats!
   '';
   outputs = { self, ... }: let
-    utils = import ./nix;
-  in {
     # everything is in utils.
+    utils = import ./.;
+  in {
     inherit utils;
     inherit (utils) templates;
-    nixosModules.default = utils.mkNixosModules {
+    nixosModule = utils.mkNixosModules {
       defaultPackageName = "nixCats";
     };
-    nixosModule = self.nixosModules.default;
-    # and the same for home manager
-    homeModules.default = utils.mkHomeModules {
+    homeModule = utils.mkHomeModules {
       defaultPackageName = "nixCats";
     };
-    homeModule = self.homeModules.default;
+    nixosModules.default = self.nixosModules.default;
+    homeModules.default = self.homeModules.default;
   };
 
 }

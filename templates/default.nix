@@ -7,6 +7,10 @@
     path = ./fresh;
     description = "starting point template for making your neovim flake";
   };
+  example = {
+    path = ./example;
+    description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
+  };
   nixExpressionFlakeOutputs = {
     path = ./nixExpressionFlakeOutputs;
     description = ''

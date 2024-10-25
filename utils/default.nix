@@ -186,7 +186,7 @@ with builtins; rec {
       , keepLuaBuilder ? null
       , categoryDefinitions ? (_:{})
       , packageDefinitions ? {}
-      , defaultPackageName ? "nixCats"
+      , defaultPackageName
       , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:
@@ -202,7 +202,7 @@ with builtins; rec {
       , keepLuaBuilder ? null
       , categoryDefinitions ? (_:{})
       , packageDefinitions ? {}
-      , defaultPackageName ? "nixCats"
+      , defaultPackageName
       , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:

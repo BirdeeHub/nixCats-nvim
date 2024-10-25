@@ -6,7 +6,7 @@
   , keepLuaBuilder ? null
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
-  , defaultPackageName ? "nixCats"
+  , defaultPackageName
   , utils
   , nixpkgs ? null
   , extra_pkg_config ? {}

@@ -5,7 +5,7 @@
   # (lazy.nvim wrapper only works on unstable)
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim?dir=nix";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
   };
 
   Then call this file with:
