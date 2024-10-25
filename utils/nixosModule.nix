@@ -92,7 +92,10 @@ in {
             just like :help nixCats.flake.outputs.categories
             you should use ${pkgs.system} provided in the packageDef set
             to access system specific items.
-            Will replace the categoryDefinitions of the flake with this value.
+
+            If any value is found for categoryDefinitions.replace,
+            any inherited values from the package this module was based on, if any, will be overwritten.
+            To merge with inherited values, use categoryDefinitions.merge instead, and do not set this value.
           '');
           example = ''
             # see :help nixCats.flake.outputs.categories
@@ -225,7 +228,10 @@ in {
                   just like :help nixCats.flake.outputs.categories
                   you should use ''${pkgs.system} provided in the packageDef set
                   to access system specific items.
-                  Will replace the categoryDefinitions of the flake with this value.
+
+                  If any value is found for categoryDefinitions.replace,
+                  any inherited values from the package this module was based on, if any, will be overwritten.
+                  To merge with inherited values, use categoryDefinitions.merge instead, and do not set this value.
                 '';
                 example = ''
                   # see :help nixCats.flake.outputs.categories
