@@ -27,6 +27,7 @@
     in
     arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
   };
+  checkCats = val: builtins.trace config.${defaultPackageName}.categoryDefinitions.replace val;
 in {
 
   options = with lib; {
@@ -180,7 +181,7 @@ in {
 
     mapToPackages = options_set: dependencyOverlays: (let
       newCategoryDefinitions = (
-        if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else categoryDefinitions
+        if options_set.categoryDefinitions.replace != null then (checkCats options_set.categoryDefinitions.replace) else categoryDefinitions
       ) // (
         if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
       );
