@@ -33,7 +33,7 @@ Direction:
 
 - help:
 
-The modules are now nicer.
+The modules are much nicer now that they merge properly.
 
 And you can get the packages from the module to export from your system flake,
 which is possibly incorrectly documented at the end of the module help file.
