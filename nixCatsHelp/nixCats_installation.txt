@@ -32,7 +32,8 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
 <
 This will create an empty version of flake.nix (or default.nix) for you to fill in.
 
-If you have never used nvim and want a ready-made starter config, you should instead use the following template:
+If you are unfamiliar with nvim and want a ready-made starter config,
+you should instead use the following template:
 >bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#example
 <
