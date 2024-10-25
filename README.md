@@ -285,8 +285,6 @@ It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a cl
 If you're not on linux you don't need to care what those last 2 things mean.
 You also might want a [nerd font](https://www.nerdfonts.com/) for some icons depending on your OS, terminal, and configuration.
 
-(full usage covered in included help files, accessible [here](https://nixcats.org/TOC.html) and in editor, but *much better viewed in-editor* because the vimdoc links work there)
-
 If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
 See [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html#nixCats.flake.inputs) for
