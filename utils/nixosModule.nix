@@ -130,7 +130,6 @@ in {
           for information on the values you may return,
           see :help nixCats.flake.outputs.settings
           and :help nixCats.flake.outputs.categories
-          https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/nixCatsFlake.txt
         '';
         type = with types; nullOr (attrsOf catDef);
         example = ''
@@ -264,7 +263,6 @@ in {
                 for information on the values you may return,
                 see :help nixCats.flake.outputs.settings
                 and :help nixCats.flake.outputs.categories
-                https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/nixCatsFlake.txt
               '';
               type = with types; nullOr (attrsOf catDef);
               example = ''

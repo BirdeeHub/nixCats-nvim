@@ -1,6 +1,6 @@
 This directory contains the entire nixCats builder.
 
-It gets exported by the utils set in [nix/utils/default.nix](../utils/default.nix)
+It gets exported by the utils set in [utils/default.nix](../utils/default.nix)
 
 These are original and drive the category and message passing scheme.
 
@@ -8,7 +8,7 @@ These are original and drive the category and message passing scheme.
 
 default.nix also passes the nixCats plugin along as a function, to add more info later.
 
-It also imports the help files at [nix/nixCatsHelp](../nixCatsHelp) so that all versions of nixCats have help.
+It also imports the help files at [nixCatsHelp](../nixCatsHelp) so that all versions of nixCats have help.
 
 These files are modified from nixpkgs to allow multi-installation, and to pass more info to lua:
 

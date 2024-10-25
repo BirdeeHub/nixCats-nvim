@@ -7,9 +7,8 @@
 # but this one would work too!
 # Every config based on nixCats is a full nixCats.
 
-# This main example config doesnt use lazy.nvim, and
-# it loads everything via nix. This example config
-# consists of everything outside of ./nix
+# This example config doesnt use lazy.nvim, and
+# it loads everything via nix.
 
 # It has some useful tricks
 # in it, especially for lsps, so if you have any questions,

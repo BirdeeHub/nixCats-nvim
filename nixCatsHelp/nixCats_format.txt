@@ -144,7 +144,7 @@ pkgs = import nixpkgs { inherit system; overlays = []; config = {}; }
 >nix
   outputs = { self, nixpkgs, ... }@inputs: let
     # In the templates, this is inherit (inputs.nixCats) utils;
-    utils = import ./nix;
+    inherit (inputs.nixCats) utils;
     # path the the store path to be loaded as neovim config directory
     luaPath = "${./.}";
     # used when initializing the nixpkgs instance
@@ -691,7 +691,7 @@ Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
 Now we define our builder function.
 We inherit utils.baseBuilder which is
-a function that takes 5 arguments. It is defined in ./nix/builder
+a function that takes 5 arguments. It is defined in ./builder
 Right now we are going to call it with just the first 4 of them. This will
 leave us with a function that takes 1 argument.
 That argument is the name of the neovim package to be packaged.
