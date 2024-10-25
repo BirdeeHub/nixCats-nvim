@@ -15,18 +15,18 @@ buildable separately from your nixos or home-manager config.
 
 It allows you to easily pass arbitrary information from nix to lua, easily reference things installed via nix, and even output multiple neovim packages with different subsets of your configuration without duplication, import and override and re-export your nvim config in dev shells, etc...
 
-The example neovim config here ([everything](https://github.com/BirdeeHub/nixCats-nvim) outside of the internals at [./nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix)) is just one example of how to use nixCats for yourself.
-Everything in [./nix/templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates) is also either a starter template, or more examples.
+The example neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/templates/example) is a great example of how to use nixCats for yourself.
+Everything in [./templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates) is also either a starter template, or more examples.
 The [in-editor help](https://nixcats.org/nixCats_installation.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
-When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
+When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
 For the most to-the-point intro, only 100 lines, see here instead. [:help nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
 
-You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh/flake.nix).
+You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix).
 
-For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The example configuration here uses `lze`.
+For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/templates/example) uses `lze`.
 
 However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
 
@@ -73,21 +73,21 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
   - as a nixos or home-manager module
   - entirely via calling the override function on a nixCats based package.
   - It can then be imported and reconfigured without duplication and exported again. And again. and again.
-- blank flake [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh) that can be initialized into your existing neovim config directory to get you started!
+- blank flake [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh) that can be initialized into your existing neovim config directory to get you started!
   - because you can mess around with it in its own repo in any directory, this is the lowest barrier of entry, and transitions well into any other template if desired.
-- blank [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) that is called as a nix expression from any other flake.
+- blank [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) that is called as a nix expression from any other flake.
   - It is simply the outputs function of the flake template above but as its own file, callable with your system's flake inputs, and returning all the normal flake outputs the other would have.
   - great for integrating into a system config and still being able to output the finished packages from your system flake.
-- blank override [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/overwrite) that achieves functionality the same as the above two, but entirely via using the override function on the example nvim package from the nixCats flake.
-- blank module [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/module) that exports the configuration of your packages in module form, inherits values from your other template and can be reconfigured. Similar to override, but as a module.
-- luaUtils [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils) template containing the tools for detecting if nix loaded your config or not, and integrating with lazy.nvim or other plugin managers.
+- blank override [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite) that achieves functionality the same as the above two, but entirely via using the override function on the example nvim package from the nixCats flake.
+- blank module [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module) that exports the configuration of your packages in module form, inherits values from your other template and can be reconfigured. Similar to override, but as a module.
+- luaUtils [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/luaUtils) template containing the tools for detecting if nix loaded your config or not, and integrating with lazy.nvim or other plugin managers.
   - this is an optional, additional template.
   - proper useage of this template can yield a configuration that you can use both with or without nix.
   - contains the lazy.nvim wrapper.
-- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](https://nixcats.org/nixCats_installation.html#nixCats.templates))
+- other templates containing examples of how to do other things with nixCats, and even one that implements the entirety of [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim) using the lazy wrapper! (for a full list see [:help nixCats.templates](https://nixcats.org/nixCats_installation.html#nixCats.templates))
 - ability to call override as many times as you like to fully recustomize or combine packages
 - [Extensive in-editor help.](https://nixcats.org/TOC.html)
-- I mentioned the templates already but if you want to see them all on github they are here: [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates)
+- I mentioned the templates already but if you want to see them all on github they are here: [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates)
 
 ---
 
@@ -97,11 +97,8 @@ for more info, including a list of templates available (as well as a 100 line ov
 
 - to test:
 ```bash
-nix shell github:BirdeeHub/nixCats-nvim
-# or
-nix shell github:BirdeeHub/nixCats-nvim#nixCats
+nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
 ```
-> If using zsh with extra regexing, be sure to escape the #
 
 Now, typing `nixCats` will open nixCats until you exit the shell.
 
@@ -117,13 +114,12 @@ run your choice of the following commands at the top level of your neovim config
 
 (don't worry! It doesnt overwrite anything!)
 
-> If using zsh with extra regexing, be sure to escape the #
-
 - standalone flake template:
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim
 ```
 - nixExpressionFlakeOutputs template:
+  - for more advanced nix users
   - the outputs function of the flake template but as its own file
     callable with import ./the/dir { inherit inputs; }
     to recieve all normal flake outputs.
@@ -133,7 +129,8 @@ run your choice of the following commands at the top level of your neovim config
 ```bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 ```
-Those are the 2 main starter templates. Choose one of them.
+
+> If using zsh with extra regexing, be sure to escape the #
 
 There are others which _could_ be used to create a new base config,
 but these will be the simplest to start with, and don't inherit any previous config by default.
@@ -153,12 +150,18 @@ at the top level of your neovim config:
 > because if you dont use nix to load neovim,
 > nixCats (obviously) can't provide you with anything from nix!
 
-The starter templates will create an empty version of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh/flake.nix) (or [default.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs/default.nix)) for you to fill in.
+The starter templates will create an empty version of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix) (or [default.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs/default.nix)) for you to fill in.
 
-It will import the utils set and thus also the builder and
+If you are unfamiliar with neovim and want a ready-made starter config, you should instead use the following template:
+
+```bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim
+```
+
+All templates will import the utils set and thus also the builder and
 help from nixCats-nvim itself.
 
-If you added the luaUtils template, you should have that now too at [./lua/nixCatsUtils](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/nixCatsUtils).
+If you added the luaUtils template, you should have that now too at lua/nixCatsUtils.
 
 Re-enter the nixCats nvim version by typing `nixCats .` and take a look!
 Reference the help and nixCats-nvim itself as a guide for importing your setup.
@@ -178,7 +181,7 @@ You can import them from nixpkgs or straight from your inputs via a convenience 
 
 Then configure in lua.
 
-Use the help and the top level of the nixCats-nvim repo itself as an example (everything outside of ./nix!).
+Use the help, and the example config [here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example).
 The help will still be accessible in your version of the editor.
 
 When you have your plugins added, you can build it using nix build and it
@@ -199,11 +202,11 @@ There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
 This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
 
-All downloading can be done from [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/flake.nix). Then configure in the normal neovim scheme.
+All downloading can be done from [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/flake.nix). Then configure in the normal neovim scheme.
 
 For the most to-the-point intro, only 100 lines, see here instead. [:help nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
 
-You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh/flake.nix).
+You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix).
 
 If you wish to hear about the philosophy, you may continue reading. But to learn to use it, the above 2 links are more useful.
 
@@ -250,7 +253,7 @@ Then you call the function with the inputs, and recieve the normal flake outputs
 
 These templates allow you to export everything this repo does, but with your config as the base, meaning you can then [override](https://nixpkgs.org/nixCats_overriding.html) it, and it will export its own [modules](https://nixpkgs.org/nixCats_modules.html), just like you can with the example config in the top level of the repo.
 
-The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/nixExpressionFlakeOutputs) [other](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/overwrite) [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/fresh).
+The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) [other](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite) [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh).
 
 Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
 
@@ -274,15 +277,13 @@ It works as a regular config folder without any nix too using the `luaUtils` tem
 
 `luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility from before of trying to download all 4 versions of rust, node, ripgrep, and fd for your overcomplicated config on a machine without using nix...
 
-In terms of the nix code, you should not have to leave your template's equivalent of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/flake.nix) except OCCASIONALLY [customBuildsOverlay](https://github.com/BirdeeHub/nixCats-nvim/blob/main/overlays/customBuildsOverlay.nix) when the thing you wish to install is not on nixpkgs and the standardPluginOverlay does not work.
+In terms of the nix code, you should not really have to leave your template's equivalent of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/flake.nix)
 
-All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/nixCatsHelp/luaUtils.txt))
+All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](https://nixcats.org/nixCats_luaUtils.html))
 
 It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste.
 If you're not on linux you don't need to care what those last 2 things mean.
 You also might want a [nerd font](https://www.nerdfonts.com/) for some icons depending on your OS, terminal, and configuration.
-
-(full usage covered in included help files, accessible [here](https://nixcats.org/TOC.html) and in editor, but *much better viewed in-editor* because the vimdoc links work there)
 
 If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
 If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
@@ -313,7 +314,7 @@ Luckily you also don't need it. All mason does is download it to your path, and 
 
 You can do this via the lspsAndRuntimeDeps field in nixCats, and then calling lspconfig yourself.
 
-The [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) show examples of this, and the examples still run mason when nix wasn't used to load the config!
+The [example config](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/lua/myLuaConf/LSPs/init.lua) and [:h nixCats.LSPs](https://nixcats.org/nix_LSPS.html) show examples of this, and the examples still run mason when nix wasn't used to load the config!
 
 That way you can just add the lsp to the list in nix, add the same lua config you would have for mason, and move on.
 
@@ -327,7 +328,7 @@ However you can make it work with SharedLibraries and lspsAndRuntimeDeps options
 They stick to the task of lazy loading and do it well, with a very similar plugin spec style to `lazy.nvim`
 They fit in much better with all nix solutions for nvim than `lazy.nvim` does.
 
-If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html#nixCats.luaUtils.lazy) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
+If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/luaUtils/lua/nixCatsUtils) documented in [:h luaUtils](https://nixcats.org/nixCats_luaUtils.html#nixCats.luaUtils.lazy) and [demonstrated here](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim). The luaUtils template also contains other simple tools that will help if you want your configuration to still load without nix involved in any way. You likely will not need to do that though. The nix package manager runs on any linux, mac, or WSL.
 
 Lazy.nvim works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
 
@@ -366,7 +367,7 @@ But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.n
 
 Many thanks to Quoteme for a great repo to teach me the basics of nix!!! I borrowed some code from it as well because I couldn't have written it better.
 
-[utils.standardPluginOverlay](https://github.com/BirdeeHub/nixCats-nvim/blob/main/nix/utils/autoPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
+[utils.standardPluginOverlay](https://github.com/BirdeeHub/nixCats-nvim/blob/main/utils/autoPluginOverlay.nix) is copy-pasted from [a section of Quoteme's repo.](https://github.com/Quoteme/neovim-flake/blob/34c47498114f43c243047bce680a9df66abfab18/flake.nix#L42C8-L42C8)
 
 Thank you!!! I literally did not even know what an overlay was yet and you taught me!
 
