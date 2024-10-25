@@ -58,8 +58,11 @@ I would like to phase out the nixExpressionFlakeOutputs template,
 and doing it that way will continue to work as it has)
 
 I feel that providing proper help for these 2 options as a main path of installation
-provides a better onboarding path for new users, as they are familliar with modules,
+provides a better onboarding path for new users.
+
+They are familliar with modules,
 and standalone flakes, but not weird mixes of the two.
+And I feel like throwing in the weird mix as an option just confuses people.
 
 I welcome any help in making this happen.
 
