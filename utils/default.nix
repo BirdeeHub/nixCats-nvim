@@ -190,7 +190,8 @@ with builtins; rec {
       , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:
-      (import ./nixosModule.nix {
+      (import ./mkModules.nix {
+        isHomeManager = false;
         oldDependencyOverlays = dependencyOverlays;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
           packageDefinitions defaultPackageName extra_pkg_config utils;
@@ -206,7 +207,8 @@ with builtins; rec {
       , nixpkgs ? null
       , extra_pkg_config ? {}
       , ... }:
-      (import ./homeManagerModule.nix {
+      (import ./mkModules.nix {
+        isHomeManager = true;
         oldDependencyOverlays = dependencyOverlays;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
           packageDefinitions defaultPackageName extra_pkg_config utils;

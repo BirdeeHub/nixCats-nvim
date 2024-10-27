@@ -1,18 +1,18 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
 {
-  oldDependencyOverlays ? null
+  isHomeManager
+  , defaultPackageName
+  , oldDependencyOverlays ? null
   , luaPath ? ""
   , keepLuaBuilder ? null
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
-  , defaultPackageName
   , utils
   , nixpkgs ? null
   , extra_pkg_config ? {}
   , ...
 }:
-
 { config, pkgs, lib, ... }: let
   catDef = lib.mkOptionType {
     name = "catDef";
@@ -24,7 +24,7 @@
         lib.recursiveUpdateUntil (path: lhs: rhs:
             (!((builtins.isAttrs lhs && !lib.isDerivation lhs) && (builtins.isAttrs rhs && !lib.isDerivation rhs)))
           ) lhs rhs;
-      values = map lib.getValues defs;
+      values = map (v: v.value) defs;
     in
     arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
   };
@@ -52,8 +52,8 @@ in {
           A list of overlays to make available to nixCats but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
-        example = (literalExpression ''
-          addOverlays = [ (self: super: { neovimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+        example = (lib.literalExpression ''
+          addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '');
       };
 
@@ -161,29 +161,35 @@ in {
           }
         '';
       };
-      out.packages = mkOption {
-        type = types.attrsOf types.package;
-        visible = false;
-        readOnly = true;
-        description = "Resulting customized neovim packages.";
-      };
-      out.users = mkOption {
-        description = ''
-          Resulting customized neovim packages for users.
-        '';
-        visible = false;
-        readOnly = true;
-        type = with types; attrsOf (submodule {
-          options = {
-            packages = mkOption {
-              type = types.attrsOf types.package;
-              visible = false;
-              readOnly = true;
-              description = "Resulting customized neovim packages for this user";
+
+      out = {
+        packages = mkOption {
+          type = types.attrsOf types.package;
+          visible = false;
+          readOnly = true;
+          description = "Resulting customized neovim packages.";
+        };
+      } // (lib.optionalAttrs (! isHomeManager) {
+        users = mkOption {
+          description = ''
+            Resulting customized neovim packages for users.
+          '';
+          visible = false;
+          readOnly = true;
+          type = with types; attrsOf (submodule {
+            options = {
+              packages = mkOption {
+                type = types.attrsOf types.package;
+                visible = false;
+                readOnly = true;
+                description = "Resulting customized neovim packages for this user";
+              };
             };
-          };
-        });
-      };
+          });
+        };
+      });
+
+    } // (lib.optionalAttrs (! isHomeManager) {
 
       users = mkOption {
         default = {};
@@ -300,11 +306,11 @@ in {
           };
         });
       };
-    };
-
+    });
   };
 
   config = let
+    options_set = config.${defaultPackageName};
     dependencyOverlays = if builtins.isAttrs oldDependencyOverlays then
         lib.genAttrs (builtins.attrNames oldDependencyOverlays)
           (system: pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays.${system} options_set.addOverlays)])
@@ -326,7 +332,7 @@ in {
         else 
           (if keepLuaBuilder != null
             then keepLuaBuilder else 
-            builtins.throw "no luaPath or builder with applied luaPath supplied to mkNixosModules or luaPath module option"));
+            builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option"));
 
       newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version else if nixpkgs != null then nixpkgs else builtins.throw "module not based on existing nixCats package, and ${defaultPackageName}.nixpkgs_version is not defined";
@@ -342,6 +348,14 @@ in {
         { name = catName; value = boxedCat; }) options_set.packageNames))
     );
 
+    mappedPackageAttrs = mapToPackages options_set dependencyOverlays;
+    mappedPackages = builtins.attrValues mappedPackageAttrs;
+
+  in
+  (if isHomeManager then {
+    ${defaultPackageName}.out.packages = lib.mkIf options_set.enable mappedPackageAttrs;
+    home.packages = lib.mkIf options_set.enable mappedPackages;
+  } else (let
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
@@ -354,18 +368,13 @@ in {
         packages = lib.mkIf options_set.enable (mapToPackages user_options_set dependencyOverlays);
       }
     ) config.${defaultPackageName}.users;
-
-    options_set = config.${defaultPackageName};
-    mappedPackageAttrs = mapToPackages options_set dependencyOverlays;
-    mappedSystemPackages = builtins.attrValues mappedPackageAttrs;
-
-  in
-  {
+  in {
     ${defaultPackageName}.out = {
       users = newUserPackageOutputs;
       packages = lib.mkIf options_set.enable mappedPackageAttrs;
     };
     users.users = newUserPackageDefinitions;
-    environment.systemPackages = lib.mkIf options_set.enable mappedSystemPackages;
-  };
+    environment.systemPackages = lib.mkIf options_set.enable mappedPackages;
+  }));
+
 }
