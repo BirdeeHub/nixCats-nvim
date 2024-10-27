@@ -165,7 +165,6 @@ in {
       out = {
         packages = mkOption {
           type = types.attrsOf types.package;
-          visible = false;
           readOnly = true;
           description = "Resulting customized neovim packages.";
         };
@@ -174,7 +173,6 @@ in {
           description = ''
             Resulting customized neovim packages for users.
           '';
-          visible = false;
           readOnly = true;
           type = with types; attrsOf (submodule {
             options = {
