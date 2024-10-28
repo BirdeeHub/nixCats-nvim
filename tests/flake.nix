@@ -1,10 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixCats.url = "path:../.";
   };
-  outputs = { self, nixpkgs, nixCats, ... }@inputs: let
-    forAllSys = nixCats.utils.eachSystem nixpkgs.lib.platforms.all;
+  outputs = { self, nixpkgs, ... }@inputs: let
+    utils = import ../.;
+    forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
     mkTestVim = system: let
       luaPath = ./.;
       dependencyOverlays = [
@@ -20,7 +20,7 @@
           };
         };
       };
-    in nixCats.utils.baseBuilder luaPath {
+    in utils.baseBuilder luaPath {
         inherit nixpkgs system dependencyOverlays;
         extra_pkg_config = {
           allowUnfree = true;
