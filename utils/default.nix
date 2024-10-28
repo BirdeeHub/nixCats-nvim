@@ -439,16 +439,16 @@ with builtins; rec {
       name = "catDef";
       description = "a function representing categoryDefinitions or packageDefinitions for nixCats";
       descriptionClass = "noun";
-      check = v: builtins.isFunction v;
+      check = v: isFunction v;
       merge = loc: defs: let
         values = map (v: v.value) defs;
         mergefunc = if subtype == "replace"
         then lib.recursiveUpdateUntilDRV 
         else if subtype == "merge"
         then lib.recursiveUpdateWithMerge
-        else builtins.throw "invalid catDef subtype";
+        else throw "invalid catDef subtype";
       in
-      arg: builtins.foldl' mergefunc {} (map (v: v arg) values);
+      arg: foldl' mergefunc {} (map (v: v arg) values);
     };
   };
 }
