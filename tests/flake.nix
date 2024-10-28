@@ -16,9 +16,9 @@
   {
     checks = {
       default = self.checks.${system}.drv;
-      # library = pkgs.callPackage ./library { inherit inputs testvim utils; };
+      library = pkgs.callPackage ./library { inherit inputs testvim utils; };
       drv = pkgs.callPackage ./drv { inherit inputs testvim utils; };
-      # module = pkgs.callPackage ./module { inherit inputs testvim utils; };
+      module = pkgs.callPackage ./module { inherit inputs testvim utils; };
     };
   });
 }
