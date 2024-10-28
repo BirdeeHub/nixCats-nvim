@@ -38,6 +38,10 @@ with builtins; rec {
     mergeCatDefs = oldCats: newCats:
       (packageDef: lib.recursiveUpdateUntilDRV (oldCats packageDef) (newCats packageDef));
 
+    # allows category list definitions to be merged
+    deepmergeCats = oldCats: newCats:
+      (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
+
     # recursiveUpdate each overlay output to avoid issues where
     # two overlays output a set of the same name when importing from other nixCats.
     # Merges everything into 1 overlay
@@ -193,6 +197,7 @@ with builtins; rec {
       (import ./mkModules.nix {
         isHomeManager = false;
         oldDependencyOverlays = dependencyOverlays;
+        my_lib = lib;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
           packageDefinitions defaultPackageName extra_pkg_config utils;
       });
@@ -210,6 +215,7 @@ with builtins; rec {
       (import ./mkModules.nix {
         isHomeManager = true;
         oldDependencyOverlays = dependencyOverlays;
+        my_lib = lib;
         inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
           packageDefinitions defaultPackageName extra_pkg_config utils;
       });
@@ -323,12 +329,42 @@ with builtins; rec {
         );
       in f [] [rhs lhs];
 
-    recursiveUpdateUntilDRV = lhs: rhs:
+    recursiveUpdateUntilDRV = left: right:
       lib.recursiveUpdateUntil (path: lhs: rhs:
             # I added this check for derivation because a category can be just a derivation.
             # otherwise it would squish our single derivation category rather than update.
           (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
-        ) lhs rhs;
+        ) left right;
+
+    unique = foldl' (acc: e: if elem e acc then acc else acc ++ [ e ]) [];
+
+    recUpdateUntilWithMerge = pred: lhs: rhs:
+      let
+      mergefunc = left: right:
+        if typeOf left == "list" && typeOf right == "list"
+          then lib.unique (left ++ right)
+        else if typeOf left == "list" && all (lv: typeOf lv == typeOf right) left then
+          if elem right left then left else left ++ [ right ]
+        else if typeOf right == "list" && all (rv: typeOf rv == typeOf left) right then
+          if elem left right then right else [ left ] ++ right
+        else right;
+      f = attrPath:
+        zipAttrsWith (n: values:
+          let here = attrPath ++ [n]; in
+          if length values == 1
+          || pred here (elemAt values 1) (head values) then
+            mergefunc (elemAt values 1) (head values)
+          else
+            f here values
+        );
+      in f [] [rhs lhs];
+
+    recursiveUpdateWithMerge = left: right:
+      lib.recUpdateUntilWithMerge (path: lhs: rhs:
+            # I added this check for derivation because a category can be just a derivation.
+            # otherwise it would squish our single derivation category rather than update.
+          (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
+        ) left right;
 
     genAttrs =
       names:
@@ -398,6 +434,22 @@ with builtins; rec {
               else f (path ++ [ name ]) value);
       in
       recurse [ ] set;
+
+    mkCatDefType = mkOptionType: subtype: mkOptionType {
+      name = "catDef";
+      description = "a function representing categoryDefinitions or packageDefinitions for nixCats";
+      descriptionClass = "noun";
+      check = v: builtins.isFunction v;
+      merge = loc: defs: let
+        values = map (v: v.value) defs;
+        mergefunc = if subtype == "replace"
+        then lib.recursiveUpdateUntilDRV 
+        else if subtype == "merge"
+        then lib.recursiveUpdateWithMerge
+        else builtins.throw "invalid catDef subtype";
+      in
+      arg: builtins.foldl' mergefunc {} (map (v: v arg) values);
+    };
   };
 }
 
