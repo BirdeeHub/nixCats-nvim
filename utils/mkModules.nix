@@ -18,10 +18,6 @@
   catDef = my_lib.mkCatDefType lib.mkOptionType;
 in {
 
-  imports = [
-    (lib.mkRenamedOptionModule [ defaultPackageName "packages" ] [ defaultPackageName "packageDefinitions" ])
-  ];
-
   options = with lib; {
 
     ${defaultPackageName} = {
@@ -115,7 +111,7 @@ in {
         };
       };
 
-      packageDefinitions = mkOption {
+      packages = mkOption {
         default = null;
         description = ''
           VERY IMPORTANT when setting aliases for each package,
@@ -260,12 +256,6 @@ in {
 
             packages = mkOption {
               default = null;
-              type = with types; nullOr (attrsOf (catDef "replace"));
-              visible = false;
-              apply = builtins.trace "Obsolete option `${defaultPackageName}.users.<USER>.packages` is used. It was renamed to `${defaultPackageName}.users.<USER>.packageDefinitions`.";
-            };
-            packageDefinitions = mkOption {
-              default = null;
               description = ''
                 VERY IMPORTANT when setting aliases for each package,
                 they must not be the same as ANY other neovim package for that user.
@@ -335,11 +325,8 @@ in {
         );
       in stratWithExisting categoryDefinitions moduleCatDefs;
 
-      pkgDefs = let
-        oldtype = options_set ? packages && options_set.packages != null;
-        newtype = options_set.packageDefinitions != null;
-      in if (newtype || oldtype)
-        then packageDefinitions // (lib.optionalAttrs oldtype options_set.packages) // (lib.optionalAttrs newtype options_set.packageDefinitions) else packageDefinitions;
+      pkgDefs = if (options_set.packages != null)
+        then packageDefinitions // options_set.packages else packageDefinitions;
 
       newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
         else 
