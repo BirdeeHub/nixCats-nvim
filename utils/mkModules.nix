@@ -190,13 +190,7 @@ in {
           same as system config but per user instead
           and without addOverlays or nixpkgs_version
         '';
-        type = with types; attrsOf (submodule ({ config, ... }: {
-          imports = let
-            subpath = config._module.args.attrsFullPath ++ [ defaultPackageName ];
-          in [
-            (lib.mkRenamedOptionModule (subpath ++ [ "packages" ]) (subpath ++ [ "packageDefinitions" ]))
-          ];
-
+        type = with types; attrsOf (submodule {
           options = {
             enable = mkOption {
               default = false;
@@ -264,6 +258,12 @@ in {
               };
             };
 
+            packages = mkOption {
+              default = null;
+              type = with types; nullOr (attrsOf (catDef "replace"));
+              visible = false;
+              apply = builtins.trace "Obsolete option `${defaultPackageName}.users.<USER>.packages` is used. It was renamed to `${defaultPackageName}.users.<USER>.packageDefinitions`.";
+            };
             packageDefinitions = mkOption {
               default = null;
               description = ''
@@ -306,7 +306,7 @@ in {
               '';
             };
           };
-        }));
+        });
       };
     });
   };
@@ -335,8 +335,11 @@ in {
         );
       in stratWithExisting categoryDefinitions moduleCatDefs;
 
-      pkgDefs = if (options_set.packages != null)
-        then packageDefinitions // options_set.packages else packageDefinitions;
+      pkgDefs = let
+        oldtype = options_set ? packages && options_set.packages != null;
+        newtype = options_set.packageDefinitions != null;
+      in if (newtype || oldtype)
+        then packageDefinitions // (lib.optionalAttrs oldtype options_set.packages) // (lib.optionalAttrs newtype options_set.packageDefinitions) else packageDefinitions;
 
       newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
         else 
