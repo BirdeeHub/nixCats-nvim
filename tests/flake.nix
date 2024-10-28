@@ -6,14 +6,14 @@
     examplevim.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = { self, nixpkgs, nixCats, ... }@inputs: let
-    forAllSys = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all;
-  in {
-    checks = forAllSys (system: let
-      pkgs = import nixpkgs { inherit system; };
-    in
-    {
+    forAllSys = nixCats.utils.eachSystem nixpkgs.lib.platforms.all;
+  in forAllSys (system: let
+    pkgs = import nixpkgs { inherit system; };
+  in
+  {
+    checks = {
       default = pkgs.stdenv.mkDerivation {
-        name = "catsWithDefault-1";
+        name = "test-1";
         src = ./.;
         doCheck = true;
         dontUnpack = true;
@@ -23,6 +23,6 @@
         checkPhase = ''
         '';
       };
-    });
-  };
+    };
+  });
 }
