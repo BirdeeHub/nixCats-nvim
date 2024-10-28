@@ -16,6 +16,7 @@
           settings = {
           };
           categories = {
+            killAfter = true;
           };
         };
       };
@@ -41,7 +42,9 @@
           mkdir -p $out
         '';
         checkPhase = ''
+          HOME=$(mktemp -d)
           [ ! -f $src/bin/testvim ] && exit 1 || echo "$src/bin/testvim exists!"
+          ${testvim}/bin/testvim --headless --cmd "lua =require('nixCats')"
         '';
       };
     };

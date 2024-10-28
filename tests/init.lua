@@ -12,3 +12,9 @@ end
 -- Test some stuff here
 
 -- Still deciding if I want to do it this way, use buster, or both
+
+if nixCats('killAfter') then
+    vim.schedule(function()
+        vim.cmd('qa!')
+    end)
+end
