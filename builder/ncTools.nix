@@ -136,7 +136,7 @@
 
   getCatSpace = listOfSections: let
     # get the names of the categories but not the values, to avoid evaluating anything.
-    mapfunc = path: mapAttrs (name: value: if isAttrs value && ! lib.isDerivation value then mapfunc (path ++ [ name ]) value else concatStringsSep "." (path ++ [ name ]));
+    mapfunc = path: mapAttrs (name: value: if isAttrs value && ! lib.isDerivation value then mapfunc (path ++ [ name ]) value else path ++ [ name ]);
     mapped = map (mapfunc []) listOfSections;
   in
   foldl' recursiveUpdatePickDeeper { } mapped;
