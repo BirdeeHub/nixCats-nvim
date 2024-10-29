@@ -6,9 +6,12 @@ error("Cannot import a meta module")
 ---@field pawsible table
 ---@field settings table
 ---@field petShop table
----@field get fun(category: string|string[]): any
----@field addGlobals fun()
 ---@field nixCatsPath string
 ---@field vimPackDir string
 ---@field configDir string
 ---@field packageBinPath string
+---internal: this creates the nixCats global commands
+---@field addGlobals fun() 
+---internal: use the global alias, nixCats('path.to.value')
+---for full compatibility with luaUtils template
+---@field get fun(category: string|string[]): any --
