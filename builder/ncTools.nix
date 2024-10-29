@@ -1,4 +1,4 @@
-with builtins; rec {
+{ lib, ... }: with builtins; rec {
 # NIX CATS SECTION:
   
   mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
@@ -134,17 +134,26 @@ with builtins; rec {
   in
   flatten attrset;
 
-  # https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/attrsets.nix
-  lib = {
-    isDerivation = value: value.type or null == "derivation";
+  getCatSpace = listOfSections: let
+    # get the names of the categories but not the values, to avoid evaluating anything.
+    mapfunc = path: mapAttrs (name: value: if isAttrs value && ! lib.isDerivation value then mapfunc (path ++ [ name ]) value else concatStringsSep "." (path ++ [ name ]));
+    mapped = map (mapfunc []) listOfSections;
+  in
+  foldl' recursiveUpdatePickDeeper { } mapped;
 
-    filterAttrs = pred: set:
-      listToAttrs (concatMap 
-        (name: let value = set.${name}; in
-          if pred name value then
-          [({ inherit name value; })]
-          else []
-        ) (attrNames set));
+  recursiveUpdatePickDeeper = lhs: rhs: let
+    isNonDrvSet = v: isAttrs v && !lib.isDerivation v;
+    pred = path: lh: rh: ! isNonDrvSet lh || ! isNonDrvSet rh;
+    picker = left: right: noLHS: if ! noLHS && isNonDrvSet left then left else right;
+    f = attrPath:
+      zipAttrsWith (n: values:
+        let here = attrPath ++ [n]; in
+        if length values == 1
+        || pred here (elemAt values 1) (head values) then
+          picker (elemAt values 1) (head values) (length values == 1)
+        else
+          f here values
+      );
+  in f [] [rhs lhs];
 
-  };
 }

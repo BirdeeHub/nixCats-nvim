@@ -91,7 +91,7 @@ let
     disablePythonSafePath = false;
   } // thisPackage.settings;
 
-  inherit ({
+  final_cat_defs_set = ({
     startupPlugins = {};
     optionalPlugins = {};
     lspsAndRuntimeDeps = {};
@@ -111,7 +111,8 @@ let
     bashBeforeWrapper = {};
   } // (categoryDefinitions {
     inherit settings categories pkgs name;
-  }))
+  }));
+  inherit (final_cat_defs_set)
   startupPlugins optionalPlugins lspsAndRuntimeDeps
   propagatedBuildInputs environmentVariables
   extraWrapperArgs extraPython3Packages
@@ -119,8 +120,9 @@ let
   extraPython3wrapperArgs sharedLibraries
   optionalLuaPreInit bashBeforeWrapper;
 
-  ncTools = import ./ncTools.nix;
+  ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
 
+  all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 in
   let
     # copy entire flake to store directory
@@ -162,9 +164,9 @@ in
         # TODO: deprecate this with a warning
         inherit nixCats_store_config_location;
       };
-      # using writeText instead of builtins.toFile allows us to pass derivation names and paths.
       cats = pkgs.writeText "cats.lua" ''return ${ncTools.toLua categoriesPlus}'';
       settingsTable = pkgs.writeText "settings.lua" ''return ${ncTools.toLua settingsPlus}'';
+      petShop = pkgs.writeText "petShop.lua" ''return ${ncTools.toLua all_def_names}'';
       depsTable = pkgs.writeText "pawsible.lua" ''return ${ncTools.toLua allPluginDeps}'';
     in {
       name = "nixCats";
@@ -177,6 +179,7 @@ in
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
+        cp ${petShop} $out/lua/nixCats/petShop.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });
