@@ -3,6 +3,7 @@ local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.pawsible')
 M.settings = require('nixCats.settings')
+M.petShop = require('nixCats.petShop')
 M.configDir = M.settings.nixCats_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
@@ -57,6 +58,7 @@ function M.addGlobals()
         "cats",
         "settings",
         "pawsible",
+        "petShop",
         "vimPackDir",
         "configDir",
         "nixCatsPath",
@@ -171,6 +173,12 @@ function M.addGlobals()
     vim.cmd([[
         function! GetNixPawsible()
             return v:lua.require('nixCats.pawsible')
+        endfunction
+    ]])
+
+    vim.cmd([[
+        function! GetNixPetShop()
+            return v:lua.require('nixCats.petShop')
         endfunction
     ]])
 end

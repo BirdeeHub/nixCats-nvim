@@ -5,6 +5,7 @@ error("Cannot import a meta module")
 ---@field cats table
 ---@field pawsible table
 ---@field settings table
+---@field petShop table
 ---@field get fun(category: string|string[]): any
 ---@field addGlobals fun()
 ---@field nixCatsPath string
