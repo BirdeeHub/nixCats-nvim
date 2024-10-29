@@ -1,15 +1,12 @@
 {
   "nodes": {
     "nixCats": {
-      "inputs": {
-        "nixpkgs": "nixpkgs"
-      },
       "locked": {
-        "lastModified": 1729633980,
-        "narHash": "sha256-DU9zM6Kq+Nt8td8oliazThxM1WTr3pKqDA9mlETCfpM=",
+        "lastModified": 1730194116,
+        "narHash": "sha256-IuSnvXTB2CM/56cAGIxayX09jktdNx+ZAkU6ZAUufTk=",
         "owner": "BirdeeHub",
         "repo": "nixCats-nvim",
-        "rev": "0463976aac6d049510f9384060822ebec01a5f50",
+        "rev": "12e9a599d5e9209cb1e5f6f6173b9d322a93aadc",
         "type": "github"
       },
       "original": {
@@ -34,26 +31,10 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1729265718,
-        "narHash": "sha256-4HQI+6LsO3kpWTYuVGIzhJs1cetFcwT7quWCk/6rqeo=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "ccc0c2126893dd20963580b6478d1a10a4512185",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "nixCats": "nixCats",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
