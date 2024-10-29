@@ -136,7 +136,7 @@ in
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
-    nixCats = { ... }@allPluginDeps:
+    nixCats = allPluginDeps:
     pkgs.stdenv.mkDerivation (let
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
