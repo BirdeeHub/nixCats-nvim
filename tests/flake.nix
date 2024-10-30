@@ -9,33 +9,12 @@
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
-    mkTestVim = system: let
-      luaPath = ./.;
-      dependencyOverlays = [
-      ];
-      categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
-      };
-      packageDefinitions = {
-        testvim = { pkgs, ... }: {
-          settings = {
-          };
-          categories = {
-            killAfter = true;
-          };
-        };
-      };
-    in utils.baseBuilder luaPath {
-        inherit nixpkgs system dependencyOverlays;
-        extra_pkg_config = {
-          allowUnfree = true;
-        };
-        nixCats_passthru = {};
-      } categoryDefinitions packageDefinitions "testvim";
+    packagename = "testvim";
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
-    testvim = mkTestVim system;
-    hometests = pkgs.callPackage ./home { inherit testvim inputs; };
-    drvtests = pkgs.callPackage ./drv { inherit testvim inputs; };
+    testvim = import ./nvim { inherit inputs utils system packagename; };
+    hometests = pkgs.callPackage ./home { inherit testvim inputs utils packagename; };
+    drvtests = pkgs.callPackage ./drv { inherit testvim inputs utils packagename; };
   in
   {
     checks = {

@@ -1,10 +1,11 @@
-{ utils, system, inputs, packagename, ... }: let
+{ system, inputs, utils, packagename, ... }: let
   luaPath = ./.;
+  nixCats_passthru = {};
   extra_pkg_config = {
     allowUnfree = true;
   };
-  nixCats_passthru = {};
   dependencyOverlays = [
+    (utils.standardPluginOverlay inputs)
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
   };
@@ -17,8 +18,8 @@
       };
     };
   };
-in
-utils.baseBuilder luaPath {
-  inherit system dependencyOverlays extra_pkg_config nixCats_passthru;
-  inherit (inputs) nixpkgs;
-} categoryDefinitions packageDefinitions packagename
+in utils.baseBuilder luaPath {
+    inherit (inputs) nixpkgs;
+    inherit system dependencyOverlays
+    extra_pkg_config nixCats_passthru;
+  } categoryDefinitions packageDefinitions packagename
