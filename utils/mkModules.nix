@@ -9,25 +9,13 @@
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
   , utils
+  , my_lib
   , nixpkgs ? null
   , extra_pkg_config ? {}
   , ...
 }:
 { config, pkgs, lib, ... }: let
-  catDef = lib.mkOptionType {
-    name = "catDef";
-    description = "a function representing categoryDefinitions or a package definition in the packageDefinitions set for nixCats";
-    descriptionClass = "noun";
-    check = v: builtins.isFunction v;
-    merge = loc: defs: let
-      recursiveUpdateUntilDRV = lhs: rhs:
-        lib.recursiveUpdateUntil (path: lhs: rhs:
-            (!((builtins.isAttrs lhs && !lib.isDerivation lhs) && (builtins.isAttrs rhs && !lib.isDerivation rhs)))
-          ) lhs rhs;
-      values = map (v: v.value) defs;
-    in
-    arg: builtins.foldl' recursiveUpdateUntilDRV {} (map (v: v arg) values);
-  };
+  catDef = my_lib.mkCatDefType lib.mkOptionType;
 in {
 
   options = with lib; {
@@ -83,19 +71,25 @@ in {
       };
 
       categoryDefinitions = {
+        existing = mkOption {
+          default = "replace";
+          type = types.enum [ "replace" "merge" "discard" ];
+          description = ''
+            the merge strategy to use for categoryDefinitions inherited from the package this module was based on
+            choose between "replace", "merge" or "discard"
+            replace uses utils.mergeCatDefs
+            merge uses utils.deepmergeCats
+            discard does not inherit
+            see :help nixCats.flake.outputs.exports for more info on the merge strategy options
+          '';
+        };
         replace = mkOption {
           default = null;
-          type = types.nullOr catDef;
+          type = types.nullOr (catDef "replace");
           description = (literalExpression ''
-            Takes a function that receives the package definition set of this package
-            and returns a set of categoryDefinitions,
-            just like :help nixCats.flake.outputs.categories
-            you should use ${pkgs.system} provided in the packageDef set
-            to access system specific items.
-
-            If any value is found for categoryDefinitions.replace,
-            any inherited values from the package this module was based on, if any, will be overwritten.
-            To merge with inherited values, use categoryDefinitions.merge instead, and do not set this value.
+            see :help nixCats.flake.outputs.categories
+            uses utils.mergeCatDefs to recursively update old categories with new values
+            see :help nixCats.flake.outputs.exports for more info on the merge strategy options
           '');
           example = ''
             # see :help nixCats.flake.outputs.categories
@@ -104,14 +98,11 @@ in {
         };
         merge = mkOption {
           default = null;
-          type = types.nullOr catDef;
+          type = types.nullOr (catDef "merge");
           description = ''
-            Takes a function that receives the package definition set of this package
-            and returns a set of categoryDefinitions,
-            just like :help nixCats.flake.outputs.categories
-            Will merge the categoryDefinitions of the flake with this value,
-            recursively updating all non-attrset values,
-            such as replacing old category lists with ones defined here.
+            see :help nixCats.flake.outputs.categories
+            uses utils.deepmergeCats to recursively update and merge category lists if duplicates are defined
+            see :help nixCats.flake.outputs.exports for more info on the merge strategy options
           '';
           example = ''
             # see :help nixCats.flake.outputs.categories
@@ -134,7 +125,7 @@ in {
           see :help nixCats.flake.outputs.settings
           and :help nixCats.flake.outputs.categories
         '';
-        type = with types; nullOr (attrsOf catDef);
+        type = with types; nullOr (attrsOf (catDef "replace"));
         example = ''
           nixCats.packages = { 
             nixCats = { pkgs, ... }: {
@@ -223,19 +214,25 @@ in {
             };
 
             categoryDefinitions = {
+              existing = mkOption {
+                default = "replace";
+                type = types.enum [ "replace" "merge" "discard" ];
+                description = ''
+                  the merge strategy to use for categoryDefinitions inherited from the package this module was based on
+                  choose between "replace", "merge" or "discard"
+                  replace uses utils.mergeCatDefs
+                  merge uses utils.deepmergeCats
+                  discard does not inherit
+                  see :help nixCats.flake.outputs.exports for more info on the merge strategy options
+                '';
+              };
               replace = mkOption {
                 default = null;
-                type = types.nullOr catDef;
+                type = types.nullOr (catDef "replace");
                 description = ''
-                  Takes a function that receives the package definition set of this package
-                  and returns a set of categoryDefinitions,
-                  just like :help nixCats.flake.outputs.categories
-                  you should use ''${pkgs.system} provided in the packageDef set
-                  to access system specific items.
-
-                  If any value is found for categoryDefinitions.replace,
-                  any inherited values from the package this module was based on, if any, will be overwritten.
-                  To merge with inherited values, use categoryDefinitions.merge instead, and do not set this value.
+                  see :help nixCats.flake.outputs.categories
+                  uses utils.mergeCatDefs to recursively update old categories with new values
+                  see :help nixCats.flake.outputs.exports for more info on the merge strategy options
                 '';
                 example = ''
                   # see :help nixCats.flake.outputs.categories
@@ -244,14 +241,11 @@ in {
               };
               merge = mkOption {
                 default = null;
-                type = types.nullOr catDef;
+                type = types.nullOr (catDef "merge");
                 description = ''
-                  Takes a function that receives the package definition set of this package
-                  and returns a set of categoryDefinitions,
-                  just like :help nixCats.flake.outputs.categories
-                  Will merge the categoryDefinitions of the flake with this value,
-                  recursively updating all non-attrset values,
-                  such as replacing old category lists with ones defined here.
+                  see :help nixCats.flake.outputs.categories
+                  uses utils.deepmergeCats to recursively update and merge category lists if duplicates are defined
+                  see :help nixCats.flake.outputs.exports for more info on the merge strategy options
                 '';
                 example = ''
                   # see :help nixCats.flake.outputs.categories
@@ -274,7 +268,7 @@ in {
                 see :help nixCats.flake.outputs.settings
                 and :help nixCats.flake.outputs.categories
               '';
-              type = with types; nullOr (attrsOf catDef);
+              type = with types; nullOr (attrsOf (catDef "replace"));
               example = ''
                 nixCats.packages = { 
                   nixCats = { pkgs, ... }: {
@@ -317,11 +311,19 @@ in {
       else pkgs.overlays ++ options_set.addOverlays;
 
     mapToPackages = options_set: dependencyOverlays: (let
-      newCategoryDefinitions = utils.mergeCatDefs (
-        if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else categoryDefinitions
-      ) (
-        if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
-      );
+      newCategoryDefinitions = let
+        stratWithExisting = if options_set.categoryDefinitions.existing == "merge"
+          then utils.deepmergeCats
+          else if options_set.categoryDefinitions.existing == "replace"
+          then utils.mergeCatDefs
+          else (_: r: r);
+
+        moduleCatDefs = utils.deepmergeCats (
+          if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else (_:{})
+        ) (
+          if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
+        );
+      in stratWithExisting categoryDefinitions moduleCatDefs;
 
       pkgDefs = if (options_set.packages != null)
         then packageDefinitions // options_set.packages else packageDefinitions;

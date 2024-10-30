@@ -212,5 +212,25 @@ lua.
 
 `GetAllNixCats()` is `require('nixCats').cats`
 
+All of the following may be accessed by `require('nixCats').<item>`,
+or :NixCats <item>, except the :NixCats user command also
+has the `cat` subcommand to preview the value from `nixCats("catname")`,
+and doesnt show the ones marked as internal
+>lua
+  ---@class nixCats
+  ---@field cats table
+  ---@field pawsible table
+  ---@field settings table
+  ---@field petShop table
+  ---@field nixCatsPath string
+  ---@field vimPackDir string
+  ---@field configDir string
+  ---@field packageBinPath string
+  ---internal: this creates the nixCats global commands
+  ---@field addGlobals fun() 
+  ---internal: use the global alias, nixCats('path.to.value')
+  ---for full compatibility with luaUtils template
+  ---@field get fun(category: string|string[]): any --
+<
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
