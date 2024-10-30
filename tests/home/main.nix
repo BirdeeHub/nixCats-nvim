@@ -3,6 +3,7 @@
     homeDirPrefix = if pkgs.stdenv.hostPlatform.isDarwin then "Users" else "home";
     homeDirectory = "/${homeDirPrefix}/${username}";
   in homeDirectory;
+  inherit (testvim) utils;
 in {
   imports = [
   ];
@@ -25,8 +26,21 @@ in {
   home.file = {
   };
 
-  testvim = {
+  testvim = let
+    pkgname = "testvim";
+  in {
     enable = true;
-    packageNames = [ "testvim" ];
+    packageNames = [ pkgname ];
+    packages = {
+      ${pkgname} = utils.mergeCatDefs testvim.packageDefinitions.${pkgname} ({ pkgs, ... }: {
+        settings = {
+        };
+        categories = {
+          nix_test_info = {
+            hello' = "world!";
+          };
+        };
+      });
+    };
   };
 }
