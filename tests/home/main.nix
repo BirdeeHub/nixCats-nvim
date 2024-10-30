@@ -1,4 +1,4 @@
-{ config, pkgs, testvim, lib, username, inputs, ...  }@args: let
+{ config, pkgs, testvim, lib, username, inputs, packagename, ...  }@args: let
   mkHMdir = username: let
     homeDirPrefix = if pkgs.stdenv.hostPlatform.isDarwin then "Users" else "home";
     homeDirectory = "/${homeDirPrefix}/${username}";
@@ -26,13 +26,11 @@ in {
   home.file = {
   };
 
-  testvim = let
-    pkgname = "testvim";
-  in {
+  testvim = {
     enable = true;
-    packageNames = [ pkgname ];
+    packageNames = [ packagename ];
     packages = {
-      ${pkgname} = utils.mergeCatDefs testvim.packageDefinitions.${pkgname} ({ pkgs, ... }: {
+      ${packagename} = utils.mergeCatDefs testvim.packageDefinitions.${packagename} ({ pkgs, ... }: {
         settings = {
         };
         categories = {

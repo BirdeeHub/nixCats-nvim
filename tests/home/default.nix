@@ -1,8 +1,9 @@
-{ pkgs, lib, inputs, testvim, ... }: let
+{ pkgs, lib, inputs, testvim, packagename, ... }: let
     hmcfg = inputs.home-manager.lib.homeManagerConfiguration {
       extraSpecialArgs = {
         username = "birdee";
         inherit
+          packagename
           testvim
           inputs
           ;
