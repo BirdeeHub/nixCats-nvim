@@ -65,7 +65,7 @@ in {
 
       luaPath = mkOption {
         default = luaPath;
-        type = types.str;
+        type = types.oneOf [ types.str types.path ];
         description = (literalExpression ''
           The path to your nvim config directory in the store.
           In the base nixCats flake, this is "${./.}".
@@ -205,7 +205,7 @@ in {
 
             luaPath = mkOption {
               default = luaPath;
-              type = types.str;
+              type = types.oneOf [ types.str types.path ];
               description = ''
                 The path to your nvim config directory in the store.
                 In the base nixCats flake, this is "''${./.}".
