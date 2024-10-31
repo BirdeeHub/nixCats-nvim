@@ -15,10 +15,8 @@ in stdenv.mkDerivation {
   checkPhase = let
     runpkgcmd = libT.mkRunPkgTest {
       package = modulevim;
-      extraCategories = pkgs: {
-        nix_test_info = {
-          hello = "world";
-        };
+      testnames = {
+        hello = true;
       };
     };
   in /*bash*/ ''

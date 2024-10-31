@@ -11,7 +11,7 @@ end
 
 -- Test some stuff here
 
-print(vim.inspect(nixCats('nix_test_info')))
+print(vim.inspect(nixCats('nixCats_test_names')))
 
 -- Still deciding if I want to do it this way, use buster, or both
 

@@ -10,10 +10,8 @@ stdenv.mkDerivation {
   checkPhase = let
     runpkgbash = libT.mkRunPkgTest {
       inherit package;
-      extraCategories = pkgs: {
-        nix_test_info = {
-          hello = "world";
-        };
+      testnames = {
+        hello = "world";
       };
     };
   in /*bash*/ ''

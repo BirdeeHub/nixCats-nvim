@@ -23,8 +23,8 @@ in {
         settings = {
         };
         categories = {
-          nix_test_info = {
-            hello' = "world!";
+          nixCats_test_names = {
+            modulehello = true;
           };
         };
       });

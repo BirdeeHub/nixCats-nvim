@@ -79,16 +79,17 @@
     runnable_name ? packagename,
     preCfgLua ? "",
     preRunBash ? "",
-    extraCategories ? (_:{}),
-    extraSettings ? (_:{}),
+    testnames ? {},
     ...
   }: let
     luaPre = writeText "luaPreCfg" preCfgLua;
     finaltestvim = package.override (prev: {
       packageDefinitions = prev.packageDefinitions // {
         ${packagename} = utils.mergeCatDefs prev.packageDefinitions.${packagename} ({ pkgs, ... }: {
-          settings = extraSettings pkgs;
-          categories = extraCategories pkgs;
+          settings = {};
+          categories = {
+            nixCats_test_names = testnames;
+          };
         });
       };
     });
