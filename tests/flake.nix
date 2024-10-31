@@ -13,13 +13,12 @@
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     testvim = import ./nvim { inherit inputs utils system packagename; };
-    hometests = pkgs.callPackage ./home { inherit testvim inputs utils packagename; };
-    drvtests = pkgs.callPackage ./drv { inherit testvim inputs utils packagename; };
+    hometests = pkgs.callPackage ./home { inherit testvim inputs utils; };
+    drvtests = pkgs.callPackage ./drv { inherit testvim inputs utils; };
   in
   {
     checks = {
-      inherit hometests;
-      drv = drvtests;
+      inherit drvtests hometests;
     };
   });
 }

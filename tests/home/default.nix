@@ -1,19 +1,7 @@
-{ pkgs, lib, inputs, testvim, packagename, ... }: let
-    hmcfg = inputs.home-manager.lib.homeManagerConfiguration {
-      extraSpecialArgs = {
-        username = "birdee";
-        inherit
-          packagename
-          testvim
-          inputs
-          ;
-      };
-      inherit pkgs;
-      modules = [ ./main.nix testvim.homeModule ];
-    };
-    modulevim = hmcfg.config.testvim.out.packages.testvim;
-    utils = modulevim.utils;
-in pkgs.stdenv.mkDerivation {
+{ stdenv, callPackage, inputs, testvim, utils, ... }: let
+    libT = callPackage ../libT.nix { inherit inputs testvim utils; };
+    modulevim = (libT.mkHMmodulePkgs { username = "birdee"; entrymodule = ./main.nix; }).packages.testvim;
+in stdenv.mkDerivation {
   name = "modulebuilds";
   src = modulevim;
   doCheck = true;

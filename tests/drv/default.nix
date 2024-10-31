@@ -1,4 +1,4 @@
-{ inputs, stdenv, testvim, ... }:
+{ inputs, stdenv, testvim, utils, ... }:
 stdenv.mkDerivation {
   name = "itbuilds";
   src = ./.;
@@ -10,7 +10,7 @@ stdenv.mkDerivation {
   checkPhase = let
     drvtestvim = testvim.override (prev: {
       packageDefinitions = prev.packageDefinitions // {
-        ${prev.name} = testvim.utils.mergeCatDefs prev.packageDefinitions.${prev.name} ({ pkgs, ... }: {
+        ${prev.name} = utils.mergeCatDefs prev.packageDefinitions.${prev.name} ({ pkgs, ... }: {
           settings = {
           };
           categories = {
