@@ -169,7 +169,6 @@ in {
             options = {
               packages = mkOption {
                 type = types.attrsOf types.package;
-                visible = false;
                 readOnly = true;
                 description = "Resulting customized neovim packages for this user";
               };

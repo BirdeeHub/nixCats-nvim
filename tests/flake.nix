@@ -14,8 +14,11 @@
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT.nix { inherit inputs utils; };
+
     package = import ./nvim { inherit inputs utils system packagename libT; };
+
     testargs = { inherit package inputs utils libT stateVersion; };
+
     drvtests = pkgs.callPackage ./drv testargs;
     hometests = pkgs.callPackage ./home testargs;
   in
