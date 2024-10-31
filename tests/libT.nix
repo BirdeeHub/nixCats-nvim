@@ -1,8 +1,12 @@
 { pkgs
+  , lib
+  , stdenv
   , inputs
   , testvim
   , system
+  , nix
   , utils
+  , stateVersion
   , ...
 }: with builtins; rec {
   mkHMmodulePkgs = {
@@ -12,13 +16,26 @@
   }: let
     hmcfg = inputs.home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      modules = [ entrymodule testvim.homeModule ];
+      modules = [
+        entrymodule
+        testvim.homeModule
+        ({ ... }: {
+          home.username = username;
+          home.homeDirectory = lib.mkDefault (let
+            homeDirPrefix = if stdenv.hostPlatform.isDarwin then "Users" else "home";
+          in "/${homeDirPrefix}/${username}");
+          programs.home-manager.enable = true;
+          nix.package = nix;
+          home.stateVersion = stateVersion;
+        })
+      ];
       extraSpecialArgs = {
         packagename = testvim.nixCats_packageName;
         inherit
           username
           testvim
           inputs
+          utils
           ;
       };
     };
@@ -40,6 +57,7 @@
           hostname
           testvim
           username
+          utils
           ;
       };
     };

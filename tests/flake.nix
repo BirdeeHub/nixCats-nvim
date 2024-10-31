@@ -10,10 +10,11 @@
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
     packagename = "testvim";
+    stateVersion = "24.05";
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     testvim = import ./nvim { inherit inputs utils system packagename; };
-    hometests = pkgs.callPackage ./home { inherit testvim inputs utils; };
+    hometests = pkgs.callPackage ./home { inherit testvim inputs utils stateVersion; };
     drvtests = pkgs.callPackage ./drv { inherit testvim inputs utils; };
   in
   {

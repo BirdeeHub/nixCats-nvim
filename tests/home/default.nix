@@ -1,6 +1,9 @@
-{ stdenv, callPackage, inputs, testvim, utils, ... }: let
-    libT = callPackage ../libT.nix { inherit inputs testvim utils; };
-    modulevim = (libT.mkHMmodulePkgs { username = "birdee"; entrymodule = ./main.nix; }).packages.testvim;
+{ stdenv, callPackage, inputs, testvim, utils, stateVersion, ... }: let
+  libT = callPackage ../libT.nix { inherit inputs testvim utils stateVersion; };
+  modulevim = (libT.mkHMmodulePkgs {
+    username = "birdee";
+    entrymodule = ./main.nix;
+  }).packages.testvim;
 in stdenv.mkDerivation {
   name = "modulebuilds";
   src = modulevim;

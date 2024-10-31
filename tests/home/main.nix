@@ -1,21 +1,10 @@
-{ config, pkgs, testvim, lib, username, inputs, packagename, ...  }@args: let
-  mkHMdir = username: let
-    homeDirPrefix = if pkgs.stdenv.hostPlatform.isDarwin then "Users" else "home";
-    homeDirectory = "/${homeDirPrefix}/${username}";
-  in homeDirectory;
-  inherit (testvim) utils;
+{ config, pkgs, testvim, utils, lib, username, inputs, packagename, ...  }@args: let
 in {
   imports = [
   ];
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  home.username = username;
-  home.homeDirectory = lib.mkDefault (mkHMdir username);
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
-  home.stateVersion = "24.05";
+
   xdg.enable = true;
-  nix.package = pkgs.nix;
+
   home.shellAliases = {
   };
   home.sessionVariables = {
