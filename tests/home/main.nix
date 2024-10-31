@@ -1,4 +1,4 @@
-{ config, pkgs, testvim, utils, lib, username, inputs, packagename, ...  }@args: let
+{ config, pkgs, package, utils, lib, username, inputs, packagename, ...  }@args: let
 in {
   imports = [
   ];
@@ -8,18 +8,18 @@ in {
   home.shellAliases = {
   };
   home.sessionVariables = {
-    EDITOR = "nvim";
+    EDITOR = "${packagename}";
   };
   home.packages = with pkgs; [
   ];
   home.file = {
   };
 
-  testvim = {
+  ${packagename} = {
     enable = true;
     packageNames = [ packagename ];
     packages = {
-      ${packagename} = utils.mergeCatDefs testvim.packageDefinitions.${packagename} ({ pkgs, ... }: {
+      ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
         settings = {
         };
         categories = {

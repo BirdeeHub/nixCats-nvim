@@ -13,9 +13,11 @@
     stateVersion = "24.05";
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
-    testvim = import ./nvim { inherit inputs utils system packagename; };
-    hometests = pkgs.callPackage ./home { inherit testvim inputs utils stateVersion; };
-    drvtests = pkgs.callPackage ./drv { inherit testvim inputs utils; };
+    libT = pkgs.callPackage ./libT.nix { inherit inputs utils; };
+    package = import ./nvim { inherit inputs utils system packagename libT; };
+    testargs = { inherit package inputs utils libT stateVersion; };
+    drvtests = pkgs.callPackage ./drv testargs;
+    hometests = pkgs.callPackage ./home testargs;
   in
   {
     checks = {
