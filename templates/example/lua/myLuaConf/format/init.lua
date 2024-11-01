@@ -1,7 +1,7 @@
 require('lze').load {
   {
     "conform.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('format'),
+    for_cat = 'format',
     -- cmd = { "" },
     -- event = "",
     -- ft = "",

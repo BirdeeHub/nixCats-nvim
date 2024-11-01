@@ -3,7 +3,7 @@
 return {
   {
     "nvim-treesitter",
-    enabled = require('nixCatsUtils').enableForCategory('general.treesitter'),
+    for_cat = 'general.treesitter',
     -- cmd = { "" },
     event = "DeferredUIEnter",
     -- ft = "",

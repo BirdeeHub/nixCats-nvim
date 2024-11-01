@@ -2,7 +2,7 @@ require('lze').load {
   {
     "nvim-dap",
     -- NOTE: I dont want to figure out mason tools installer for this, so I only enabled debug if nix loaded config
-    enabled = require('nixCatsUtils').enableForCategory('debug', false),
+    for_cat = { cat = 'debug', default = false },
     -- cmd = { "" },
     -- event = "",
     -- ft = "",
@@ -110,7 +110,7 @@ require('lze').load {
   },
   {
     "nvim-dap-go",
-    enabled = require('nixCatsUtils').enableForCategory('debug.go', false),
+    for_cat = { cat = 'debug.go', default = false },
     on_plugin = { "nvim-dap", },
     after = function(plugin)
       require("dap-go").setup()

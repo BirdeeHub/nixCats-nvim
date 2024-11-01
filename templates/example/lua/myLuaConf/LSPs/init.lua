@@ -102,8 +102,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
 require('lze').load {
   {
     "nvim-lspconfig",
+    for_cat = "general.always",
     event = "FileType",
-    load = (require('nixCatsUtils').isNixCats and nil) or function(name)
+    load = (require('nixCatsUtils').isNixCats and vim.cmd.packadd) or function(name)
       vim.cmd.packadd(name)
       vim.cmd.packadd("mason.nvim")
       vim.cmd.packadd("mason-lspconfig.nvim")

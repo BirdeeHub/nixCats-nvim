@@ -22,7 +22,7 @@
 return {
   {
     "telescope.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.telescope'),
+    for_cat = 'general.telescope',
     cmd = { "Telescope", "LiveGrepGitRoot" },
     -- NOTE: our on attach function defines keybinds that call telescope.
     -- so, the on_require handler will load telescope when we use those.

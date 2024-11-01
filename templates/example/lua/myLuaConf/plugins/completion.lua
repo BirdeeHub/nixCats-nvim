@@ -8,67 +8,67 @@ local load_w_after_plugin = require('nixCatsUtils.lzUtils').make_load_with_after
 return {
   {
     "cmp-buffer",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp-cmdline",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp-cmdline-history",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp-nvim-lsp",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     dep_of = { "nvim-lspconfig" },
     load = load_w_after_plugin,
   },
   {
     "cmp-nvim-lsp-signature-help",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp-nvim-lua",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp-path",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "cmp_luasnip",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     on_plugin = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "friendly-snippets",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     dep_of = { "nvim-cmp" },
   },
   {
     "lspkind.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     dep_of = { "nvim-cmp" },
     load = load_w_after_plugin,
   },
   {
     "luasnip",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     dep_of = { "nvim-cmp" },
     after = function (plugin)
       local luasnip = require 'luasnip'
@@ -86,7 +86,7 @@ return {
   },
   {
     "nvim-cmp",
-    enabled = require('nixCatsUtils').enableForCategory('general.cmp'),
+    for_cat = 'general.cmp',
     -- cmd = { "" },
     event = { "DeferredUIEnter" },
     on_require = { "cmp" },

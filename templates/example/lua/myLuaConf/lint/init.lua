@@ -1,7 +1,7 @@
 require('lze').load {
   {
     "nvim-lint",
-    enabled = require('nixCatsUtils').enableForCategory('lint'),
+    for_cat = 'lint',
     -- cmd = { "" },
     event = "FileType",
     -- ft = "",

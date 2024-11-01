@@ -53,7 +53,7 @@ require('lze').load {
   { import = "myLuaConf.plugins.completion", },
   {
     "lazydev.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('neonixdev'),
+    for_cat = 'neonixdev',
     cmd = { "LazyDev" },
     ft = "lua",
     after = function(plugin)
@@ -66,11 +66,12 @@ require('lze').load {
   },
   {
     "markdown-preview.nvim",
-    -- NOTE: enableForCategory is just a helper function that lets you specify a different default
-    -- value as a second argument if you want for when you arent using nix.
-    -- Totally unnecessary. But hey, might as well use it as a demo since this example config is meant to load without nix too.
-    -- it comes from the optional luaUtils template.
-    enabled = require('nixCatsUtils').enableForCategory('general.markdown'),
+    -- NOTE: for_cat is a custom handler that just sets enabled value for us,
+    -- based on result of nixCats('cat.name') and allows us to set a different default if we wish
+    -- it is defined in luaUtils template in lua/nixCatsUtils/lzUtils.lua
+    -- you could replace this with enabled = nixCats('cat.name') == true
+    -- if you didnt care to set a different default for when not using nix than the default you already set
+    for_cat = 'general.markdown',
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
     keys = {
@@ -84,7 +85,7 @@ require('lze').load {
   },
   {
     "undotree",
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
+    for_cat = 'general.extra',
     cmd = { "UndotreeToggle", "UndotreeHide", "UndotreeShow", "UndotreeFocus", "UndotreePersistUndo", },
     keys = { { "<leader>U", "<cmd>UndotreeToggle<CR>", mode = { "n" }, desc = "Undo Tree" }, },
     before = function(_)
@@ -94,7 +95,7 @@ require('lze').load {
   },
   {
     "comment.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
+    for_cat = 'general.extra',
     event = "DeferredUIEnter",
     after = function(plugin)
       require('Comment').setup()
@@ -102,7 +103,7 @@ require('lze').load {
   },
   {
     "indent-blankline.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
+    for_cat = 'general.extra',
     event = "DeferredUIEnter",
     after = function(plugin)
       require("ibl").setup()
@@ -110,7 +111,7 @@ require('lze').load {
   },
   {
     "nvim-surround",
-    enabled = require('nixCatsUtils').enableForCategory('general.always'),
+    for_cat = 'general.always',
     event = "DeferredUIEnter",
     -- keys = "",
     after = function(plugin)
@@ -119,8 +120,8 @@ require('lze').load {
   },
   {
     "vim-startuptime",
+    for_cat = 'general.extra',
     cmd = { "StartupTime" },
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
     before = function(_)
       vim.g.startuptime_event_width = 0
       vim.g.startuptime_tries = 10
@@ -129,7 +130,7 @@ require('lze').load {
   },
   {
     "fidget.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
+    for_cat = 'general.extra',
     event = "DeferredUIEnter",
     -- keys = "",
     after = function(plugin)
@@ -151,7 +152,7 @@ require('lze').load {
   -- },
   {
     "lualine.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.always'),
+    for_cat = 'general.always',
     -- cmd = { "" },
     event = "DeferredUIEnter",
     -- ft = "",
@@ -192,7 +193,7 @@ require('lze').load {
   },
   {
     "gitsigns.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.always'),
+    for_cat = 'general.always',
     event = "DeferredUIEnter",
     -- cmd = { "" },
     -- ft = "",
@@ -276,7 +277,7 @@ require('lze').load {
   },
   {
     "which-key.nvim",
-    enabled = require('nixCatsUtils').enableForCategory('general.extra'),
+    for_cat = 'general.extra',
     -- cmd = { "" },
     event = "DeferredUIEnter",
     -- ft = "",
