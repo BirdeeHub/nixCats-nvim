@@ -1,7 +1,6 @@
 {
   inputs
   , pkgs
-  , system
   , lib
   , stdenv
   , nix
@@ -12,8 +11,8 @@
 }: with builtins; rec {
   mkHMmodulePkgs = {
     package
+    , entrymodule
     , stateVersion ? "24.05"
-    , entrymodule ? ./main.nix
     , username ? "REPLACE_ME"
     , ...
   }: let
@@ -47,18 +46,43 @@
 
   mkNixOSmodulePkgs = {
     package
-    , entrymodule ? ./main.nix
-    , stateVersion ? "24.05"
+    , entrymodule
     , username ? "REPLACE_ME"
     , hostname ? "HOSTLESS"
     , ...
   }: let
+    # NOTE: too hard to set all the system options
+    # to make it work without building it on a system apparently
+    # so we use lib.evalModules and make our own options to set
+    # to mirror the ones the nixCats module uses.
     packagename = package.nixCats_packageName;
-    nixoscfg = nixpkgs.lib.nixosSystem {
-      inherit system;
+    nixoscfg = inputs.nixpkgs.lib.evalModules {
+      modules = [
+        entrymodule
+        package.nixosModule
+        ({ ... }:{
+          options = {
+            environment.systemPackages = lib.mkOption {
+              default = [];
+              type = lib.types.listOf lib.types.package;
+            };
+            users.users = lib.mkOption {
+              default = {};
+              type = lib.types.attrsOf (lib.types.submodule {
+                options.packages = lib.mkOption {
+                  default = [];
+                  type = lib.types.listOf lib.types.package;
+                };
+              });
+            };
+          };
+        })
+      ];
       specialArgs = {
         inherit
           packagename
+          pkgs
+          lib
           inputs
           hostname
           package
@@ -66,10 +90,6 @@
           utils
           ;
       };
-      modules = [
-        entrymodule
-        package.nixosModule
-      ];
     };
   in nixoscfg.config.${packagename}.out;
 

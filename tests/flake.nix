@@ -21,10 +21,11 @@
 
     drvtests = pkgs.callPackage ./drv testargs;
     hometests = pkgs.callPackage ./home testargs;
+    nixostests = pkgs.callPackage ./nixos testargs;
   in
   {
     checks = {
-      inherit drvtests hometests;
+      inherit drvtests hometests nixostests;
     };
   });
 }
