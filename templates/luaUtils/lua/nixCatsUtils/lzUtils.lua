@@ -101,6 +101,7 @@ function M.make_load_with_after(dirs, load)
 end
 
 -- A nixCats specific lze handler that you can use to conditionally enable by category easier.
+-- NOTE: if you wish to use this for startup plugins, you must set lazy = false manually
 M.for_cat = {
     spec_field = "for_cat",
     modify = function(plugin)
