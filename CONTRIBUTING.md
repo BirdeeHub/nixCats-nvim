@@ -65,12 +65,15 @@ comes up with a better way to explain the lazy wrapper other than
 
 - tests:
 
+To run the tests:
+
+`nix flake check --show-trace -Lv ./tests`
+
+I will slowly be adding tests to the tests directory.
+
 I plan to add tests for utils.catsWithDefault under conditions of multiple merges.
 
-I plan to do this in a separate internal flake so as to not add a dependency to the main one.
-
-I will slowly add more after I do that and would love test
-contributions once I have a clear place for people to put them.
+If anyone else would like to add some tests, please do!
 
 ---
 
