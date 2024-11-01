@@ -75,6 +75,8 @@ I plan to add tests for utils.catsWithDefault under conditions of multiple merge
 
 If anyone else would like to add some tests, please do!
 
+When adding tests, keep in mind that the tests will hang forever if a test is enabled but not defined
+
 ---
 
 Any other contributions and fixes are also welcome!
