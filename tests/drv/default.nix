@@ -11,7 +11,7 @@ stdenv.mkDerivation {
     runpkgbash = libT.mkRunPkgTest {
       inherit package;
       testnames = {
-        hello = "world";
+        hello = true;
       };
     };
   in /*bash*/ ''

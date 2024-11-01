@@ -4,7 +4,7 @@
     entrymodule = ./main.nix;
   }).packages.${package.nixCats_packageName};
 in stdenv.mkDerivation {
-  name = "modulebuilds";
+  name = "nixosmodulebuilds";
   src = modulevim;
   doCheck = true;
   dontUnpack = true;
