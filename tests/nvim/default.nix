@@ -15,6 +15,7 @@
     };
     extraLuaPackages = {
       nixCats_test_lib_deps = (lp: with lp; [
+        ansicolors
         luassert
       ]);
     };

@@ -1,22 +1,23 @@
 if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
-    local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return (v and k) or nil end):filter(function(v) return v ~= nil end):totable()
+    local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return v and k or nil end):filter(function(v) return v ~= nil end):totable()
     _G.assert = require('luassert')
 
     local function finalize(fstates)
+        local colors = require('ansicolors')
         for k, v in pairs(fstates) do
             if v == true then
-                print("PASS: " .. k)
+                io.stdout:write(colors("%{green}PASS:%{reset} " .. k .. "\n"))
             else
-                print("FAIL: " .. k)
+                io.stdout:write(colors("%{red}FAIL:%{reset} " .. k .. "\n"))
                 local msg = (type(v) == "string" and v) or vim.inspect(v)
-                print(msg)
+                io.stdout:write(msg .. "\n")
             end
         end
         local total_num = #toRun
         local passed = #vim.iter(fstates):filter(function(_, v) return v == true end):totable()
-        print("passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.\n")
+        io.stdout:write(colors((passed == total_num and '%{green}' or '%{red}') .. "passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.%{reset}\n"))
         if passed == total_num then
             if nixCats('killAfter') then
                 vim.schedule(function()
