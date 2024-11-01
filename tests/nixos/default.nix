@@ -1,4 +1,4 @@
-{ stdenv, callPackage, inputs, package, utils, libT, stateVersion, ... }: let
+{ stdenv, inputs, package, utils, libT, ... }: let
   modulevim = (libT.mkNixOSmodulePkgs {
     package = package;
     entrymodule = ./main.nix;

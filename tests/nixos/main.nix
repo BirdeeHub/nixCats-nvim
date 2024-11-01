@@ -1,4 +1,4 @@
-{ config, pkgs, package, utils, lib, hostname, username, inputs, packagename, ...  }@args: {
+{ config, pkgs, package, utils, lib, inputs, packagename, ...  }@args: {
   ${packagename} = {
     enable = true;
     packageNames = [ packagename ];

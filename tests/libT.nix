@@ -83,9 +83,7 @@
           pkgs
           lib
           inputs
-          hostname
           package
-          username
           utils
           ;
       };
