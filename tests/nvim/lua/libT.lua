@@ -9,13 +9,14 @@ if nixCats('nixCats_test_lib_deps') then
             if v == true then
                 print("PASS: " .. k)
             else
+                print("FAIL: " .. k)
                 local msg = (type(v) == "string" and v) or vim.inspect(v)
-                print("FAIL: " .. k .. "\n" .. msg)
+                print(msg)
             end
         end
         local total_num = #toRun
         local passed = #vim.iter(fstates):filter(function(_, v) return v == true end):totable()
-        print("passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.")
+        print("passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.\n")
         if passed == total_num then
             if nixCats('killAfter') then
                 vim.schedule(function()
