@@ -2,7 +2,7 @@ if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
     local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return (v and k) or nil end):filter(function(v) return v ~= nil end):totable()
-    require('luassert')
+    _G.assert = require('luassert')
 
     local function finalize(fstates)
         for k, v in pairs(fstates) do
