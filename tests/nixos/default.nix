@@ -1,7 +1,6 @@
 { stdenv, callPackage, inputs, package, utils, libT, stateVersion, ... }: let
   modulevim = (libT.mkNixOSmodulePkgs {
     package = package;
-    inherit stateVersion;
     entrymodule = ./main.nix;
   }).packages.${package.nixCats_packageName};
 in stdenv.mkDerivation {

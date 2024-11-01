@@ -1,10 +1,11 @@
 {
   inputs
+  , utils
+
   , pkgs
   , lib
   , stdenv
   , nix
-  , utils
   , writeText
   , writeShellScript
   , ...
@@ -47,8 +48,6 @@
   mkNixOSmodulePkgs = {
     package
     , entrymodule
-    , username ? "REPLACE_ME"
-    , hostname ? "HOSTLESS"
     , ...
   }: let
     # NOTE: too hard to set all the system options
