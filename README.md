@@ -236,7 +236,7 @@ Want to pass info from nix to lua? Just add it to the same table in nix and then
 
 The category scheme allows you to output many different packages with different subsets of your config.
 
-You need a minimal python3 nvim ide in a shell, and it was a subset of your previous config? Throw some `nixCats("the.category")` at it, and enable only those in a new entry in packageDefinitions.
+You need a minimal python3 nvim ide in a shell, and it was a subset of your previous config? Throw some `if nixCats("the.category") then` at it in lua, and enable only those in a new entry in packageDefinitions.
 
 Want one that actually reflects lua changes without rebuilding for testing? Have 2 `packageDefinitions` with the same categories, except one has wrapRc = false and unwrappedCfgPath set. You can install them both!
 

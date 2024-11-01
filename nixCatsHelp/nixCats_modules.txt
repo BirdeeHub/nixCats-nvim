@@ -76,7 +76,7 @@ other than the packages themselves in config.${defaultPackageName}.out
 
       luaPath = mkOption {
         default = luaPath;
-        type = types.str;
+        type = types.oneOf [ types.str types.path ];
         description = (literalExpression ''
           The path to your nvim config directory in the store.
           In the base nixCats flake, this is "${./.}".
