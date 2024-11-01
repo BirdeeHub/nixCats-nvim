@@ -14,7 +14,7 @@ if nixCats('nixCats_test_lib_deps') then
             end
         end
         local total_num = #toRun
-        local passed = #vim.tbl_keys(vim.iter(fstates):filter(function(_, v) return v == true end):totable())
+        local passed = #vim.iter(fstates):filter(function(_, v) return v == true end):totable()
         print("passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.")
         if passed == total_num then
             if nixCats('killAfter') then
