@@ -94,6 +94,7 @@
     package,
     packagename ? package.nixCats_packageName,
     runnable_name ? packagename,
+    runnable_is_nvim ? true,
     preCfgLua ? "",
     preRunBash ? "",
     testnames ? {},
@@ -118,7 +119,10 @@
     [ ! -f "${finaltestvim}/bin/${runnable_name}" ] && \
       echo "${finaltestvim}/bin/${runnable_name} does not exist!" && exit 1
     ${preRunBash}
+  '' + (if runnable_is_nvim then ''
     "${finaltestvim}/bin/${runnable_name}" --headless \
     --cmd "lua vim.g.nix_test_out = [[$out]]; vim.g.nix_test_src = [[$src]]; vim.g.nix_test_temp = [[$TEST_TEMP]]; dofile('${luaPre}')"
-  '';
+  '' else ''
+    ${finaltestvim}/bin/${runnable_name} "$@"
+  '');
 }
