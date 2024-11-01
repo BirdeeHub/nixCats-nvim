@@ -9,11 +9,7 @@ _G.my_assert = function(c, message)
     end
 end
 
--- Test some stuff here
-
-print(vim.inspect(nixCats('nixCats_test_names')))
-
--- Still deciding if I want to do it this way, use buster, or both
+require("libT")
 
 if nixCats('killAfter') then
     vim.schedule(function()
