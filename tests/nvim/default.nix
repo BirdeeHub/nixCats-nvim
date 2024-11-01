@@ -8,25 +8,12 @@
     (utils.standardPluginOverlay inputs)
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
-    startupPlugins = {
-      nixCats_test_lib_deps = with pkgs.vimPlugins; [
-        lze
-      ];
-    };
-    extraLuaPackages = {
-      nixCats_test_lib_deps = (lp: with lp; [
-        ansicolors
-        luassert
-      ]);
-    };
   };
   packageDefinitions = {
     ${packagename} = { pkgs, ... }: {
       settings = {
       };
       categories = {
-        nixCats_test_lib_deps = true;
-        killAfter = true;
       };
     };
   };

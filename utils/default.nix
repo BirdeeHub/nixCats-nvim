@@ -353,8 +353,9 @@ with builtins; rec {
       f = attrPath:
         zipAttrsWith (n: values:
           let here = attrPath ++ [n]; in
-          if length values == 1
-          || pred here (elemAt values 1) (head values) then
+          if length values == 1 then
+            head values
+          else if pred here (elemAt values 1) (head values) then
             mergefunc (elemAt values 1) (head values)
           else
             f here values

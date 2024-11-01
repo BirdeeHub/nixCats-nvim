@@ -13,7 +13,7 @@
     stateVersion = "24.05";
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
-    libT = pkgs.callPackage ./libT.nix { inherit inputs utils; };
+    libT = pkgs.callPackage ./libT { inherit inputs utils; };
 
     package = import ./nvim { inherit inputs utils system packagename libT; };
 
