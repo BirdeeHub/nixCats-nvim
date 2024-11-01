@@ -17,6 +17,8 @@ in stdenv.mkDerivation {
       package = modulevim;
       testnames = {
         hello = true;
+        pluginfile = true;
+        afterplugin = true;
       };
     };
   in /*bash*/ ''

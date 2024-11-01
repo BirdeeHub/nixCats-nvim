@@ -12,6 +12,8 @@ stdenv.mkDerivation {
       inherit package;
       testnames = {
         hello = true;
+        pluginfile = true;
+        afterplugin = true;
       };
     };
   in /*bash*/ ''
