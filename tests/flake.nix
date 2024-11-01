@@ -15,7 +15,7 @@
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT { inherit inputs utils; };
 
-    package = import ./nvim { inherit inputs utils system packagename libT; };
+    package = import ./nvim { inherit inputs utils system packagename; };
 
     testargs = { inherit package inputs utils libT stateVersion; };
 
@@ -24,6 +24,7 @@
     nixostests = pkgs.callPackage ./nixos testargs;
   in
   {
+    libT = libT;
     checks = {
       inherit drvtests hometests nixostests;
     };
