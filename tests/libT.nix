@@ -111,7 +111,7 @@
         });
       };
     });
-  in writeShellScript "runtests-${packagename}-${runnable_name}" ''
+  in writeShellScript "runtests-${packagename}-${runnable_name}" (''
     HOME="$(mktemp -d)"
     TEST_TEMP="$(mktemp -d)"
     mkdir -p "$TEST_TEMP" "$HOME"
@@ -124,5 +124,5 @@
     --cmd "lua vim.g.nix_test_out = [[$out]]; vim.g.nix_test_src = [[$src]]; vim.g.nix_test_temp = [[$TEST_TEMP]]; dofile('${luaPre}')"
   '' else ''
     ${finaltestvim}/bin/${runnable_name} "$@"
-  '');
+  ''));
 }
