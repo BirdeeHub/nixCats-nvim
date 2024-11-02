@@ -269,7 +269,6 @@ with builtins; rec {
           mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
         in removeNullPaths (mapToPaths cats);
 
-
         result = let
           final_cats = lib.attrByPath attrpath false categories;
           allIncPaths = flattener (mapToSetOfPaths final_cats);
