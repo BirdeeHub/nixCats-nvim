@@ -8,6 +8,9 @@ stdenv.mkDerivation {
     mkdir -p $out
   '';
   checkPhase = let
+    # you can define multiple test runs within a single test phase.
+    # if you need a clean environment:
+    # define 2 of these with different tests, and run them both in the check phase
     runpkgbash = libT.mkRunPkgTest {
       inherit package;
       testnames = {
