@@ -144,13 +144,14 @@
   recursiveUpdatePickDeeper = lhs: rhs: let
     isNonDrvSet = v: isAttrs v && !lib.isDerivation v;
     pred = path: lh: rh: ! isNonDrvSet lh || ! isNonDrvSet rh;
-    picker = left: right: noLHS: if ! noLHS && isNonDrvSet left then left else right;
+    picker = left: right: if isNonDrvSet left then left else right;
     f = attrPath:
       zipAttrsWith (n: values:
         let here = attrPath ++ [n]; in
-        if length values == 1
-        || pred here (elemAt values 1) (head values) then
-          picker (elemAt values 1) (head values) (length values == 1)
+        if length values == 1 then
+          head values
+        else if pred here (elemAt values 1) (head values) then
+          picker (elemAt values 1) (head values)
         else
           f here values
       );
