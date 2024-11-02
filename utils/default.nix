@@ -116,6 +116,9 @@ with builtins; rec {
 
     # finds an included category in lib.attrByPath false categories
     # adds defaults to it, returns the resulting set with the added values
+    # TODO: this is a somewhat brittle solution. Find a better one.
+    # but it works well enough for now,
+    # and will be fixable without changing the interface.
     catsWithDefault = categories: attrpath: defaults: subcategories: let
       include_path = let
         flattener = cats: let
