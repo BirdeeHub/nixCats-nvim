@@ -19,6 +19,7 @@ in stdenv.mkDerivation {
         hello = true;
         pluginfile = true;
         afterplugin = true;
+        test_libT_vars = true;
       };
     };
   in /*bash*/ ''

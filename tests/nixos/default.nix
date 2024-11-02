@@ -18,6 +18,7 @@ in stdenv.mkDerivation {
         helloNixos = true;
         pluginfile = true;
         afterplugin = true;
+        test_libT_vars = true;
       };
     };
   in /*bash*/ ''
