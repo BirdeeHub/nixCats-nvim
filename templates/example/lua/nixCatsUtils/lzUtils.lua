@@ -101,6 +101,9 @@ function M.make_load_with_after(dirs, load)
 end
 
 -- A nixCats specific lze handler that you can use to conditionally enable by category easier.
+-- at the start of your config, register with
+-- require('lze').register_handlers(require('nixCatsUtils.lzUtils').for_cat)
+-- before any calls to require('lze').load using the handler have been made.
 -- NOTE: if you wish to use this for startup plugins, you must set lazy = false manually
 M.for_cat = {
     spec_field = "for_cat",
