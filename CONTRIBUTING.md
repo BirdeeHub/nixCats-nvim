@@ -111,6 +111,13 @@ So if this happens, cancel it and define the test, or if it was defined,
 you know that an uncaught failure occurred OUTSIDE of the tests themselves,
 which prevented a scheduled test from being defined.
 
+To prevent this as much as possible, if you want to use the lua directory for config outside of a test definition,
+you should do it inside of [tests/nvim/lua/config](./tests/nvim/lua/config), because this directory is wrapped
+in a pcall, and if it errors or not is reported by lua_dir test.
+
+All config added to the test nvim config should be done within `if nixCats('category') then`
+checks so that it can be enabled for specific tests only.
+
 There are 2 functions for creating packages based on the module form for testing modules.
 
 `lib.mkNixOSmodulePkgs` takes `{ package, entrymodule }`
