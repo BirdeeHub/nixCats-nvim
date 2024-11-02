@@ -16,7 +16,7 @@ if nixCats('nixCats_test_lib_deps') then
         end
         local total_num = #toRun
         local passed = #vim.iter(fstates):filter(function(_, v) return v == true end):totable()
-        io.stdout:write(colors((passed == total_num and '%{green}' or '%{red}') .. "passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.%{reset}\n"))
+        io.stdout:write(colors((passed == total_num and '%{green}' or '%{red}') .. "Passed " .. tostring(passed) .. " out of " .. tostring(total_num) .. " tests.%{reset}\n"))
         if passed == total_num then
             if nixCats('killAfter') then
                 vim.schedule(function()
