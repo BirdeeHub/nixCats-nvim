@@ -95,27 +95,15 @@
     packagename ? package.nixCats_packageName,
     runnable_name ? packagename,
     runnable_is_nvim ? true,
-    preCfgLua ? "",
     preRunBash ? "",
     testnames ? {},
     ...
   }: let
-    luaPre = writeText "luaPreCfg" preCfgLua;
     finaltestvim = package.override (prev: {
       categoryDefinitions = utils.deepmergeCats prev.categoryDefinitions ({ pkgs, categories, settings, name, ... }:{
         startupPlugins = {
           nixCats_test_lib_deps = with pkgs.vimPlugins; [
             lze
-          ];
-        };
-        optionalLuaPreInit = {
-          nixCats_test_lib_deps = [
-            /*lua*/''
-              package.preload.libT = function()
-                return dofile([[${./libT.lua}]])
-              end
-              require('libT')
-            ''
           ];
         };
         extraLuaPackages = {
@@ -136,6 +124,14 @@
         });
       };
     });
+    # defined separately just to absolutely guarantee the testing library is always run FIRST.
+    # although using optionalLuaPreInit in categoryDefinitions would most likely be sufficient.
+    luaPre = writeText "luaPreCfg" /*lua*/''
+      package.preload.libT = function()
+        return dofile([[${./libT.lua}]])
+      end
+      require('libT')
+    '';
   in writeShellScript "runtests-${packagename}-${runnable_name}" (/*bash*/''
     HOME="$(mktemp -d)"
     TEST_TEMP="$(mktemp -d)"

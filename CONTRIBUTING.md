@@ -5,8 +5,6 @@ please also post them in discussions so that others may benefit from any answers
 
 If you suspect a bug, please leave an issue here so that we can address it.
 
----
-
 PLEASE HELP WITH DOCS AND README!!!
 
 Im just trying to get information on the page as best as I can.
@@ -19,7 +17,7 @@ For the readme it just uses pandoc with a github flavored markdown.
 If anyone knows how to make the little warning and info
 things from github work with pandoc, that would be great too.
 
-Due to needing to work on both github and the site, all links in the readme must be full urls.
+Due to needing to work on both github and the site, all links in the README must be full urls.
 
 The site generation for the in-editor docs will look exactly how it does in the editor,
 and helptag links will work.
@@ -29,9 +27,7 @@ I wont make you work with my bespoke nvim-based site-gen, but it works quite wel
 
 ---
 
-Direction:
-
-- help:
+### Direction:
 
 The modules are much nicer now that they merge properly.
 
@@ -63,7 +59,9 @@ The kickstart-nvim template should remain as is until someone
 comes up with a better way to explain the lazy wrapper other than
 "grep for this and read about the 10 places its different"
 
-- tests:
+---
+
+### Tests:
 
 To run the tests:
 
@@ -71,11 +69,58 @@ To run the tests:
 
 I will slowly be adding tests to the tests directory.
 
-I plan to add tests for utils.catsWithDefault under conditions of multiple merges.
+If anyone would like to add some tests, please do!
 
-If anyone else would like to add some tests, please do!
+This is the suggested workflow for writing tests.
 
-When adding tests, keep in mind that the tests will hang forever if a test is enabled but not defined
+First, write a test in the test nvim config at [./tests/nvim](./tests/nvim)
+
+To do this, add whatever dependencies you need to the `default.nix` file,
+then in lua use `make_test("name", function() end)` and the assert library from `luassert` to write tests.
+Anywhere that nvim will run it is fine.
+
+Then, to run the test created, create a nix check derivation, or add to an existing one.
+
+Inside that derivation, you must use the following to create a script that runs the tests.
+
+```nix
+  mkRunPkgTest = {
+    package,
+    packagename ? package.nixCats_packageName,
+    runnable_name ? packagename,
+    runnable_is_nvim ? true,
+    preRunBash ? "",
+    testnames ? {},
+    ...
+  }:
+```
+
+The above function will make a command to run the set of tests, to include in the `checkPhase` of the nix check derivation.
+
+It will add the testing library to the package passed in,
+and including `testname = true` in the `testnames` set will schedule that
+test to be ran within that run of `nvim --headless`.
+
+If a test is scheduled to be ran that does not exist,
+or an error is thrown that causes a scheduled test not to be ran,
+the `checkPhase` will hang indefinitely.
+
+So if this happens, cancel it and define the test, or if it was defined,
+you know that an uncaught failure occurred OUTSIDE of the tests themselves,
+which prevented a scheduled test from being defined.
+
+There are 2 functions for creating packages based on the module form for testing modules.
+
+`lib.mkNixOSmodulePkgs` takes `{ package, entrymodule }`
+
+`lib.mkHMmodulePkgs` takes `{ package, entrymodule, stateVersion ? "24.05", username = "REPLACE_ME" }`
+
+These will give you `config.${defaultPackageName}.out.packages` containing the resulting packages from the module.
+The nixos form also includes `config.${defaultPackageName}.out.users.<USERNAME>.packages`.
+
+entrymodule in the home module test form has access to all the modules in home manager.
+
+entrymodule in the nixos module test form does not, as it has to use `lib.evalModules` to build without making a whole machine.
 
 ---
 
