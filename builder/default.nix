@@ -122,7 +122,6 @@ let
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
 
-  all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 in
   let
     # copy entire flake to store directory
@@ -164,6 +163,8 @@ in
         # TODO: deprecate this with a warning
         inherit nixCats_store_config_location;
       };
+      all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
+
       cats = pkgs.writeText "cats.lua" ''return ${ncTools.toLua categoriesPlus}'';
       settingsTable = pkgs.writeText "settings.lua" ''return ${ncTools.toLua settingsPlus}'';
       petShop = pkgs.writeText "petShop.lua" ''return ${ncTools.toLua all_def_names}'';
