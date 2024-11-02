@@ -145,28 +145,66 @@ in
       nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
         else if isStdCfgPath then ncTools.mkLuaInline ''vim.fn.stdpath("config")''
         else "${LuaConfig}";
-      # TODO: nixCats_store_config_location is not in the lazy.nvim wrapper anymore....
-      # maybe figure out how to add a deprecation warning to it and get them to pull the new template...
-      # because its name is incorrect....
+      # TODO: delete this
       nixCats_store_config_location = nixCats_config_location;
 
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
         nixCats_packageName = name;
         inherit nixCats_config_location;
-        # TODO: deprecate this with a warning
+        # TODO: delete this
         inherit nixCats_store_config_location;
       };
       settingsPlus = settings // {
         nixCats_packageName = name;
         inherit nixCats_config_location;
-        # TODO: deprecate this with a warning
+        # TODO: delete this
         inherit nixCats_store_config_location;
       };
       all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 
-      cats = pkgs.writeText "cats.lua" ''return ${ncTools.toLua categoriesPlus}'';
-      settingsTable = pkgs.writeText "settings.lua" ''return ${ncTools.toLua settingsPlus}'';
+      deprecation_message = builtins.toFile "depmsg" ''
+        return [[nixCats_store_config_location is being depreciated for nixCats_config_location.
+        If you are using the lazy.nvim wrapper,
+        please delete lazyCat.lua from the nixCatsUtils directory,
+        cd back up to the top level of your nvim config dir, and run:
+        nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils]]
+      '';
+
+      cats = pkgs.writeText "cats.lua" /*lua*/''
+        local cats = ${ncTools.toLua categoriesPlus};
+        return setmetatable({}, {
+          __index = function(self, key)
+            if key == "nixCats_store_config_location" then
+              vim.schedule(function()
+                vim.notify(
+                  require('nixCats.deprecation_message'),
+                  vim.log.levels.WARN,
+                  { title = "nixCats" }
+                )
+              end)
+            end
+            return cats[key]
+          end,
+        })
+      '';
+      settingsTable = pkgs.writeText "settings.lua" /*lua*/''
+        local settings = ${ncTools.toLua settingsPlus};
+        return setmetatable({}, {
+          __index = function(self, key)
+            if key == "nixCats_store_config_location" then
+              vim.schedule(function()
+                vim.notify(
+                  require('nixCats.deprecation_message'),
+                  vim.log.levels.WARN,
+                  { title = "nixCats" }
+                )
+              end)
+            end
+            return settings[key]
+          end,
+        })
+      '';
       petShop = pkgs.writeText "petShop.lua" ''return ${ncTools.toLua all_def_names}'';
       depsTable = pkgs.writeText "pawsible.lua" ''return ${ncTools.toLua allPluginDeps}'';
     in {
@@ -181,6 +219,7 @@ in
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp ${petShop} $out/lua/nixCats/petShop.lua
+        cp ${deprecation_message} $out/lua/nixCats/deprecation_message.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });
