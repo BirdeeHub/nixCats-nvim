@@ -141,6 +141,7 @@ require('lze').load {
   },
   -- {
   --   "hlargs",
+  --   for_cat = 'general.extra',
   --   event = "DeferredUIEnter",
   --   -- keys = "",
   --   dep_of = { "nvim-lspconfig" },
