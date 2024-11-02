@@ -101,13 +101,9 @@
   }: let
     finaltestvim = package.override (prev: {
       categoryDefinitions = utils.deepmergeCats prev.categoryDefinitions ({ pkgs, categories, settings, name, ... }:{
-        startupPlugins = {
-          nixCats_test_lib_deps = with pkgs.vimPlugins; [
-            lze
-          ];
-        };
         extraLuaPackages = {
           nixCats_test_lib_deps = (lp: with lp; [
+            lze
             ansicolors
             luassert
           ]);
