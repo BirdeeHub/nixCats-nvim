@@ -127,9 +127,15 @@ There are 2 functions for creating packages based on the module form for testing
 These will give you `config.${defaultPackageName}.out.packages` containing the resulting packages from the module.
 The nixos form also includes `config.${defaultPackageName}.out.users.<USERNAME>.packages`.
 
-entrymodule in the home module test form has access to all the modules in home manager.
+entrymodule in the home module test form has access to all the modules in home manager,
+although they wont be evaluated, so things like setting home.sessionVariables wont show up in the test.
 
-entrymodule in the nixos module test form does not, as it has to use `lib.evalModules` to build without making a whole machine.
+entrymodule in the nixos module test form does not have access to the default set of modules,
+as it has to use `lib.evalModules` to build without making a whole machine,
+so if you want to use outside modules you will have to import them, or define dummy options.
+
+Like the home manager modules, you can use the config values they set and they will contain the expected values,
+but they otherwise will not be evaluated and will not show up in the test.
 
 ---
 
