@@ -2,7 +2,6 @@ if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
     local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return v and k or nil end):filter(function(v) return v ~= nil end):totable()
-    _G.assert = require('luassert')
 
     local function finalize(fstates)
         local colors = require('ansicolors')
@@ -71,10 +70,14 @@ if nixCats('nixCats_test_lib_deps') then
     }
     require('lze').register_handlers(handler)
 
-    _G.make_test = function(name,func)
+    local assert = require('luassert')
+    local make_test = function(name,func)
         require('lze').load {
             name,
             test = func,
         }
     end
+    _G.assert = assert
+    _G.make_test = make_test
 end
+return { make_test = make_test, assert = assert }
