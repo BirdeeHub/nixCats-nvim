@@ -79,7 +79,7 @@ function M.make_load_with_after(dirs, load)
             end
         end
         for _, info in pairs(to_source) do
-            local plugpath = info.path or require("nixCats").pawsible.allPlugins.opt[info.name] or fromPackpath(info.name)
+            local plugpath = info.path or vim.tbl_get(package.loaded, "nixCats", "pawsible", "allPlugins", "opt", info.name) or fromPackpath(info.name)
             if type(plugpath) == "string" then
                 local afterpath = plugpath .. "/after"
                 for _, dir in ipairs(dirs) do

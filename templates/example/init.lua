@@ -4,7 +4,7 @@ if you plan to always load your nixCats via nix,
 you can safely ignore this setup call,
 and the require('myLuaConf.non_nix_download') call below it.
 as well as the entire lua/myLuaConf/non_nix_download file.
-You also won't need lua/nixCatsUtils
+Unless you want the lzUtils file, or the lazy wrapper, you also wont need lua/nixCatsUtils
 
 IF YOU DO NOT DO THIS SETUP CALL:
 the result will be that, when you load this folder without using nix,
