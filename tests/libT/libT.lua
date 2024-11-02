@@ -79,5 +79,5 @@ if nixCats('nixCats_test_lib_deps') then
     end
     _G.assert = assert
     _G.make_test = make_test
+    return { make_test = make_test, assert = assert }
 end
-return { make_test = make_test, assert = assert }
