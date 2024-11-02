@@ -15,7 +15,8 @@ in stdenv.mkDerivation {
     runpkgcmd = libT.mkRunPkgTest {
       package = modulevim;
       testnames = {
-        helloNixos = true;
+        hello = true;
+        lua_dir = true;
         pluginfile = true;
         afterplugin = true;
         test_libT_vars = true;

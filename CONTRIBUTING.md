@@ -76,8 +76,10 @@ This is the suggested workflow for writing tests.
 First, write a test in the test nvim config at [./tests/nvim](./tests/nvim)
 
 To do this, add whatever dependencies you need to the `default.nix` file,
-then in lua use `make_test("name", function() end)` and the assert library from `luassert` to write tests.
-Anywhere that nvim will run it is fine.
+then in lua use `make_test("name", function() assert.True(condition) end)`
+using the assert library from `luassert` to write tests.
+Anywhere that nvim will run it is fine, but writing the tests in
+a new file the plugin directory is the easiest.
 
 Then, to run the test created, create a nix check derivation, or add to an existing one.
 

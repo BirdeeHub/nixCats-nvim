@@ -15,6 +15,7 @@ stdenv.mkDerivation {
       inherit package;
       testnames = {
         hello = true;
+        lua_dir = true;
         pluginfile = true;
         afterplugin = true;
         test_libT_vars = true;

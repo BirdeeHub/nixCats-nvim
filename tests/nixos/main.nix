@@ -8,7 +8,7 @@
         };
         categories = {
           nixCats_test_names = {
-            helloNixosModule = true;
+            nixos_hello = true;
           };
         };
       });

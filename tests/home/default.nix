@@ -17,6 +17,7 @@ in stdenv.mkDerivation {
       package = modulevim;
       testnames = {
         hello = true;
+        lua_dir = true;
         pluginfile = true;
         afterplugin = true;
         test_libT_vars = true;

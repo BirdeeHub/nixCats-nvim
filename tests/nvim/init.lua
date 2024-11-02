@@ -1,3 +1,7 @@
-require("config")
-
-require("tests")
+make_test("hello", function()
+    assert.truthy(nixCats("nixCats_test_names.hello"))
+end)
+local ok, err = pcall(require, "config")
+make_test("lua_dir", function()
+    assert.truthy(ok, err)
+end)

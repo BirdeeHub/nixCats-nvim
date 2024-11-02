@@ -24,7 +24,7 @@ in {
         };
         categories = {
           nixCats_test_names = {
-            modulehello = true;
+            home_hello = true;
           };
         };
       });
