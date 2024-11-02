@@ -73,6 +73,134 @@ with builtins; rec {
         dependencyOverlays
       else [];
 
+    mkNixosModules = {
+      dependencyOverlays ? null
+      , luaPath ? ""
+      , keepLuaBuilder ? null
+      , categoryDefinitions ? (_:{})
+      , packageDefinitions ? {}
+      , defaultPackageName
+      , nixpkgs ? null
+      , extra_pkg_config ? {}
+      , ... }:
+      (import ./mkModules.nix {
+        isHomeManager = false;
+        oldDependencyOverlays = dependencyOverlays;
+        my_lib = lib;
+        inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
+          packageDefinitions defaultPackageName extra_pkg_config utils;
+      });
+
+    mkHomeModules = {
+      dependencyOverlays ? null
+      , luaPath ? ""
+      , keepLuaBuilder ? null
+      , categoryDefinitions ? (_:{})
+      , packageDefinitions ? {}
+      , defaultPackageName
+      , nixpkgs ? null
+      , extra_pkg_config ? {}
+      , ... }:
+      (import ./mkModules.nix {
+        isHomeManager = true;
+        oldDependencyOverlays = dependencyOverlays;
+        my_lib = lib;
+        inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
+          packageDefinitions defaultPackageName extra_pkg_config utils;
+      });
+
+    # you can use this to make values in the tables generated
+    # for the nixCats plugin using lua literals.
+    # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
+    mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
+
+    # finds an included category in lib.attrByPath false categories
+    # adds defaults to it, returns the resulting set with the added values
+    catsWithDefault = categories: attrpath: defaults: subcategories: let
+      include_path = let
+        flattener = cats: let
+          mapper = attrs: map (v: if isAttrs v then mapper v else v) (attrValues attrs);
+          flatten = accum: LoLoS: foldl' (acc: v: if any (i: isList i) v then flatten acc v else acc ++ [ v ]) accum LoLoS;
+        in flatten [] (mapper cats);
+
+        mapToSetOfPaths = cats: let
+          removeNullPaths = attrs: lib.filterAttrsRecursive (n: v: v != null) attrs;
+          mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
+        in removeNullPaths (mapToPaths cats);
+
+        result = let
+          final_cats = lib.attrByPath attrpath false categories;
+          allIncPaths = flattener (mapToSetOfPaths final_cats);
+        in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
+          then head allIncPaths
+          else []; 
+      in
+      result;
+
+      toMerge = let
+        firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
+          then lib.attrByPath include_path [] subcategories
+          else if isList subcategories then subcategories else [ subcategories ];
+
+        fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
+          then include_path ++ [ "default" ] else include_path;
+
+        normed = let
+          listType = if isAttrs firstGet && ! lib.isDerivation firstGet
+            then lib.attrByPath fIncPath [] subcategories
+            else if isList firstGet then firstGet else [ firstGet ];
+          attrType = let
+            pre = if isAttrs firstGet && ! lib.isDerivation firstGet
+              then lib.attrByPath fIncPath {} subcategories
+              else firstGet;
+            basename = if fIncPath != [] then tail fIncPath else "default";
+            fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
+          in
+          fin;
+        in
+        if isList defaults then listType else if isAttrs defaults then attrType else throw "defaults must be a list or a set";
+
+        final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
+      in
+      final;
+
+    in
+    if isAttrs subcategories && ! lib.isDerivation subcategories then
+      lib.recursiveUpdateUntilDRV subcategories toMerge
+    else toMerge;
+
+    # flake-utils' main function, because its all I used
+    # Builds a map from <attr>=value to <attr>.<system>=value for each system
+    eachSystem = systems: f:
+      let
+        # Merge together the outputs for all systems.
+        op = attrs: system:
+          let
+            ret = f system;
+            op = attrs: key: attrs //
+                {
+                  ${key} = (attrs.${key} or { })
+                    // { ${system} = ret.${key}; };
+                }
+            ;
+          in
+          foldl' op attrs (attrNames ret);
+      in
+      foldl' op { }
+        (systems
+          ++ # add the current system if --impure is used
+            (if builtins ? currentSystem then
+               if elem currentSystem systems
+               then []
+               else [ currentSystem ]
+            else []));
+
+    # in case someoneone wants flake-utils but for only 1 output,
+    # and didnt know genAttrs is great as a bySystems
+    bySystems = lib.genAttrs;
+
+    # NOTE: non-module flake output construction utils below:
+
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:
       { default = finalBuilder defaultName; }
@@ -183,132 +311,6 @@ with builtins; rec {
           );
         }
       );
-
-    mkNixosModules = {
-      dependencyOverlays ? null
-      , luaPath ? ""
-      , keepLuaBuilder ? null
-      , categoryDefinitions ? (_:{})
-      , packageDefinitions ? {}
-      , defaultPackageName
-      , nixpkgs ? null
-      , extra_pkg_config ? {}
-      , ... }:
-      (import ./mkModules.nix {
-        isHomeManager = false;
-        oldDependencyOverlays = dependencyOverlays;
-        my_lib = lib;
-        inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-          packageDefinitions defaultPackageName extra_pkg_config utils;
-      });
-
-    mkHomeModules = {
-      dependencyOverlays ? null
-      , luaPath ? ""
-      , keepLuaBuilder ? null
-      , categoryDefinitions ? (_:{})
-      , packageDefinitions ? {}
-      , defaultPackageName
-      , nixpkgs ? null
-      , extra_pkg_config ? {}
-      , ... }:
-      (import ./mkModules.nix {
-        isHomeManager = true;
-        oldDependencyOverlays = dependencyOverlays;
-        my_lib = lib;
-        inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-          packageDefinitions defaultPackageName extra_pkg_config utils;
-      });
-
-    # flake-utils' main function, because its all I used
-    # Builds a map from <attr>=value to <attr>.<system>=value for each system
-    eachSystem = systems: f:
-      let
-        # Merge together the outputs for all systems.
-        op = attrs: system:
-          let
-            ret = f system;
-            op = attrs: key: attrs //
-                {
-                  ${key} = (attrs.${key} or { })
-                    // { ${system} = ret.${key}; };
-                }
-            ;
-          in
-          foldl' op attrs (attrNames ret);
-      in
-      foldl' op { }
-        (systems
-          ++ # add the current system if --impure is used
-            (if builtins ? currentSystem then
-               if elem currentSystem systems
-               then []
-               else [ currentSystem ]
-            else []));
-
-    # in case someoneone wants flake-utils but for only 1 output,
-    # and didnt know genAttrs is great as a bySystems
-    bySystems = lib.genAttrs;
-
-    # you can use this to make values in the tables generated
-    # for the nixCats plugin using lua literals.
-    # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
-    mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
-
-    # finds an included category in lib.attrByPath false categories
-    # adds defaults to it, returns the resulting set with the added values
-    catsWithDefault = categories: attrpath: defaults: subcategories: let
-      include_path = let
-        flattener = cats: let
-          mapper = attrs: map (v: if isAttrs v then mapper v else v) (attrValues attrs);
-          flatten = accum: LoLoS: foldl' (acc: v: if any (i: isList i) v then flatten acc v else acc ++ [ v ]) accum LoLoS;
-        in flatten [] (mapper cats);
-
-        mapToSetOfPaths = cats: let
-          removeNullPaths = attrs: lib.filterAttrsRecursive (n: v: v != null) attrs;
-          mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
-        in removeNullPaths (mapToPaths cats);
-
-        result = let
-          final_cats = lib.attrByPath attrpath false categories;
-          allIncPaths = flattener (mapToSetOfPaths final_cats);
-        in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
-          then head allIncPaths
-          else []; 
-      in
-      result;
-
-      toMerge = let
-        firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
-          then lib.attrByPath include_path [] subcategories
-          else if isList subcategories then subcategories else [ subcategories ];
-
-        fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
-          then include_path ++ [ "default" ] else include_path;
-
-        normed = let
-          listType = if isAttrs firstGet && ! lib.isDerivation firstGet
-            then lib.attrByPath fIncPath [] subcategories
-            else if isList firstGet then firstGet else [ firstGet ];
-          attrType = let
-            pre = if isAttrs firstGet && ! lib.isDerivation firstGet
-              then lib.attrByPath fIncPath {} subcategories
-              else firstGet;
-            basename = if fIncPath != [] then tail fIncPath else "default";
-            fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
-          in
-          fin;
-        in
-        if isList defaults then listType else if isAttrs defaults then attrType else throw "defaults must be a list or a set";
-
-        final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
-      in
-      final;
-
-    in
-    if isAttrs subcategories && ! lib.isDerivation subcategories then
-      lib.recursiveUpdateUntilDRV subcategories toMerge
-    else toMerge;
 
   };
 
