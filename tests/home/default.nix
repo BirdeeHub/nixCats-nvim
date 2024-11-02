@@ -21,6 +21,7 @@ in stdenv.mkDerivation {
         pluginfile = true;
         afterplugin = true;
         test_libT_vars = true;
+        nested_test = true;
       };
     };
   in /*bash*/ ''
