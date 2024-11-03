@@ -108,9 +108,9 @@ end
 -- for_cat = { "your" "cat" }; for_cat = { cat = { "your" "cat" }, default = bool }
 -- for_cat = "your.cat"; for_cat = { cat = "your.cat", default = bool }
 -- where default is an alternate value for when nixCats was NOT used to install the config
--- NOTE: if you wish to use this for startup plugins, you must set lazy = false manually
 M.for_cat = {
     spec_field = "for_cat",
+    set_lazy = false,
     modify = function(plugin)
         if type(plugin.for_cat) == "table" then
             if plugin.for_cat.cat ~= nil then

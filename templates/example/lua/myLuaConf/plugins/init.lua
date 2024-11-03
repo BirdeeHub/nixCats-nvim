@@ -72,8 +72,6 @@ require('lze').load {
     -- you could replace this with enabled = nixCats('cat.name') == true
     -- if you didnt care to set a different default for when not using nix than the default you already set
     for_cat = 'general.markdown',
-    -- NOTE: using the for_cat handler means lazy will be set to true
-    -- to load a plugin at startup while this handler is used, set lazy = false explicitly
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
     keys = {
