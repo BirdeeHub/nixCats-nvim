@@ -498,16 +498,16 @@ in {
   config = let
     combineModDeps = replacements: merges: utils.deepmergeCats (
       if replacements != null then replacements else (_:{})
-    ) (
-      if merges != null then merges else (_:{})
-    );
+    ) (if merges != null then merges else (_:{}));
     getStratWithExisting = enumstr: if enumstr == "merge"
       then utils.deepmergeCats
       else if enumstr == "replace"
       then utils.mergeCatDefs
       else (_: r: r);
     pkgmerger = strat: old: new: let
-      merged = builtins.mapAttrs (n: v: if (if builtins.isAttrs old then old else {}) ? ${n} then strat old.${n} v else v) new;
+      oldAttrs = if builtins.isAttrs old then old else {};
+      newAttrs = if builtins.isAttrs new then new else {};
+      merged = builtins.mapAttrs (n: v: if oldAttrs ? ${n} then strat oldAttrs.${n} v else v) newAttrs;
     in
     old // merged;
 
@@ -535,12 +535,10 @@ in {
           in ''
             Deprecation warning: ${basepath}.packages renamed to: ${basepath}.packageDefinitions.replace
             Done in order to achieve consistency with categoryDefinitions module options, and provide better control
-          '') (pkgmerger utils.mergeCatDefs options_set.packages (if options_set.packageDefinitions.replace != null then options_set.packageDefinitions.replace else {}))
+          '') (pkgmerger utils.mergeCatDefs options_set.packages options_set.packageDefinitions.replace)
             else options_set.packageDefinitions.replace;
-          reps = if repments != null then repments else {};
-          merges = if options_set.packageDefinitions.merge != null then options_set.packageDefinitions.merge else {};
         in
-        pkgmerger utils.mergeCatDefs reps merges;
+        pkgmerger utils.mergeCatDefs repments options_set.packageDefinitions.merge;
       in pkgmerger stratWithExisting packageDefinitions modulePkgDefs;
 
       newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
@@ -574,7 +572,7 @@ in {
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf options_set.enable (builtins.attrValues (mapToPackages user_options_set dependencyOverlays));
+        packages = lib.mkIf options_set.enable (builtins.attrValues (mapToPackages user_options_set dependencyOverlays [ defaultPackageName "users" uname ]));
       }
     ) config.${defaultPackageName}.users;
     newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
