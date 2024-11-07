@@ -37,7 +37,7 @@ in {
         default = [];
         type = (types.listOf types.anything);
         description = ''
-          A list of overlays to make available to nixCats but not to your system.
+          A list of overlays to make available to any nixCats package from this module but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
         example = (lib.literalExpression ''
@@ -244,7 +244,6 @@ in {
         default = {};
         description = ''
           same as system config but per user instead
-          and without addOverlays or nixpkgs_version
         '';
         type = with types; attrsOf (submodule {
           options = {
@@ -270,7 +269,8 @@ in {
               default = [];
               type = (types.listOf types.anything);
               description = ''
-                A list of overlays to make available to nixCats but not to your system.
+                A list of overlays to make available to
+                this user's nixCats packages from this module but not to your system.
                 Will have access to system overlays regardless of this setting.
                 This per user version of addOverlays is merged with the value of ${defaultPackageName}.addOverlays 
               '';

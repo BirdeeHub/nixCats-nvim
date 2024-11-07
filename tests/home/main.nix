@@ -18,7 +18,7 @@ in {
   ${packagename} = {
     enable = true;
     packageNames = [ packagename ];
-    packages = {
+    packageDefinitions.replace = {
       ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
         settings = {
         };

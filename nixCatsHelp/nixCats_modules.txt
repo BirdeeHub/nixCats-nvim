@@ -57,16 +57,13 @@ other than the packages themselves in config.${defaultPackageName}.out
         default = [];
         type = (types.listOf types.anything);
         description = ''
-          A list of overlays to make available to nixCats but not to your system.
+          A list of overlays to make available to any nixCats package from this module but not to your system.
           Will have access to system overlays regardless of this setting.
         '';
         example = (lib.literalExpression ''
-          addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+          addOverlays = [ (self: super: { nvimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '');
       };
-
-      # the above 2 are the only ones not also available at
-      # a per-user level in the nixos system module.
 
       enable = mkOption {
         default = false;
@@ -134,53 +131,109 @@ other than the packages themselves in config.${defaultPackageName}.out
         };
       };
 
-      packages = mkOption {
-        default = null;
-        description = ''
-          VERY IMPORTANT when setting aliases for each package,
-          they must not be the same as ANY other neovim package for that user.
-          It will cause a build conflict.
+      packageDefinitions = {
+        existing = mkOption {
+          default = "replace";
+          type = types.enum [ "replace" "merge" "discard" ];
+          description = ''
+            the merge strategy to use for packageDefinitions inherited from the package this module was based on
+            choose between "replace", "merge" or "discard"
+            replace uses utils.mergeCatDefs
+            merge uses utils.deepmergeCats
+            discard does not inherit
+            see :help nixCats.flake.outputs.exports for more info on the merge strategy options
+          '';
+        };
+        merge = mkOption {
+          default = null;
+          description = ''
+            VERY IMPORTANT when setting aliases for each package,
+            they must not be the same as ANY other neovim package for that user.
+            It will cause a build conflict.
 
-          You can have as many nixCats installed per user as you want,
-          as long as you obey that rule.
+            You can have as many nixCats installed per user as you want,
+            as long as you obey that rule.
 
-          for information on the values you may return,
-          see :help nixCats.flake.outputs.settings
-          and :help nixCats.flake.outputs.categories
-        '';
-        type = with types; nullOr (attrsOf (catDef "replace"));
-        example = ''
-          nixCats.packages = { 
-            nixCats = { pkgs, ... }: {
-              settings = {
-                wrapRc = true;
-                configDirName = "nixCats-nvim";
-                # nvimSRC = inputs.neovim;
-                aliases = [ "vim" "nixCats" ];
+            for information on the values you may return,
+            see :help nixCats.flake.outputs.settings
+            and :help nixCats.flake.outputs.categories
+          '';
+          type = with types; nullOr (attrsOf (catDef "replace"));
+          example = ''
+            nixCats.packages = { 
+              nixCats = { pkgs, ... }: {
+                settings = {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  # nvimSRC = inputs.neovim;
+                  aliases = [ "vim" "nixCats" ];
+                };
+                categories = {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                };
               };
-              categories = {
-                generalBuildInputs = true;
-                markdown = true;
-                gitPlugins = true;
-                general = true;
-                custom = true;
-                neonixdev = true;
-                debug = false;
-                test = true;
-                lspDebugMode = false;
-                themer = true;
-                colorscheme = "onedark";
+            }
+          '';
+        };
+        replace = mkOption {
+          default = null;
+          description = ''
+            VERY IMPORTANT when setting aliases for each package,
+            they must not be the same as ANY other neovim package for that user.
+            It will cause a build conflict.
+
+            You can have as many nixCats installed per user as you want,
+            as long as you obey that rule.
+
+            for information on the values you may return,
+            see :help nixCats.flake.outputs.settings
+            and :help nixCats.flake.outputs.categories
+          '';
+          type = with types; nullOr (attrsOf (catDef "replace"));
+          example = ''
+            nixCats.packages = { 
+              nixCats = { pkgs, ... }: {
+                settings = {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  # nvimSRC = inputs.neovim;
+                  aliases = [ "vim" "nixCats" ];
+                };
+                categories = {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                };
               };
-            };
-          }
-        '';
+            }
+          '';
+        };
       };
+
+      # in addition, the nixos module also has per-user options if desired.
 
       users = mkOption {
         default = {};
         description = ''
           same as system config but per user instead
-          and without addOverlays or nixpkgs_version
         '';
         type = with types; attrsOf (submodule {
           options = {
