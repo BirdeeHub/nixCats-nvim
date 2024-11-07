@@ -111,6 +111,12 @@ in {
         };
       };
 
+      packages = mkOption {
+        default = null;
+        type = with types; nullOr (attrsOf (catDef "replace"));
+        visible = false;
+      };
+
       packageDefinitions = {
         existing = mkOption {
           default = "replace";
@@ -206,48 +212,6 @@ in {
             }
           '';
         };
-      };
-
-      packages = mkOption {
-        default = null;
-        description = ''
-          VERY IMPORTANT when setting aliases for each package,
-          they must not be the same as ANY other neovim package for that user.
-          It will cause a build conflict.
-
-          You can have as many nixCats installed per user as you want,
-          as long as you obey that rule.
-
-          for information on the values you may return,
-          see :help nixCats.flake.outputs.settings
-          and :help nixCats.flake.outputs.categories
-        '';
-        type = with types; nullOr (attrsOf (catDef "replace"));
-        example = ''
-          nixCats.packages = { 
-            nixCats = { pkgs, ... }: {
-              settings = {
-                wrapRc = true;
-                configDirName = "nixCats-nvim";
-                # nvimSRC = inputs.neovim;
-                aliases = [ "vim" "nixCats" ];
-              };
-              categories = {
-                generalBuildInputs = true;
-                markdown = true;
-                gitPlugins = true;
-                general = true;
-                custom = true;
-                neonixdev = true;
-                debug = false;
-                test = true;
-                lspDebugMode = false;
-                themer = true;
-                colorscheme = "onedark";
-              };
-            };
-          }
-        '';
       };
 
       out = {
@@ -375,6 +339,12 @@ in {
               };
             };
 
+            packages = mkOption {
+              default = null;
+              type = with types; nullOr (attrsOf (catDef "replace"));
+              visible = false;
+            };
+
             packageDefinitions = {
               existing = mkOption {
                 default = "replace";
@@ -470,48 +440,6 @@ in {
                   }
                 '';
               };
-            };
-
-            packages = mkOption {
-              default = null;
-              description = ''
-                VERY IMPORTANT when setting aliases for each package,
-                they must not be the same as ANY other neovim package for that user.
-                It will cause a build conflict.
-
-                You can have as many nixCats installed per user as you want,
-                as long as you obey that rule.
-
-                for information on the values you may return,
-                see :help nixCats.flake.outputs.settings
-                and :help nixCats.flake.outputs.categories
-              '';
-              type = with types; nullOr (attrsOf (catDef "replace"));
-              example = ''
-                nixCats.packages = { 
-                  nixCats = { pkgs, ... }: {
-                    settings = {
-                      wrapRc = true;
-                      configDirName = "nixCats-nvim";
-                      # nvimSRC = inputs.neovim;
-                      aliases = [ "vim" "nixCats" ];
-                    };
-                    categories = {
-                      generalBuildInputs = true;
-                      markdown = true;
-                      gitPlugins = true;
-                      general = true;
-                      custom = true;
-                      neonixdev = true;
-                      debug = false;
-                      test = true;
-                      lspDebugMode = false;
-                      themer = true;
-                      colorscheme = "onedark";
-                    };
-                  };
-                }
-              '';
             };
 
           };
