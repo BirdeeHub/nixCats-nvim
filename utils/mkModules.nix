@@ -603,13 +603,21 @@ in {
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf user_options_set.enable (builtins.attrValues (mapToPackages user_options_set (dependencyOverlaysFunc { inherit main_options_set user_options_set; }) [ defaultPackageName "users" uname ]));
+        packages = lib.mkIf user_options_set.enable (builtins.attrValues (mapToPackages
+          user_options_set
+          (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
+          [ defaultPackageName "users" uname ]
+        ));
       }
     ) config.${defaultPackageName}.users;
     newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf user_options_set.enable (mapToPackages user_options_set (dependencyOverlaysFunc { inherit main_options_set user_options_set; }) [ defaultPackageName "users" uname ]);
+        packages = lib.mkIf user_options_set.enable (mapToPackages
+          user_options_set
+          (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
+          [ defaultPackageName "users" uname ]
+        );
       }
     ) config.${defaultPackageName}.users;
   in {
