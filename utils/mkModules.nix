@@ -538,7 +538,7 @@ in {
           '') (pkgmerger utils.mergeCatDefs options_set.packages options_set.packageDefinitions.replace)
             else options_set.packageDefinitions.replace;
         in
-        pkgmerger utils.mergeCatDefs repments options_set.packageDefinitions.merge;
+        pkgmerger utils.deepmergeCats repments options_set.packageDefinitions.merge;
       in pkgmerger stratWithExisting packageDefinitions modulePkgDefs;
 
       newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
