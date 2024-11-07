@@ -116,7 +116,7 @@ in {
           default = "replace";
           type = types.enum [ "replace" "merge" "discard" ];
           description = ''
-            the merge strategy to use for categoryDefinitions inherited from the package this module was based on
+            the merge strategy to use for packageDefinitions inherited from the package this module was based on
             choose between "replace", "merge" or "discard"
             replace uses utils.mergeCatDefs
             merge uses utils.deepmergeCats
