@@ -41,7 +41,7 @@ in {
           Will have access to system overlays regardless of this setting.
         '';
         example = (lib.literalExpression ''
-          addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+          addOverlays = [ (self: super: { nvimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
         '');
       };
 
@@ -275,7 +275,7 @@ in {
                 This per user version of addOverlays is merged with the value of ${defaultPackageName}.addOverlays 
               '';
               example = (lib.literalExpression ''
-                addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+                addOverlays = [ (self: super: { nvimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
               '');
             };
 
