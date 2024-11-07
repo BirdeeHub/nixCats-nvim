@@ -290,6 +290,31 @@ in {
               description = "Enable the ${defaultPackageName} module for a user";
             };
 
+            nixpkgs_version = mkOption {
+              default = null;
+              type = types.nullOr (types.anything);
+              description = ''
+                a different nixpkgs import to use for this users nvim.
+                By default will use the one from ${defaultPackageName}.nixpkgs_version, or flake, or throw if none exists.
+              '';
+              example = ''
+                nixpkgs_version = inputs.nixpkgs
+              '';
+            };
+
+            addOverlays = mkOption {
+              default = [];
+              type = (types.listOf types.anything);
+              description = ''
+                A list of overlays to make available to nixCats but not to your system.
+                Will have access to system overlays regardless of this setting.
+                This per user version of addOverlays is merged with the value of ${defaultPackageName}.addOverlays 
+              '';
+              example = (lib.literalExpression ''
+                addOverlays = [ (self: super: { vimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
+              '');
+            };
+
             luaPath = mkOption {
               default = luaPath;
               type = types.oneOf [ types.str types.path ];
@@ -496,36 +521,37 @@ in {
   };
 
   config = let
-    combineModDeps = replacements: merges: utils.deepmergeCats (
-      if replacements != null then replacements else (_:{})
-    ) (if merges != null then merges else (_:{}));
-    getStratWithExisting = enumstr: if enumstr == "merge"
-      then utils.deepmergeCats
-      else if enumstr == "replace"
-      then utils.mergeCatDefs
-      else (_: r: r);
-    pkgmerger = strat: old: new: let
-      oldAttrs = if builtins.isAttrs old then old else {};
-      newAttrs = if builtins.isAttrs new then new else {};
-      merged = builtins.mapAttrs (n: v: if oldAttrs ? ${n} then strat oldAttrs.${n} v else v) newAttrs;
-    in
-    old // merged;
-
-    options_set = config.${defaultPackageName};
-    dependencyOverlays = if builtins.isAttrs oldDependencyOverlays then
+    dependencyOverlaysFunc = { main_options_set, user_options_set ? { addOverlays = []; } }: let
+      overlaylists = [ (utils.mergeOverlayLists main_options_set.addOverlays user_options_set.addOverlays) ];
+    in if builtins.isAttrs oldDependencyOverlays then
         lib.genAttrs (builtins.attrNames oldDependencyOverlays)
-          (system: pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays.${system} options_set.addOverlays)])
+          (system: pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays.${system} overlaylists)])
       else if builtins.isList oldDependencyOverlays then
-      pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays)]
-      else pkgs.overlays ++ options_set.addOverlays;
+      pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays overlaylists)]
+      else pkgs.overlays ++ overlaylists;
 
     mapToPackages = options_set: dependencyOverlays: atp: (let
+      getStratWithExisting = enumstr: if enumstr == "merge"
+        then utils.deepmergeCats
+        else if enumstr == "replace"
+        then utils.mergeCatDefs
+        else (_: r: r);
+
       newCategoryDefinitions = let
+        combineModDeps = replacements: merges: utils.deepmergeCats (
+          if replacements != null then replacements else (_:{})
+        ) (if merges != null then merges else (_:{}));
         stratWithExisting = getStratWithExisting options_set.categoryDefinitions.existing;
         moduleCatDefs = combineModDeps options_set.categoryDefinitions.replace options_set.categoryDefinitions.merge;
       in stratWithExisting categoryDefinitions moduleCatDefs;
 
       pkgDefs = let
+        pkgmerger = strat: old: new: let
+          oldAttrs = if builtins.isAttrs old then old else {};
+          newAttrs = if builtins.isAttrs new then new else {};
+          merged = builtins.mapAttrs (n: v: if oldAttrs ? ${n} then strat oldAttrs.${n} v else v) newAttrs;
+        in
+        old // merged;
         stratWithExisting = getStratWithExisting options_set.packageDefinitions.existing;
         modulePkgDefs = let
           # TODO: this `repments` step can be removed when options_set.packages is removed
@@ -534,7 +560,7 @@ in {
             basepath = builtins.concatStringsSep "." atp;
           in ''
             Deprecation warning: ${basepath}.packages renamed to: ${basepath}.packageDefinitions.replace
-            Done in order to achieve consistency with categoryDefinitions module options, and provide better control
+            Done in order to achieve consistency with ${basepath}.categoryDefinitions module options, and provide better control
           '') (pkgmerger utils.mergeCatDefs options_set.packages options_set.packageDefinitions.replace)
             else options_set.packageDefinitions.replace;
         in
@@ -547,8 +573,12 @@ in {
             then keepLuaBuilder else 
             builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option"));
 
-      newNixpkgs = if config.${defaultPackageName}.nixpkgs_version != null
-        then config.${defaultPackageName}.nixpkgs_version else if nixpkgs != null then nixpkgs else builtins.throw "module not based on existing nixCats package, and ${defaultPackageName}.nixpkgs_version is not defined";
+      newNixpkgs = if options_set.nixpkgs_version != null
+        then options_set.nixpkgs_version
+        else if config.${defaultPackageName}.nixpkgs_version != null
+        then config.${defaultPackageName}.nixpkgs_version
+        else if nixpkgs != null
+        then nixpkgs else builtins.throw "module not based on existing nixCats package, and ${defaultPackageName}.nixpkgs_version is not defined";
 
     in (builtins.listToAttrs (builtins.map (catName: let
         boxedCat = newLuaBuilder {
@@ -561,33 +591,34 @@ in {
         { name = catName; value = boxedCat; }) options_set.packageNames))
     );
 
-    mappedPackageAttrs = mapToPackages options_set dependencyOverlays [ "${defaultPackageName}" ];
+    main_options_set = config.${defaultPackageName};
+    mappedPackageAttrs = mapToPackages main_options_set (dependencyOverlaysFunc { inherit main_options_set;}) [ "${defaultPackageName}" ];
     mappedPackages = builtins.attrValues mappedPackageAttrs;
 
   in
   (if isHomeManager then {
-    ${defaultPackageName}.out.packages = lib.mkIf options_set.enable mappedPackageAttrs;
-    home.packages = lib.mkIf options_set.enable mappedPackages;
+    ${defaultPackageName}.out.packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
+    home.packages = lib.mkIf main_options_set.enable mappedPackages;
   } else (let
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf options_set.enable (builtins.attrValues (mapToPackages user_options_set dependencyOverlays [ defaultPackageName "users" uname ]));
+        packages = lib.mkIf user_options_set.enable (builtins.attrValues (mapToPackages user_options_set (dependencyOverlaysFunc { inherit main_options_set user_options_set; }) [ defaultPackageName "users" uname ]));
       }
     ) config.${defaultPackageName}.users;
     newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf options_set.enable (mapToPackages user_options_set dependencyOverlays [ defaultPackageName "users" uname ]);
+        packages = lib.mkIf user_options_set.enable (mapToPackages user_options_set (dependencyOverlaysFunc { inherit main_options_set user_options_set; }) [ defaultPackageName "users" uname ]);
       }
     ) config.${defaultPackageName}.users;
   in {
     ${defaultPackageName}.out = {
       users = newUserPackageOutputs;
-      packages = lib.mkIf options_set.enable mappedPackageAttrs;
+      packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
     };
     users.users = newUserPackageDefinitions;
-    environment.systemPackages = lib.mkIf options_set.enable mappedPackages;
+    environment.systemPackages = lib.mkIf main_options_set.enable mappedPackages;
   }));
 
 }
