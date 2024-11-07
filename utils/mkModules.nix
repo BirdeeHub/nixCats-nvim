@@ -111,6 +111,103 @@ in {
         };
       };
 
+      packageDefinitions = {
+        existing = mkOption {
+          default = "replace";
+          type = types.enum [ "replace" "merge" "discard" ];
+          description = ''
+            the merge strategy to use for categoryDefinitions inherited from the package this module was based on
+            choose between "replace", "merge" or "discard"
+            replace uses utils.mergeCatDefs
+            merge uses utils.deepmergeCats
+            discard does not inherit
+            see :help nixCats.flake.outputs.exports for more info on the merge strategy options
+          '';
+        };
+        merge = mkOption {
+          default = null;
+          description = ''
+            VERY IMPORTANT when setting aliases for each package,
+            they must not be the same as ANY other neovim package for that user.
+            It will cause a build conflict.
+
+            You can have as many nixCats installed per user as you want,
+            as long as you obey that rule.
+
+            for information on the values you may return,
+            see :help nixCats.flake.outputs.settings
+            and :help nixCats.flake.outputs.categories
+          '';
+          type = with types; nullOr (attrsOf (catDef "replace"));
+          example = ''
+            nixCats.packages = { 
+              nixCats = { pkgs, ... }: {
+                settings = {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  # nvimSRC = inputs.neovim;
+                  aliases = [ "vim" "nixCats" ];
+                };
+                categories = {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                };
+              };
+            }
+          '';
+        };
+        replace = mkOption {
+          default = null;
+          description = ''
+            VERY IMPORTANT when setting aliases for each package,
+            they must not be the same as ANY other neovim package for that user.
+            It will cause a build conflict.
+
+            You can have as many nixCats installed per user as you want,
+            as long as you obey that rule.
+
+            for information on the values you may return,
+            see :help nixCats.flake.outputs.settings
+            and :help nixCats.flake.outputs.categories
+          '';
+          type = with types; nullOr (attrsOf (catDef "replace"));
+          example = ''
+            nixCats.packages = { 
+              nixCats = { pkgs, ... }: {
+                settings = {
+                  wrapRc = true;
+                  configDirName = "nixCats-nvim";
+                  # nvimSRC = inputs.neovim;
+                  aliases = [ "vim" "nixCats" ];
+                };
+                categories = {
+                  generalBuildInputs = true;
+                  markdown = true;
+                  gitPlugins = true;
+                  general = true;
+                  custom = true;
+                  neonixdev = true;
+                  debug = false;
+                  test = true;
+                  lspDebugMode = false;
+                  themer = true;
+                  colorscheme = "onedark";
+                };
+              };
+            }
+          '';
+        };
+      };
+
       packages = mkOption {
         default = null;
         description = ''
@@ -253,6 +350,103 @@ in {
               };
             };
 
+            packageDefinitions = {
+              existing = mkOption {
+                default = "replace";
+                type = types.enum [ "replace" "merge" "discard" ];
+                description = ''
+                  the merge strategy to use for categoryDefinitions inherited from the package this module was based on
+                  choose between "replace", "merge" or "discard"
+                  replace uses utils.mergeCatDefs
+                  merge uses utils.deepmergeCats
+                  discard does not inherit
+                  see :help nixCats.flake.outputs.exports for more info on the merge strategy options
+                '';
+              };
+              merge = mkOption {
+                default = null;
+                description = ''
+                  VERY IMPORTANT when setting aliases for each package,
+                  they must not be the same as ANY other neovim package for that user.
+                  It will cause a build conflict.
+
+                  You can have as many nixCats installed per user as you want,
+                  as long as you obey that rule.
+
+                  for information on the values you may return,
+                  see :help nixCats.flake.outputs.settings
+                  and :help nixCats.flake.outputs.categories
+                '';
+                type = with types; nullOr (attrsOf (catDef "replace"));
+                example = ''
+                  nixCats.users.<USER>.packages = { 
+                    nixCats = { pkgs, ... }: {
+                      settings = {
+                        wrapRc = true;
+                        configDirName = "nixCats-nvim";
+                        # nvimSRC = inputs.neovim;
+                        aliases = [ "vim" "nixCats" ];
+                      };
+                      categories = {
+                        generalBuildInputs = true;
+                        markdown = true;
+                        gitPlugins = true;
+                        general = true;
+                        custom = true;
+                        neonixdev = true;
+                        debug = false;
+                        test = true;
+                        lspDebugMode = false;
+                        themer = true;
+                        colorscheme = "onedark";
+                      };
+                    };
+                  }
+                '';
+              };
+              replace = mkOption {
+                default = null;
+                description = ''
+                  VERY IMPORTANT when setting aliases for each package,
+                  they must not be the same as ANY other neovim package for that user.
+                  It will cause a build conflict.
+
+                  You can have as many nixCats installed per user as you want,
+                  as long as you obey that rule.
+
+                  for information on the values you may return,
+                  see :help nixCats.flake.outputs.settings
+                  and :help nixCats.flake.outputs.categories
+                '';
+                type = with types; nullOr (attrsOf (catDef "replace"));
+                example = ''
+                  nixCats.users.<USER>.packages = { 
+                    nixCats = { pkgs, ... }: {
+                      settings = {
+                        wrapRc = true;
+                        configDirName = "nixCats-nvim";
+                        # nvimSRC = inputs.neovim;
+                        aliases = [ "vim" "nixCats" ];
+                      };
+                      categories = {
+                        generalBuildInputs = true;
+                        markdown = true;
+                        gitPlugins = true;
+                        general = true;
+                        custom = true;
+                        neonixdev = true;
+                        debug = false;
+                        test = true;
+                        lspDebugMode = false;
+                        themer = true;
+                        colorscheme = "onedark";
+                      };
+                    };
+                  }
+                '';
+              };
+            };
+
             packages = mkOption {
               default = null;
               description = ''
@@ -294,6 +488,7 @@ in {
                 }
               '';
             };
+
           };
         });
       };
@@ -301,6 +496,21 @@ in {
   };
 
   config = let
+    combineModDeps = replacements: merges: utils.deepmergeCats (
+      if replacements != null then replacements else (_:{})
+    ) (
+      if merges != null then merges else (_:{})
+    );
+    getStratWithExisting = enumstr: if enumstr == "merge"
+      then utils.deepmergeCats
+      else if enumstr == "replace"
+      then utils.mergeCatDefs
+      else (_: r: r);
+    pkgmerger = strat: old: new: let
+      merged = builtins.mapAttrs (n: v: if (if builtins.isAttrs old then old else {}) ? ${n} then strat old.${n} v else v) new;
+    in
+    old // merged;
+
     options_set = config.${defaultPackageName};
     dependencyOverlays = if builtins.isAttrs oldDependencyOverlays then
         lib.genAttrs (builtins.attrNames oldDependencyOverlays)
@@ -309,23 +519,29 @@ in {
       pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays options_set.addOverlays)]
       else pkgs.overlays ++ options_set.addOverlays;
 
-    mapToPackages = options_set: dependencyOverlays: (let
+    mapToPackages = options_set: dependencyOverlays: atp: (let
       newCategoryDefinitions = let
-        stratWithExisting = if options_set.categoryDefinitions.existing == "merge"
-          then utils.deepmergeCats
-          else if options_set.categoryDefinitions.existing == "replace"
-          then utils.mergeCatDefs
-          else (_: r: r);
-
-        moduleCatDefs = utils.deepmergeCats (
-          if options_set.categoryDefinitions.replace != null then options_set.categoryDefinitions.replace else (_:{})
-        ) (
-          if options_set.categoryDefinitions.merge != null then options_set.categoryDefinitions.merge else (_:{})
-        );
+        stratWithExisting = getStratWithExisting options_set.categoryDefinitions.existing;
+        moduleCatDefs = combineModDeps options_set.categoryDefinitions.replace options_set.categoryDefinitions.merge;
       in stratWithExisting categoryDefinitions moduleCatDefs;
 
-      pkgDefs = if (options_set.packages != null)
-        then packageDefinitions // options_set.packages else packageDefinitions;
+      pkgDefs = let
+        stratWithExisting = getStratWithExisting options_set.packageDefinitions.existing;
+        modulePkgDefs = let
+          # TODO: this `repments` step can be removed when options_set.packages is removed
+          # In addition, `mapToPackages` will once again no longer need to know its attrpath
+          repments = if options_set.packages != null then builtins.trace (let
+            basepath = builtins.concatStringsSep "." atp;
+          in ''
+            Deprecation warning: ${basepath}.packages renamed to: ${basepath}.packageDefinitions.replace
+            Done in order to achieve consistency with categoryDefinitions module options, and provide better control
+          '') (pkgmerger utils.mergeCatDefs options_set.packages (if options_set.packageDefinitions.replace != null then options_set.packageDefinitions.replace else {}))
+            else options_set.packageDefinitions.replace;
+          reps = if repments != null then repments else {};
+          merges = if options_set.packageDefinitions.merge != null then options_set.packageDefinitions.merge else {};
+        in
+        pkgmerger utils.mergeCatDefs reps merges;
+      in pkgmerger stratWithExisting packageDefinitions modulePkgDefs;
 
       newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
         else 
@@ -347,7 +563,7 @@ in {
         { name = catName; value = boxedCat; }) options_set.packageNames))
     );
 
-    mappedPackageAttrs = mapToPackages options_set dependencyOverlays;
+    mappedPackageAttrs = mapToPackages options_set dependencyOverlays [ "${defaultPackageName}" ];
     mappedPackages = builtins.attrValues mappedPackageAttrs;
 
   in
@@ -364,7 +580,7 @@ in {
     newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf options_set.enable (mapToPackages user_options_set dependencyOverlays);
+        packages = lib.mkIf options_set.enable (mapToPackages user_options_set dependencyOverlays [ defaultPackageName "users" uname ]);
       }
     ) config.${defaultPackageName}.users;
   in {
