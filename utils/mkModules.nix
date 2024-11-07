@@ -551,7 +551,7 @@ in {
           newAttrs = if builtins.isAttrs new then new else {};
           merged = builtins.mapAttrs (n: v: if oldAttrs ? ${n} then strat oldAttrs.${n} v else v) newAttrs;
         in
-        old // merged;
+        oldAttrs // merged;
         stratWithExisting = getStratWithExisting options_set.packageDefinitions.existing;
         modulePkgDefs = let
           # TODO: this `repments` step can be removed when options_set.packages is removed
