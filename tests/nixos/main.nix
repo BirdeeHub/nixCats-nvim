@@ -3,7 +3,7 @@
     enable = true;
     packageNames = [ packagename ];
     packageDefinitions.replace = {
-      ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
+      ${packagename} = { pkgs, ... }: {
         settings = {
         };
         categories = {
@@ -11,13 +11,13 @@
             nixos_hello = true;
           };
         };
-      });
+      };
     };
     users.testuser = {
       enable = true;
       packageNames = [ packagename ];
       packageDefinitions.replace = {
-        ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
+        ${packagename} = { pkgs, ... }: {
           settings = {
           };
           categories = {
@@ -25,7 +25,7 @@
               nixos_user_hello = true;
             };
           };
-        });
+        };
       };
     };
   };

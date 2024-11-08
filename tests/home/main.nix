@@ -19,7 +19,7 @@ in {
     enable = true;
     packageNames = [ packagename ];
     packageDefinitions.replace = {
-      ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
+      ${packagename} = { pkgs, ... }: {
         settings = {
         };
         categories = {
@@ -27,7 +27,7 @@ in {
             home_hello = true;
           };
         };
-      });
+      };
     };
   };
 }
