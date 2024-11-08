@@ -13,5 +13,20 @@
         };
       });
     };
+    users.testuser = {
+      enable = true;
+      packageNames = [ packagename ];
+      packageDefinitions.replace = {
+        ${packagename} = utils.mergeCatDefs package.packageDefinitions.${packagename} ({ pkgs, ... }: {
+          settings = {
+          };
+          categories = {
+            nixCats_test_names = {
+              nixos_user_hello = true;
+            };
+          };
+        });
+      };
+    };
   };
 }
