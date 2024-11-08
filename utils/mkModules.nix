@@ -144,7 +144,7 @@ in {
             see :help nixCats.flake.outputs.settings
             and :help nixCats.flake.outputs.categories
           '';
-          type = with types; nullOr (attrsOf (catDef "replace"));
+          type = with types; nullOr (attrsOf (catDef "merge"));
           example = ''
             nixCats.packages = { 
               nixCats = { pkgs, ... }: {
@@ -372,7 +372,7 @@ in {
                   see :help nixCats.flake.outputs.settings
                   and :help nixCats.flake.outputs.categories
                 '';
-                type = with types; nullOr (attrsOf (catDef "replace"));
+                type = with types; nullOr (attrsOf (catDef "merge"));
                 example = ''
                   nixCats.users.<USER>.packages = { 
                     nixCats = { pkgs, ... }: {
