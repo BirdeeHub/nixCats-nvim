@@ -70,13 +70,12 @@ let
 
     hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
   in
-    lib.concatStringsSep ";" hostProviderLua;
+    lib.concatStringsSep "\n" hostProviderLua;
 
   finalPackDir = (callPackage ./vim-pack-dir.nix {}) nixCats packpathDirs;
 
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
-    vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
     ${customRC}
     ${luaPluginConfigs}
   '' + (lib.optionalString (vimlPluginConfigs != "") ''
@@ -91,12 +90,26 @@ let
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 
   generatedWrapperArgs = let
-    rtpSetup = ''vim.opt.packpath:prepend([[${finalPackDir}]]); vim.opt.runtimepath:prepend([[${finalPackDir}]])'';
-    nixCatsSetup = ''vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]; require('nixCats').addGlobals()'';
-      in [
-        # vim accepts a limited number of commands so we join them as much as we can
-        "--add-flags" ''--cmd "lua ${providerLuaRc}; ${rtpSetup}; ${nixCatsSetup}"''
-      ];
+    setupLua = writeText "setup.lua" /*lua*/''
+      ${providerLuaRc}
+      vim.opt.packpath:prepend([[${finalPackDir}]])
+      vim.opt.runtimepath:prepend([[${finalPackDir}]])
+      vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
+      vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
+      require('nixCats').addGlobals()
+      vim.g.configdir = vim.fn.stdpath('config')
+      vim.opt.packpath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir)
+      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
+      vim.g.configdir = require('nixCats').cats.nixCats_config_location
+      vim.opt.packpath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:prepend(vim.g.configdir)
+      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
+    '';
+  in [
+    # vim accepts a limited number of commands so we join them all
+    "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"''
+  ];
 
   wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
 

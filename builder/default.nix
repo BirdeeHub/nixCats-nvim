@@ -233,17 +233,9 @@ in
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
           (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
-    in/* lua */''
-      vim.g.configdir = vim.fn.stdpath('config')
-      vim.opt.packpath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
-      vim.g.configdir = require('nixCats').get([[nixCats_config_location]])
-      vim.opt.packpath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
+    in/*lua*/''
       ${optLuaPre}
-      vim.g.configdir = require('nixCats').get([[nixCats_config_location]])
+      vim.g.configdir = require('nixCats').cats.nixCats_config_location
       if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
         vim.cmd.source(vim.g.configdir .. "/init.vim")
       end
