@@ -20,6 +20,7 @@ stdenv.mkDerivation {
         afterplugin = true;
         test_libT_vars = true;
         nested_test = true;
+        nixCats_fields = true;
       };
     };
   in /*bash*/ ''
