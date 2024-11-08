@@ -76,7 +76,6 @@ let
 
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
-    vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
     vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
     ${customRC}
     ${luaPluginConfigs}
@@ -95,7 +94,7 @@ let
     # vim accepts a limited number of commands so we join them all
         [
           "--add-flags" ''--cmd "lua ${providerLuaRc}"''
-          "--add-flags" ''--cmd "set packpath^=${finalPackDir} | set rtp^=${finalPackDir} | lua require('nixCats').addGlobals()"''
+          "--add-flags" ''--cmd "set packpath^=${finalPackDir} | set rtp^=${finalPackDir} | lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]; require('nixCats').addGlobals()"''
         ];
 
   wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
