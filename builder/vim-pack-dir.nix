@@ -37,7 +37,7 @@
       , ...
     }:
   let
-    inherit (import ./ncTools.nix) mkLuaInline;
+    inherit (import ./ncTools.nix { inherit lib; }) mkLuaInline;
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if isOldGrammarType then ts_grammar_plugin_combined else
       mkLuaInline "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
