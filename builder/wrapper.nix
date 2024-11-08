@@ -91,12 +91,11 @@ let
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 
   generatedWrapperArgs = let
-    rtpSetup = ''set packpath^=${finalPackDir} | set rtp^=${finalPackDir}'';
-    nixCatsSetup = ''lua vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]; require('nixCats').addGlobals()'';
+    rtpSetup = ''vim.opt.packpath:prepend([[${finalPackDir}]]); vim.opt.runtimepath:prepend([[${finalPackDir}]])'';
+    nixCatsSetup = ''vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]; require('nixCats').addGlobals()'';
       in [
         # vim accepts a limited number of commands so we join them as much as we can
-        "--add-flags" ''--cmd "lua ${providerLuaRc}"''
-        "--add-flags" ''--cmd "${rtpSetup} | ${nixCatsSetup}"''
+        "--add-flags" ''--cmd "lua ${providerLuaRc}; ${rtpSetup}; ${nixCatsSetup}"''
       ];
 
   wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
