@@ -83,7 +83,7 @@ in {
       });
 
       # see :help nixCats.flake.outputs.packageDefinitions
-      packages = {
+      packageDefinitions.replace = {
         # These are the names of your packages
         # you can include as many as you wish.
         myNixModuleNvim = {pkgs , ... }: {
@@ -173,7 +173,7 @@ in {
             test = [ (_:[]) ];
           };
         });
-        packages = {
+        packageDefinitions.replace = {
           REPLACE_MEs_VIM = {pkgs, ...}: {
             settings = {
               wrapRc = true;
