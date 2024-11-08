@@ -3,6 +3,9 @@ in {
   imports = [
   ];
 
+  # these options dont actually do anything because
+  # we dont evaluate the entire HM config only the nvim from it
+  # but you could get their value via config variable still.
   xdg.enable = true;
 
   home.shellAliases = {
@@ -15,6 +18,7 @@ in {
   home.file = {
   };
 
+  # nixCats module:
   ${packagename} = {
     enable = true;
     packageNames = [ packagename ];
