@@ -1,4 +1,4 @@
-This directory contains a somewhat idiomatic[^1] `nixCats` config using `lze` for lazy loading. (with a backup downloading method via `paq` and `mason` in case you want to load the directory without using `nix` at all)
+This directory contains a somewhat idiomatic[^1] `nixCats` config using [`lze`](https://github.com/BirdeeHub/lze) for lazy loading. (with a backup downloading method via `paq` and `mason` in case you want to load the directory without using `nix` at all)
 
 While the `lazy.nvim` wrapper does exist, this template shows a suggested way of using `nixCats`.
 
@@ -27,4 +27,5 @@ Even `pack/*/{start, opt}` in your config works, so do your thing.
 [^1]: where idiomatic mostly means that it doesn't use `lazy.nvim`, and uses `nixCats` to download everything,
     and makes sure to check if its category was enabled before it loads a plugin,
     and makes use of the [luaUtils template](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/luaUtils/lua/nixCatsUtils)
-    (see :h [nixCats.luaUtils](https://nixcats.org/nixCats_luaUtils.html)).
+    (see :h [nixCats.luaUtils](https://nixcats.org/nixCats_luaUtils.html)),
+    and uses [`lze`](https://github.com/BirdeeHub/lze).
