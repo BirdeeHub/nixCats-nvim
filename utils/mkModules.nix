@@ -489,6 +489,7 @@ in {
           in ''
             Deprecation warning: ${basepath}.packages renamed to: ${basepath}.packageDefinitions.replace
             Done in order to achieve consistency with ${basepath}.categoryDefinitions module options, and provide better control
+            Old option will be removed before 2025
           '') (pkgmerger utils.mergeCatDefs options_set.packages options_set.packageDefinitions.replace)
             else options_set.packageDefinitions.replace;
         in
