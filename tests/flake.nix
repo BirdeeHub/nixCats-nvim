@@ -21,6 +21,7 @@
 
     package = import ./nvim { inherit inputs utils system packagename; };
 
+    # NOTE: impure:
     exampleconfig = (builtins.getFlake (builtins.toString utils.templates.example.path)).packages.${system}.default;
     kickstartconfig = (builtins.getFlake (builtins.toString utils.templates.kickstart-nvim.path)).packages.${system}.default;
 
@@ -44,7 +45,9 @@
   {
     libT = libT;
     checks = {
-      inherit drvtests hometests nixostests exampledrvtests kickstartdrvtests;
+      inherit drvtests hometests nixostests;
+      # NOTE: impure outputs:
+      inherit exampledrvtests kickstartdrvtests;
     };
   });
 }
