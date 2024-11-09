@@ -320,15 +320,22 @@
       # and also the default command name for it.
       nixCats = { pkgs, ... }@misc: {
         # these also recieve our pkgs variable
-        # see :help nixCats.flake.outputs.settings
+        # see :help nixCats.flake.outputs.packageDefinitions
         settings = {
-          # will check for config in the store rather than .config
+          # The name of the package, and the default launch name,
+          # and the name of the .desktop file, is `nixCats`,
+          # or, whatever you named the package definition in the packageDefinitions set.
+          # WARNING: MAKE SURE THESE DONT CONFLICT WITH OTHER INSTALLED PACKAGES ON YOUR PATH
+          # That would result in a failed build, as nixos and home manager modules validate for collisions on your path
+          aliases = [ "vim" "vimcat" ];
+
+          # explained below in the `regularCats` package's definition
+          # OR see :help nixCats.flake.outputs.settings for all of the settings available
           wrapRc = true;
           configDirName = "nixCats-nvim";
-          aliases = [ "vim" "vimcat" ];
           # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
         };
-        # see :help nixCats.flake.outputs.packageDefinitions
+        # enable the categories you want from categoryDefinitions
         categories = {
           markdown = true;
           general = true;
@@ -355,13 +362,23 @@
       };
       regularCats = { pkgs, ... }@misc: {
         settings = {
-          # will check for config in .config rather than the store
-          # this is mostly useful for fast iteration while editing lua.
+          # IMPURE PACKAGE: normal config reload
+          # include same categories as main config,
+          # will load from vim.fn.stdpath('config')
           wrapRc = false;
-          # will now look for nixCats-nvim within .config and .local and others
+          # or tell it some other place to load
+          # unwrappedCfgPath = "/some/path/to/your/config";
+
+          # configDirName: will now look for nixCats-nvim within .config and .local and others
+          # this can be changed so that you can choose which ones share data folders for auths
+          # :h $NVIM_APPNAME
           configDirName = "nixCats-nvim";
+
           aliases = [ "testCat" ];
+
+          # If you wanted nightly, uncomment this, and the flake input.
           # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
+          # Probably add the cache stuff they recommend too.
         };
         categories = {
           markdown = true;
@@ -410,6 +427,8 @@
     #   packageNames = [ "nixCats" ]; # <- the packages you want installed
     #   <see :h nixCats.module for options>
     # }
+    # In addition, every package exports its own module via passthru, and is overrideable.
+    # so you can yourpackage.homeModule and then the namespace would be that packages name.
   in
   # you shouldnt need to change much past here, but you can if you wish.
   # but you should at least eventually try to figure out whats going on here!
