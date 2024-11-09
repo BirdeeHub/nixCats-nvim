@@ -13,7 +13,7 @@ stdenv.mkDerivation {
     finalpackage = package.override (prev: {
       categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, ... }@packageDef: {
         lspsAndRuntimeDeps = {
-          extratestconfig = [
+          kickstarttestcfg = [
             pkgs.git
           ];
         };
@@ -29,6 +29,7 @@ stdenv.mkDerivation {
         ${package.nixCats_packageName} = utils.mergeCatDefs prev.packageDefinitions.${package.nixCats_packageName} ({ pkgs, ... }: {
           categories = {
             extratestconfig = true;
+            kickstarttestcfg = ! isMain;
           };
         });
       };
