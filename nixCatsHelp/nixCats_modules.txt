@@ -46,7 +46,7 @@ other than the packages themselves in config.${defaultPackageName}.out
         default = null;
         type = types.nullOr (types.anything);
         description = ''
-          a different nixpkgs import to use. By default will use the one from the flake, or throw if none exists.
+          a different nixpkgs import to use. By default will use the one from the flake, or `pkgs.path`.
         '';
         example = ''
           nixpkgs_version = inputs.nixpkgs

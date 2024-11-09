@@ -26,7 +26,7 @@ in {
         default = null;
         type = types.nullOr (types.anything);
         description = ''
-          a different nixpkgs import to use. By default will use the one from the flake, or throw if none exists.
+          a different nixpkgs import to use. By default will use the one from the flake, or pkgs.path.
         '';
         example = ''
           nixpkgs_version = inputs.nixpkgs
@@ -258,7 +258,7 @@ in {
               type = types.nullOr (types.anything);
               description = ''
                 a different nixpkgs import to use for this users nvim.
-                By default will use the one from ${defaultPackageName}.nixpkgs_version, or flake, or throw if none exists.
+                By default will use the one from ${defaultPackageName}.nixpkgs_version, or flake, or pkgs.path.
               '';
               example = ''
                 nixpkgs_version = inputs.nixpkgs
@@ -507,7 +507,8 @@ in {
         else if config.${defaultPackageName}.nixpkgs_version != null
         then config.${defaultPackageName}.nixpkgs_version
         else if nixpkgs != null
-        then nixpkgs else builtins.throw "module not based on existing nixCats package, and ${defaultPackageName}.nixpkgs_version is not defined";
+        then nixpkgs
+        else pkgs.path;
 
     in (builtins.listToAttrs (builtins.map (catName: let
         boxedCat = newLuaBuilder {
