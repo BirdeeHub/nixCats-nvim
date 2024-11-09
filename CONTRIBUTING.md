@@ -65,7 +65,9 @@ comes up with a better way to explain the lazy wrapper other than
 
 To run the tests:
 
-`nix flake check --show-trace -Lv ./tests`
+`nix flake check --show-trace --impure -Lv ./tests`
+
+`--impure` is required to use `builtins.getFlake` on the example templates, but not for the other tests.
 
 I will slowly be adding tests to the tests directory.
 
