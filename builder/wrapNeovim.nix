@@ -2,7 +2,6 @@
 # https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L126-L164
 {
   pkgs,
-  nixpkgs,
   neovim-unwrapped,
   extraMakeWrapperArgs ? "",
   # the function you would have passed to python.withPackages
@@ -95,7 +94,7 @@ let
     # but now it gets the luaEnv from the actual neovim-unwrapped you used
     # instead of the one in the neovim-unwrapped from the nixpkgs you used
     inherit neovim-unwrapped;
-    inherit nixpkgs pkgs;
+    inherit pkgs;
     inherit gem_path;
   };
 in

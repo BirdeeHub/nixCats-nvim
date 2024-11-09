@@ -15,12 +15,11 @@
 
 , neovim-unwrapped
 , pkgs
-, nixpkgs
 , ...
 }@args:
 let
   inherit (pkgs) lib;
-  gemPath = if gem_path != null then gem_path else "${nixpkgs}/pkgs/applications/editors/neovim/ruby_provider";
+  gemPath = if gem_path != null then gem_path else "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
   rubyEnv = pkgs.bundlerEnv ({
     name = "neovim-ruby-env";
     postBuild = ''

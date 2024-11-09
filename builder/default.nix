@@ -296,7 +296,7 @@ import ./wrapNeovim.nix {
         categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
     };
   });
-  inherit pkgs nixpkgs;
+  inherit pkgs;
   neovim-unwrapped = myNeovimUnwrapped;
   inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path;
