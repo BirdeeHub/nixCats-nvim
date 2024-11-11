@@ -1033,14 +1033,6 @@ is NOT set, nixCats uses this function to make
 your config path default to the value of:
 `nixCats_config_location = utils.mkLuaInline "vim.fn.stdpath('config')"`
 
-<catsWithDefault> categories: attrpath: defaults: subcategories:
-Takes the categories set passed to your
-categoryDefinitions, the attribute path to the attribute you called this
-function in, a list or set of default values, and a set of subcategories
-
-For a more complete explanation, see:
-:help |nixCats.flake.outputs.categoryDefinitions.default_values|
-
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*
                                   *nixCats.flake.outputs.exports.mkHomeModules*
