@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 ---@type nixCats
 local M = {}
 M.cats = require('nixCats.cats')

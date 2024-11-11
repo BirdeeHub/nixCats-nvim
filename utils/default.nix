@@ -327,30 +327,21 @@ with builtins; rec {
   lib = {
     isDerivation = value: value.type or null == "derivation";
 
-    recursiveUpdateUntil = pred: lhs: rhs:
-      let f = attrPath:
-        zipAttrsWith (n: values:
-          let here = attrPath ++ [n]; in
-          if length values == 1
-          || pred here (elemAt values 1) (head values) then
-            head values
-          else
-            f here values
-        );
-      in f [] [rhs lhs];
-
-    recursiveUpdateUntilDRV = left: right:
-      lib.recursiveUpdateUntil (path: lhs: rhs:
-            # I added this check for derivation because a category can be just a derivation.
-            # otherwise it would squish our single derivation category rather than update.
-          (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
-        ) left right;
+    recursiveUpdateUntilDRV = left: right: let
+      pred = path: lhs: rhs:
+          # I added this check for derivation because a category can be just a derivation.
+          # otherwise it would squish our single derivation category rather than update.
+        (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)));
+    in lib.recUpUntilWpicker { inherit pred; } left right;
 
     unique = foldl' (acc: e: if elem e acc then acc else acc ++ [ e ]) [];
 
-    recUpdateUntilWithMerge = pred: lhs: rhs:
-      let
-      mergefunc = left: right:
+    recursiveUpdateWithMerge = lhs: rhs: let
+      pred = path: left: right:
+          # I added this check for derivation because a category can be just a derivation.
+          # otherwise it would squish our single derivation category rather than update.
+        (!((isAttrs left && !lib.isDerivation left) && (isAttrs right && !lib.isDerivation right)));
+      picker = left: right:
         if isList left && isList right
           then lib.unique (left ++ right)
         # category lists can contain mixes of sets and derivations.
@@ -360,24 +351,7 @@ with builtins; rec {
         else if isList right && all (rv: typeOf rv == typeOf left) right then
           if elem left right then right else [ left ] ++ right
         else right;
-      f = attrPath:
-        zipAttrsWith (n: values:
-          let here = attrPath ++ [n]; in
-          if length values == 1 then
-            head values
-          else if pred here (elemAt values 1) (head values) then
-            mergefunc (elemAt values 1) (head values)
-          else
-            f here values
-        );
-      in f [] [rhs lhs];
-
-    recursiveUpdateWithMerge = left: right:
-      lib.recUpdateUntilWithMerge (path: lhs: rhs:
-            # I added this check for derivation because a category can be just a derivation.
-            # otherwise it would squish our single derivation category rather than update.
-          (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)))
-        ) left right;
+      in lib.recUpUntilWpicker { inherit pred picker; } lhs rhs;
 
     genAttrs =
       names:
@@ -388,6 +362,37 @@ with builtins; rec {
       name:
       value:
       { inherit name value; };
+
+    recUpUntilWpicker = { pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh), picker ? (l: r: r) }: lhs: rhs: let
+      f = attrPath:
+        zipAttrsWith (n: values:
+          let here = attrPath ++ [n]; in
+          if length values == 1 then
+            head values
+          else if pred here (elemAt values 1) (head values) then
+            picker (elemAt values 1) (head values)
+          else
+            f here values
+        );
+    in f [] [rhs lhs];
+
+    mkCatDefType = mkOptionType: subtype: mkOptionType {
+      name = "catDef";
+      description = "a function representing categoryDefinitions or packageDefinitions for nixCats";
+      descriptionClass = "noun";
+      check = v: isFunction v;
+      merge = loc: defs: let
+        values = map (v: v.value) defs;
+        mergefunc = if subtype == "replace"
+        then lib.recursiveUpdateUntilDRV 
+        else if subtype == "merge"
+        then lib.recursiveUpdateWithMerge
+        else throw "invalid catDef subtype";
+      in
+      arg: foldl' mergefunc {} (map (v: v arg) values);
+    };
+
+    # all of the following can be removed when utils.catsWithDefault is removed
 
     filterAttrsRecursive =
       pred:
@@ -447,22 +452,6 @@ with builtins; rec {
               else f (path ++ [ name ]) value);
       in
       recurse [ ] set;
-
-    mkCatDefType = mkOptionType: subtype: mkOptionType {
-      name = "catDef";
-      description = "a function representing categoryDefinitions or packageDefinitions for nixCats";
-      descriptionClass = "noun";
-      check = v: isFunction v;
-      merge = loc: defs: let
-        values = map (v: v.value) defs;
-        mergefunc = if subtype == "replace"
-        then lib.recursiveUpdateUntilDRV 
-        else if subtype == "merge"
-        then lib.recursiveUpdateWithMerge
-        else throw "invalid catDef subtype";
-      in
-      arg: foldl' mergefunc {} (map (v: v arg) values);
-    };
   };
 }
 
