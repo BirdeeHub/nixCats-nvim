@@ -69,8 +69,8 @@ let
       NOT prev.pkgsargs.dependencyOverlays or something like that
   '';
 
+  ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
-  pkgCategories = thisPackage.categories;
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -109,10 +109,11 @@ let
     optionalLuaAdditions = {};
     optionalLuaPreInit = {};
     bashBeforeWrapper = {};
-    extraCats = {}; # set of lists of lists of strings of other categories to enable
+    # set of lists of lists of strings of other categories to enable
+    extraCats = {};
   } // (categoryDefinitions {
-    inherit categories;
-    inherit settings pkgs name;
+    # categories depends on extraCats
+    inherit categories settings pkgs name;
   }));
   inherit (final_cat_defs_set)
   startupPlugins optionalPlugins lspsAndRuntimeDeps
@@ -122,9 +123,7 @@ let
   extraPython3wrapperArgs sharedLibraries
   optionalLuaPreInit bashBeforeWrapper;
 
-  ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
-
-  categories = ncTools.applyExtraCats pkgCategories final_cat_defs_set.extraCats;
+  categories = ncTools.applyExtraCats thisPackage.categories final_cat_defs_set.extraCats;
 
 in
   let
