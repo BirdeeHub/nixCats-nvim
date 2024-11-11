@@ -177,14 +177,14 @@
       # to get the name packadd expects, use the
       # `:NixCats pawsible` command to see them all
       optionalPlugins = {
-        debug = utils.catsWithDefault categories [ "debug" ]
-        (with pkgs.vimPlugins; [
-          nvim-dap
-          nvim-dap-ui
-          nvim-dap-virtual-text
-        ]) (with pkgs.vimPlugins; {
+        debug = with pkgs.vimPlugins; {
+          default = [
+            nvim-dap
+            nvim-dap-ui
+            nvim-dap-virtual-text
+          ];
           go = [ nvim-dap-go ];
-        });
+        };
         lint = with pkgs.vimPlugins; [
           nvim-lint
         ];
@@ -265,9 +265,10 @@
       # this section is for environmentVariables that should be available
       # at RUN TIME for plugins. Will be available to path within neovim terminal
       environmentVariables = {
-        test = utils.catsWithDefault categories [ "test" ] {
-          CATTESTVARDEFAULT = "It worked!";
-        } {
+        test = {
+          default = {
+            CATTESTVARDEFAULT = "It worked!";
+          };
           subtest1 = {
             CATTESTVAR = "It worked!";
           };
@@ -299,6 +300,20 @@
       # populates $LUA_PATH and $LUA_CPATH
       extraLuaPackages = {
         general = [ (_:[]) ];
+      };
+
+      # this will enable test.default and debug.default
+      # if any subcategory of test or debug is enabled
+      extraCats = {
+        test = [
+          [ "test" "default" ]
+        ];
+        debug = [
+          [ "debug" "default" ]
+        ];
+        go = [
+          [ "debug" "go" ] # yes it has to be a list of lists
+        ];
       };
     };
 
@@ -345,8 +360,7 @@
           test = {
             subtest1 = true;
           };
-          # go = true; # <- disabled but you could enable it with override
-          # debug.go = true; # <- disabled but you could enable it with override
+          go = true; # <- disabled but you could enable it with override
 
           # this does not have an associated category of plugins, 
           # but lua can still check for it
@@ -388,7 +402,6 @@
           format = true;
           test = true;
           # go = true; # <- disabled but you could enable it with override
-          # debug.go = true; # <- disabled but you could enable it with override
           lspDebugMode = false;
           themer = true;
           colorscheme = "catppuccin";

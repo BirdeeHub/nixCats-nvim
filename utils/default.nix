@@ -114,11 +114,6 @@ with builtins; rec {
     # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
     mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
 
-    # finds an included category in lib.attrByPath false categories
-    # adds defaults to it, returns the resulting set with the added values
-    # TODO: this is a somewhat brittle solution. Find a better one.
-    # but it works well enough for now,
-    # and will be fixable without changing the interface.
     catsWithDefault = categories: attrpath: defaults: subcategories: let
       include_path = let
         flattener = cats: let
@@ -165,7 +160,14 @@ with builtins; rec {
 
         final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
       in
-      final;
+      builtins.trace ''
+        nixCats.utils.catsWithDefault is being deprecated, due to be removed before 2025.
+
+        It does not play well with merging categoryDefinitions together
+        To create default values, use extraCats section of categoryDefinitions
+        as outlined in :h nixCats.flake.outputs.categoryDefinitions.default_values,
+        and demonstrated in the main example template
+      '' final;
 
     in
     if isAttrs subcategories && ! lib.isDerivation subcategories then

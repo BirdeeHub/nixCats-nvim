@@ -70,7 +70,7 @@ let
   '';
 
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
-  categories = thisPackage.categories;
+  pkgCategories = thisPackage.categories;
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -109,8 +109,10 @@ let
     optionalLuaAdditions = {};
     optionalLuaPreInit = {};
     bashBeforeWrapper = {};
+    extraCats = {}; # set of lists of lists of strings of other categories to enable
   } // (categoryDefinitions {
-    inherit settings categories pkgs name;
+    categories = pkgCategories;
+    inherit settings pkgs name;
   }));
   inherit (final_cat_defs_set)
   startupPlugins optionalPlugins lspsAndRuntimeDeps
@@ -121,6 +123,8 @@ let
   optionalLuaPreInit bashBeforeWrapper;
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
+
+  categories = ncTools.applyExtraCats final_cat_defs_set.extraCats pkgCategories;
 
 in
   let
