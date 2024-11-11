@@ -114,64 +114,6 @@ with builtins; rec {
     # i.e. cache_location = mkLuaInline "vim.fn.stdpath('cache')",
     mkLuaInline = expr: { __type = "nix-to-lua-inline"; inherit expr; };
 
-    # finds an included category in lib.attrByPath false categories
-    # adds defaults to it, returns the resulting set with the added values
-    # TODO: this is a somewhat brittle solution. Find a better one.
-    # but it works well enough for now,
-    # and will be fixable without changing the interface.
-    catsWithDefault = categories: attrpath: defaults: subcategories: let
-      include_path = let
-        flattener = cats: let
-          mapper = attrs: map (v: if isAttrs v then mapper v else v) (attrValues attrs);
-          flatten = accum: LoLoS: foldl' (acc: v: if any (i: isList i) v then flatten acc v else acc ++ [ v ]) accum LoLoS;
-        in flatten [] (mapper cats);
-
-        mapToSetOfPaths = cats: let
-          removeNullPaths = attrs: lib.filterAttrsRecursive (n: v: v != null) attrs;
-          mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
-        in removeNullPaths (mapToPaths cats);
-
-        result = let
-          final_cats = lib.attrByPath attrpath false categories;
-          allIncPaths = flattener (mapToSetOfPaths final_cats);
-        in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
-          then head allIncPaths
-          else []; 
-      in
-      result;
-
-      toMerge = let
-        firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
-          then lib.attrByPath include_path [] subcategories
-          else if isList subcategories then subcategories else [ subcategories ];
-
-        fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
-          then include_path ++ [ "default" ] else include_path;
-
-        normed = let
-          listType = if isAttrs firstGet && ! lib.isDerivation firstGet
-            then lib.attrByPath fIncPath [] subcategories
-            else if isList firstGet then firstGet else [ firstGet ];
-          attrType = let
-            pre = if isAttrs firstGet && ! lib.isDerivation firstGet
-              then lib.attrByPath fIncPath {} subcategories
-              else firstGet;
-            basename = if fIncPath != [] then tail fIncPath else "default";
-            fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
-          in
-          fin;
-        in
-        if isList defaults then listType else if isAttrs defaults then attrType else throw "defaults must be a list or a set";
-
-        final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
-      in
-      final;
-
-    in
-    if isAttrs subcategories && ! lib.isDerivation subcategories then
-      lib.recursiveUpdateUntilDRV subcategories toMerge
-    else toMerge;
-
     # flake-utils' main function, because its all I used
     # Builds a map from <attr>=value to <attr>.<system>=value for each system
     eachSystem = systems: f:
@@ -314,6 +256,70 @@ with builtins; rec {
           );
         }
       );
+
+    catsWithDefault = categories: attrpath: defaults: subcategories: let
+      include_path = let
+        flattener = cats: let
+          mapper = attrs: map (v: if isAttrs v then mapper v else v) (attrValues attrs);
+          flatten = accum: LoLoS: foldl' (acc: v: if any (i: isList i) v then flatten acc v else acc ++ [ v ]) accum LoLoS;
+        in flatten [] (mapper cats);
+
+        mapToSetOfPaths = cats: let
+          removeNullPaths = attrs: lib.filterAttrsRecursive (n: v: v != null) attrs;
+          mapToPaths = attrs: lib.mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
+        in removeNullPaths (mapToPaths cats);
+
+        result = let
+          final_cats = lib.attrByPath attrpath false categories;
+          allIncPaths = flattener (mapToSetOfPaths final_cats);
+        in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
+          then head allIncPaths
+          else []; 
+      in
+      result;
+
+      toMerge = let
+        firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
+          then lib.attrByPath include_path [] subcategories
+          else if isList subcategories then subcategories else [ subcategories ];
+
+        fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
+          then include_path ++ [ "default" ] else include_path;
+
+        normed = let
+          listType = if isAttrs firstGet && ! lib.isDerivation firstGet
+            then lib.attrByPath fIncPath [] subcategories
+            else if isList firstGet then firstGet else [ firstGet ];
+          attrType = let
+            pre = if isAttrs firstGet && ! lib.isDerivation firstGet
+              then lib.attrByPath fIncPath {} subcategories
+              else firstGet;
+            basename = if fIncPath != [] then tail fIncPath else "default";
+            fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
+          in
+          fin;
+        in
+        if isList defaults then listType else if isAttrs defaults then attrType else throw "defaults must be a list or a set";
+
+        final = lib.setAttrByPath fIncPath (if isList defaults then normed ++ defaults else { inherit normed; default = defaults; });
+      in
+      builtins.trace ''
+        nixCats.utils.catsWithDefault is being deprecated, due to be removed before 2025.
+
+        It is being removed due to not playing well
+        with merging categoryDefinitions together.
+
+        A new, more capable method has been added.
+
+        To create default values, use extraCats section of categoryDefinitions
+        as outlined in :h nixCats.flake.outputs.categoryDefinitions.default_values,
+        and demonstrated in the main example template
+      '' final;
+
+    in
+    if isAttrs subcategories && ! lib.isDerivation subcategories then
+      lib.recursiveUpdateUntilDRV subcategories toMerge
+    else toMerge;
 
   };
 

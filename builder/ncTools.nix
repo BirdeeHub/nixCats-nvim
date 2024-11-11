@@ -157,4 +157,38 @@
       );
   in f [] [rhs lhs];
 
+  applyExtraCats = pkgcats: xtracats: let
+    applyExtraCatsInternal = prev: xtracats: pkgcats: let
+      filteredCatPaths = filterAndFlatten pkgcats xtracats;
+      # remove if already included
+      checkPath = atpath: if atpath == [] then true
+        else if lib.attrByPath atpath null pkgcats == true
+        then false
+        else checkPath (lib.reverseList (tail (lib.reverseList atpath)));
+      filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
+      toMerge = map (v: lib.setAttrByPath v true) filtered;
+      finalMergeable = foldl' recursiveUpdatePickShallower {} toMerge;
+      firstRes = recursiveUpdatePickShallower finalMergeable pkgcats;
+      # recurse until it doesnt change, so that values applying
+      # to the newly enabled categories can have an effect.
+    in if firstRes == prev then firstRes
+      else applyExtraCatsInternal firstRes xtracats firstRes;
+  in if xtracats == {} then pkgcats
+    else applyExtraCatsInternal pkgcats xtracats pkgcats;
+
+  recursiveUpdatePickShallower = lhs: rhs: let
+    pred = path: lh: rh: ! isAttrs lh || ! isAttrs rh;
+    picker = left: right: if ! isAttrs left then left else right;
+    f = attrPath:
+      zipAttrsWith (n: values:
+        let here = attrPath ++ [n]; in
+        if length values == 1 then
+          head values
+        else if pred here (elemAt values 1) (head values) then
+          picker (elemAt values 1) (head values)
+        else
+          f here values
+      );
+  in f [] [rhs lhs];
+
 }

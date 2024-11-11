@@ -339,6 +339,14 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   to run before the wrapper starts within the wrapper's bash environment.
   CAUTION: only use this if you know what you are doing and why you need
   to do it. Whenever possible, use extraWrapperArgs instead.
+<extraCats>
+  a flexible set of categories, each containing a list of attribute paths,
+  specified as lists of strings. Thus each category would contain a list of
+  lists of strings.
+  Allows inclusion of extra categories contingent on each lists inclusion in the package,
+  and is useful for creating default values for subcategories.
+  For more info, see below at
+  :h |nixCats.flake.outputs.categoryDefinitions.default_values|
 }
 
 In essence, the contents of each set listed here are filtered
@@ -393,7 +401,9 @@ single derivation.
 <
                             *nixCats.flake.outputs.categoryDefinitions.default_values*
 
-First Kind: implicit, when value is in another section of categoryDefinitions
+There are 2 ways of creating default values in nixCats.
+
+#1 Implicit: when value is in another section of categoryDefinitions
 
 If in your categoryDefinitions you had the following:
 >nix
@@ -463,43 +473,50 @@ Sometimes it is not and a list of packages would be better suited.
 
 This leads us to our second way to make a default value:
 
-Second Way: explicit, default values within the same section of categoryDefinitions
+#2 Explicit: using extraCats section of categoryDefinitions.
 
-`utils.catsWithDefault` takes the categories set passed to your
-categoryDefinitions, the attribute path to the current set it is within,
-a list of default values, and a set of subcategories
+extraCats section of categoryDefinitions contains categories of attribute
+paths. If that category is defined, the categories specified by the attribute
+paths will also be enabled. This means you could make it so that if you
+included the go category, it could then enable debug.go and lsp.go for you.
+But in addition to that, it can be combined with the implicit form of creating
+default values above in an interesting way.
 >nix
-  optionalPlugins = {
-    debug = utils.catsWithDefault categories [ "debug" ]
-    (with pkgs.vimPlugins; [
-      nvim-dap
-      nvim-dap-ui
-      nvim-dap-virtual-text
-    ]) (with pkgs.vimPlugins; {
-      go = [ nvim-dap-go ];
-    });
-  };
-<
-If you were to put the following in your
-categories set of a packageDefinitions function:
->nix
-  debug.go = true;
-<
-then it would also include the
-values in the list passed as the 3rd argument.
-
-It also can accept an attrset as its default value:
->nix
-  environmentVariables = {
-    test = utils.catsWithDefault categories [ "test" ] {
-      CATTESTVARDEFAULT = "It worked!";
-    } {
-      subtest1 = {
-        CATTESTVAR = "It worked!";
+  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    lspsAndRuntimeDeps = {
+      debug = with pkgs; {
+        go = [ delve ];
       };
-      subtest2 = {
-        CATTESTVAR3 = "It didn't work!";
+      go = with pkgs; [
+        gopls
+        gotools
+        go-tools
+        gccgo
+      ];
+    };
+    startupPlugins = {
+      debug = with pkgs.vimPlugins; {
+        default = [
+          nvim-dap
+          nvim-dap-ui
+          nvim-dap-virtual-text
+        ];
+        go = [ nvim-dap-go ];
       };
+    };
+    extraCats = {
+      # due to the implicit form of default values in different sections,
+      # this will enable debug.default
+      # if any subcategory of debug is enabled
+      # thus, enabling debug.go would also enable debug.default
+      debug = [
+        [ "debug" "default" ]
+      ];
+      # and if go is enabled, it enables debug.go
+      # which then enables debug.default
+      go = [
+        [ "debug" "go" ] # yes it has to be a list of lists
+      ];
     };
   };
 <
