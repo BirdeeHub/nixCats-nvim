@@ -178,6 +178,10 @@
       # `:NixCats pawsible` command to see them all
       optionalPlugins = {
         debug = with pkgs.vimPlugins; {
+          # it is possible to add default values.
+          # there is nothing special about the word "default"
+          # but we have turned this subcategory into a default value
+          # via the extraCats section at the bottom of categoryDefinitions.
           default = [
             nvim-dap
             nvim-dap-ui
@@ -360,7 +364,10 @@
           test = {
             subtest1 = true;
           };
-          go = true; # <- disabled but you could enable it with override
+
+          # enabling this category will enable the go category,
+          # and ALSO debug.go and debug.default due to our extraCats in categoryDefinitions.
+          # go = true; # <- disabled but you could enable it with override
 
           # this does not have an associated category of plugins, 
           # but lua can still check for it
