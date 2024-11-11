@@ -347,6 +347,9 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   and is useful for creating default values for subcategories.
   For more info, see below at
   :h |nixCats.flake.outputs.categoryDefinitions.default_values|
+  # WARNING: use of categories argument in this set will cause infinite recursion
+  # The categories argument of this function is the FINAL value.
+  # You may use it in any of the other sets.
 }
 
 In essence, the contents of each set listed here are filtered
@@ -504,6 +507,9 @@ default values above in an interesting way.
         go = [ nvim-dap-go ];
       };
     };
+    # WARNING: use of categories argument in this set will cause infinite recursion
+    # The categories argument of this function is the FINAL value.
+    # You may use it in any of the other sets.
     extraCats = {
       # due to the implicit form of default values in different sections,
       # this will enable debug.default

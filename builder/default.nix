@@ -111,7 +111,7 @@ let
     bashBeforeWrapper = {};
     extraCats = {}; # set of lists of lists of strings of other categories to enable
   } // (categoryDefinitions {
-    categories = pkgCategories;
+    inherit categories;
     inherit settings pkgs name;
   }));
   inherit (final_cat_defs_set)
