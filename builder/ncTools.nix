@@ -157,7 +157,7 @@
       checkPath = atpath: if atpath == [] then true
         else if lib.attrByPath atpath null pkgcats == true
         then false
-        else checkPath (lib.reverseList (tail (lib.reverseList atpath)));
+        else checkPath (lib.init atpath);
       filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
       toMerge = map (v: lib.setAttrByPath v true) filtered;
       firstRes = foldl' recursiveUpdatePickShallower {} (toMerge ++ [ pkgcats ]);
