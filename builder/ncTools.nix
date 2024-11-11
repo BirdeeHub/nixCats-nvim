@@ -146,11 +146,10 @@
   in
   foldl' recursiveUpdatePickDeeper { } mapped;
 
-  applyExtraCats = pkgcats: xtracats: let
+  applyExtraCats = packageCats: extraCats: let
     recursiveUpdatePickShallower = lhs: rhs: let
-      pred = path: lh: rh: ! isAttrs lh || ! isAttrs rh;
       picker = left: right: if ! isAttrs left then left else right;
-    in recUpUntilWpicker { inherit pred picker; } lhs rhs;
+    in recUpUntilWpicker { inherit picker; } lhs rhs;
 
     applyExtraCatsInternal = prev: xtracats: pkgcats: let
       filteredCatPaths = filterAndFlatten pkgcats xtracats;
@@ -166,8 +165,9 @@
       # to the newly enabled categories can have an effect.
     in if firstRes == prev then firstRes
       else applyExtraCatsInternal firstRes xtracats firstRes;
-  in if xtracats == {} then pkgcats
-    else applyExtraCatsInternal pkgcats xtracats pkgcats;
+
+  in if extraCats == {} then packageCats
+    else applyExtraCatsInternal packageCats extraCats packageCats;
 
   recUpUntilWpicker = { pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh), picker ? (l: r: r) }: lhs: rhs: let
     f = attrPath:
