@@ -124,7 +124,7 @@ let
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
 
-  categories = ncTools.applyExtraCats final_cat_defs_set.extraCats pkgCategories;
+  categories = ncTools.applyExtraCats pkgCategories final_cat_defs_set.extraCats;
 
 in
   let

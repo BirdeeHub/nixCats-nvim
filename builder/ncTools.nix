@@ -157,17 +157,24 @@
       );
   in f [] [rhs lhs];
 
-  applyExtraCats = xtracats: pkgcats: let
-    filteredCatPaths = filterAndFlatten pkgcats xtracats;
-    # remove if already included
-    checkPath = atpath: if atpath == [] then true
-      else if lib.attrByPath atpath null pkgcats == true
-      then false
-      else checkPath (lib.reverseList (tail (lib.reverseList atpath)));
-    filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
-    toMerge = map (v: lib.setAttrByPath v true) filtered;
-    finalMergeable = foldl' recursiveUpdatePickShallower {} toMerge;
-  in recursiveUpdatePickShallower finalMergeable pkgcats;
+  applyExtraCats = pkgcats: xtracats: let
+    applyExtraCatsInternal = prev: xtracats: pkgcats: let
+      filteredCatPaths = filterAndFlatten pkgcats xtracats;
+      # remove if already included
+      checkPath = atpath: if atpath == [] then true
+        else if lib.attrByPath atpath null pkgcats == true
+        then false
+        else checkPath (lib.reverseList (tail (lib.reverseList atpath)));
+      filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
+      toMerge = map (v: lib.setAttrByPath v true) filtered;
+      finalMergeable = foldl' recursiveUpdatePickShallower {} toMerge;
+      firstRes = recursiveUpdatePickShallower finalMergeable pkgcats;
+      # recurse until it doesnt change, so that values applying
+      # to the newly enabled categories can have an effect.
+    in if firstRes == prev then firstRes
+      else applyExtraCatsInternal firstRes xtracats firstRes;
+  in if xtracats == {} then pkgcats
+    else applyExtraCatsInternal pkgcats xtracats pkgcats;
 
   recursiveUpdatePickShallower = lhs: rhs: let
     pred = path: lh: rh: ! isAttrs lh || ! isAttrs rh;
