@@ -71,6 +71,15 @@ other than the packages themselves in config.${defaultPackageName}.out
         description = "Enable the ${defaultPackageName} module";
       };
 
+      dontInstall = mkOption {
+        default = false;
+        type = types.bool;
+        description = ''
+          If true, do not output to packages list,
+          output only to config.${defaultPackageName}.out
+        '';
+      };
+
       luaPath = mkOption {
         default = luaPath;
         type = types.oneOf [ types.str types.path ];
