@@ -71,7 +71,7 @@ let
 
     hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
   in
-    lib.concatStringsSep "\n" hostProviderLua;
+    lib.concatStringsSep ";" hostProviderLua;
 
   finalPackDir = (callPackage ./vim-pack-dir.nix { inherit collate_grammars; }) nixCats packpathDirs;
 
@@ -92,7 +92,6 @@ let
 
   generatedWrapperArgs = let
     setupLua = writeText "setup.lua" /*lua*/''
-      ${providerLuaRc}
       vim.opt.packpath:prepend([[${finalPackDir}]])
       vim.opt.runtimepath:prepend([[${finalPackDir}]])
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
@@ -108,7 +107,8 @@ let
       vim.opt.runtimepath:append(vim.g.configdir .. "/after")
     '';
   in [
-    # vim accepts a limited number of commands so we join them all
+    # vim accepts a limited number of commands so we join them as best we can
+    "--add-flags" ''--cmd "lua ${providerLuaRc}"''
     "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"''
   ];
 
