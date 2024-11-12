@@ -51,6 +51,15 @@ in {
         description = "Enable the ${defaultPackageName} module";
       };
 
+      dontInstall = mkOption {
+        default = false;
+        type = types.bool;
+        description = ''
+          If true, do not output to packages list,
+          output only to config.${defaultPackageName}.out
+        '';
+      };
+
       luaPath = mkOption {
         default = luaPath;
         type = types.oneOf [ types.str types.path ];
@@ -251,6 +260,15 @@ in {
               default = false;
               type = types.bool;
               description = "Enable the ${defaultPackageName} module for a user";
+            };
+
+            dontInstall = mkOption {
+              default = false;
+              type = types.bool;
+              description = ''
+                If true, do not output to packages list,
+                output only to config.${defaultPackageName}.out
+              '';
             };
 
             nixpkgs_version = mkOption {
@@ -528,12 +546,12 @@ in {
   in
   (if isHomeManager then {
     ${defaultPackageName}.out.packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
-    home.packages = lib.mkIf main_options_set.enable mappedPackages;
+    home.packages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
   } else (let
     newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
-        packages = lib.mkIf user_options_set.enable (builtins.attrValues (mapToPackages
+        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (builtins.attrValues (mapToPackages
           user_options_set
           (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
           [ defaultPackageName "users" uname ]
@@ -556,7 +574,7 @@ in {
       packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
     };
     users.users = newUserPackageDefinitions;
-    environment.systemPackages = lib.mkIf main_options_set.enable mappedPackages;
+    environment.systemPackages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
   }));
 
 }
