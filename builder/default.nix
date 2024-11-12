@@ -89,7 +89,7 @@ let
     suffix-path = false;
     suffix-LD = false;
     disablePythonSafePath = false;
-  } // thisPackage.settings;
+  } // (if thisPackage ? settings then thisPackage.settings else {});
 
   final_cat_defs_set = ({
     startupPlugins = {};
@@ -123,7 +123,7 @@ let
   extraPython3wrapperArgs sharedLibraries
   optionalLuaPreInit bashBeforeWrapper;
 
-  categories = ncTools.applyExtraCats thisPackage.categories final_cat_defs_set.extraCats;
+  categories = ncTools.applyExtraCats (if thisPackage ? categories then thisPackage.categories else {}) final_cat_defs_set.extraCats;
 
 in
   let
