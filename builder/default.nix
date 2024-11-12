@@ -5,7 +5,7 @@
 , packageDefinitions
 , name
 , nixpkgs
-, system
+, system ? (if builtins.isAttrs nixpkgs && nixpkgs ? system then nixpkgs.system else import ./builder_error.nix)
 , extra_pkg_config ? {}
 , dependencyOverlays ? null
 , nixCats_passthru ? {}
@@ -13,16 +13,20 @@
 let
   pkgs = with builtins; let
     config = if ! (isAttrs extra_pkg_config) then import ./builder_error.nix
-      else if nixpkgs ? config then nixpkgs.config // extra_pkg_config else extra_pkg_config;
+      else (nixpkgs.config or {}) // extra_pkg_config;
     overlays = if isList dependencyOverlays
       then dependencyOverlays
       else if isAttrs dependencyOverlays && hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
       else if isNull dependencyOverlays then []
       else import ./builder_error.nix;
-  in if isAttrs nixCats_passthru then import nixpkgs {
-    inherit system config overlays;
-  } else import ./builder_error.nix;
+  in if isAttrs nixCats_passthru && isFunction categoryDefinitions
+    && isAttrs packageDefinitions && isString name then
+  import (
+    if isAttrs nixpkgs && nixpkgs ? path && ! nixpkgs ? outPath
+    then nixpkgs.path else nixpkgs
+  ) { inherit system config overlays; }
+  else import ./builder_error.nix;
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
@@ -44,7 +48,7 @@ let
     suffix-path = false;
     suffix-LD = false;
     disablePythonSafePath = false;
-  } // (if thisPackage ? settings then thisPackage.settings else {});
+  } // (thisPackage.settings or {});
 
   final_cat_defs_set = ({
     startupPlugins = {};
@@ -78,7 +82,7 @@ let
   extraPython3wrapperArgs sharedLibraries
   optionalLuaPreInit bashBeforeWrapper;
 
-  categories = ncTools.applyExtraCats (if thisPackage ? categories then thisPackage.categories else {}) final_cat_defs_set.extraCats;
+  categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
 
 in
   let
@@ -229,7 +233,7 @@ in
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
-      propagatedBuildInputs = buildInputs ++ (pkgs.lib.optionals (prev ? propagatedBuildInputs) prev.propagatedBuildInputs);
+      propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
     }) else baseNvimUnwrapped;
 
   in

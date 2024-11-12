@@ -80,8 +80,8 @@ let
 
   # we process plugin spec style configurations here ourselves rather than using makeNeovimConfig for that.
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
-  lcfgs = builtins.filter (v: v != null) (map (v: if v ? type && v.type == "lua" then v.config else null) pluginsWithConfig);
-  vcfgs = builtins.filter (v: v != null) (map (v: if v ? type && v.type == "viml" then v.config else null) pluginsWithConfig);
+  lcfgs = builtins.filter (v: v != null) (map (v: if v.type or "" == "lua" then v.config else null) pluginsWithConfig);
+  vcfgs = builtins.filter (v: v != null) (map (v: if v.type or "" == "viml" then v.config else null) pluginsWithConfig);
   luaPluginConfigs = builtins.concatStringsSep "\n" lcfgs;
   vimlPluginConfigs = builtins.concatStringsSep "\n" vcfgs;
 
