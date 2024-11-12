@@ -11,63 +11,18 @@
 , nixCats_passthru ? {}
 }:
 let
-  pkgs = with builtins; if isAttrs nixCats_passthru && isAttrs extra_pkg_config &&
-      (isList dependencyOverlays || isAttrs dependencyOverlays || isNull dependencyOverlays)
-  then import nixpkgs {
-    inherit system;
-    config = extra_pkg_config;
+  pkgs = with builtins; let
+    config = if ! (isAttrs extra_pkg_config) then import ./builder_error.nix
+      else if nixpkgs ? config then nixpkgs.config // extra_pkg_config else extra_pkg_config;
     overlays = if isList dependencyOverlays
       then dependencyOverlays
       else if isAttrs dependencyOverlays && hasAttr system dependencyOverlays
       then dependencyOverlays.${system}
-      else [];
-  } else throw error_message;
-  error_message = ''
-    The following arguments are accepted:
-
-    # -------------------------------------------------------- #
-
-    # the path to your ~/.config/nvim replacement within your nix config.
-    luaPath: # <-- must be a store path
-
-    { # set of items for building the pkgs that builds your neovim
-
-      , nixpkgs # <-- required
-      , system # <-- required
-
-      # type: (attrsOf listOf overlays) or (listOf overlays) or null
-      , dependencyOverlays ? null 
-
-      # import nixpkgs { config = extra_pkg_config; inherit system; }
-      , extra_pkg_config ? {} # type: attrs
-
-      # any extra stuff for finalPackage.passthru
-      , nixCats_passthru ? {} # type: attrs
-    }:
-
-    # type: function with args { pkgs, settings, categories, name, ... }:
-    # returns: set of sets of categories
-    # see :h nixCats.flake.outputs.categories
-    categoryDefinitions: 
-
-    # type: function with args { pkgs, ... }:
-    # returns: { settings = {}; categories = {}; }
-    packageDefinitions: 
-    # see :h nixCats.flake.outputs.packageDefinitions
-    # see :h nixCats.flake.outputs.settings
-
-    # name of the package to built from packageDefinitions
-    name: 
-
-    # -------------------------------------------------------- #
-
-    # Note:
-    When using override, all values shown above will
-    be top level attributes of prev, none will be nested.
-
-    i.e. finalPackage.override (prev: { inherit (prev) dependencyOverlays; })
-      NOT prev.pkgsargs.dependencyOverlays or something like that
-  '';
+      else if isNull dependencyOverlays then []
+      else import ./builder_error.nix;
+  in if isAttrs nixCats_passthru then import nixpkgs {
+    inherit system config overlays;
+  } else import ./builder_error.nix;
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
