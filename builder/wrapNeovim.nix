@@ -27,6 +27,7 @@
   extraPython3wrapperArgs ? [ ],
   preWrapperShellCode ? "",
   gem_path ? null,
+  collate_grammars ? false,
 }:
 let
   # accepts 4 different plugin syntaxes, specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
@@ -103,6 +104,6 @@ in
     customAliases = aliases;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru
-      customRC luaPluginConfigs vimlPluginConfigs preWrapperShellCode;
+      customRC luaPluginConfigs vimlPluginConfigs preWrapperShellCode collate_grammars;
   }
 )

@@ -3,21 +3,17 @@
 { lib, stdenv, buildEnv, writeText, writeTextFile
   , runCommand
   , python3
+  , symlinkJoin
   , linkFarm
+  , collate_grammars ? false
 }: let
   # NOTE: define helpers for packDir function here:
-
-  # TODO:
-  # https://github.com/NixOS/nixpkgs/pull/344849
-  # when this PR is merged, you can set this to false to fix niche grammars.
-  # but rn the current version is broken so, dont set it to false yet.
-  isOldGrammarType = true;
 
   grammarPackName = "myNeovimGrammars";
 
   grammarMatcher = yes: builtins.filter (drv: let
     # NOTE: matches if pkgs.neovimUtils.grammarToPlugin was called on it.
-    # This only matters for the lazy.nvim wrapper anyway.
+    # This only matters for collate_grammars setting and the lazy.nvim wrapper.
     cond = (builtins.match "^vimplugin-treesitter-grammar-.*" "${lib.getName drv}") != null;
     match = if yes then cond else ! cond;
   in
@@ -39,7 +35,7 @@
   let
     inherit (import ./ncTools.nix { inherit lib; }) mkLuaInline;
     # lazy.nvim wrapper uses this value to add the parsers back.
-    ts_grammar_path = if isOldGrammarType then ts_grammar_plugin_combined else
+    ts_grammar_path = if collate_grammars then ts_grammar_plugin_combined else
       mkLuaInline "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
 
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
@@ -64,7 +60,7 @@
     });
     nixCatsFinal = nixCats fullDeps;
   in # we add the plugin with ALL the parsers if its the old way, if its the new way, it will be in our packpath already
-  [ nixCatsFinal (nixCatsDir nixCatsFinal) ] ++ (lib.optionals isOldGrammarType [ ts_grammar_plugin_combined ]);
+  [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
 
   # gets plugin.dependencies from
   # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
@@ -103,29 +99,21 @@ nixCats: packages: let
     # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
     collected_grammars = grammarMatcher true allPlugins;
 
-    # This was added as a fix for errors introduced, but hopefully can be removed one day....
-    ts_grammar_plugin_combined = with builtins; stdenv.mkDerivation (let 
-      # so we make a single plugin with them
-      treesitter_grammars = map (e: e.outPath) collected_grammars;
-
-      builderLines = map (grmr: /* bash */''
-        cp -f -L ${grmr}/parser/*.so $out/parser
-      '') treesitter_grammars;
-
-      builderText = (/* bash */''
-        #!/usr/bin/env bash
-        source $stdenv/setup
-        mkdir -p $out/parser
-      '') + (concatStringsSep "\n" builderLines);
-
-    in {
+    ts_grammar_plugin_combined = symlinkJoin {
       name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
-      builder = writeText "builder.sh" builderText;
-    });
+      paths = map (e: e.outPath) collected_grammars;
+      # TODO:
+      # https://github.com/NixOS/nixpkgs/pull/344849
+      # when this PR is merged, you can delete this to fix grammars not in nvim-treesitter core.
+      # This was added as a fix for errors introduced.
+      # when you do so, you should finish making collate_grammars into a setting.
+      postBuild = ''
+        rm -rf $out/queries
+      '';
+    };
 
-    # When they get fixed, add them like this instead.
-    packdirGrammar = lib.optionals (! isOldGrammarType) [
-      (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" collected_grammars)
+    packdirGrammar = [
+      (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" (if collate_grammars then [ ts_grammar_plugin_combined ] else collected_grammars))
     ];
 
     #creates the nixCats plugin from the function definition in builder/default.nix

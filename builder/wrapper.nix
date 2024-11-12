@@ -26,6 +26,7 @@ neovim-unwrapped:
   # to resolve dependencies and other things
   # from plugins. It has all the plugins in it.
   , packpathDirs
+  , collate_grammars ? false
 
   # should contain all args but the binary. Can be either a string or list
   , wrapperArgs ? []
@@ -72,7 +73,7 @@ let
   in
     lib.concatStringsSep "\n" hostProviderLua;
 
-  finalPackDir = (callPackage ./vim-pack-dir.nix {}) nixCats packpathDirs;
+  finalPackDir = (callPackage ./vim-pack-dir.nix { inherit collate_grammars; }) nixCats packpathDirs;
 
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
