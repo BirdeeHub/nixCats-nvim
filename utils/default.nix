@@ -8,7 +8,7 @@ with builtins; rec {
       luaPath:
       {
         nixpkgs
-        , system ? (if isAttrs nixpkgs && nixpkgs ? system then nixpkgs.system else import ../builder/builder_error.nix)
+        , system ? (nixpkgs.system or import ../builder/builder_error.nix)
         , extra_pkg_config ? {}
         , dependencyOverlays ? null
         , nixCats_passthru ? {}
@@ -24,20 +24,15 @@ with builtins; rec {
           else if isPath nixpkgs || isString nixpkgs then "path"
           else if isAttrs nixpkgs && (lib.isDerivation nixpkgs || nixpkgs ? outPath) then "drv"
           else import ../builder/builder_error.nix;
-        nixpkgspath = if pkgstype == "drv" then nixpkgs.outPath else if pkgstype == "pkgs" then nixpkgs.path else nixpkgs;
-        nixlib = if pkgstype == "pkgs" || pkgstype == "nixpkgs"
-          then nixpkgs.lib
-          else import "${nixpkgspath}/lib";
-        newnixpkgs = if pkgstype == "nixpkgs"
-          then nixpkgs
-          else if pkgstype == "pkgs"
-          then nixpkgs // { outPath = nixpkgspath; }
+        nixpkgspath = if pkgstype == "pkgs" then nixpkgs.path else nixpkgs.outPath or nixpkgs;
+        newnixpkgs = if pkgstype == "nixpkgs" then nixpkgs
+          else if pkgstype == "pkgs" then nixpkgs // { outPath = nixpkgspath; }
           else {
-            lib = nixlib;
+            lib = nixpkgs.lib or import "${nixpkgspath}/lib";
             outPath = nixpkgspath;
           };
       in
-      nixlib.makeOverridable (import ../builder) {
+      newnixpkgs.lib.makeOverridable (import ../builder) {
         nixpkgs = newnixpkgs;
         inherit luaPath categoryDefinitions packageDefinitions name
         system extra_pkg_config dependencyOverlays nixCats_passthru;

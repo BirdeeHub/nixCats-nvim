@@ -5,7 +5,7 @@
 , packageDefinitions
 , name
 , nixpkgs
-, system ? (if builtins.isAttrs nixpkgs && nixpkgs ? system then nixpkgs.system else import ./builder_error.nix)
+, system ? (nixpkgs.system or import ./builder_error.nix)
 , extra_pkg_config ? {}
 , dependencyOverlays ? null
 , nixCats_passthru ? {}
@@ -16,16 +16,13 @@ let
       else (nixpkgs.config or {}) // extra_pkg_config;
     overlays = if isList dependencyOverlays
       then dependencyOverlays
-      else if isAttrs dependencyOverlays && hasAttr system dependencyOverlays
-      then dependencyOverlays.${system}
-      else if isNull dependencyOverlays then []
-      else import ./builder_error.nix;
+      else dependencyOverlays.${system} or
+      (if isNull dependencyOverlays then []
+      else import ./builder_error.nix);
   in if isAttrs nixCats_passthru && isFunction categoryDefinitions
-    && isAttrs packageDefinitions && isString name then
-  import (
-    if isAttrs nixpkgs && nixpkgs ? path && ! nixpkgs ? outPath
-    then nixpkgs.path else nixpkgs
-  ) { inherit system config overlays; }
+    && isAttrs packageDefinitions && isString name
+  then import (nixpkgs.path or nixpkgs.outPath or nixpkgs)
+    { inherit system config overlays; }
   else import ./builder_error.nix;
 
   ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
