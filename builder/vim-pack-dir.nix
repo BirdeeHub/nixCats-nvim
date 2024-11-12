@@ -1,6 +1,6 @@
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/ae5d2af73efa5e25bf9bf43672cd3d8d99c613d0/pkgs/applications/editors/vim/plugins/vim-utils.nix#L136-L207
-{ lib, stdenv, buildEnv, writeText, writeTextFile
+{ lib, buildEnv, writeTextFile
   , runCommand
   , python3
   , symlinkJoin
