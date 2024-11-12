@@ -107,9 +107,8 @@ let
       vim.opt.runtimepath:append(vim.g.configdir .. "/after")
     '';
   in [
-    # vim accepts a limited number of commands so we join them as best we can
-    "--add-flags" ''--cmd "lua ${providerLuaRc}"''
-    "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"''
+    # vim accepts a limited number of commands so we join them all
+    "--add-flags" ''--cmd "lua ${providerLuaRc};dofile([[${setupLua}]])"''
   ];
 
   wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
