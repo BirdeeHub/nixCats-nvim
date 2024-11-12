@@ -16,9 +16,7 @@ let
       else (nixpkgs.config or {}) // extra_pkg_config;
     overlays = if isList dependencyOverlays
       then dependencyOverlays
-      else dependencyOverlays.${system} or
-      (if isNull dependencyOverlays then []
-      else import ./builder_error.nix);
+      else dependencyOverlays.${system} or [];
   in if isAttrs nixCats_passthru && isFunction categoryDefinitions
     && isAttrs packageDefinitions && isString name
   then import (nixpkgs.path or nixpkgs.outPath or nixpkgs)
