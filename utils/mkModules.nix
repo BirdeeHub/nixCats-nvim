@@ -548,16 +548,6 @@ in {
     ${defaultPackageName}.out.packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
     home.packages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
   } else (let
-    newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
-      user_options_set = config.${defaultPackageName}.users.${uname};
-      in {
-        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (builtins.attrValues (mapToPackages
-          user_options_set
-          (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
-          [ defaultPackageName "users" uname ]
-        ));
-      }
-    ) config.${defaultPackageName}.users;
     newUserPackageOutputs = builtins.mapAttrs ( uname: _: let
       user_options_set = config.${defaultPackageName}.users.${uname};
       in {
@@ -566,6 +556,12 @@ in {
           (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
           [ defaultPackageName "users" uname ]
         );
+      }
+    ) config.${defaultPackageName}.users;
+    newUserPackageDefinitions = builtins.mapAttrs ( uname: _: let
+      user_options_set = config.${defaultPackageName}.users.${uname};
+      in {
+        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (builtins.attrValues newUserPackageOutputs.${uname}.packages);
       }
     ) config.${defaultPackageName}.users;
   in {
