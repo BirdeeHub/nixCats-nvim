@@ -33,7 +33,7 @@ if nixCats('neonixdev') then
       }
     }
     -- If you integrated with your system flake,
-    -- you should pass inputs.self.outPath as nixdExtras.flake-path
+    -- you should pass inputs.self as nixdExtras.flake-path
     -- that way it will ALWAYS work, regardless
     -- of where your config actually was.
     -- otherwise flake-path could be an absolute path to your system flake, or nil or false

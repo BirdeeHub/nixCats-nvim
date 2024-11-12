@@ -75,7 +75,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
       }
     }
     -- If you integrated with your system flake,
-    -- you should pass inputs.self.outPath as nixdExtras.flake-path
+    -- you should pass inputs.self as nixdExtras.flake-path
     -- that way it will ALWAYS work, regardless
     -- of where your config actually was.
 

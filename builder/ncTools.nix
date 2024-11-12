@@ -55,8 +55,9 @@
       else if value == null then "nil"
       else if isFloat value || isInt value then toString value
       else if isList value then "${luaListPrinter level value}"
-      else if lib.isDerivation value then luaEnclose "${value}"
       else if isLuaInline value then replacer (luaToString value)
+      else if isAttrs value && value ? outPath then luaEnclose "${value.outPath}"
+      else if lib.isDerivation value then luaEnclose "${value}"
       else if isAttrs value then "${luaTablePrinter level value}"
       else replacer (luaEnclose (toString value));
 

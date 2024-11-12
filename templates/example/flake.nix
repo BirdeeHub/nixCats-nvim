@@ -380,7 +380,7 @@
           themer = true;
           colorscheme = "onedark";
           nixdExtras = {
-            nixpkgs = nixpkgs.outPath;
+            nixpkgs = nixpkgs;
           };
         };
       };
@@ -416,10 +416,7 @@
           themer = true;
           colorscheme = "catppuccin";
           nixdExtras = {
-            # note, use outPath here instead of just
-            # putting the derivation. otherwise,
-            # nix would try to evaluate the entire nixpkgs.
-            nixpkgs = nixpkgs.outPath;
+            nixpkgs = nixpkgs;
           };
           theBestCat = "says meow!!";
           # yes even tortured inputs work.
