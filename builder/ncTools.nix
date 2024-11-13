@@ -38,10 +38,7 @@
 
     genStr = str: num: concatStringsSep "" (genList (_: str) num);
 
-    isLuaInline = toCheck:
-    if isAttrs toCheck && toCheck ? __type
-    then toCheck.__type == "nix-to-lua-inline"
-    else false;
+    isLuaInline = toCheck: toCheck.__type or "" == "nix-to-lua-inline" && toCheck ? expr;
 
     luaToString = LI: "assert(loadstring(${luaEnclose "return ${LI.expr}"}))()";
 
