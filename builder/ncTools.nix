@@ -1,9 +1,9 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-{ lib, ... }: with builtins; rec {
+{ lib, writeText, ... }: with builtins; rec {
 # NIX CATS INTERNAL UTILS:
 
-  mkLuaFileWithMeta = { writeText }: modname: table: writeText "${modname}.lua" /*lua*/''
+  mkLuaFileWithMeta = modname: table: writeText "${modname}.lua" /*lua*/''
     local ${modname} = ${toLua table};
     return setmetatable(${modname}, {
       __call = function(self, attrpath)

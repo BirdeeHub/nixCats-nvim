@@ -23,7 +23,7 @@ let
     { inherit system config overlays; }
   else import ./builder_error.nix;
 
-  ncTools = import ./ncTools.nix { inherit (pkgs) lib; };
+  ncTools = pkgs.callPackage ./ncTools.nix { };
   thisPackage = packageDefinitions.${name} { inherit pkgs; };
   settings = {
     wrapRc = true;
@@ -95,7 +95,6 @@ in
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = allPluginDeps: pkgs.stdenv.mkDerivation (let
-      mkLuaFileWithMeta = pkgs.callPackage ncTools.mkLuaFileWithMeta {};
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
 
@@ -114,10 +113,10 @@ in
       };
       all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 
-      cats = mkLuaFileWithMeta "cats" categoriesPlus;
-      settingsTable = mkLuaFileWithMeta "settings" settingsPlus;
-      petShop = mkLuaFileWithMeta "petShop" all_def_names;
-      depsTable = mkLuaFileWithMeta "pawsible" allPluginDeps;
+      cats = ncTools.mkLuaFileWithMeta "cats" categoriesPlus;
+      settingsTable = ncTools.mkLuaFileWithMeta "settings" settingsPlus;
+      petShop = ncTools.mkLuaFileWithMeta "petShop" all_def_names;
+      depsTable = ncTools.mkLuaFileWithMeta "pawsible" allPluginDeps;
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''

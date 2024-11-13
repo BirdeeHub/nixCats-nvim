@@ -7,6 +7,7 @@
   , python3
   , symlinkJoin
   , linkFarm
+  , callPackage
   , collate_grammars ? false
 }: let
   # NOTE: define helpers for packDir function here:
@@ -35,7 +36,7 @@
       , ...
     }:
   let
-    inherit (import ./ncTools.nix { inherit lib; }) mkLuaInline;
+    inherit (callPackage ./ncTools.nix { }) mkLuaInline;
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if collate_grammars then ts_grammar_plugin_combined else
       mkLuaInline "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
