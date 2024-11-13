@@ -104,14 +104,6 @@ nixCats: packages: let
     ts_grammar_plugin_combined = symlinkJoin {
       name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
       paths = map (e: e.outPath) collected_grammars;
-      # TODO:
-      # https://github.com/NixOS/nixpkgs/pull/344849
-      # when this PR is merged, you can delete this to fix grammars not in nvim-treesitter core.
-      # This was added as a fix for errors introduced.
-      # when you do so, you should finish making collate_grammars into a setting.
-      postBuild = ''
-        rm -rf $out/queries
-      '';
     };
 
     packdirGrammar = [

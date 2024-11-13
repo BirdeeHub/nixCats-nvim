@@ -43,6 +43,7 @@ let
     suffix-path = false;
     suffix-LD = false;
     disablePythonSafePath = false;
+    collate_grammars = false;
   } // (thisPackage.settings or {});
 
   final_cat_defs_set = ({
@@ -258,8 +259,7 @@ import ./wrapNeovim.nix {
   inherit pkgs;
   neovim-unwrapped = myNeovimUnwrapped;
   inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path;
-  collate_grammars = true;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars;
   pluginsOG.myVimPackage = {
     inherit start opt;
   };

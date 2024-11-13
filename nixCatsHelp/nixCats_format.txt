@@ -653,6 +653,14 @@ These are the defaults:
       # causes sharedLibraries to be added to the END of
       # LD_LIBRARY_PATH instead of the start
 
+      # whether to group up treesitter grammars into a single directory,
+      # or leave them as separate plugins.
+      # Some users report a startup performance increase from doing this.
+      # Works only on grammars that have been passed through
+      # pkgs.neovimUtils.grammarToPlugin
+      # or pkgs.vimPlugins.nvim-treesitter.withPlugins
+      collate_grammars = false;
+
       # unsets PYTHONSAFEPATH variable.
       # Can cause issues with reproducibility,
       # can fix some stuff
