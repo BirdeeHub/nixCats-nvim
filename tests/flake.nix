@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
 {
   description = ''
     assuming you are at the top level of the repo,

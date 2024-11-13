@@ -3,17 +3,33 @@
 ---@meta
 error("Cannot import a meta module")
 
----@class nixCats
----@field cats table
----@field pawsible table
----@field settings table
----@field petShop table
+---@class nixCats.main
+---See :h nixCats.flake.outputs.packageDefinitions
+---Function form will return vim.tml_get for the attrpath
+---@field cats table|fun(attrpath: string|string[]): any
+---See :h nixCats.flake.outputs.settings
+---Function form will return vim.tml_get for the attrpath
+---@field settings table|fun(attrpath: string|string[]): any
+---Contains the final set of plugins added for this package
+---Function form will return vim.tml_get for the attrpath
+---@field pawsible table|fun(attrpath: string|string[]): any
+---Contains all the defined categories that you COULD enable from nix
+---Function form will return vim.tml_get for the attrpath
+---@field petShop table|fun(attrpath: string|string[]): any
 ---@field nixCatsPath string
 ---@field vimPackDir string
 ---@field configDir string
 ---@field packageBinPath string
 ---internal: this creates the nixCats global commands
 ---@field addGlobals fun() 
----internal: use the global alias, nixCats('path.to.value')
----for full compatibility with luaUtils template
----@field get fun(category: string|string[]): any --
+---:h nixCats
+---This function will return the nearest parent category value, unless the nearest
+---parent is a table, in which case that means a different subcategory
+---was enabled but this one was not. In that case it returns nil.
+---@field get fun(category: string|string[]): any
+
+---:h nixCats
+---This function will return the nearest parent category value, unless the nearest
+---parent is a table, in which case that means a different subcategory
+---was enabled but this one was not. In that case it returns nil.
+---@alias nixCats nixCats.main | fun(category: string|string[]): any

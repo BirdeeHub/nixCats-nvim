@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
 # Derived from:
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix
 { stdenv
@@ -96,15 +98,14 @@ let
       vim.opt.runtimepath:prepend([[${finalPackDir}]])
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
       vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
-      require('nixCats').addGlobals()
-      vim.g.configdir = vim.fn.stdpath('config')
-      vim.opt.packpath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir)
-      vim.opt.runtimepath:remove(vim.g.configdir .. "/after")
-      vim.g.configdir = require('nixCats').cats.nixCats_config_location
-      vim.opt.packpath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:prepend(vim.g.configdir)
-      vim.opt.runtimepath:append(vim.g.configdir .. "/after")
+      local configdir = vim.fn.stdpath('config')
+      vim.opt.packpath:remove(configdir)
+      vim.opt.runtimepath:remove(configdir)
+      vim.opt.runtimepath:remove(configdir .. "/after")
+      configdir = require('nixCats').configDir
+      vim.opt.packpath:prepend(configdir)
+      vim.opt.runtimepath:prepend(configdir)
+      vim.opt.runtimepath:append(configdir .. "/after")
     '';
   in [
     # vim accepts a limited number of commands so we join them all

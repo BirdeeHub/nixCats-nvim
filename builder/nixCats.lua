@@ -1,6 +1,6 @@
 -- Copyright (c) 2023 BirdeeHub 
 -- Licensed under the MIT license 
----@type nixCats
+---@type nixCats.main
 local M = {}
 M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.pawsible')
@@ -13,28 +13,20 @@ M.nixCatsPath = require('nixCats.saveTheCats')
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
 M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
 
----:h nixCats
----will return the nearest parent category value, unless the nearest
----parent is a table, in which case that means a different subcategory
----was enabled but this one was not. In that case it returns nil.
----@param category string|string[]
----@return any
 function M.get(category)
-    local strtable
+    local strtable = {}
     if type(category) == "table" then
         strtable = category
     elseif type(category) == "string" then
-        local keys = {}
         for key in category:gmatch("([^%.]+)") do
-            table.insert(keys, key)
+            table.insert(strtable, key)
         end
-        strtable = keys
     else
         print("get function requires a table of strings or a dot separated string")
         return
     end
     ---@type any
-    local cats = require('nixCats.cats')
+    local cats = M.cats
     for _, key in ipairs(strtable) do
         if type(cats) == "table" then
             cats = cats[key]
@@ -42,19 +34,17 @@ function M.get(category)
             return cats
         end
     end
-
     return cats
 end
 
 function M.addGlobals()
+
     ---:h nixCats
-    ---will return the nearest parent category value, unless the nearest
+    ---This function will return the nearest parent category value, unless the nearest
     ---parent is a table, in which case that means a different subcategory
     ---was enabled but this one was not. In that case it returns nil.
-    ---@type fun(category: string|string[]): any
-    function _G.nixCats(category)
-        return M.get(category)
-    end
+    ---@type nixCats
+    _G.nixCats = M
 
     local attributes = {
         "cats",
@@ -69,7 +59,7 @@ function M.addGlobals()
     -- command with debug info for nixCats setups
     vim.api.nvim_create_user_command('NixCats', function(opts)
         if #opts.fargs == 0 then
-            print(vim.inspect(require('nixCats.cats')))
+            print(vim.inspect(M.cats))
             return
         elseif #opts.fargs == 1 then
             if vim.list_contains(attributes, opts.fargs[1]) then
@@ -77,14 +67,14 @@ function M.addGlobals()
                 return
             end
         elseif #opts.fargs == 2 then
-            if opts.fargs[1] == 'cat' then
-                print(vim.inspect(nixCats(opts.fargs[2])))
+            if opts.fargs[1] == 'cat' or opts.fargs[1] == 'get' then
+                print(vim.inspect(M.get(opts.fargs[2])))
                 return
             end
         elseif #opts.fargs > 2 then
             local first = table.remove(opts.fargs, 1)
-            if first == 'cat' then
-                print(vim.inspect(nixCats(opts.fargs)))
+            if first == 'cat' or first == 'get' then
+                print(vim.inspect(M.get(opts.fargs)))
                 return
             end
         end
@@ -101,7 +91,7 @@ function M.addGlobals()
             for _ in cmdLineBeforeCursor:gmatch("([%s]+)") do
                 numSpaces = numSpaces + 1
             end
-            local candidates = vim.list_extend({ "cat" }, attributes)
+            local candidates = vim.list_extend({ "cat", "get" }, attributes)
             local matches = {}
 
             if not (#argsTyped > 1) then
@@ -110,7 +100,7 @@ function M.addGlobals()
                         table.insert(matches, candidate)
                     end
                 end
-            elseif argsTyped[2] == 'cat' then
+            elseif argsTyped[2] == 'cat' or argsTyped[2] == 'get' then
                 table.remove(argsTyped, 1)
                 table.remove(argsTyped, 1)
                 local argsSoFar = {}
@@ -126,7 +116,8 @@ function M.addGlobals()
                 end
                 -- Walk table till end of argsSoFar,
                 -- and offer matching completion options
-                local cats = require('nixCats.cats')
+                ---@type any
+                local cats = M.cats
                 for index, key in pairs(argsSoFar) do
                     if index == #argsSoFar then
                         for name, value in pairs(cats) do
@@ -185,4 +176,11 @@ function M.addGlobals()
     ]])
 end
 
-return M
+M.addGlobals()
+
+---@type nixCats
+return setmetatable(M, {
+    __call = function(_, cat)
+        return M.get(cat)
+    end
+})
