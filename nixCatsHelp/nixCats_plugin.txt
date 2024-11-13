@@ -29,9 +29,8 @@ I.e. if nix was not a category you included a value true or false for,
 it would evaluate as if it was false.
 if your category has an illegal lua name you may instead use this syntax
 >lua
-    nixCats({'attr-set', "path", "to", [[valu.e'!#$@]]})
+    nixCats { 'attr-set', "path", "to", [[valu.e'!#$@]] }
 <
-
 nixCats command will return the nearest parent category value, unless the nearest
 parent is a table, in which case that means a different subcategory
 was enabled but this one was not.
