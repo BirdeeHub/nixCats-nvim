@@ -135,14 +135,18 @@ in
     });
 
     customRC = let
-      optLuaPre = if builtins.isString optionalLuaPreInit
+      optLuaPre = let
+        lua = if builtins.isString optionalLuaPreInit
           then optionalLuaPreInit
           else builtins.concatStringsSep "\n"
           (pkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
-      optLuaAdditions = if builtins.isString optionalLuaAdditions
+      in if lua != "" then "dofile([[${pkgs.writeText "optLuaPre.lua" lua}]])" else "";
+      optLuaAdditions = let
+        lua = if builtins.isString optionalLuaAdditions
           then optionalLuaAdditions
           else builtins.concatStringsSep "\n"
           (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+      in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
     in/*lua*/''
       ${optLuaPre}
       if vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
