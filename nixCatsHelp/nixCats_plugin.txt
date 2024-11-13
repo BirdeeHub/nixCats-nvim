@@ -221,16 +221,16 @@ has the `cat` subcommand to preview the value from `nixCats("catname")`,
 >lua
   ---@class nixCats.main
   ---See :h nixCats.flake.outputs.packageDefinitions
-  ---Function form will return vim.tml_get for the attrpath
+  ---Function form will return vim.tbl_get for the attrpath
   ---@field cats table|fun(attrpath: string|string[]): any
   ---See :h nixCats.flake.outputs.settings
-  ---Function form will return vim.tml_get for the attrpath
+  ---Function form will return vim.tbl_get for the attrpath
   ---@field settings table|fun(attrpath: string|string[]): any
   ---Contains the final set of plugins added for this package
-  ---Function form will return vim.tml_get for the attrpath
+  ---Function form will return vim.tbl_get for the attrpath
   ---@field pawsible table|fun(attrpath: string|string[]): any
   ---Contains all the defined categories that you COULD enable from nix
-  ---Function form will return vim.tml_get for the attrpath
+  ---Function form will return vim.tbl_get for the attrpath
   ---@field petShop table|fun(attrpath: string|string[]): any
   ---@field nixCatsPath string
   ---@field vimPackDir string
