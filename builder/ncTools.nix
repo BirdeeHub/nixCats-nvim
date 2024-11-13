@@ -18,7 +18,13 @@
             print("function requires a table of strings or a dot separated string")
             return
         end
-        return vim.tbl_get(${modname}, unpack(strtable));
+        if #strtable == 0 then return nil end
+        local tbl = ${modname};
+        for _, key in ipairs(strtable) do
+          if type(tbl) ~= "table" then return nil end
+          tbl = tbl[key]
+        end
+        return tbl
       end
     })
   '';
