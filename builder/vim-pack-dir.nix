@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub 
+# Licensed under the MIT license 
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/ae5d2af73efa5e25bf9bf43672cd3d8d99c613d0/pkgs/applications/editors/vim/plugins/vim-utils.nix#L136-L207
 { lib, buildEnv, writeTextFile
@@ -44,7 +46,6 @@
         start = builtins.listToAttrs (map mkEntryFromDrv startPlugins);
         opt = builtins.listToAttrs (map mkEntryFromDrv opt);
         inherit ts_grammar_path;
-        ts_grammar_plugin = ts_grammar_path;
       };
       python3Path = if (allPython3Dependencies python3.pkgs == []) then null
         else ''${python3link}/pack/${packageName}/start/__python3_dependencies/python3'';

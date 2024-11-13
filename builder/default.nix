@@ -94,8 +94,8 @@ in
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
-    nixCats = allPluginDeps:
-    pkgs.stdenv.mkDerivation (let
+    nixCats = allPluginDeps: pkgs.stdenv.mkDerivation (let
+      mkLuaFileWithMeta = pkgs.callPackage ncTools.mkLuaFileWithMeta {};
       isUnwrappedCfgPath = settings.wrapRc == false && settings.unwrappedCfgPath != null && builtins.isString settings.unwrappedCfgPath;
       isStdCfgPath = settings.wrapRc == false && ! isUnwrappedCfgPath;
 
@@ -114,10 +114,10 @@ in
       };
       all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 
-      cats = pkgs.writeText "cats.lua" ''return ${ncTools.toLua categoriesPlus}'';
-      settingsTable = pkgs.writeText "settings.lua" ''return ${ncTools.toLua settingsPlus}'';
-      petShop = pkgs.writeText "petShop.lua" ''return ${ncTools.toLua all_def_names}'';
-      depsTable = pkgs.writeText "pawsible.lua" ''return ${ncTools.toLua allPluginDeps}'';
+      cats = mkLuaFileWithMeta "cats" categoriesPlus;
+      settingsTable = mkLuaFileWithMeta "settings" settingsPlus;
+      petShop = mkLuaFileWithMeta "petShop" all_def_names;
+      depsTable = mkLuaFileWithMeta "pawsible" allPluginDeps;
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
@@ -145,12 +145,11 @@ in
           (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
     in/*lua*/''
       ${optLuaPre}
-      vim.g.configdir = require('nixCats').cats.nixCats_config_location
-      if vim.fn.filereadable(vim.g.configdir .. "/init.vim") == 1 then
-        vim.cmd.source(vim.g.configdir .. "/init.vim")
+      if vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
+        vim.cmd.source(require('nixCats').configDir .. "/init.vim")
       end
-      if vim.fn.filereadable(vim.g.configdir .. "/init.lua") == 1 then
-        dofile(vim.g.configdir .. "/init.lua")
+      if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
+        dofile(require('nixCats').configDir .. "/init.lua")
       end
       ${optLuaAdditions}
     '';

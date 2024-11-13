@@ -1,7 +1,7 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 with builtins; rec {
-  # These are to be exported in flake outputs
+  # NOTE: This utils set is the entire public interface for nixCats
   utils = {
     # The big function that does everything
     baseBuilder =
@@ -19,14 +19,11 @@ with builtins; rec {
         # validate channel, regardless of its type
         # normalize to something that has lib and outPath in it
         # so that overriders can always use it as expected
-        pkgstype = if isAttrs nixpkgs && nixpkgs ? path && nixpkgs ? lib && nixpkgs ? config && nixpkgs ? system then "pkgs"
-          else if isAttrs nixpkgs && nixpkgs ? lib && nixpkgs ? outPath then "nixpkgs"
-          else if isPath nixpkgs || isString nixpkgs then "path"
-          else if isAttrs nixpkgs && (lib.isDerivation nixpkgs || nixpkgs ? outPath) then "drv"
-          else import ../builder/builder_error.nix;
-        nixpkgspath = if pkgstype == "pkgs" then nixpkgs.path else nixpkgs.outPath or nixpkgs;
-        newnixpkgs = if pkgstype == "nixpkgs" then nixpkgs
-          else if pkgstype == "pkgs" then nixpkgs // { outPath = nixpkgspath; }
+        isPkgs = isAttrs nixpkgs && nixpkgs ? path && nixpkgs ? lib && nixpkgs ? config && nixpkgs ? system;
+        isNixpkgs = isAttrs nixpkgs && nixpkgs ? lib && nixpkgs ? outPath;
+        nixpkgspath = nixpkgs.path or nixpkgs.outPath or nixpkgs;
+        newnixpkgs = if isPkgs then nixpkgs // { outPath = nixpkgspath; }
+          else if isNixpkgs then nixpkgs
           else {
             lib = nixpkgs.lib or import "${nixpkgspath}/lib";
             outPath = nixpkgspath;
@@ -160,8 +157,6 @@ with builtins; rec {
     # in case someoneone wants flake-utils but for only 1 output,
     # and didnt know genAttrs is great as a bySystems
     bySystems = lib.genAttrs;
-
-    # NOTE: non-module flake output construction utils below:
 
     # makes a default package and then one for each name in packageDefinitions
     mkPackages = finalBuilder: packageDefinitions: defaultName:

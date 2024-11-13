@@ -1,3 +1,5 @@
+-- Copyright (c) 2023 BirdeeHub 
+-- Licensed under the MIT license 
 if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
