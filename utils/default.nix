@@ -19,8 +19,8 @@ with builtins; rec {
         # validate channel, regardless of its type
         # normalize to something that has lib and outPath in it
         # so that overriders can always use it as expected
-        isPkgs = isAttrs nixpkgs && nixpkgs ? path && nixpkgs ? lib && nixpkgs ? config && nixpkgs ? system;
-        isNixpkgs = isAttrs nixpkgs && nixpkgs ? lib && nixpkgs ? outPath;
+        isPkgs = nixpkgs ? path && nixpkgs ? lib && nixpkgs ? config && nixpkgs ? system;
+        isNixpkgs = nixpkgs ? lib && nixpkgs ? outPath;
         nixpkgspath = nixpkgs.path or nixpkgs.outPath or nixpkgs;
         newnixpkgs = if isPkgs then nixpkgs // { outPath = nixpkgspath; }
           else if isNixpkgs then nixpkgs
