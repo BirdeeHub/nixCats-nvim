@@ -48,7 +48,6 @@ function M.setup(v)
         get = function(_) return nixCats_default_value end,
         cats = mk_with_meta({
           nixCats_config_location = vim.fn.stdpath('config'),
-          configDirName = os.getenv("NVIM_APPNAME") or "nvim",
           wrapRc = false,
         }),
         settings = mk_with_meta({
