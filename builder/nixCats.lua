@@ -28,11 +28,8 @@ function M.get(category)
     ---@type any
     local cats = M.cats
     for _, key in ipairs(strtable) do
-        if type(cats) == "table" then
-            cats = cats[key]
-        else
-            return cats
-        end
+        if type(cats) ~= "table" then return cats end
+        cats = cats[key]
     end
     return cats
 end
