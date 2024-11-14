@@ -60,7 +60,7 @@
       destination = "/lua/nixCats/saveTheCats.lua";
     });
     nixCatsFinal = nixCats fullDeps;
-  in # we add the plugin with ALL the parsers if its the old way, if its the new way, it will be in our packpath already
+  in # add fully called nixCats plugin along with another to save its path.
   [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
 
   # gets plugin.dependencies from
