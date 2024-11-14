@@ -1079,21 +1079,27 @@ These are all the types, each one has an associated `mk`
 function to create a value of that type,
 which accepts the fields listed here, defined with default values.
 >nix
+  # creates an inline lua value in a way that cant break the table
   inline-safe = {
     default = (v: if v ? body then v else { body = v; });
     fields = { body = "nil"; };
     format = LI: "assert(loadstring(${luaEnclose "return ${LI.expr.body or LI.expr or "nil"}"}))()";
   };
+  # iterpolates whatever string you provide into the table raw
   inline-unsafe = {
     fields = { body = "nil"; };
     format = LI: "${LI.expr.body or "nil"}";
   };
+  # creates a function with args of the names given in args list
+  # does so in a way where you cannot accidentally break the table
   function-safe = {
     fields = { body = "return nil"; args = []; };
     format = LI: ''(function(${fixargs (LI.expr.args or [])})
       return assert(loadstring(${luaEnclose "${LI.expr.body or "return nil"}"}))()
     end)'';
   };
+  # creates a function with args of the names given in args list
+  # interpolates the body segment raw, just like inline-unsafe, but in a function
   function-unsafe = {
     fields = { body = "return nil"; args = []; };
     format = LI: ''(function(${fixargs (LI.expr.args or [])})
