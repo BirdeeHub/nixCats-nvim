@@ -574,7 +574,19 @@ an example package definition:
         # builtins.toString on it and passes it in as a string
         theBestCat = "says meow!!!";
         # maybe you need to pass a port or path in or something idk.
-        # you could :lua print(require('nixCats').theBestCat)
+        # you could :lua =nixCats("theBestCat")
+        # this nixCats("path.to.val") is the main category check function
+        # and it is built to mirror the nix category scheme as much as possible
+      };
+      extra = {
+        there_is = "also";
+        an_extra = "table";
+        for = ''if you dont want the main subcategory get function
+          to apply to something, or think it all being in categories is too
+          messy
+        '';
+        you_can = ''nixCats.extra("path.to.val")'';
+        for_safer = ''table access via vim.tbl_get'';
       };
     };
   };
@@ -1023,15 +1035,6 @@ whole outputs section instead of eachSystem, it would add the
 
 It is the same thing as `nixpkgs.lib.genAttrs`, renamed so that people know
 how to use it.
-
-<mkLuaInline> luaCode:
-This helper can be used in the `packageDefinitions` set in order to write
-unescaped lua code into the nixCats plugin.
-
-For example, if `settings.wrapRc = false;` and `settings.unwrappedCfgPath`
-is NOT set, nixCats uses this function to make
-your config path default to the value of:
-`nixCats_config_location = utils.mkLuaInline "vim.fn.stdpath('config')"`
 
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*

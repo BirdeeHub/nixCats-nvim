@@ -10,6 +10,9 @@ error("Cannot import a meta module")
 ---See :h nixCats.flake.outputs.settings
 ---Function form will return vim.tbl_get for the attrpath
 ---@field settings table|fun(attrpath: string|string[]): any
+---See :h nixCats.flake.outputs.packageDefinitions
+---Function form will return vim.tbl_get for the attrpath
+---@field extra table|fun(attrpath: string|string[]): any
 ---Contains the final set of plugins added for this package
 ---Function form will return vim.tbl_get for the attrpath
 ---@field pawsible table|fun(attrpath: string|string[]): any

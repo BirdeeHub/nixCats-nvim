@@ -6,6 +6,7 @@ M.cats = require('nixCats.cats')
 M.pawsible = require('nixCats.pawsible')
 M.settings = require('nixCats.settings')
 M.petShop = require('nixCats.petShop')
+M.extra = require('nixCats.extra')
 M.configDir = M.settings.nixCats_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
@@ -22,7 +23,7 @@ function M.get(category)
             table.insert(strtable, key)
         end
     else
-        print("get function requires a table of strings or a dot separated string")
+        print([[function requires a { "list", "of", "strings" } or a "dot.separated.string"]])
         return
     end
     ---@type any
@@ -48,6 +49,7 @@ function M.addGlobals()
         "settings",
         "pawsible",
         "petShop",
+        "extra",
         "vimPackDir",
         "configDir",
         "nixCatsPath",
