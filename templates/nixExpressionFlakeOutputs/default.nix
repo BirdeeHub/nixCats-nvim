@@ -43,7 +43,7 @@
     ];
   in { inherit dependencyOverlays; })) dependencyOverlays;
 
-  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
 
     lspsAndRuntimeDeps = {
       general = with pkgs; [
@@ -124,6 +124,7 @@
           ];
         };
       };
+      extra = {};
     };
   };
   # In this section, the main thing you will need to do is change the default package name

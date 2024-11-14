@@ -268,7 +268,7 @@ which allows categoryDefinitions to be much more dynamic.
 
 These are the things you can return:
 >nix
-  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
 <
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSP's or 
@@ -485,7 +485,7 @@ included the go category, it could then enable debug.go and lsp.go for you.
 But in addition to that, it can be combined with the implicit form of creating
 default values above in an interesting way.
 >nix
-  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
     lspsAndRuntimeDeps = {
       debug = with pkgs; {
         go = [ delve ];

@@ -67,6 +67,7 @@ let
     extraCats = {};
   } // (categoryDefinitions {
     # categories depends on extraCats
+    extra = extraTableLua;
     inherit categories settings pkgs name;
   }));
   inherit (final_cat_defs_set)
@@ -78,6 +79,7 @@ let
   optionalLuaPreInit bashBeforeWrapper;
 
   categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
+  extraTableLua = thisPackage.extra or {};
 
 in
   let
@@ -117,7 +119,7 @@ in
       settingsTable = ncTools.mkLuaFileWithMeta "settings" settingsPlus;
       petShop = ncTools.mkLuaFileWithMeta "petShop" all_def_names;
       depsTable = ncTools.mkLuaFileWithMeta "pawsible" allPluginDeps;
-      extraItems = ncTools.mkLuaFileWithMeta "extra" (thisPackage.extra or {});
+      extraItems = ncTools.mkLuaFileWithMeta "extra" extraTableLua;
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
