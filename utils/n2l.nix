@@ -1,3 +1,5 @@
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
 with builtins; let
   genStr = str: num: concatStringsSep "" (genList (_: str) num);
   luaEnclose = inString: let
