@@ -17,6 +17,8 @@ nixCats.flake.outputs.getOverlays	nixCats_format.txt	/*nixCats.flake.outputs.get
 nixCats.flake.outputs.overlays	nixCats_format.txt	/*nixCats.flake.outputs.overlays*
 nixCats.flake.outputs.packageDefinitions	nixCats_format.txt	/*nixCats.flake.outputs.packageDefinitions*
 nixCats.flake.outputs.settings	nixCats_format.txt	/*nixCats.flake.outputs.settings*
+nixCats.flake.outputs.utils	nixCats_format.txt	/*nixCats.flake.outputs.utils*
+nixCats.flake.outputs.utils.n2l	nixCats_format.txt	/*nixCats.flake.outputs.utils.n2l*
 nixCats.installation_options	nixCats_installation.txt	/*nixCats.installation_options*
 nixCats.luaUtils	nixCats_luaUtils.txt	/*nixCats.luaUtils*
 nixCats.luaUtils.intro	nixCats_luaUtils.txt	/*nixCats.luaUtils.intro*

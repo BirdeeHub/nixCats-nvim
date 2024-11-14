@@ -47,21 +47,21 @@ with builtins; let
   in {
     inline-safe = {
       default = (v: if v ? body then v else { body = v; });
-      fields = { body = ""; };
+      fields = { body = "nil"; };
       format = LI: "assert(loadstring(${luaEnclose "return ${LI.expr.body or LI.expr or "nil"}"}))()";
     };
     inline-unsafe = {
-      fields = { body = ""; };
+      fields = { body = "nil"; };
       format = LI: "${LI.expr.body or "nil"}";
     };
     function-safe = {
-      fields = { body = ""; args = []; };
+      fields = { body = "return nil"; args = []; };
       format = LI: ''(function(${fixargs (LI.expr.args or [])})
         return assert(loadstring(${luaEnclose "${LI.expr.body or "return nil"}"}))()
       end)'';
     };
     function-unsafe = {
-      fields = { body = ""; args = []; };
+      fields = { body = "return nil"; args = []; };
       format = LI: ''(function(${fixargs (LI.expr.args or [])})
         ${LI.expr.body or "return nil"}
       end)'';
