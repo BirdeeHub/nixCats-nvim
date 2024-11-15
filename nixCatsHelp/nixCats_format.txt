@@ -1104,6 +1104,29 @@ which accepts the fields listed here, defined with default values.
     format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)'';
   };
 <
+
+Some more useage examples:
+>nix
+  exampleSafeFunc = utils.n2l.types.function-safe.mk {
+    args = [ "hello" ];
+    body = /*lua*/ ''
+      print(hello)
+      return hi
+    '';
+  };
+  exampleUnsafeFunc = utils.n2l.types.function-unsafe.mk {
+    args = [ "hi" "hello" ];
+    body = /*lua*/ ''
+      print(hi)
+      print(hello)
+      return hi .. hello
+    '';
+  };
+  };
+  funcResults = {
+    test1 = utils.n2l.types.inline-safe.mk ''${nixToLua.resolve theWorstCat.exampleSafeFunc}("Hello World!")'';
+  };
+<
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*
                                   *nixCats.flake.outputs.exports.mkHomeModules*
