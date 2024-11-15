@@ -50,7 +50,7 @@ with builtins; rec {
     # this means it works slightly differently for environment variables
     # because each one will be updated individually rather than at a category level.
     mergeCatDefs = oldCats: newCats:
-      (packageDef: lib.recursiveUpdateUntilDRV (oldCats packageDef) (newCats packageDef));
+      (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
 
     # allows category list definitions to be merged
     deepmergeCats = oldCats: newCats:
@@ -129,6 +129,7 @@ with builtins; rec {
     n2l = import ./n2l.nix;
 
     mkLuaInline = trace "utils.mkLuaInline renamed to utils.n2l.types.inline-safe.mk, due to be removed before 2025" n2l.types.inline-safe.mk;
+
     # flake-utils' main function, because its all I used
     # Builds a map from <attr>=value to <attr>.<system>=value for each system
     eachSystem = systems: f:
@@ -331,7 +332,7 @@ with builtins; rec {
 
     in
     if isAttrs subcategories && ! lib.isDerivation subcategories then
-      lib.recursiveUpdateUntilDRV subcategories toMerge
+      lib.recUpdateHandleInlineORdrv subcategories toMerge
     else toMerge;
 
   };
@@ -340,20 +341,20 @@ with builtins; rec {
   lib = {
     isDerivation = value: value.type or null == "derivation";
 
-    recursiveUpdateUntilDRV = left: right: let
-      pred = path: lhs: rhs:
-          # I added this check for derivation because a category can be just a derivation.
-          # otherwise it would squish our single derivation category rather than update.
-        (!((isAttrs lhs && !lib.isDerivation lhs) && (isAttrs rhs && !lib.isDerivation rhs)));
-    in lib.recUpUntilWpicker { inherit pred; } left right;
+    updateUntilPred = path: lhs: rhs:
+      lib.isDerivation lhs || lib.isDerivation rhs
+      || utils.n2l.member lhs || utils.n2l.member rhs
+      || ! isAttrs lhs || ! isAttrs rhs;
+
+    recursiveUpdateUntilDRV = lib.recUpUntilWpicker { pred = path: lhs: rhs:
+      lib.isDerivation lhs || lib.isDerivation rhs || ! isAttrs lhs || ! isAttrs rhs; };
+
+    recUpdateHandleInlineORdrv = lib.recUpUntilWpicker { pred = lib.updateUntilPred; };
 
     unique = foldl' (acc: e: if elem e acc then acc else acc ++ [ e ]) [];
 
-    recursiveUpdateWithMerge = lhs: rhs: let
-      pred = path: left: right:
-          # I added this check for derivation because a category can be just a derivation.
-          # otherwise it would squish our single derivation category rather than update.
-        (!((isAttrs left && !lib.isDerivation left) && (isAttrs right && !lib.isDerivation right)));
+    recursiveUpdateWithMerge = lib.recUpUntilWpicker {
+      pred = lib.updateUntilPred;
       picker = left: right:
         if isList left && isList right
           then lib.unique (left ++ right)
@@ -364,7 +365,7 @@ with builtins; rec {
         else if isList right && all (rv: typeOf rv == typeOf left) right then
           if elem left right then right else [ left ] ++ right
         else right;
-      in lib.recUpUntilWpicker { inherit pred picker; } lhs rhs;
+    };
 
     genAttrs =
       names:
@@ -397,7 +398,7 @@ with builtins; rec {
       merge = loc: defs: let
         values = map (v: v.value) defs;
         mergefunc = if subtype == "replace"
-        then lib.recursiveUpdateUntilDRV 
+        then lib.recUpdateHandleInlineORdrv 
         else if subtype == "merge"
         then lib.recursiveUpdateWithMerge
         else throw "invalid catDef subtype";
