@@ -37,8 +37,7 @@ with builtins; let
       in valdef;
     member = v: v.__type or null == id && v ? expr
       && null != types."${v.expr.type or default_subtype}".name or null;
-    typeof = v: let
-      in if ! (member v) then null
+    typeof = v: if ! (member v) then null
       else types."${v.expr.type or default_subtype}".name;
     resolve = v: let vt = typeof v; in
       if vt == null then throw "unable to resolve, not subtype of ${id}"
