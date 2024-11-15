@@ -29,8 +29,8 @@ with builtins; let
     types = mapAttrs (n: p: p // { name = n; mk = mkmk n p (p.default or (o: o)); }) proto;
     default_subtype = let
       defvals = attrNames (filterAttrs (n: x: isFunction (x.default or false)) proto);
-      valdef = if defvals == [] then throw "no default type specified"
-        else if length defvals  == 1 then head defvals
+      valdef = if length defvals  == 1 then head defvals
+        else if defvals == [] then throw "no default type specified"
         else throw "multiple default types specified";
     in valdef;
     member = v: v.__type or null == id && v ? expr
