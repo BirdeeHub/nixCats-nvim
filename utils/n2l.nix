@@ -25,8 +25,10 @@ with builtins; let
     filterAttrs = pred: set:
       removeAttrs set (filter (name: ! pred name set.${name}) (attrNames set));
     mkBaseT = expr: { __type = id; inherit expr; };
-    mkmk = n: p: default: v: mkBaseT ((p.fields or {}) // { type = n; } // default v);
-    types = mapAttrs (n: p: p // { name = n; mk = mkmk n p (p.default or (o: o)); }) proto;
+    mkmk = n: p: v: mkBaseT ((p.fields or {}) // { type = n; } // ((p.default or (o: o)) v));
+    types = mapAttrs (n: p: p // { name = n; mk = mkmk n p;
+        check = v: (p.check or (_:true)) v && typeof v == n;
+      }) proto;
     default_subtype = let
       defvals = attrNames (filterAttrs (n: x: isFunction (x.default or false)) proto);
       valdef = if length defvals  == 1 then head defvals
