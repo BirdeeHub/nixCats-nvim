@@ -59,27 +59,31 @@ with builtins; let
     };
     function-safe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: 
+      format = LI:
         ''assert(loadstring(${luaEnclose ''return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)''}))()'';
     };
     function-unsafe = {
       fields = { body = "return nil"; args = []; };
       format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)'';
     };
+    with-meta = {
+      fields = {
+        table = {};
+        meta = {};
+        newtable = null; # <- if you want to specify a different first arg to setmetatable
+        tablevar = "tbl_in"; # <- varname to refer to the table, to avoid translating multiple times
+      };
+      format = LI: opts: let
+        metaarg1 = if LI.expr.newtable or null == null then LI.expr.tablevar or "{}" else toLuaFull opts LI.expr.newtable;
+        result = inline.types.function-unsafe.mk {
+          args = [ (LI.expr.tablevar or "tbl_in") ];
+          body = ''return setmetatable(${metaarg1}, ${toLuaFull opts LI.expr.meta})'';
+        };
+      in "${toLuaFull opts result}(${toLuaFull opts LI.expr.table})";
+    };
   };
 
   inline = mkEnum "nix-to-lua-inline" LIproto;
-
-in rec {
-
-  toLua = toLuaFull {};
-
-  prettyLua = toLuaFull { pretty = true; formatstrings = true; };
-
-  uglyLua = toLuaFull { pretty = false; formatstrings = false; };
-
-  inherit mkEnum inline;
-  inherit (inline) types typeof member resolve default_subtype;
 
   toLuaFull = {
     pretty ? true,
@@ -130,5 +134,16 @@ in rec {
 
   in
   doSingleLuaValue _level input;
+
+in {
+
+  toLua = toLuaFull {};
+
+  prettyLua = toLuaFull { pretty = true; formatstrings = true; };
+
+  uglyLua = toLuaFull { pretty = false; formatstrings = false; };
+
+  inherit mkEnum inline toLuaFull;
+  inherit (inline) types typeof member resolve default_subtype;
 
 }

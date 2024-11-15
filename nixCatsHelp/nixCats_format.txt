@@ -1103,6 +1103,21 @@ which accepts the fields listed here, defined with default values.
     fields = { body = "return nil"; args = []; };
     format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)'';
   };
+  with-meta = {
+    fields = {
+      table = {}; # <- the table you are adding
+      meta = {}; # <- the metatable you want to add to it (in nix)
+      newtable = null; # <- if you want to specify a different first arg to setmetatable
+      tablevar = "tbl_in"; # <- varname to refer to the table, to avoid translating multiple times
+    };
+    format = LI: opts: let
+      metaarg1 = if LI.expr.newtable or null == null then LI.expr.tablevar or "{}" else toLuaFull opts LI.expr.newtable;
+      result = inline.types.function-unsafe.mk {
+        args = [ (LI.expr.tablevar or "tbl_in") ];
+        body = ''return setmetatable(${metaarg1}, ${toLuaFull opts LI.expr.meta})'';
+      };
+    in "${toLuaFull opts result}(${toLuaFull opts LI.expr.table})";
+  };
 <
 
 Some more useage examples:
@@ -1126,6 +1141,31 @@ Some more useage examples:
   funcResults = {
     test1 = utils.n2l.types.inline-safe.mk ''${utils.n2l.resolve exampleSafeFunc}("Hello World!")'';
   };
+  lua_table_with_meta = utils.n2l.types.with-meta.mk (let
+    tablevar = "tbl_in";
+  in {
+    table = {
+      this = "is a test table";
+      inatesttable = "that will be translated to a lua table with a metatable";
+    };
+    # to avoid translating the table multiple times,
+    # define a variable name for it in lua. Defaults to "tbl_in"
+    inherit tablevar;
+    meta = {
+      # __call in lua lets us also call it like a function
+      __call = utils.n2l.types.function-unsafe.mk {
+        args = [ "self" "..." ];
+        body = ''
+          print("This table is named ${tablevar}")
+          return ${tablevar}.this
+        '';
+      };
+    };
+    # you can change it to set the metatable of
+    # and return a different table instead.
+    # sometimes done so that access always uses __index function
+    newtable = null; # <- default val, sets metatable of tablevar
+  });
 <
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*
