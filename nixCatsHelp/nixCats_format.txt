@@ -1124,7 +1124,7 @@ Some more useage examples:
   };
   };
   funcResults = {
-    test1 = utils.n2l.types.inline-safe.mk ''${nixToLua.resolve theWorstCat.exampleSafeFunc}("Hello World!")'';
+    test1 = utils.n2l.types.inline-safe.mk ''${utils.n2l.resolve exampleSafeFunc}("Hello World!")'';
   };
 <
 ---------------------------------------------------------------------------------------
