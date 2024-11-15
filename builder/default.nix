@@ -17,8 +17,9 @@ let
     overlays = if isList dependencyOverlays
       then dependencyOverlays
       else dependencyOverlays.${system} or [];
-  in if isAttrs nixCats_passthru && isFunction categoryDefinitions
-    && isAttrs packageDefinitions && isString name
+  in if isAttrs extra_pkg_config && isAttrs nixCats_passthru
+    && isFunction categoryDefinitions && isAttrs packageDefinitions && isString name
+    && (isPath luaPath || (isString luaPath && hasContext luaPath))
   then import (nixpkgs.path or nixpkgs.outPath or nixpkgs)
     { inherit system config overlays; }
   else import ./builder_error.nix;
@@ -83,16 +84,6 @@ let
 
 in
   let
-    # copy entire flake to store directory
-    LuaConfig = pkgs.stdenv.mkDerivation {
-      name = "nixCats-special-rtp-entry-LuaConfig";
-      builder = pkgs.writeText "builder.sh" /* bash */ ''
-        source $stdenv/setup
-        mkdir -p $out
-        cp -r ${luaPath}/* $out/
-      '';
-    };
-
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
@@ -102,7 +93,7 @@ in
 
       nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
         else if isStdCfgPath then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
-        else "${LuaConfig}";
+        else "${luaPath}";
 
       categoriesPlus = categories // {
         nixCats_wrapRc = settings.wrapRc;
