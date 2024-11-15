@@ -56,7 +56,7 @@
           ]
         ));
 
-        categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+        categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
           # NOTE: for all available fields, see:
           # :help nixCats.flake.outputs.categories
           startupPlugins = with pkgs.vimPlugins; {
