@@ -96,7 +96,7 @@
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
-    categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
       # to define and use a new category, simply add a new list to a set here, 
       # and later, you will include categoryname = true; in the set you
       # provide when you build the package using this builder function.
@@ -383,6 +383,7 @@
             nixpkgs = nixpkgs;
           };
         };
+        extra = {};
       };
       regularCats = { pkgs, ... }@misc: {
         settings = {
@@ -419,7 +420,13 @@
             nixpkgs = nixpkgs;
           };
           theBestCat = "says meow!!";
+        };
+        extra = {
           # yes even tortured inputs work.
+          # extra is just for extra stuff. It works just like categories
+          # except it doesnt control what gets included, and
+          # nixCats.extra("attr.path") behaves like vim.tbl_get
+          # unlike nixCats('attr.path')
           theWorstCat = {
             thing'1 = [ "MEOW" '']]' ]=][=[HISSS]]"[['' ];
             thing2 = [
@@ -427,7 +434,7 @@
                 thing3 = [ "give" "treat" ];
               }
               "I LOVE KEYBOARDS"
-              (utils.mkLuaInline ''[[I am a]] .. [[ lua ]] .. type("value")'')
+              (utils.n2l.types.inline-safe.mk ''[[I am a]] .. [[ lua ]] .. type("value")'')
             ];
             thing4 = "couch is for scratching";
           };

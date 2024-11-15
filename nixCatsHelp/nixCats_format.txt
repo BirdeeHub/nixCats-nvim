@@ -268,7 +268,7 @@ which allows categoryDefinitions to be much more dynamic.
 
 These are the things you can return:
 >nix
-  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
 <
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSP's or 
@@ -485,7 +485,7 @@ included the go category, it could then enable debug.go and lsp.go for you.
 But in addition to that, it can be combined with the implicit form of creating
 default values above in an interesting way.
 >nix
-  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
     lspsAndRuntimeDeps = {
       debug = with pkgs; {
         go = [ delve ];
@@ -574,7 +574,19 @@ an example package definition:
         # builtins.toString on it and passes it in as a string
         theBestCat = "says meow!!!";
         # maybe you need to pass a port or path in or something idk.
-        # you could :lua print(require('nixCats').theBestCat)
+        # you could :lua =nixCats("theBestCat")
+        # this nixCats("path.to.val") is the main category check function
+        # and it is built to mirror the nix category scheme as much as possible
+      };
+      extra = {
+        there_is = "also";
+        an_extra = "table";
+        for = ''if you dont want the main subcategory get function
+          to apply to something, or think it all being in categories is too
+          messy
+        '';
+        you_can = ''nixCats.extra("path.to.val")'';
+        for_safer = ''table access via vim.tbl_get'';
       };
     };
   };
@@ -872,6 +884,7 @@ They look something like this:
     inherit (utils) templates;
   };
 <
+                                  *nixCats.flake.outputs.utils*
 
 We also export the <utils> set so we can get it easier later,
 along with <templates> which are inside it.
@@ -1024,15 +1037,96 @@ whole outputs section instead of eachSystem, it would add the
 It is the same thing as `nixpkgs.lib.genAttrs`, renamed so that people know
 how to use it.
 
-<mkLuaInline> luaCode:
-This helper can be used in the `packageDefinitions` set in order to write
-unescaped lua code into the nixCats plugin.
+                                  *nixCats.flake.outputs.utils.n2l*
+<n2l> This is the nix to lua library nixCats
+uses to create the nixCats lua plugin
+You may wish to use some functions from it.
 
-For example, if `settings.wrapRc = false;` and `settings.unwrappedCfgPath`
-is NOT set, nixCats uses this function to make
-your config path default to the value of:
-`nixCats_config_location = utils.mkLuaInline "vim.fn.stdpath('config')"`
+It contains <toLua> and <prettyLua> and <uglyLua> which convert nix to lua.
 
+it contains a <member> function to determine if a value is a special "inline lua" type
+it contains a <typeof> function to determine which special "inline lua" type it is
+it contains a <resolve> function which knows how to resolve the types to a string of code
+it contains the <default_subtype> name as well.
+
+But of much more interest to you is the types you may declare.
+
+Everything being passed through settings, categories, and extra in packageDefinitions
+will be properly escaped. But this also means that
+you cannot write any lua code there.
+
+Luckily, we have some types we can declare that will allow you to do this.
+
+To declare that an item is a lua value rather than a hard coded one,
+you may choose one of these types. To do this, call its constructor!
+
+for example, `types.inline-unsafe` has 1 field, `body`.
+
+To declare one in our settings, categories, and extra sets, it would look
+something like this:
+>nix
+  categories = {
+    somecat = utils.n2l.types.inline-unsafe.mk {body = "vim.fn.stdpath('data')"; }`
+  }
+<
+`inline-safe` is the default type, and it gets to define a shorthand form.
+>nix
+  categories = {
+    somecat = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('data')";`
+  }
+<
+These are all the types, each one has an associated `mk`
+function to create a value of that type,
+which accepts the fields listed here, defined with default values.
+>nix
+  # creates an inline lua value in a way that cant break the table
+  inline-safe = {
+    default = (v: if v ? body then v else { body = v; });
+    fields = { body = "nil"; };
+    format = LI: "assert(loadstring(${luaEnclose "return ${LI.expr.body or LI.expr or "nil"}"}))()";
+  };
+  # iterpolates whatever string you provide into the table raw
+  inline-unsafe = {
+    fields = { body = "nil"; };
+    format = LI: "${LI.expr.body or "nil"}";
+  };
+  # creates a function with args of the names given in args list
+  # does so in a way where you cannot accidentally break the table
+  function-safe = {
+    fields = { body = "return nil"; args = []; };
+    format = LI: 
+      ''assert(loadstring(${luaEnclose ''return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)''}))()'';
+  };
+  # creates a function with args of the names given in args list
+  # interpolates the body segment raw, just like inline-unsafe, but in a function
+  function-unsafe = {
+    fields = { body = "return nil"; args = []; };
+    format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)'';
+  };
+<
+
+Some more useage examples:
+>nix
+  exampleSafeFunc = utils.n2l.types.function-safe.mk {
+    args = [ "hello" ];
+    body = /*lua*/ ''
+      print(hello)
+      return hi
+    '';
+  };
+  exampleUnsafeFunc = utils.n2l.types.function-unsafe.mk {
+    args = [ "hi" "hello" ];
+    body = /*lua*/ ''
+      print(hi)
+      print(hello)
+      return hi .. hello
+    '';
+  };
+  };
+  funcResults = {
+    test1 = utils.n2l.types.inline-safe.mk ''${utils.n2l.resolve exampleSafeFunc}("Hello World!")'';
+  };
+<
 ---------------------------------------------------------------------------------------
 Nix OS Module                     *nixCats.flake.outputs.exports.mkNixosModules*
                                   *nixCats.flake.outputs.exports.mkHomeModules*

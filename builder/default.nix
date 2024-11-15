@@ -67,6 +67,7 @@ let
     extraCats = {};
   } // (categoryDefinitions {
     # categories depends on extraCats
+    extra = extraTableLua;
     inherit categories settings pkgs name;
   }));
   inherit (final_cat_defs_set)
@@ -78,6 +79,7 @@ let
   optionalLuaPreInit bashBeforeWrapper;
 
   categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
+  extraTableLua = thisPackage.extra or {};
 
 in
   let
@@ -99,7 +101,7 @@ in
       isStdCfgPath = settings.wrapRc == false && ! builtins.isString settings.unwrappedCfgPath;
 
       nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
-        else if isStdCfgPath then ncTools.mkLuaInline ''vim.fn.stdpath("config")''
+        else if isStdCfgPath then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
         else "${LuaConfig}";
 
       categoriesPlus = categories // {
@@ -117,6 +119,7 @@ in
       settingsTable = ncTools.mkLuaFileWithMeta "settings" settingsPlus;
       petShop = ncTools.mkLuaFileWithMeta "petShop" all_def_names;
       depsTable = ncTools.mkLuaFileWithMeta "pawsible" allPluginDeps;
+      extraItems = ncTools.mkLuaFileWithMeta "extra" extraTableLua;
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
@@ -129,6 +132,7 @@ in
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp ${petShop} $out/lua/nixCats/petShop.lua
+        cp ${extraItems} $out/lua/nixCats/extra.lua
         cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     });

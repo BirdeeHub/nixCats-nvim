@@ -7,7 +7,6 @@
   , python3
   , symlinkJoin
   , linkFarm
-  , callPackage
   , collate_grammars ? false
 }: let
   # NOTE: define helpers for packDir function here:
@@ -36,10 +35,10 @@
       , ...
     }:
   let
-    inherit (callPackage ./ncTools.nix { }) mkLuaInline;
+    inherit (import ../utils/n2l.nix) types;
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if collate_grammars then ts_grammar_plugin_combined else
-      mkLuaInline "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
+      types.inline-unsafe.mk { body = "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]"; };
 
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {
@@ -61,7 +60,7 @@
       destination = "/lua/nixCats/saveTheCats.lua";
     });
     nixCatsFinal = nixCats fullDeps;
-  in # we add the plugin with ALL the parsers if its the old way, if its the new way, it will be in our packpath already
+  in # add fully called nixCats plugin along with another to save its path.
   [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
 
   # gets plugin.dependencies from

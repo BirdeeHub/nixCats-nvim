@@ -28,7 +28,7 @@ in {
 
       # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
-      categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, ... }@packageDef: {
         lspsAndRuntimeDeps = {
           general = [];
         };
@@ -120,7 +120,7 @@ in {
       users.REPLACE_ME = {
         enable = true;
         packageNames = [ "REPLACE_MEs_VIM" ];
-        categoryDefinitions.replace = ({ pkgs, settings, categories, name, ... }@packageDef: {
+        categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, ... }@packageDef: {
           lspsAndRuntimeDeps = {
             general = [];
           };

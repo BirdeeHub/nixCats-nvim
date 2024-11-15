@@ -56,6 +56,7 @@ function M.setup(v)
           wrapRc = false,
         }),
         petShop = mk_with_meta({}),
+        extra = mk_with_meta({}),
         pawsible = mk_with_meta({
           allPlugins = {
             start = {},
