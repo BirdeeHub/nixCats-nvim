@@ -128,7 +128,7 @@ with builtins; rec {
     # i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
     n2l = import ./n2l.nix;
 
-    mkLuaInline = trace "utils.mkLuaInline renamed to utils.n2l.types.inline-safe.mk, due to be removed before 2025" n2l.types.inline-safe.mk;
+    mkLuaInline = trace "utils.mkLuaInline renamed to utils.n2l.types.inline-safe.mk, due to be removed before 2025" utils.n2l.types.inline-safe.mk;
 
     # flake-utils' main function, because its all I used
     # Builds a map from <attr>=value to <attr>.<system>=value for each system
