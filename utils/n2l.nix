@@ -60,11 +60,11 @@ with builtins; let
     function-safe = {
       fields = { body = "return nil"; args = []; };
       format = LI: ''assert(loadstring(${luaEnclose ''
-      return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"}; end)''}))()'';
+      return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)''}))()'';
     };
     function-unsafe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"}; end)'';
+      format = LI: ''(function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)'';
     };
   };
 
