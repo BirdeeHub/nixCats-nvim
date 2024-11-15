@@ -1094,7 +1094,7 @@ which accepts the fields listed here, defined with default values.
   # does so in a way where you cannot accidentally break the table
   function-safe = {
     fields = { body = "return nil"; args = []; };
-    format = LI: ''(function(${fixargs LI})
+    format = LI: ''(function(${fixargs (LI.expr.args or [])})
       return assert(loadstring(${luaEnclose "${LI.expr.body or "return nil"}"}))()
     end)'';
   };
@@ -1102,7 +1102,7 @@ which accepts the fields listed here, defined with default values.
   # interpolates the body segment raw, just like inline-unsafe, but in a function
   function-unsafe = {
     fields = { body = "return nil"; args = []; };
-    format = LI: ''(function(${fixargs LI})
+    format = LI: ''(function(${fixargs (LI.expr.args or [])})
       ${LI.expr.body or "return nil"}
     end)'';
   };

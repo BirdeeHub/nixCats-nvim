@@ -44,9 +44,9 @@ with builtins; let
   in { inherit types typeof member resolve mkBaseT id default_subtype; };
 
   LIproto = let
-    fixargs = LI: if any (v: ! isString v || builtins.match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' v == null) (LI.expr.args or [])
+    fixargs = args: if any (v: ! isString v || builtins.match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' v == null) args
       then throw "args must be valid lua identifiers"
-      else concatStringsSep ", " (LI.expr.args or []);
+      else concatStringsSep ", " args;
   in {
     inline-safe = {
       default = (v: if v ? body then v else { body = v; });
@@ -59,13 +59,13 @@ with builtins; let
     };
     function-safe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: ''(function(${fixargs LI})
+      format = LI: ''(function(${fixargs (LI.expr.args or [])})
         return assert(loadstring(${luaEnclose "${LI.expr.body or "return nil"}"}))()
       end)'';
     };
     function-unsafe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: ''(function(${fixargs LI})
+      format = LI: ''(function(${fixargs (LI.expr.args or [])})
         ${LI.expr.body or "return nil"}
       end)'';
     };
