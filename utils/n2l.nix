@@ -114,6 +114,8 @@ with builtins; let
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
       else if isAttrs value then "${luaTablePrinter level value}"
+      else if isFunction value then addErrorContext ("toLua called on a function with these functionArgs: " + (toJSON (functionArgs value)))
+        (throw "Lua cannot run nix functions. Either call your function first, or make a lua function using `nixToLua.types.function-safe.mk`.")
       else replacer (luaEnclose (toString value));
 
     luaTablePrinter = level: attrSet: let
