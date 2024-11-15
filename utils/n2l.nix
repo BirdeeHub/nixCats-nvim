@@ -33,7 +33,8 @@ with builtins; let
         else if length defvals  == 1 then head defvals
         else throw "multiple default types specified";
     in valdef;
-    member = v: (v.__type or null == id && v ? expr) && null != types."${v.expr.type or default_subtype}".name or null;
+    member = v: v.__type or null == id && v ? expr
+      && null != types."${v.expr.type or default_subtype}".name or null;
     typeof = v: let
       in if ! (member v) then null
       else types."${v.expr.type or default_subtype}".name;
