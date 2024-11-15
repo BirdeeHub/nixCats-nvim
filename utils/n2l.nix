@@ -32,7 +32,7 @@ with builtins; let
       valdef = if length defvals  == 1 then head defvals
         else if defvals == [] then throw "no default type specified"
         else throw "multiple default types specified";
-    in valdef;
+      in valdef;
     member = v: v.__type or null == id && v ? expr
       && null != types."${v.expr.type or default_subtype}".name or null;
     typeof = v: let
