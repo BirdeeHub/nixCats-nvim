@@ -91,7 +91,7 @@ in rec {
     # and multiline lua expressions
     formatstrings ? false, # <-- only active if pretty is true
     ...
-  }: input: let
+  }@opts: input: let
     nl_spc = level: if pretty == true
       then "\n${genStr " " (level * indentSize)}" else " ";
 
@@ -104,7 +104,9 @@ in rec {
       else if value == null then "nil"
       else if isFloat value || isInt value then toString value
       else if isList value then "${luaListPrinter level value}"
-      else if inline.member value then replacer (inline.resolve value)
+      else if inline.member value then let
+          res = inline.resolve value;
+        in if isFunction res then res level opts else replacer res
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
       else if isAttrs value then "${luaTablePrinter level value}"
