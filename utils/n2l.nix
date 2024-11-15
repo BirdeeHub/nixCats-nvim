@@ -90,6 +90,7 @@ in rec {
     # adds indenting to multiline strings
     # and multiline lua expressions
     formatstrings ? false, # <-- only active if pretty is true
+    _level ? 0, # <- starting indentation level, for internal use when defining inline types
     ...
   }@opts: input: let
     nl_spc = level: if pretty == true
@@ -106,7 +107,7 @@ in rec {
       else if isList value then "${luaListPrinter level value}"
       else if inline.member value then let
           res = inline.resolve value;
-        in if isFunction res then res level opts else replacer res
+        in if isFunction res then res (opts // { _level = level; }) else replacer res
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
       else if isAttrs value then "${luaTablePrinter level value}"
@@ -131,6 +132,6 @@ in rec {
     LuaList;
 
   in
-  doSingleLuaValue 0 input;
+  doSingleLuaValue _level input;
 
 }
