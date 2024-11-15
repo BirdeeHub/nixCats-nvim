@@ -59,13 +59,13 @@ with builtins; let
     };
     function-safe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: ''(function(${fixargs (LI.expr.args or [])})
+      format = LI: ''(function(${fixargs LI})
         return assert(loadstring(${luaEnclose "${LI.expr.body or "return nil"}"}))()
       end)'';
     };
     function-unsafe = {
       fields = { body = "return nil"; args = []; };
-      format = LI: ''(function(${fixargs (LI.expr.args or [])})
+      format = LI: ''(function(${fixargs LI})
         ${LI.expr.body or "return nil"}
       end)'';
     };
