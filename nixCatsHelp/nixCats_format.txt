@@ -1044,9 +1044,9 @@ You may wish to use some functions from it.
 
 It contains <toLua> and <prettyLua> and <uglyLua> which convert nix to lua.
 
-it contains <member> to determine if a value is a special "inline lua" type
-it contains <typeof> to determine which special "inline lua" type it is
-it contains <resolve> which knows how to resolve the types to a string of code
+it contains a <member> function to determine if a value is a special "inline lua" type
+it contains a <typeof> function to determine which special "inline lua" type it is
+it contains a <resolve> function which knows how to resolve the types to a string of code
 it contains the <default_subtype> name as well.
 
 But of much more interest to you is the types you may declare.
