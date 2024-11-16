@@ -98,9 +98,8 @@
   foldl' recursiveUpdatePickDeeper { } mapped;
 
   applyExtraCats = packageCats: extraCats: let
-    recursiveUpdatePickShallower = lhs: rhs: let
-      picker = left: right: if ! isAttrs left then left else right;
-    in recUpUntilWpicker { inherit picker; } lhs rhs;
+    recursiveUpdatePickShallower = recUpUntilWpicker {
+      picker = left: right: if ! isAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: xtracats: pkgcats: let
       filteredCatPaths = filterAndFlatten pkgcats xtracats;
