@@ -68,8 +68,13 @@ let
     extraCats = {};
   } // (categoryDefinitions {
     # categories depends on extraCats
-    extra = extraTableLua;
     inherit categories settings pkgs name;
+    extra = extraTableLua;
+    mkNvimPlugin = src: pname:
+      pkgs.vimUtils.buildVimPlugin {
+        inherit pname src;
+        version = builtins.toString (src.lastModifiedDate or "master");
+      };
   }));
   inherit (final_cat_defs_set)
   startupPlugins optionalPlugins lspsAndRuntimeDeps

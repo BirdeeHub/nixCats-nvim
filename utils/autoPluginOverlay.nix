@@ -18,10 +18,10 @@
         (builtins.stringLength "plugins-")
         (builtins.stringLength input)
         input;
-    buildPlug = name: buildVimPlugin {
+    buildPlug = name: buildVimPlugin rec {
       pname = plugName name;
-      version = "master";
       src = builtins.getAttr name inputs;
+      version = toString (src.lastModified or "master");
     };
   in
   {
@@ -47,10 +47,10 @@
         (builtins.stringLength input)
         input;
     plugAttrName = input: builtins.replaceStrings [ "." ] [ "-" ] (plugName input);
-    buildPlug = name: buildVimPlugin {
+    buildPlug = name: buildVimPlugin rec {
       pname = plugName name;
-      version = "master";
       src = builtins.getAttr name inputs;
+      version = toString (src.lastModified or "master");
     };
   in
   {
