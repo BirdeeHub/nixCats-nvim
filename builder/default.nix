@@ -5,7 +5,7 @@
 , packageDefinitions
 , name
 , nixpkgs
-, system ? (nixpkgs.system or import ./builder_error.nix)
+, system ? (nixpkgs.system or builtins.system or import ./builder_error.nix)
 , extra_pkg_config ? {}
 , dependencyOverlays ? null
 , nixCats_passthru ? {}
