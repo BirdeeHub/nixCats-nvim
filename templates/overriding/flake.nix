@@ -72,7 +72,7 @@
       withExtraCats = withExtraOverlays.override (prev: {
         # add some new stuff, we update into the old categoryDefinitions our new values
         # to replace all, just dont call utils.mergeCatDefs
-        categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, extra, name, ... }@packageDef: {
+        categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
           # We do this with utils.mergeCatDefs
           # and now we can add some more stuff.
           lspsAndRuntimeDeps = with pkgs; {

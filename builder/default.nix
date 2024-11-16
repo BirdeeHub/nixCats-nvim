@@ -25,7 +25,12 @@ let
   else import ./builder_error.nix;
 
   ncTools = pkgs.callPackage ./ncTools.nix { };
-  thisPackage = packageDefinitions.${name} { inherit pkgs; };
+  mkNvimPlugin = src: pname:
+    pkgs.vimUtils.buildVimPlugin {
+      inherit pname src;
+      version = builtins.toString (src.lastModifiedDate or "master");
+    };
+  thisPackage = packageDefinitions.${name} { inherit pkgs mkNvimPlugin; };
   settings = {
     wrapRc = true;
     viAlias = false;
@@ -68,13 +73,8 @@ let
     extraCats = {};
   } // (categoryDefinitions {
     # categories depends on extraCats
-    inherit categories settings pkgs name;
+    inherit categories settings pkgs name mkNvimPlugin;
     extra = extraTableLua;
-    mkNvimPlugin = src: pname:
-      pkgs.vimUtils.buildVimPlugin {
-        inherit pname src;
-        version = builtins.toString (src.lastModifiedDate or "master");
-      };
   }));
   inherit (final_cat_defs_set)
   startupPlugins optionalPlugins lspsAndRuntimeDeps

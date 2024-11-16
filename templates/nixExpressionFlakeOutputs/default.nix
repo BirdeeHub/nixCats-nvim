@@ -43,7 +43,7 @@
     ];
   in { inherit dependencyOverlays; })) dependencyOverlays;
 
-  categoryDefinitions = { pkgs, settings, categories, extra, name, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
 
     lspsAndRuntimeDeps = {
       general = with pkgs; [
