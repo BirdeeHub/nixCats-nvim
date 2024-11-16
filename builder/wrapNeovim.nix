@@ -34,13 +34,13 @@
 let
   # accepts 4 different plugin syntaxes, specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
   parsepluginspec = opt: p: let
-    optional = if p ? optional && builtins.isBool p.optional then p.optional else opt;
+    optional = if builtins.isBool (p.optional or null) then p.optional else opt;
 
-    attrsyn = p ? plugin && p ? config && builtins.isAttrs p.config;
-    hmsyn = p ? plugin && p ? config && !builtins.isAttrs p.config && p ? type;
-    nixossyn = p ? plugin && p ? config && !builtins.isAttrs p.config && !(p ? type);
+    attrsyn = p ? plugin && builtins.isAttrs (p.config or null);
+    hmsyn = p ? plugin && p ? type && !builtins.isAttrs (p.config or {});
+    nixossyn = p ? plugin && !(p ? type) && !builtins.isAttrs (p.config or {});
 
-    type = if !p ? config then null
+    type = if !(p ? config) then null
       else if nixossyn then "viml"
       else if hmsyn then p.type
       else if attrsyn then
@@ -62,7 +62,7 @@ let
                 ${p.config.lua}
               NIXCATSVIMLUA
             '')
-        else p.config.lua
+        else p.config.lua or null
       else if hmsyn || nixossyn then p.config
       else null;
   in
