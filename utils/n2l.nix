@@ -148,6 +148,10 @@ in {
   uglyLua = toLuaFull { pretty = false; formatstrings = false; };
 
   inherit mkEnum inline toLuaFull;
-  inherit (inline) types typeof member resolve default_subtype;
+  inherit (inline) types typeof member default_subtype;
+
+  resolve = let
+      res = inline.resolve value;
+    in if isFunction res then (res { pretty = false; }) else res;
 
 }
