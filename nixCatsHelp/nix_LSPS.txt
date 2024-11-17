@@ -62,7 +62,8 @@ The stuff added to servers table is what is passed to lspconfig/mason
         nixpkgs = {
           -- nixd requires some configuration in flake based configs.
           -- luckily, the nixCats plugin is here to pass whatever we need!
-          expr = [[import (builtins.getFlake "]] .. nixCats("nixdExtras.nixpkgs") .. [[") { }   ]],
+          -- we passed this in via the `extra` table in our packageDefinitions
+          expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
         },
         formatting = {
           command = { "nixfmt" }
@@ -86,21 +87,22 @@ The stuff added to servers table is what is passed to lspconfig/mason
     -- for a walkthrough of useage.
 
     -- otherwise flake-path could be an absolute path to your system flake, or nil or false
-    if nixCats("nixdExtras.flake-path") and nixCats("nixdExtras.systemCFGname") and nixCats("nixdExtras.homeCFGname") then
-      servers.nixd.nixd.options = {
+    if nixCats.extra("nixdExtras.flake-path") then
+      local flakePath = nixCats.extra("nixdExtras.flake-path")
+      if nixCats.extra("nixdExtras.systemCFGname") then
         -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
-        nixos = {
-          expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") ..  [[").nixosConfigurations."]] ..
-            nixCats("nixdExtras.systemCFGname") .. [[".options]]
-        },
-        -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
-        ["home-manager"] = {
-          expr = [[(builtins.getFlake "]] ..
-            nixCats("nixdExtras.flake-path") .. [[").homeConfigurations."]] ..
-            nixCats("nixdExtras.homeCFGname") .. [[".options]]
+        servers.nixd.nixd.options.nixos = {
+          expr = [[(builtins.getFlake "]] .. flakePath ..  [[").nixosConfigurations."]] ..
+            nixCats.extra("nixdExtras.systemCFGname") .. [[".options]]
         }
-      }
+      end
+      if nixCats.extra("nixdExtras.homeCFGname") then
+        -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
+        servers.nixd.nixd.options["home-manager"] = {
+          expr = [[(builtins.getFlake "]] .. flakePath .. [[").homeConfigurations."]]
+            .. nixCats.extra("nixdExtras.homeCFGname") .. [[".options]]
+        }
+      end
     end
   else
     servers.rnix = {}
