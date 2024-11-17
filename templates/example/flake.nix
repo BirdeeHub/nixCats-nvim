@@ -159,7 +159,7 @@
         # packageDefinitions of the package this was packaged with.
         # :help nixCats.flake.outputs.categoryDefinitions.scheme
         themer = with pkgs.vimPlugins;
-          (builtins.getAttr categories.colorscheme {
+          (builtins.getAttr (categories.colorscheme or "onedark") {
               # Theme switcher without creating a new category
               "onedark" = onedark-nvim;
               "catppuccin" = catppuccin-nvim;
@@ -306,6 +306,7 @@
         general = [ (_:[]) ];
       };
 
+      # see :help nixCats.flake.outputs.categoryDefinitions.default_values
       # this will enable test.default and debug.default
       # if any subcategory of test or debug is enabled
       # WARNING: use of categories argument in this set will cause infinite recursion
@@ -370,7 +371,7 @@
 
           # enabling this category will enable the go category,
           # and ALSO debug.go and debug.default due to our extraCats in categoryDefinitions.
-          # go = true; # <- disabled but you could enable it with override
+          # go = true; # <- disabled but you could enable it with override or module on install
 
           # this does not have an associated category of plugins, 
           # but lua can still check for it
@@ -379,11 +380,15 @@
           # see :help nixCats
           themer = true;
           colorscheme = "onedark";
+        };
+        extra = {
+          # to keep the categories table from being filled with non category things that you want to pass
+          # there is also an extra table you can use to pass extra stuff.
+          # but you can pass all the same stuff in any of these sets and access it in lua
           nixdExtras = {
             nixpkgs = nixpkgs;
           };
         };
-        extra = {};
       };
       regularCats = { pkgs, ... }@misc: {
         settings = {
@@ -412,21 +417,22 @@
           lint = true;
           format = true;
           test = true;
-          # go = true; # <- disabled but you could enable it with override
+          # go = true; # <- disabled but you could enable it with override or module on install
           lspDebugMode = false;
           themer = true;
           colorscheme = "catppuccin";
+        };
+        extra = {
+          # nixCats.extra("path.to.val") will perform vim.tbl_get(nixCats.extra, "path" "to" "val")
+          # this is different from the main nixCats("path.to.cat") in that
+          # the main nixCats("path.to.cat") will report true if `path.to = true`
+          # even though path.to.cat would be an indexing error in that case.
+          # this is to mimic the concept of "subcategories" but may get in the way of just fetching values.
           nixdExtras = {
             nixpkgs = nixpkgs;
           };
-          theBestCat = "says meow!!";
-        };
-        extra = {
           # yes even tortured inputs work.
-          # extra is just for extra stuff. It works just like categories
-          # except it doesnt control what gets included, and
-          # nixCats.extra("attr.path") behaves like vim.tbl_get
-          # unlike nixCats('attr.path')
+          theBestCat = "says meow!!";
           theWorstCat = {
             thing'1 = [ "MEOW" '']]' ]=][=[HISSS]]"[['' ];
             thing2 = [
