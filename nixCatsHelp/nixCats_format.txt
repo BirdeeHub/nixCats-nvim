@@ -673,11 +673,12 @@ These are the defaults:
 
       # whether to group up treesitter grammars into a single directory,
       # or leave them as separate plugins.
-      # Some users report a startup performance increase from doing this.
+      # Defaults to true as it results in
+      # a significant startup time performance boost
       # Works only on grammars that have been passed through
       # pkgs.neovimUtils.grammarToPlugin
       # or pkgs.vimPlugins.nvim-treesitter.withPlugins
-      collate_grammars = false;
+      collate_grammars = true;
 
       # unsets PYTHONSAFEPATH variable.
       # Can cause issues with reproducibility,

@@ -49,7 +49,7 @@ let
     suffix-path = false;
     suffix-LD = false;
     disablePythonSafePath = false;
-    collate_grammars = false;
+    collate_grammars = true;
   } // (thisPackage.settings or {});
 
   final_cat_defs_set = ({
