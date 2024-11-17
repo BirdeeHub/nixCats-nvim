@@ -5,9 +5,8 @@
 
   inherit (import ../utils/n2l.nix) toLua types;
 
-  mkLuaFileWithMeta = modname: table: writeText "${modname}.lua" /*lua*/ ''
-  local ${modname} = ${toLua table};
-  return setmetatable(${modname}, {
+  mkLuaFileWithMeta = filename: table: writeText filename /*lua*/ ''
+  return setmetatable(${toLua table}, {
     __call = function(self, attrpath)
       local strtable = {}
       if type(attrpath) == "table" then
@@ -21,7 +20,7 @@
           return
       end
       if #strtable == 0 then return nil end
-      local tbl = ${modname};
+      local tbl = self;
       for _, key in ipairs(strtable) do
         if type(tbl) ~= "table" then return nil end
         tbl = tbl[key]

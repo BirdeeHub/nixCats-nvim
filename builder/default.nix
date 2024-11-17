@@ -112,11 +112,11 @@ in
       };
       all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 
-      cats = ncTools.mkLuaFileWithMeta "cats" categoriesPlus;
-      settingsTable = ncTools.mkLuaFileWithMeta "settings" settingsPlus;
-      petShop = ncTools.mkLuaFileWithMeta "petShop" all_def_names;
-      depsTable = ncTools.mkLuaFileWithMeta "pawsible" allPluginDeps;
-      extraItems = ncTools.mkLuaFileWithMeta "extra" extraTableLua;
+      cats = ncTools.mkLuaFileWithMeta "cats.lua" categoriesPlus;
+      settingsTable = ncTools.mkLuaFileWithMeta "settings.lua" settingsPlus;
+      petShop = ncTools.mkLuaFileWithMeta "petShop.lua" all_def_names;
+      depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
+      extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
     in {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
