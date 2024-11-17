@@ -53,7 +53,7 @@ with builtins; let
     inline-safe = {
       default = (v: if v ? body then v else { body = v; });
       fields = { body = "nil"; };
-      format = LI: "assert(loadstring(${luaEnclose "return ${LI.expr.body or LI.expr or "nil"}"}))()";
+      format = LI: "(assert(loadstring(${luaEnclose "return ${LI.expr.body or LI.expr or "nil"}"}))())";
     };
     inline-unsafe = {
       fields = { body = "nil"; };
@@ -62,7 +62,7 @@ with builtins; let
     function-safe = {
       fields = { body = "return nil"; args = []; };
       format = LI:
-        ''assert(loadstring(${luaEnclose ''return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)''}))()'';
+        ''(assert(loadstring(${luaEnclose ''return (function(${fixargs (LI.expr.args or [])}) ${LI.expr.body or "return nil"} end)''}))())'';
     };
     function-unsafe = {
       fields = { body = "return nil"; args = []; };
@@ -81,7 +81,7 @@ with builtins; let
           args = [ (LI.expr.tablevar or "tbl_in") ];
           body = ''return setmetatable(${metaarg1}, ${toLuaFull opts LI.expr.meta})'';
         };
-      in "${toLuaFull opts result}(${toLuaFull opts LI.expr.table})";
+      in "(${toLuaFull opts result}(${toLuaFull opts LI.expr.table}))";
     };
   };
 
