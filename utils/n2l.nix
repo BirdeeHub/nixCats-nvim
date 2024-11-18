@@ -39,7 +39,7 @@ with builtins; let
       && null != types."${v.expr.type or default_subtype}".name or null;
     typeof = v: if ! (member v) then null
       else types."${v.expr.type or default_subtype}".name;
-    resolve = v: let vt = typeof v; checkres = proto."${vt}".check v; in
+    resolve = v: let vt = typeof v; checkres = (proto."${vt}".check or (_: true)) v; in
       if vt == null then throw "unable to resolve, not subtype of ${id}"
       else if checkres == true then (proto."${vt}".format or (o: o.expr)) v
       else throw "unable to resolve, value is not a valid instance of type ${id}.${vt}.\nError: ${checkres}";
