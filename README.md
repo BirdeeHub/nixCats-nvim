@@ -1,7 +1,5 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's neovim config on nix!
 
----
-
 ## Table of Contents:
 1. [Introduction](#intro)
 2. [Features](#features)
