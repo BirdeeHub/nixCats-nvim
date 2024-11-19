@@ -16,8 +16,8 @@ In addition, this means you can make use of the amazing auto completion and othe
 But it is only nicer if you have an easy way to get info from nix to wherever you need it.
 
 This is where home-manager and `pkgs.wrapNeovim` start to fall short.
-It is not uncommon to see a mess of global variables passed from lua written in nix,
-and a bunch of files called via dofile that are not properly detected by neovim tooling, whenever people use one of these options.
+It is not uncommon to see a mess of global variables written in nix strings,
+and a bunch of files called via `dofile` that are not properly detected by neovim tooling with these methods.
 
 Nix is for downloading. Lua is for configuring.
 
