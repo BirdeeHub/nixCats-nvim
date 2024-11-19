@@ -2,7 +2,7 @@
 
 `nixCats` is a neovim package manager written in nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from nix to lua.
 
-It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal lua reloading while editing, and allows you to easily output multiple configured packages that are subsets of your main config.
+It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal lua reloading while editing, and allows you to easily output multiple configured packages that are variations of your main config.
 
 Unlike `nixvim`, whose goal is to nixify everything neovim they can, `nixCats` takes the opposite approach. Make it as easy to interact with the normal scheme as possible while using nix to install things, and add useful meta features in nix in addition to your normal neovim config that can be optionally used.
 
