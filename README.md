@@ -6,7 +6,11 @@ It can be configured in a flake, as a derivation, or as a module, can be set up 
 
 Unlike nixvim, whose goal is to nixify everything neovim they can, nixCats takes the opposite approach. Make it as easy to interact with the normal scheme as possible while using nix to install things, and then allow some cool meta style options on top that you can make use of if desired.
 
-The end result ends up being very comparable if not better than using a regular neovim package manager + mason, and certainly has more overall capability to be ran in a portable way, without falling into the classic trap of trying to make a module for every plugin somebody might want to use.
+The end result ends up being very comparable if not better than using a regular neovim package manager + mason, and certainly has more overall capability to be ran in a portable way.
+
+In this way, it avoids falling into the classic trap of trying to make a module for every plugin somebody might want to use.
+
+It avoids this because this results in a bunch of simple translations of plugin options from lua to nix, while leaving the user with a higher barrier of entry to adding their own, and inability to use normal neovim dev tools for your configuration.
 
 In short, it is a way to configure neovim in the normal neovim way while seeing actual benefits from nix, rather than struggling through the difficulty of "how do I get this needed info into my config without having to write it all in nix strings"
 
@@ -33,7 +37,9 @@ There is significantly more help and example in this repository than there is ac
 
 When you are ready, start with a [template](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
-For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) uses `lze`.
+All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it.
+
+For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) uses `lze`. They are not package managers, and work within the normal neovim plugin system, the just like `nixCats` does.
 
 However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but follow that link and read the info about it before deciding to take that route as lazy.nvim is known for not playing well in conjunction with other package managers, so using it will require a little bit of extra setup compared to the 2 above options.
 
@@ -202,110 +208,6 @@ When you have a working version, you can begin to explore the many
 options made available for importing your new nix neovim configuration
 into a nix system or home manager configuration.
 There are *MANY*, thanks to the virtues of the category scheme of this flake.
-
----
-
-## Philosophy: <a name="philosophy"></a>
-
-This project is a heavily modified version of the wrapNeovim/wrapNeovimUnstable functions provided by nixpkgs, to allow you to get right into a working and full-featured, nix-integrated setup based on your old configuration as quickly as possible without making sacrifices in your nix that you will need to refactor out later.
-
-All downloading can be done from [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/flake.nix). Then configure in the normal neovim scheme.
-
-For the most to-the-point intro, only 100 lines, see here instead. [:help nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
-
-You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix).
-
-If you wish to hear about the philosophy, you may continue reading. But to learn to use it, the above 2 links are more useful.
-
-The first main feature is the nixCats messaging system, which means you will not need to write ANY lua within your nix files (although you still can), and thus can use all the neovim tools like lazydev that make configuring it so wonderful when configuring in your normal ~/.config/nvim
-
-Nix is for downloading and should stay for downloading. Your lua just needs to know what it was built with and where that is.
-
-There is no live updating from nix. Nix runs, it installs your stuff, and then it does nothing. Therefore, there is no reason you can't just write your data to a lua table in a file.
-
-And thus nixCats was born. A system for doing just that in an effective and organized manner. It can pass anything other than nix functions, because again, nix is done by the time any lua ever executes.
-
-The second main feature is the category system, which allows you to enable and disable categories of nvim dependencies within your nix PER NVIM PACKAGE within the SAME CONFIG DIRECTORY and have your lua know about it without any stress (thanks to the nixCats messaging system).
-
-Both of these features are a result of the same simple innovation. Generate a lua table from a nix set, put it in a lua file that returns it, and put that in a plugin.
-
-The name is NIX CATEGORIES but shorter. 🐱
-
-You can use it to have as many neovim configs as you want. For direnv shells and stuff.
-
-But its also just a normal neovim configuration installed via nix with an easy way to pass info from nix to lua so use it however you want.
-
-Simply add plugins and lsps and stuff to lists in flake.nix, and then configure like normal!
-
-You dont always want a plugin? Ask `nixCats("the.category")` and learn if you want to load it this time!
-
-Want to pass info from nix to lua? Just add it to the same table in nix and then `nixCats("some.info")`.
-
-The category scheme allows you to output many different packages with different subsets of your config.
-
-You need a minimal python3 nvim ide in a shell, and it was a subset of your previous config? Throw some `if nixCats("the.category") then` at it in lua, and enable only those in a new entry in packageDefinitions.
-
-Want one that actually reflects lua changes without rebuilding for testing? Have 2 `packageDefinitions` with the same categories, except one has wrapRc = false and unwrappedCfgPath set. You can install them both!
-
-It is easy to convert between all templates, so do not worry at the start which one to choose, all options will be available to you in any of them,
-including installing multiple versions of neovim to your PATH.
-
-However I suggest starting with the flake standalone and then later copying your definitions into the nixExpressionFlakeOutputs template
-to combine your neovim into your normal system flake when you are ready to do so.
-
-This is because the flake standalone is easy to have in its own directory somewhere to test things out, it runs without nixos or home manager, and you can explore its outputs in the repl.
-
-Then the `nixExpressionFlakeOutputs` template is literally just the outputs function of the flake, and you move your inputs to your system inputs.
-Then you call the function with the inputs, and recieve the normal flake outputs.
-
-These templates allow you to export everything this repo does, but with your config as the base, meaning you can then [override](https://nixpkgs.org/nixCats_overriding.html) it, and it will export its own [modules](https://nixpkgs.org/nixCats_modules.html), just like you can with the example config in the top level of the repo.
-
-The modules can optionally inherit category definitions from the flake you import from. This makes it easy to modify an existing neovim config in a separate nix config if required. However when using the [module](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module), it is harder to export the configuration separately from your main system flake for running via `nix run`, so I would generally suggest starting with one of [the](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) [other](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite) [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh).
-
-Everything you need to make a config based on nixCats is exported by the nixCats.utils variable, the templates demonstrate usage of it and make it easy to start.
-
-You should make use of the in-editor help at:
-
-[:help nixCats](https://nixcats.org/nixCats_plugin.html)
-
-[:help nixCats.overview](https://nixcats.org/nixCats_installation.html)
-
-[:help nixCats.flake](https://nixcats.org/nixCats_format.html)
-
-[:help nixCats.*](https://nixcats.org/TOC.html)
-
-> An important note: if you add a file,
-> nix will not package it unless you add it 
-> to your git staging before you build it...
-> So nvim wont be able to find it...
-> So, run git add before you build.
-
-It works as a regular config folder without any nix too using the `luaUtils` template and [help: nixCats.luaUtils](https://nixcats.org/nixCats_luaUtils.html).
-
-`luaUtils` contains the tools and advice to adapt your favorite package managers to give your nix setup the ultimate flexibility from before of trying to download all 4 versions of rust, node, ripgrep, and fd for your overcomplicated config on a machine without using nix...
-
-In terms of the nix code, you should not really have to leave your template's equivalent of [flake.nix](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/example/flake.nix)
-
-All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`), if you want lazy loading put it in `optionalPlugins` in a category in the flake and call `vim.cmd('packadd <pluginName>')` from an autocommand or keybind when you want it. NOTE: `packadd` does not source `after` dirs, so to lazy load those you must source those yourself (or use the lazy.nvim wrapper in [luaUtils](https://nixcats.org/nixCats_luaUtils.html))
-
-It runs on linux, mac, and WSL. You will need nix with flakes enabled, git, a clipboard manager of some kind, and a terminal that supports bracketed paste.
-If you're not on linux you don't need to care what those last 2 things mean.
-You also might want a [nerd font](https://www.nerdfonts.com/) for some icons depending on your OS, terminal, and configuration.
-
-If a dependency is not on nixpkgs already, you may need to add its link to the flake inputs.
-If you dont know to use nix flake inputs, check [the official documentation](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-flake.html#flake-inputs)
-See [:h nixCats.flake.inputs](https://nixcats.org/nixCats_format.html#nixCats.flake.inputs) for
-how to use the auto plugin import helper in your inputs for neovim plugins not on nixpkgs.
-
-It is made to be customized into your own portable nix neovim distribution
-with as many options as you wish, while requiring you to leave the normal
-nvim configuration scheme as little as possible.
-
-Further info for getting started:
-All info I could manage to cover is covered in the included help files.
-see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html)
-and also :help [nixCats.flake.outputs.exports](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.exports)
-for more info about the outputs and util functions available.
 
 ---
 
