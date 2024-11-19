@@ -1,6 +1,6 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's neovim config on nix!
 
-Its a neovim plugin/package manager written in nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from nix to lua.
+`nixCats` is a neovim plugin/package manager written in nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from nix to lua.
 
 It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal lua reloading while editing, and allows you to easily output multiple configured packages that are subsets of your main config.
 
