@@ -1,5 +1,15 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's neovim config on nix!
 
+Its a neovim plugin/package manager written in nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from nix to lua.
+
+It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal lua reloading while editing, and allows you to easily output multiple configured packages that are subsets of your main config.
+
+Unlike nixvim, whose goal is to nixify everything neovim they can, nixCats takes the opposite approach. Make it as easy to interact with the normal scheme as possible while using nix to install things, and then allow some cool meta style options on top that you can make use of if desired.
+
+The end result ends up being very comparable if not better than using a regular neovim package manager + mason, and certainly has more overall capability to be ran in a portable way, without falling into the classic trap of trying to make a module for every plugin somebody might want to use.
+
+In short, it is a way to configure neovim in the normal neovim way while seeing actual benefits from nix, rather than struggling through the difficulty of "how do I get this needed info into my config without having to write it all in nix strings"
+
 This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
 
 Nix is for downloading. Lua is for configuring. To pass info from nix to lua, you must `''${interpolate a string}'';` So you need to write some lua in strings in nix.
@@ -13,22 +23,19 @@ Even if you dont use it for downloading plugins at all, preferring to use lazy a
 It allows you to provide a configuration and any dependency you could need to your neovim in a contained and reproducible way,
 buildable separately from your nixos or home-manager config.
 
-It allows you to easily pass arbitrary information from nix to lua, easily reference things installed via nix, and even output multiple neovim packages with different subsets of your configuration without duplication, import and override and re-export your nvim config in dev shells, etc...
-
 The example neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) is a great example of how to use nixCats for yourself.
+
+You should stop and take a moment to read the [overview](https://nixcats.org/nixCats_installation.html#nixCats.overview) while looking at the above example configuration and/or the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix) to get a feel of what this package management scheme has to offer!
+
 Everything in [./templates](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org/nixCats_installation.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/TOC.html)!
+The [in-editor help](https://nixcats.org/TOC.html) will be available in any nvim that uses the nixCats builder, or at the [website](https://nixcats.org/)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
-When you are ready, start [with](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs) a [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
-
-For the most to-the-point intro, only 100 lines, see here instead. [:help nixCats.overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
-
-You will want to read the above overview while looking at the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix).
+When you are ready, start with a [template](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) and include your normal configuration, and refer back here or to the in-editor help or the other templates for guidance!
 
 For lazy loading in your configuration, I strongly recommend using [lze](https://github.com/BirdeeHub/lze) or [lz.n](https://github.com/nvim-neorocks/lz.n). The main example configuration [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) uses `lze`.
 
-However there is a [lazy.nvim](#outro) wrapper that can be used if desired.
+However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but follow that link and read the info about it before deciding to take that route as lazy.nvim is known for not playing well in conjunction with other package managers, so using it will require a little bit of extra setup compared to the 2 above options.
 
 ##### (just remember to change your $EDITOR variable if you named your package something other than nvim!)
 
