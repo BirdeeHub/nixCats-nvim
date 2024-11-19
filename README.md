@@ -1,5 +1,19 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's neovim config on nix!
 
+---
+
+## Table of Contents:
+1. [Introduction](#intro)
+2. [Features](#features)
+3. [Installation](#installation)
+5. [Extra Information](#outro)
+6. [Alternative / Similar Projects](#alternatives)
+- [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
+
+---
+
+## Introduction: <a name="intro"></a>
+
 `nixCats` is a neovim package manager written in nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from nix to lua.
 
 It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal lua reloading while editing, and allows you to easily output multiple configured packages that are variations of your main config.
@@ -62,16 +76,6 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but 
 > Nvim does not know about the wrapper script. It is still at `<store_path>/bin/nvim` and is aware of that. Thus, this should not cause any issues beyond the way nvim is normally wrapped via the wrappers in nixpkgs.
 
 ##### (remember to change your $EDITOR variable if you named your package something other than nvim!)
-
----
-
-## Table of Contents:
-1. [Features](#features)
-2. [Installation](#installation)
-3. [Philosophy](#philosophy)
-5. [Extra Information](#outro)
-6. [Alternative / Similar Projects](#alternatives)
-- [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
 
 ---
 
