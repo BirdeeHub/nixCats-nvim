@@ -14,7 +14,7 @@ It avoids this because this results in a bunch of simple translations of plugin 
 
 In short, it is a way to configure neovim in the normal neovim way while seeing actual benefits from nix, rather than struggling through the difficulty of "how do I get this needed info into my config without having to write it all in nix strings"
 
-This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here and then some.
+This is a neovim configuration scheme for new and advanced nix users alike, and you will find all the normal options here from `pkgs.wrapNeovim` or the home-manager module and then some.
 
 Nix is for downloading. Lua is for configuring. To pass info from nix to lua, you must `''${interpolate a string}'';` So you need to write some lua in strings in nix.
 
