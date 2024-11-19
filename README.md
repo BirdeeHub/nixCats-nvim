@@ -168,7 +168,7 @@ The starter templates will create an empty version of [flake.nix](https://github
 If you are unfamiliar with neovim and want a ready-made starter config, you should instead use the following template:
 
 ```bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim
+  nix flake init -t github:BirdeeHub/nixCats-nvim#example
 ```
 
 All templates will import the utils set and thus also the builder and
