@@ -90,7 +90,7 @@ dont name them in that format.
 If they are a plugin from a flake, they can be added directly,
 or they may be added as an overlay if offered.
 If they are anything else they arent a plugin at all and obviously
-should thus not be added as a plugin via plugins-<pluginName>
+should not be added as a plugin via plugins-<pluginName>
 
 If they are on nixpkgs, you dont need to put them in inputs,
 because you will be able to access them through pkgs.vimPlugins variable.
@@ -109,8 +109,12 @@ If in your inputs you had:
 Where you put plugins in your categoryDefinitions, instead of:
 >nix
   pkgs.neovimPlugins.<plugin-name>
-
-You would put this:
+<
+You could put this:
+>nix
+  { name = "<plugin.name>"; plugin = pkgs.neovimPlugins.<plugin-name>; }
+<
+You can also override them instead of (or before/during) the above:
 >nix
   (pkgs.neovimPlugins.<plugin-name>.overrideAttrs { pname = "<plugin.name>"; })
 <
@@ -400,8 +404,9 @@ single derivation.
       { plugin = derivation; config = ""; type = "<viml or lua>"; }
       { plugin = derivation; config = ""; } # defaults to viml
       { plugin = derivation; }
-      # all the above options can accept an optional = bool;
+      # all the above options can also accept an optional = bool;
       # to override its presence in either startupPlugins or optionalPlugins
+      # and they can also accept a name = string; to override its name
       derivation
       # plain derivation does not need to be in a list, but it should be
       # anyway. It could be on its own though and would act as its own

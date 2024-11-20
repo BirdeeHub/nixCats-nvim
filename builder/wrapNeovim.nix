@@ -65,10 +65,13 @@ let
         else p.config.lua or null
       else if hmsyn || nixossyn then p.config
       else null;
+
+    plugin = if p ? plugin && p ? name
+      then pkgs.symlinkJoin { name = p.name; paths = [ p.plugin ]; }
+      else p.plugin or p;
   in
   if p ? plugin then {
-      inherit (p) plugin;
-      inherit config type optional;
+    inherit config type optional plugin;
   } else {
     plugin = p;
     inherit optional;
