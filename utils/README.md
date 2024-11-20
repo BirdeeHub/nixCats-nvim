@@ -1,4 +1,4 @@
-The utils set in default.nix is the interface through which the entire nixCats library is accessed.
+[utils/default.nix](./default.nix) is the interface through which the entire nixCats library is accessed.
 
 As such:
 

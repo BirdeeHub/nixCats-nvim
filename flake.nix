@@ -6,7 +6,7 @@
   '';
   outputs = { self, ... }: let
     # everything you will need is in utils.
-    utils = import ./.;
+    utils = import ./utils;
   in {
     inherit utils;
     inherit (utils) templates;

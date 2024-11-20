@@ -239,7 +239,7 @@ in
   # nothing goes past this file that hasnt been sorted
 import ./wrapNeovim.nix {
   nixCats_passthru = nixCats_passthru // (let
-    utils = (import ../utils).utils;
+    utils = (import ../utils);
   in {
     keepLuaBuilder = utils.baseBuilder luaPath;
     nixCats_packageName = name;
