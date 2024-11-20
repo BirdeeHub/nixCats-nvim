@@ -1,9 +1,10 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-{ lib, writeText, ... }: with builtins; rec {
+{ lib, writeText, ... }: with builtins; let nclib = import ../utils/lib.nix; in rec {
 # NIX CATS INTERNAL UTILS:
 
-  inherit (import ../utils/n2l.nix) toLua types;
+  inherit (nclib.n2l) toLua types;
+  inherit (nclib) recUpUntilWpicker;
 
   mkLuaFileWithMeta = filename: table: writeText filename /*lua*/ ''
   return setmetatable(${toLua table}, {
@@ -117,18 +118,5 @@
 
   in if extraCats == {} then packageCats
     else applyExtraCatsInternal packageCats extraCats packageCats;
-
-  recUpUntilWpicker = { pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh), picker ? (l: r: r) }: lhs: rhs: let
-    f = attrPath:
-      zipAttrsWith (n: values:
-        let here = attrPath ++ [n]; in
-        if length values == 1 then
-          head values
-        else if pred here (elemAt values 1) (head values) then
-          picker (elemAt values 1) (head values)
-        else
-          f here values
-      );
-  in f [] [rhs lhs];
 
 }
