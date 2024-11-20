@@ -250,19 +250,19 @@ If you do decide to use `lazy.nvim`, consider using the `lazy.nvim` wrapper [in 
 
 Lazy.nvim works but unless you tell it not to reset the RTP you will lose your config directory and treesitter parsers.
 
-There is an included wrapper that you can use to do this and also optionally stop it from downloading stuff you already downloaded via nix.
+There is an included wrapper that you can use to do this and also stop it from downloading stuff you already downloaded via nix.
 
-You call that instead. It takes 2 extra arguments, and then the 2 standard lazy.setup arguments.
+You call that instead. It takes 1 extra argument, and then the 2 standard lazy.setup arguments.
 
-The first is a list of url repo name matches not to download. You can get the full set of your plugins to pass in here from nixCats.
+The first argument is the path to `lazy.nvim` downloaded from nix. If this is `nil` it will download lazy the normal way instead.
 
-The second is the path to lazy.nvim downloaded from nix
+You can fetch this value with `nixCats.pawsible({"allPlugins", "start", "lazy.nvim" })` unless your `lazy.nvim` has been given a different name.
 
 Then in your specs, simply fix any names that were different from nix (see `:NixCats pawsible` for the new values) and disable build statements while on nix with the `require('nixCatsUtils').lazyAdd` function
 
 Obviously if you chose to still download the plugins via lazy you would want to keep the build statements and instead add any non-plugin dependencies they need to your nix.
 
-Keep in mind, lazy.nvim will prevent nix from loading any plugins unless you also add it to a lazy plugin spec
+Keep in mind, `lazy.nvim` will prevent nix from loading any plugins unless you also add it to a lazy plugin spec
 
 I highly recommend using one of the following 2 projects for lazy loading instead:
 
@@ -272,10 +272,10 @@ I highly recommend using one of the following 2 projects for lazy loading instea
 
 #### [lze](https://github.com/BirdeeHub/lze)
 
-`lze` is my take on what `lz.n` did. I preferred a different design to the management of state and custom handlers,
-and quite like the result. The example configuration in this repo uses it for lazy loading.
+`lze` is my take on what `lz.n` did, after spending a decent amount of time contributing to `lz.n` to begin with.
 
-But it solves the same problems as `lz.n`, so hopefully one of these non-`lazy.nvim` solutions to lazy loading will appeal to you!
+I preferred a different design to the management of state and custom handlers,
+and quite like the result. The main example configuration in this repo uses it for lazy loading.
 
 ---
 
