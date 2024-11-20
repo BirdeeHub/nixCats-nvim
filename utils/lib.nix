@@ -48,7 +48,7 @@ with builtins; rec {
   genAttrs =
     names:
     f:
-    listToAttrs (map (n: lib.nameValuePair n (f n)) names);
+    listToAttrs (map (n: nameValuePair n (f n)) names);
 
   nameValuePair =
     name:
@@ -78,8 +78,8 @@ with builtins; rec {
         concatMap (name:
           let v = set.${name}; in
           if pred name v then [
-            (lib.nameValuePair name (
-              if isAttrs v then lib.filterAttrsRecursive pred v
+            (nameValuePair name (
+              if isAttrs v then filterAttrsRecursive pred v
               else v
             ))
           ] else []
@@ -139,36 +139,36 @@ with builtins; rec {
 
       mapToSetOfPaths = cats: let
         removeNullPaths = attrs: filterAttrsRecursive (n: v: v != null) attrs;
-        mapToPaths = attrs: mapAttrsRecursiveCond (as: ! lib.isDerivation as) (path: v: if v == true then path else null) attrs;
+        mapToPaths = attrs: mapAttrsRecursiveCond (as: ! isDerivation as) (path: v: if v == true then path else null) attrs;
       in removeNullPaths (mapToPaths cats);
 
       result = let
         final_cats = attrByPath attrpath false categories;
         allIncPaths = flattener (mapToSetOfPaths final_cats);
-      in if isAttrs final_cats && ! lib.isDerivation final_cats && allIncPaths != []
+      in if isAttrs final_cats && ! isDerivation final_cats && allIncPaths != []
         then head allIncPaths
         else []; 
     in
     result;
 
     toMerge = let
-      firstGet = if isAttrs subcategories && ! lib.isDerivation subcategories
-        then lib.attrByPath include_path [] subcategories
+      firstGet = if isAttrs subcategories && ! isDerivation subcategories
+        then attrByPath include_path [] subcategories
         else if isList subcategories then subcategories else [ subcategories ];
 
-      fIncPath = if isAttrs firstGet && ! lib.isDerivation firstGet
+      fIncPath = if isAttrs firstGet && ! isDerivation firstGet
         then include_path ++ [ "default" ] else include_path;
 
       normed = let
-        listType = if isAttrs firstGet && ! lib.isDerivation firstGet
-          then lib.attrByPath fIncPath [] subcategories
+        listType = if isAttrs firstGet && ! isDerivation firstGet
+          then attrByPath fIncPath [] subcategories
           else if isList firstGet then firstGet else [ firstGet ];
         attrType = let
-          pre = if isAttrs firstGet && ! lib.isDerivation firstGet
-            then lib.attrByPath fIncPath {} subcategories
+          pre = if isAttrs firstGet && ! isDerivation firstGet
+            then attrByPath fIncPath {} subcategories
             else firstGet;
           basename = if fIncPath != [] then tail fIncPath else "default";
-          fin = if isAttrs pre && ! lib.isDerivation pre then pre else { ${basename} = pre; };
+          fin = if isAttrs pre && ! isDerivation pre then pre else { ${basename} = pre; };
         in
         fin;
       in
@@ -190,8 +190,8 @@ with builtins; rec {
     '' final;
 
   in
-  if isAttrs subcategories && ! lib.isDerivation subcategories then
-    lib.recUpdateHandleInlineORdrv subcategories toMerge
+  if isAttrs subcategories && ! isDerivation subcategories then
+    recUpdateHandleInlineORdrv subcategories toMerge
   else toMerge;
 
 }
