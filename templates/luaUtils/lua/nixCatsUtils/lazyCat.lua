@@ -1,31 +1,17 @@
 local M = {}
 
-function M.mergePluginTables(table1, table2)
-  return vim.tbl_extend('keep', table1, table2)
-end
-
----used to help provide the list of plugin names for lazy wrapper.
----@param pluginTable table|string[]|nil
----@return string[]
-function M.getTableNamesOrListValues(pluginTable)
-  if pluginTable == nil then
-    return {}
-  end
-  for key, _ in pairs(pluginTable) do
-    if type(key) ~= 'string' then
-      return vim.tbl_values(pluginTable)
-    end
-    break
-  end
-  return vim.tbl_keys(pluginTable)
-end
-
 ---lazy.nvim wrapper
----@param pluginTable table|string[]|nil
----@param nixLazyPath string|nil
----@param lazySpecs any
----@param lazyCFG table
-function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
+---@overload fun(nixLazyPath: string|nil, lazySpec: any, opts: table)
+---@overload fun(nixLazyPath: string|nil, opts: table)
+function M.setup(nixLazyPath, lazySpec, opts)
+  local lazySpecs = nil
+  local lazyCFG = nil
+  if opts == nil and type(lazySpec) == "table" and lazySpec.spec then
+    lazyCFG = lazySpec
+  else
+    lazySpecs = lazySpec
+    lazyCFG = opts
+  end
 
   local function regularLazyDownload()
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -59,14 +45,10 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
 
     local oldPath
     local lazypatterns
+    local fallback
     if type(lazyCFG) == "table" and type(lazyCFG.dev) == "table" then
-      if type(lazyCFG.dev.patterns) ~= 'table' then
-        lazypatterns = M.getTableNamesOrListValues(pluginTable)
-      else
-        local toInclude = lazyCFG.dev.patterns
-        vim.list_extend(toInclude, M.getTableNamesOrListValues(pluginTable))
-        lazypatterns = toInclude
-      end
+      lazypatterns = lazyCFG.dev.patterns
+      fallback = lazyCFG.dev.fallback
       oldPath = lazyCFG.dev.path
     end
 
@@ -100,7 +82,8 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
           end
           return path
         end,
-        patterns = lazypatterns or M.getTableNamesOrListValues(pluginTable),
+        patterns = lazypatterns or { "" },
+        fallback = fallback == nil and true or fallback,
       }
     }
     lazyCFG = vim.tbl_deep_extend("force", lazyCFG or {}, newLazyOpts)
@@ -118,7 +101,11 @@ function M.setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
     }
   end
 
-  require('lazy').setup(lazySpecs, lazyCFG)
+  if lazySpecs then
+    require('lazy').setup(lazySpecs, lazyCFG)
+  else
+    require('lazy').setup(lazyCFG)
+  end
 end
 
 return M

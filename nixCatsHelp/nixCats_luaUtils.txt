@@ -100,69 +100,15 @@ Use the following command in a new directory and check it out!
 >bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#kickstart-nvim
 <
-In that template, all notes about the lazy wrapper are in comments that begin
-with the string: `NOTE: nixCats:` so to find all of the info, search for that.
-
-The 3 main utilities at require('nixCatsUtils.lazyCat')
 >lua
   --the main wrapper
-  ---@param pluginTable table|string[]|nil
-  ---@param nixLazyPath string|nil
-  ---@param lazySpecs any
-  ---@param lazyCFG table
-  require('nixCatsUtils.lazyCat').setup(pluginTable, nixLazyPath, lazySpecs, lazyCFG)
-  -- pluginTable is a table of plugin names, either as a list or as the names
-  -- of a table of pluginName = "a string";
-<
-
-`pluginTable` should contain the plugin names, which lazy.nvim will match
-against the repo names of the plugins.
-You may get this by merging the tables of plugins provided by nix.
->lua
-  local plugins = require('nixCats').pawsible.allPlugins
-  local pluginTable = require('nixCatsUtils.lazyCat')
-                      .mergePluginTables(plugins.start, plugins.opt)
-<
-NOTE: Keep in mind you may need to add a few items for plugins with different
-repo names from their nix plugin names. When you do this, you should also
-set the name field in that plugin's spec to the nix-provided value.
->lua
-  -- for example of when the the nix name is different:
-  -- this must match the repository name
-  pluginTable[ [[Comment.nvim]] ] = ""
-  pluginTable[ [[LuaSnip]] ] = ""
-  -- this also means that in their lazySpecs,
-  -- you must set the name field of comment.nvim and luasnip
-  -- to match their nix-provided values.
-  -- this will also ensure that it works regardless of if nix or lazy downloads it.
-
-  -- usually, the names match and you do not need to do this.
-  -- you could also override the name of the plugin in nix instead!
-<
-You may view the list of plugin names provided by nix to make
-this easier via `:NixCats pawsible`
-
-If you do not have the correct name for the plugin in the `pluginTable` argument,
-lazy.nvim will attempt to download the plugin normally. This will often work anyway.
-
-`nixLazyPath` is the path to lazy.nvim downloaded via nix. You may get it
-via the same table you got the other plugin names from.
-
-lazy.nvim disables all normal plugin loading, so if you want to load a plugin
-via nix, you must also fill out a spec for it.
-
-If you plan on loading a plugin via nix, and it has a build step,
-you may conditionally disable it via `nixCatsUtils.lazyAdd` function,
-thus ensuring it does not run if nix downloads it,
-but still runs if you did not load your config via nix.
-
-The other 2 functions, which are useful for creating
-the table of plugin names for the setup function above:
->lua
-  -- to help you merge the start and opt lists in require('nixCats').included
-  require('nixCatsUtils.lazyCat').mergePluginTables(table1, table2)
-  -- its available if you want it, but it is used in the wrapper on pluginTable
-  require('nixCatsUtils.lazyCat').getTableNamesOrListValues(pluginTable)
+  ---@overload fun(nixLazyPath: string|nil, lazySpec: any, opts: table)
+  ---@overload fun(nixLazyPath: string|nil, opts: table)
+  require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "lazy.nvim" }), lazySpec, opts)
+  -- as long as you call the require('nixCatsUtils').setup function first,
+  -- nixCats.pawsible will not throw an error even
+  -- if no nix was used to load your config
+  -- this is covered in the mentioned template
 <
 The tutorial:
 >nix
@@ -203,8 +149,10 @@ the only methods supported via the `lazy.nvim` wrapper are the following.
 <
 Summary: as long as `pkgs.neovimUtils.grammarToPlugin` is called on it somehow, it will work.
 
-Any other ways will still work in nixCats, but not necessarily when using the lazy wrapper,
-because the lazy wrapper has to add them back to the runtimepath.
+Any other ways will still work in nixCats if they would work in other schemes,
+but not necessarily when using the lazy wrapper,
+because the lazy wrapper has to be given their paths from nix,
+and thus need to be sorted from other plugins somehow.
 
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.paq-nvim*

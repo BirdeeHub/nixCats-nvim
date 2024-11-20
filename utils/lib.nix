@@ -1,7 +1,11 @@
 with builtins; rec {
-  mkCatDefType = mkOptionType: subtype: mkOptionType {
+  mkCatDefType = mkOptionType: pkgType: subtype: let
+    pkgdesc = ''function representing the settings and categories for a nvim package'';
+    catdesc = ''function returning sets of categories of different types of dependency'';
+    subtypedesc = ",\n where multiple declarations are combined using ${if subtype == "merge" then "utils.deepmergeCats" else "utils.mergeCatDefs"}";
+  in mkOptionType {
     name = "catDef";
-    description = "a function representing categoryDefinitions or packageDefinitions for nixCats";
+    description = "${if pkgType then pkgdesc else catdesc}${subtypedesc}";
     descriptionClass = "noun";
     check = v: isFunction v;
     merge = loc: defs: let

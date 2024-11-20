@@ -155,7 +155,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     (import ./mkModules.nix {
       isHomeManager = false;
       oldDependencyOverlays = dependencyOverlays;
-      my_lib = lib;
+      nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
         packageDefinitions defaultPackageName extra_pkg_config;
@@ -174,7 +174,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     (import ./mkModules.nix {
       isHomeManager = true;
       oldDependencyOverlays = dependencyOverlays;
-      my_lib = lib;
+      nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
         packageDefinitions defaultPackageName extra_pkg_config;
