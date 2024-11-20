@@ -67,7 +67,7 @@ let
       else null;
 
     plugin = if p ? plugin && p ? name
-      then pkgs.symlinkJoin { name = p.name; paths = [ p.plugin ]; }
+      then p.plugin // { pname = p.name; }
       else p.plugin or p;
   in
   if p ? plugin then {
