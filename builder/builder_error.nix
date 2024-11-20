@@ -23,13 +23,13 @@ builtins.throw ''
     , nixCats_passthru ? {} # type: attrs
   }:
 
-  # type: function with args { pkgs, settings, categories, name, ... }:
+  # type: function with args { pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:
   # returns: set of sets of categories
   # see :h nixCats.flake.outputs.categories
   categoryDefinitions: 
 
-  # type: function with args { pkgs, ... }:
-  # returns: { settings = {}; categories = {}; }
+  # type: function with args { pkgs, mkNvimPlugin, ... }:
+  # returns: { settings = {}; categories = {}; extra = {}; }
   packageDefinitions: 
   # see :h nixCats.flake.outputs.packageDefinitions
   # see :h nixCats.flake.outputs.settings

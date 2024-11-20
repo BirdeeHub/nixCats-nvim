@@ -3,7 +3,61 @@
 # NOTE: This file exports the entire public interface for nixCats
 with builtins; let lib = import ./lib.nix; in rec {
   /**
-    the big function that does everything
+    The main builder function of nixCats.
+
+    # Arguments
+
+    - [luaPath]: store path to your ~/.config/nvim replacement within your nix config.
+
+    - [pkgsParams]: set of items for building the pkgs that builds your neovim.
+      accepted attributes are:
+      - nixpkgs, # <-- required. allows path, input, or channel
+      - system, # <-- required unless nixpkgs is a resolved channel
+      - dependencyOverlays ? null,
+
+        `listOf overlays` or `attrsOf (listOf overlays)` or `null`
+
+      - extra_pkg_config ? {},
+
+        the attrset passed to:
+        `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+      - nixCats_passthru ? {},
+
+        attrset of extra stuff for finalPackage.passthru
+
+    - [categoryDefinitions]:
+
+      type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
+
+      returns: set of sets of categories of dependencies
+
+      see :h nixCats.flake.outputs.categories
+
+    - [packageDefinitions]: 
+      set of functions that each represent the settings and included categories for that package.
+
+      ```nix
+      {
+        nvim = { pkgs, mkNvimPlugin, ... }: { settings = {}; categories = {}; extra = {}; };
+      }
+      ```
+
+      see :h nixCats.flake.outputs.packageDefinitions
+
+      see :h nixCats.flake.outputs.settings
+
+    - [name]: 
+      name of the package to build from `packageDefinitions`
+
+    # Note:
+
+    When using override, all values shown above will
+    be top level attributes of prev, none will be nested.
+
+    i.e. finalPackage.override (prev: { inherit (prev) dependencyOverlays; })
+    
+    NOT prev.pkgsParams.dependencyOverlays or something like that
   */
   baseBuilder =
     luaPath:
@@ -36,6 +90,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       system extra_pkg_config dependencyOverlays nixCats_passthru;
     };
 
+  /** a set of templates to get you started. See :h nixCats.templates */
   templates = import ../templates;
 
   # allows for inputs named plugins-something to be turned into plugins automatically
