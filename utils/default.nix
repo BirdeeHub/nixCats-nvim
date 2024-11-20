@@ -202,7 +202,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     in overlays;
 
   easyMultiOverlayNamespaced = package: importName: let
-    allnames = builtins.attrNames package.passthru.packageDefinitions;
+    allnames = attrNames package.passthru.packageDefinitions;
   in
   (final: prev: {
     ${importName} = listToAttrs (map (name:
@@ -211,7 +211,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   });
 
   mkAllPackages = package: let
-    allnames = builtins.attrNames package.passthru.packageDefinitions;
+    allnames = attrNames package.passthru.packageDefinitions;
   in
   listToAttrs (map (name:
     lib.nameValuePair name (package.override { inherit name; })
@@ -221,14 +221,14 @@ with builtins; let lib = import ./lib.nix; in rec {
   { default = package; } // (mkAllPackages package);
 
   easyMultiOverlay = package: let
-    allnames = builtins.attrNames package.passthru.packageDefinitions;
+    allnames = attrNames package.passthru.packageDefinitions;
   in
   (final: prev: listToAttrs (map (name:
     lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
   ) allnames));
 
   easyNamedOvers = package: let
-    allnames = builtins.attrNames package.passthru.packageDefinitions;
+    allnames = attrNames package.passthru.packageDefinitions;
     mapfunc = map (name:
       lib.nameValuePair name (final: prev: {
         ${name} = package.override { inherit (prev) system; };
@@ -255,7 +255,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       ${importName} = listToAttrs (
         map
           (name: let
-            keepLuaBuilder = if builtins.isFunction luaPath then luaPath else baseBuilder luaPath;
+            keepLuaBuilder = if isFunction luaPath then luaPath else baseBuilder luaPath;
           in
             {
               inherit name;
