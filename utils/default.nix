@@ -525,31 +525,6 @@ with builtins; let lib = import ./lib.nix; in rec {
       };
     in overlays;
 
-  easyMultiOverlayNamespaced = package: importName: let
-    allnames = attrNames package.passthru.packageDefinitions;
-  in
-  (final: prev: {
-    ${importName} = listToAttrs (map (name:
-        lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
-      ) allnames);
-  });
-
-  easyMultiOverlay = package: let
-    allnames = attrNames package.passthru.packageDefinitions;
-  in
-  (final: prev: listToAttrs (map (name:
-    lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
-  ) allnames));
-
-  easyNamedOvers = package: let
-    allnames = attrNames package.passthru.packageDefinitions;
-    mapfunc = map (name:
-      lib.nameValuePair name (final: prev: {
-        ${name} = package.override { inherit (prev) system; };
-      }));
-  in
-  listToAttrs (mapfunc allnames);
-
   # maybe you want multiple nvim packages in the same system and want
   # to add them like pkgs.MyNeovims.packageName when you install them?
   # both to keep it organized and also to not have to worry about naming conflicts with programs?
@@ -579,6 +554,31 @@ with builtins; let lib = import ./lib.nix; in rec {
         );
       }
     );
+
+  easyMultiOverlayNamespaced = package: importName: let
+    allnames = attrNames package.passthru.packageDefinitions;
+  in
+  (final: prev: {
+    ${importName} = listToAttrs (map (name:
+        lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+      ) allnames);
+  });
+
+  easyMultiOverlay = package: let
+    allnames = attrNames package.passthru.packageDefinitions;
+  in
+  (final: prev: listToAttrs (map (name:
+    lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+  ) allnames));
+
+  easyNamedOvers = package: let
+    allnames = attrNames package.passthru.packageDefinitions;
+    mapfunc = map (name:
+      lib.nameValuePair name (final: prev: {
+        ${name} = package.override { inherit (prev) system; };
+      }));
+  in
+  listToAttrs (mapfunc allnames);
 
   # DEPRECATED
   mkLuaInline = trace "utils.mkLuaInline renamed to utils.n2l.types.inline-safe.mk, due to be removed before 2025" lib.n2l.types.inline-safe.mk;
