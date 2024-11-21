@@ -21,6 +21,7 @@ stdenv.mkDerivation {
         test_libT_vars = true;
         nested_test = true;
         nixCats_fields = true;
+        n2l_tests = true;
       };
     };
   in /*bash*/ ''

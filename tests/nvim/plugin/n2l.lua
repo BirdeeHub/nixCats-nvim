@@ -1,0 +1,7 @@
+make_test("n2l_tests", function()
+    assert.same(3, nixCats.extra("typetests.inlinesafe1"))
+    assert.same(2, nixCats.extra("typetests.inlinesafe2"))
+    assert.same(3, nixCats.extra("typetests.inlineunsafe1"))
+    assert.same(2, nixCats.extra("typetests.inlineunsafe2"))
+    assert.same("is a test table", nixCats.extra("typetests.metatest"))
+end)
