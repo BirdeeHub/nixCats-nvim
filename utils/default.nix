@@ -281,7 +281,9 @@ with builtins; let lib = import ./lib.nix; in rec {
     you can use this to make values in the tables generated
     for the nixCats plugin using lua literals.
 
-    i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
+    ```
+    cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
+    ```
   */
   n2l = lib.n2l;
 
