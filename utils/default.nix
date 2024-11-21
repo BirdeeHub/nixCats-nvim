@@ -511,7 +511,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : exactly the same a the `pkgsParams` in baseBuilder
     : except without `system`
 
-    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in baseBuilder
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
@@ -552,7 +552,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : exactly the same a the `pkgsParams` in baseBuilder
     : except without `system`
 
-    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in baseBuilder
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
@@ -595,7 +595,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : exactly the same a the `pkgsParams` in baseBuilder
     : except without `system`
 
-    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in baseBuilder
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
