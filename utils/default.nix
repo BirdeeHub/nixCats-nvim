@@ -207,7 +207,8 @@ with builtins; let lib = import ./lib.nix; in rec {
       else []));
 
   /**
-    in case someone didn't know that genAttrs is great for dealing with the system variable
+    in case someone didn't know that genAttrs is great for dealing with the system variable,
+    this is literally just nixpkgs.lib.genAttrs
   */
   bySystems = lib.genAttrs;
 
