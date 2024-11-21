@@ -3,13 +3,15 @@
 # NOTE: This file exports the entire public interface for nixCats
 with builtins; let lib = import ./lib.nix; in rec {
   /**
-    The main builder function of nixCats.
+    `utils.baseBuilder` is the main builder function of nixCats.
 
     # Arguments
 
-    - [luaPath]: store path to your ~/.config/nvim replacement within your nix config.
+    ## **luaPath** (path or string)
+      store path to your ~/.config/nvim replacement within your nix config.
 
-    - [pkgsParams]: set of items for building the pkgs that builds your neovim.
+    ## **pkgsParams** (AttrSet)
+      set of items for building the pkgs that builds your neovim.
       accepted attributes are:
       - nixpkgs, # <-- required. allows path, input, or channel
       - system, # <-- required unless nixpkgs is a resolved channel
@@ -26,16 +28,14 @@ with builtins; let lib = import ./lib.nix; in rec {
 
         attrset of extra stuff for finalPackage.passthru
 
-    - [categoryDefinitions]:
-
+    ## **categoryDefinitions** (function)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
-
       returns: set of sets of categories of dependencies
 
       see :h nixCats.flake.outputs.categories
 
-    - [packageDefinitions]: 
-      set of functions that each represent the settings and included categories for that package.
+    ## **packageDefinitions** (function)
+      set of functions that each represent the settings and included categories for a package.
 
       ```nix
       {
@@ -47,7 +47,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
       see :h nixCats.flake.outputs.settings
 
-    - [name]: 
+    ## **name** (string)
       name of the package to build from `packageDefinitions`
 
     # Note:
@@ -93,27 +93,58 @@ with builtins; let lib = import ./lib.nix; in rec {
   /** a set of templates to get you started. See :h nixCats.templates */
   templates = import ../templates;
 
-  # allows for inputs named plugins-something to be turned into plugins automatically
+  /**
+    standardPluginOverlay is called with flake inupts or a set of fetched derivations.
+
+    It will extract all items named in the form `plugins-foobar`
+
+    and return an overlay containing those items transformed into neovim plugins.
+
+    After adding the overlay returned, you can access them using `pkgs.neovimPlugins.foobar`
+
+    # Example
+
+    ```
+      dependencyOverlays = [ (standardPluginOverlay inputs) ];
+    ```
+  */
   standardPluginOverlay = (import ./autoPluginOverlay.nix).standardPluginOverlay;
 
-  # same as standardPluginOverlay except if you give it `plugins-foo.bar`
-  # you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
+  /**
+    same as standardPluginOverlay except if you give it `plugins-foo.bar`
+    you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
+  */
   sanitizedPluginOverlay = (import ./autoPluginOverlay.nix).sanitizedPluginOverlay;
 
-  # returns a merged set of definitions, with new overriding old.
-  # updates anything it finds that isn't another set.
-  # this means it works slightly differently for environment variables
-  # because each one will be updated individually rather than at a category level.
+  /**
+    returns a merged set of definitions, with new overriding old.
+    updates anything it finds that isn't another set.
+
+    this means it works slightly differently for environment variables
+    because each one will be updated individually rather than at a category level.
+
+    Works with both categoryDefinitions and individual packageDefinitions
+  */
   mergeCatDefs = oldCats: newCats:
     (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
 
-  # allows category list definitions to be merged
+  /**
+    Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
+    it will merge them together rather than replacing the old one with the new one.
+  */
   deepmergeCats = oldCats: newCats:
     (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
 
-  # recursiveUpdate each overlay output to avoid issues where
-  # two overlays output a set of the same name when importing from other nixCats.
-  # Merges everything into 1 overlay
+  /**
+    recursiveUpdate each overlay output to avoid issues where
+    two overlays output a set of the same name when importing from other nixCats.
+    Merges everything into 1 overlay
+
+    If you have 2 overlays both outputting a set like pkgs.neovimPlugins,
+    The second will replace the first.
+
+    This will merge the results instead.
+  */
   mergeOverlayLists = oldOverlist: newOverlist: self: super: let
     oldOversMapped = map (value: value self super) oldOverlist;
     newOversMapped = map (value: value self super) newOverlist;
@@ -122,17 +153,22 @@ with builtins; let lib = import ./lib.nix; in rec {
   in
   mergedOvers;
 
-  # if your dependencyOverlays is a list rather than a system-wrapped set,
-  # to deal with when other people output an overlay wrapped in a system variable
-  # you may call the following function on it.
+  /**
+    if your dependencyOverlays is a list rather than a system-wrapped set,
+    to deal with when other people output an overlay wrapped in a system variable
+    you may call the following function on it.
+  */
   fixSystemizedOverlay = overlaysSet: outfunc:
     (final: prev: if !(overlaysSet ? prev.system) then {}
       else (outfunc prev.system) final prev);
 
-  # Simple helper function for mergeOverlayLists
-  # If dependencyOverlays is an attrset, system string is required.
-  # If dependencyOverlays is a list, system string is ignored
-  # if invalid type or system, returns an empty list
+  /**
+    Simple helper function for mergeOverlayLists
+
+    If dependencyOverlays is an attrset, system string is required.
+    If dependencyOverlays is a list, system string is ignored.
+    if invalid type or system, returns an empty list
+  */
   safeOversList = { dependencyOverlays, system ? null }:
     if isAttrs dependencyOverlays && system == null then
       throw "dependencyOverlays is a set, but no system was provided"
@@ -185,8 +221,11 @@ with builtins; let lib = import ./lib.nix; in rec {
   # i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
   inherit (lib) n2l;
 
-  # flake-utils' main function, because its all I used
-  # Builds a map from <attr>=value to <attr>.<system>=value for each system
+  /**
+    flake-utils.lib.eachSystem
+    but without the flake input
+    Builds a map from <attr>=value to <attr>.<system>=value for each system
+  */
   eachSystem = systems: f: let
     # Merge together the outputs for all systems.
     op = attrs: system: let
@@ -206,15 +245,32 @@ with builtins; let lib = import ./lib.nix; in rec {
          else [ currentSystem ]
       else []));
 
-  # in case someoneone wants flake-utils but for only 1 output,
-  # and didnt know genAttrs is great as a bySystems
+  /**
+    in case someone didn't know that genAttrs is great for dealing with the system variable
+  */
   bySystems = lib.genAttrs;
 
-  # makes a default package and then one for each name in packageDefinitions
+  /**
+    makes a default package and then one for each name in packageDefinitions
+
+    # Arguments
+    
+    `finalBuilder` (function)
+    : `baseBuilder` with all arguments except `name` applied.
+
+    `packageDefinitions` (set)
+    : the set of packageDefinitions passed to the builder, passed in again.
+
+    `defaultName` (string)
+    : the name of the package to be output as default in the resulting set of packages.
+  */
   mkPackages = finalBuilder: packageDefinitions: defaultName:
     { default = finalBuilder defaultName; }
     // mkExtraPackages finalBuilder packageDefinitions;
 
+  /**
+    `mkPackages` but without adding a default package, or the final defaultName argument
+  */
   mkExtraPackages = finalBuilder: packageDefinitions:
   (mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
