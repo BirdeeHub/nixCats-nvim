@@ -117,6 +117,8 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but 
 see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html#nixCats.installation_options)
 for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
+The installation info here is simply a repetition of the info there, and I would suggest viewing it there instead.
+
 - to test:
 ```bash
 nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
