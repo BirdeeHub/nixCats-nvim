@@ -445,6 +445,14 @@ with builtins; let lib = import ./lib.nix; in rec {
 
   /**
     `mkPackages` but without adding a default package, or the final defaultName argument
+
+    # Arguments
+    
+    `finalBuilder` (`function`)
+    : `baseBuilder` with all arguments except `name` applied.
+
+    `packageDefinitions` (`AttrSet`)
+    : the set of packageDefinitions passed to the builder, passed in again.
   */
   mkExtraPackages = finalBuilder: packageDefinitions:
   (mapAttrs (name: _: finalBuilder name) packageDefinitions);
@@ -454,6 +462,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Pass it a package and it will make that the default, and build all the packages
     in the packageDefinitions that package was built with.
+
+    # Arguments
+
+    `package` (`NixCats nvim derivation`)
   */
   mkAllWithDefault = package:
   { default = package; } // (mkAllPackages package);
@@ -463,6 +475,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Pass it a package and it will build all the packages
     in the packageDefinitions that package was built with.
+
+    # Arguments
+
+    `package` (`NixCats nvim derivation`)
   */
   mkAllPackages = package: let
     allnames = attrNames package.passthru.packageDefinitions;
