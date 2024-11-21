@@ -7,10 +7,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Arguments
 
-    ## **luaPath** (path or string)
+    ## **luaPath** (`path` or `stringWithContext`)
       store path to your ~/.config/nvim replacement within your nix config.
 
-    ## **pkgsParams** (AttrSet)
+    ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
       accepted attributes are:
       - nixpkgs, # <-- required. allows path, input, or channel
@@ -28,13 +28,13 @@ with builtins; let lib = import ./lib.nix; in rec {
 
         attrset of extra stuff for finalPackage.passthru
 
-    ## **categoryDefinitions** (function)
+    ## **categoryDefinitions** (`function`)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
       returns: set of sets of categories of dependencies
 
       see :h nixCats.flake.outputs.categories
 
-    ## **packageDefinitions** (AttrsOf function)
+    ## **packageDefinitions** (`AttrsOf` `function`)
       set of functions that each represent the settings and included categories for a package.
 
       ```nix
@@ -47,7 +47,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
       see :h nixCats.flake.outputs.settings
 
-    ## **name** (string)
+    ## **name** (`string`)
       name of the package to build from `packageDefinitions`
 
     # Note:
@@ -139,6 +139,53 @@ with builtins; let lib = import ./lib.nix; in rec {
     (final: prev: if !(overlaysSet ? prev.system) then {}
       else (outfunc prev.system) final prev);
 
+  /**
+    takes all the arguments of the main builder function but as a single set
+
+    Instead of name it needs defaultPackageName
+
+    This will control the namespace of the generated modules
+    as well as the default package name to be enabled if only enable = true is present.
+
+    Unlike in the baseBuilder, all other arguments are optional
+
+    But if you want the module to actually contain configured packages, they are not optional.
+
+    The module will be able to combine any definitions passed in with new ones defined in the module correctly.
+
+    # Arguments
+
+    `defaultPackageName` (`string`)
+    : the only truly required argument
+    : controls the namespace of the generated module and the default package installed
+
+    `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    : default = null
+
+    `luaPath` (`path` or `stringWithContext`)
+    : default = ""
+    : store path to your ~/.config/nvim replacement within your nix config.
+
+    `keepLuaBuilder` (`function`)
+    : default = null
+    : baseBuilder with luaPath argument applied, can be used instead of luaPath
+
+    `extra_pkg_config` (`attrs`)
+    : default = {}
+    : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+    `nixpkgs` (`path` or `attrs`)
+    : default = null
+    : nixpkgs flake input, channel path, or pkgs variable
+
+    `categoryDefinitions` (`functionTo` `AttrSet`)
+    : default = (_:{})
+    : same as for the baseBuilder
+
+    `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
+    : default = {}
+    : same as for the baseBuilder
+  */
   mkNixosModules = {
     dependencyOverlays ? null
     , luaPath ? ""
@@ -158,6 +205,57 @@ with builtins; let lib = import ./lib.nix; in rec {
         packageDefinitions defaultPackageName extra_pkg_config;
     });
 
+  /**
+    takes all the arguments of the main builder function but as a single set
+
+    Instead of name it needs defaultPackageName
+
+    This will control the namespace of the generated modules
+    as well as the default package name to be enabled if only enable = true is present.
+
+    Unlike in the baseBuilder, all other arguments are optional
+
+    But if you want the module to actually contain configured packages, they are not optional.
+
+    The module will be able to combine any definitions passed in with new ones defined in the module correctly.
+
+    The generated home manager module is the same as the nixos module
+
+    Except there are no per-user arguments, because the module installs for the home manager user
+
+    # Arguments
+
+    `defaultPackageName` (`string`)
+    : the only truly required argument
+    : controls the namespace of the generated module and the default package installed
+
+    `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    : default = null
+
+    `luaPath` (`path` or `stringWithContext`)
+    : default = ""
+    : store path to your ~/.config/nvim replacement within your nix config.
+
+    `keepLuaBuilder` (`function`)
+    : default = null
+    : baseBuilder with luaPath argument applied, can be used instead of luaPath
+
+    `extra_pkg_config` (`attrs`)
+    : default = {}
+    : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+    `nixpkgs` (`path` or `attrs`)
+    : default = null
+    : nixpkgs flake input, channel path, or pkgs variable
+
+    `categoryDefinitions` (`functionTo` `AttrSet`)
+    : default = (_:{})
+    : same as for the baseBuilder
+
+    `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
+    : default = {}
+    : same as for the baseBuilder
+  */
   mkHomeModules = {
     dependencyOverlays ? null
     , luaPath ? ""
@@ -180,12 +278,19 @@ with builtins; let lib = import ./lib.nix; in rec {
   # you can use this to make values in the tables generated
   # for the nixCats plugin using lua literals.
   # i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
+  # TODO: make doc comments there, reference those in doc comments here.
   inherit (lib) n2l;
 
   /**
     flake-utils.lib.eachSystem but without the flake input
 
     Builds a map from <attr>=value to <attr>.<system>=value for each system
+
+    # Arguments
+
+    `systems` (`listOf strings`)
+
+    `f` (`functionTo` `AttrSet`)
   */
   eachSystem = systems: f: let
     # Merge together the outputs for all systems.
@@ -209,6 +314,12 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     in case someone didn't know that genAttrs is great for dealing with the system variable,
     this is literally just nixpkgs.lib.genAttrs
+
+    # Arguments
+
+    `systems` (`listOf strings`)
+
+    `f` (`function`)
   */
   bySystems = lib.genAttrs;
 
@@ -223,9 +334,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Arguments
 
-    `oldCats` (categoryDefinitions | packageDefinitions)
+    `oldCats` (`functionTo` `AttrSet`)
+    : categoryDefinitions or a single packageDefinition
 
-    `newCats` (categoryDefinitions | packageDefinitions)
+    `newCats` (`functionTo` `AttrSet`)
+    : categoryDefinitions or a single packageDefinition
   */
   mergeCatDefs = oldCats: newCats:
     (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
@@ -236,9 +349,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Arguments
 
-    `oldCats` (categoryDefinitions | packageDefinitions)
+    `oldCats` (`functionTo` `AttrSet`)
+    : categoryDefinitions or a single packageDefinition
 
-    `newCats` (categoryDefinitions | packageDefinitions)
+    `newCats` (`functionTo` `AttrSet`)
+    : categoryDefinitions or a single packageDefinition
   */
   deepmergeCats = oldCats: newCats:
     (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
@@ -257,9 +372,9 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Arguments
 
-    `oldOverlist` (list of overlays)
+    `oldOverlist` (`listOf` `overlays`)
 
-    `newOverlist` (list of overlays)
+    `newOverlist` (`listOf` `overlays`)
   */
   mergeOverlayLists = oldOverlist: newOverlist: self: super: let
     oldOversMapped = map (value: value self super) oldOverlist;
@@ -307,13 +422,13 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Arguments
     
-    `finalBuilder` (function)
+    `finalBuilder` (`function`)
     : `baseBuilder` with all arguments except `name` applied.
 
-    `packageDefinitions` (set)
+    `packageDefinitions` (`AttrSet`)
     : the set of packageDefinitions passed to the builder, passed in again.
 
-    `defaultName` (string)
+    `defaultName` (`string`)
     : the name of the package to be output as default in the resulting set of packages.
   */
   mkPackages = finalBuilder: packageDefinitions: defaultName:
