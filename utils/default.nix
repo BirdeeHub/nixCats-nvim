@@ -13,8 +13,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
       accepted attributes are:
-      - `nixpkgs`, # <-- required. allows path, input, or channel
-      - `system`, # <-- required unless nixpkgs is a resolved channel
+      - `nixpkgs` (`path` | `input` | `channel`)
+        : required. allows path, input, or channel
+        : channel means a resolved pkgs variable
+        : will not grab overlays from pkgs type variable
+        : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
+      - `system` (`string`)
+        : required unless nixpkgs is a resolved channel
+        : or using --impure argument
       - `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
         : default = null
       - `extra_pkg_config` (`AttrSet`)
