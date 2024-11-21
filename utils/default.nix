@@ -28,13 +28,13 @@ with builtins; let lib = import ./lib.nix; in rec {
 
         attrset of extra stuff for finalPackage.passthru
 
-    ## **categoryDefinitions** (`function`)
+    ## **categoryDefinitions** (`functionTo` `AttrSet`)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
       returns: set of sets of categories of dependencies
 
       see :h nixCats.flake.outputs.categories
 
-    ## **packageDefinitions** (`AttrsOf` `function`)
+    ## **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
       set of functions that each represent the settings and included categories for a package.
 
       ```nix
