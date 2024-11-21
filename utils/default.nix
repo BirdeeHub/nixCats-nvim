@@ -283,7 +283,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
   */
-  inherit (lib) n2l;
+  n2l = lib.n2l;
 
   /**
     flake-utils.lib.eachSystem but without the flake input
