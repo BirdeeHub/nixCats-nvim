@@ -8,7 +8,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Arguments
 
     ## **luaPath** (`path` or `stringWithContext`)
-      store path to your ~/.config/nvim replacement within your nix config.
+      STORE PATH to your `~/.config/nvim` replacement.
 
     ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
@@ -35,7 +35,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
       returns: set of sets of categories of dependencies
 
-      see :h nixCats.flake.outputs.categories
+      see `:h nixCats.flake.outputs.categories`
 
     ## **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
       set of functions that each represent the settings and included categories for a package.
@@ -46,9 +46,9 @@ with builtins; let lib = import ./lib.nix; in rec {
       }
       ```
 
-      see :h nixCats.flake.outputs.packageDefinitions
+      see `:h nixCats.flake.outputs.packageDefinitions`
 
-      see :h nixCats.flake.outputs.settings
+      see `:h nixCats.flake.outputs.settings`
 
     ## **name** (`string`)
       name of the package to build from `packageDefinitions`
@@ -58,9 +58,9 @@ with builtins; let lib = import ./lib.nix; in rec {
     When using override, all values shown above will
     be top level attributes of prev, none will be nested.
 
-    i.e. finalPackage.override (prev: { inherit (prev) dependencyOverlays; })
+    i.e. `finalPackage.override (prev: { inherit (prev) dependencyOverlays; })`
     
-    NOT prev.pkgsParams.dependencyOverlays or something like that
+    NOT `prev.pkgsParams.dependencyOverlays` or something like that
   */
   baseBuilder =
     luaPath:
@@ -279,7 +279,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     });
 
   /**
-    see :h nixCats.flake.outputs.utils.n2l
+    see `:h nixCats.flake.outputs.utils.n2l`
 
     you can use this to make values in the tables generated
     for the nixCats plugin using lua literals.
@@ -291,9 +291,9 @@ with builtins; let lib = import ./lib.nix; in rec {
   n2l = lib.n2l;
 
   /**
-    flake-utils.lib.eachSystem but without the flake input
+    `flake-utils.lib.eachSystem` but without the flake input
 
-    Builds a map from <attr>=value to <attr>.<system>=value for each system
+    Builds a map from `<attr>=value` to `<attr>.<system>=value` for each system
 
     # Arguments
 
@@ -542,7 +542,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Differs from makeOverlays in that the default overlay is a set of all the packages
 
-    default overlay yeilds pkgs.${defaultName}.${packageName} with all the packages
+    default overlay yeilds `pkgs.${defaultName}.${packageName}` with all the packages
 
     # Arguments
 
@@ -583,7 +583,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     makes a set of overlays from your definitions for exporting from a flake.
 
-    overlay yeilds pkgs.${importName}.${packageName}
+    overlay yeilds `pkgs.${importName}.${packageName}`
 
     contains all the packages named in `namesIncList` (the last argument)
 
