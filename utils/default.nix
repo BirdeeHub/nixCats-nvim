@@ -449,6 +449,28 @@ with builtins; let lib = import ./lib.nix; in rec {
   mkExtraPackages = finalBuilder: packageDefinitions:
   (mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
+  /**
+    like mkPackages but easier.
+
+    Pass it a package and it will make that the default, and build all the packages
+    in the packageDefinitions that package was built with.
+  */
+  mkAllWithDefault = package:
+  { default = package; } // (mkAllPackages package);
+
+  /**
+    like mkExtraPackages but easier.
+
+    Pass it a package and it will build all the packages
+    in the packageDefinitions that package was built with.
+  */
+  mkAllPackages = package: let
+    allnames = attrNames package.passthru.packageDefinitions;
+  in
+  listToAttrs (map (name:
+    lib.nameValuePair name (package.override { inherit name; })
+  ) allnames);
+
   makeOverlays = 
     luaPath:
     {
@@ -495,16 +517,6 @@ with builtins; let lib = import ./lib.nix; in rec {
         lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
       ) allnames);
   });
-
-  mkAllPackages = package: let
-    allnames = attrNames package.passthru.packageDefinitions;
-  in
-  listToAttrs (map (name:
-    lib.nameValuePair name (package.override { inherit name; })
-  ) allnames);
-
-  mkAllWithDefault = package:
-  { default = package; } // (mkAllPackages package);
 
   easyMultiOverlay = package: let
     allnames = attrNames package.passthru.packageDefinitions;
