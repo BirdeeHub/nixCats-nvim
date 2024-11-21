@@ -74,10 +74,6 @@
     # without fear.
 
     # sometimes our overlays require a ${system} to access the overlay.
-    # The default templates wrap the set we add them to with ${system}
-    # because using them this way requires
-    # least intervention when encountering malformed flakes.
-
     # Your dependencyOverlays can either be lists
     # in a set of ${system}, or simply a list.
     # the nixCats builder function will accept either.
