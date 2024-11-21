@@ -34,7 +34,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
       see :h nixCats.flake.outputs.categories
 
-    ## **packageDefinitions** (function)
+    ## **packageDefinitions** (AttrsOf function)
       set of functions that each represent the settings and included categories for a package.
 
       ```nix
