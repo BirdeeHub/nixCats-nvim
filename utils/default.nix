@@ -13,20 +13,17 @@ with builtins; let lib = import ./lib.nix; in rec {
     ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
       accepted attributes are:
-      - nixpkgs, # <-- required. allows path, input, or channel
-      - system, # <-- required unless nixpkgs is a resolved channel
-      - dependencyOverlays ? null,
-
-        `listOf overlays` or `attrsOf (listOf overlays)` or `null`
-
-      - extra_pkg_config ? {},
-
-        the attrset passed to:
-        `import nixpkgs { config = extra_pkg_config; inherit system; }`
-
-      - nixCats_passthru ? {},
-
-        attrset of extra stuff for finalPackage.passthru
+      - `nixpkgs`, # <-- required. allows path, input, or channel
+      - `system`, # <-- required unless nixpkgs is a resolved channel
+      - `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
+        : default = null
+      - `extra_pkg_config` (`AttrSet`)
+        : default = {}
+        : the attrset passed to:
+        : `import nixpkgs { config = extra_pkg_config; inherit system; }`
+      - `nixCats_passthru` (`AttrSet`)
+        : default = {}
+        : attrset of extra stuff for finalPackage.passthru
 
     ## **categoryDefinitions** (`functionTo` `AttrSet`)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
