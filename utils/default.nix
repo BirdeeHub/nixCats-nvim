@@ -275,10 +275,14 @@ with builtins; let lib = import ./lib.nix; in rec {
         packageDefinitions defaultPackageName extra_pkg_config;
     });
 
-  # you can use this to make values in the tables generated
-  # for the nixCats plugin using lua literals.
-  # i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
-  # TODO: make doc comments there, reference those in doc comments here.
+  /**
+    see :h nixCats.flake.outputs.utils.n2l
+
+    you can use this to make values in the tables generated
+    for the nixCats plugin using lua literals.
+
+    i.e. cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
+  */
   inherit (lib) n2l;
 
   /**
@@ -428,6 +432,8 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     makes a default package and then one for each name in packageDefinitions
 
+    for constructing flake outputs.
+
     # Arguments
     
     `finalBuilder` (`function`)
@@ -487,6 +493,27 @@ with builtins; let lib = import ./lib.nix; in rec {
     lib.nameValuePair name (package.override { inherit name; })
   ) allnames);
 
+  /**
+    makes a set of overlays from your definitions for exporting from a flake.
+
+    defaultName is the package name for the default overlay
+
+    # Arguments
+
+    `luaPath` (`function` or `stringWithContext`)
+
+    `pkgsParams` (`AttrSet`)
+    : exactly the same a the `pkgsParams` in baseBuilder
+    : except without `system`
+
+    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    : exactly the same as `categoryDefinitions` in baseBuilder
+
+    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    : exactly the same as `packageDefinitions` in baseBuilder
+
+    `defaultName` (`string`)
+  */
   makeOverlays = 
     luaPath:
     {
@@ -505,6 +532,29 @@ with builtins; let lib = import ./lib.nix; in rec {
       overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // { default = (makeOverlay defaultName); };
     in overlays;
 
+  /**
+    makes a set of overlays from your definitions for exporting from a flake.
+
+    Differs from makeOverlays in that the default overlay is a set of all the packages
+
+    default overlay yeilds pkgs.${defaultName}.${packageName} with all the packages
+
+    # Arguments
+
+    `luaPath` (`function` or `stringWithContext`)
+
+    `pkgsParams` (`AttrSet`)
+    : exactly the same a the `pkgsParams` in baseBuilder
+    : except without `system`
+
+    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    : exactly the same as `categoryDefinitions` in baseBuilder
+
+    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    : exactly the same as `packageDefinitions` in baseBuilder
+
+    `defaultName` (`string`)
+  */
   makeOverlaysWithMultiDefault = 
     luaPath:
     {
@@ -525,9 +575,33 @@ with builtins; let lib = import ./lib.nix; in rec {
       };
     in overlays;
 
-  # maybe you want multiple nvim packages in the same system and want
-  # to add them like pkgs.MyNeovims.packageName when you install them?
-  # both to keep it organized and also to not have to worry about naming conflicts with programs?
+  /**
+    makes a set of overlays from your definitions for exporting from a flake.
+
+    overlay yeilds pkgs.${importName}.${packageName}
+
+    contains all the packages named in `namesIncList` (the last argument)
+
+    # Arguments
+
+    `luaPath` (`function` or `stringWithContext`)
+
+    `pkgsParams` (`AttrSet`)
+    : exactly the same a the `pkgsParams` in baseBuilder
+    : except without `system`
+
+    `categoryDefinitions (`FunctionTo` `AttrSet`)
+    : exactly the same as `categoryDefinitions` in baseBuilder
+
+    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    : exactly the same as `packageDefinitions` in baseBuilder
+
+    `importName` (`string`)
+    : when applied, overlay yeilds `pkgs.${importName}.${packageName}`
+
+    `namesIncList` (`listOf` `string`)
+    : the names of packages to include in the set yeilded by the overlay
+  */
   makeMultiOverlay = luaPath:
     {
       nixpkgs
@@ -555,6 +629,25 @@ with builtins; let lib = import ./lib.nix; in rec {
       }
     );
 
+  /**
+    `makeMultiOverlay` except it takes only 2 arguments.
+
+    # Arguments
+
+    `package` (`NixCats nvim derivation`)
+    : will include all packages in the packageDefinitions the package was built with
+
+    `importName` (`string`)
+    : overlay will yield `pkgs.${importName}.${packageName}`
+
+    # Example
+
+    ```
+      easyMultiOverlayNamespaced self.packages.x86_64-linux.${packageName} packageName
+      # The `system` chosen DOES NOT MATTER.
+      # The overlay utilizes override to change it to match `prev.system`
+    ```
+  */
   easyMultiOverlayNamespaced = package: importName: let
     allnames = attrNames package.passthru.packageDefinitions;
   in
@@ -564,6 +657,23 @@ with builtins; let lib = import ./lib.nix; in rec {
       ) allnames);
   });
 
+  /**
+    makes a single overlay with all the packages
+    in `packageDefinitions` from the package as `pkgs.${packageName}`
+
+    # Arguments
+
+    `package` (`NixCats nvim derivation`)
+    : will include all packages in the packageDefinitions the package was built with
+
+    # Example
+
+    ```
+      easyMultiOverlay self.packages.x86_64-linux.${packageName}
+      # The `system` chosen DOES NOT MATTER.
+      # The overlay utilizes override to change it to match `prev.system`
+    ```
+  */
   easyMultiOverlay = package: let
     allnames = attrNames package.passthru.packageDefinitions;
   in
@@ -571,6 +681,23 @@ with builtins; let lib = import ./lib.nix; in rec {
     lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
   ) allnames));
 
+  /**
+    makes a separate overlay for each of the packages
+    in `packageDefinitions` from the package as `pkgs.${packageName}`
+
+    # Arguments
+
+    `package` (`NixCats nvim derivation`)
+    : will include all packages in the packageDefinitions the package was built with
+
+    # Example
+
+    ```
+      easyMultiOverlay self.packages.x86_64-linux.${packageName}
+      # The `system` chosen DOES NOT MATTER.
+      # The overlay utilizes override to change it to match `prev.system`
+    ```
+  */
   easyNamedOvers = package: let
     allnames = attrNames package.passthru.packageDefinitions;
     mapfunc = map (name:
