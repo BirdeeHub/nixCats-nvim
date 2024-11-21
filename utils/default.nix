@@ -12,7 +12,9 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
-      accepted attributes are:
+
+      - accepted attributes are:
+
       `nixpkgs` (`path` | `input` | `channel`)
       : required. allows path, input, or channel
       : channel means a resolved pkgs variable
