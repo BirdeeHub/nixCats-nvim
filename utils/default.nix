@@ -393,6 +393,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     If dependencyOverlays is a list, system string is ignored.
     if invalid type or system, returns an empty list
 
+    # Arguments
+
+    `system` (`string` or `null`)
+    : Technically optional if you know dependencyOverlays is a list
+    : But the whole function isnt required at that point so, this is effectively required
+
+    `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
+
     # Example
 
     ```
