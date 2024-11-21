@@ -13,23 +13,27 @@ with builtins; let lib = import ./lib.nix; in rec {
     ## **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
       accepted attributes are:
-      - `nixpkgs` (`path` | `input` | `channel`)
-        : required. allows path, input, or channel
-        : channel means a resolved pkgs variable
-        : will not grab overlays from pkgs type variable
-        : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
-      - `system` (`string`)
-        : required unless nixpkgs is a resolved channel
-        : or using --impure argument
-      - `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
-        : default = null
-      - `extra_pkg_config` (`AttrSet`)
-        : default = {}
-        : the attrset passed to:
-        : `import nixpkgs { config = extra_pkg_config; inherit system; }`
-      - `nixCats_passthru` (`AttrSet`)
-        : default = {}
-        : attrset of extra stuff for finalPackage.passthru
+      `nixpkgs` (`path` | `input` | `channel`)
+      : required. allows path, input, or channel
+      : channel means a resolved pkgs variable
+      : will not grab overlays from pkgs type variable
+      : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
+
+      `system` (`string`)
+      : required unless nixpkgs is a resolved channel
+      : or using --impure argument
+
+      `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
+      : default = null
+
+      `extra_pkg_config` (`AttrSet`)
+      : default = {}
+      : the attrset passed to:
+      : `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+      `nixCats_passthru` (`AttrSet`)
+      : default = {}
+      : attrset of extra stuff for finalPackage.passthru
 
     ## **categoryDefinitions** (`functionTo` `AttrSet`)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
