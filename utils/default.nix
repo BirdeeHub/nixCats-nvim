@@ -113,70 +113,31 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     same as standardPluginOverlay except if you give it `plugins-foo.bar`
     you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
+
+    # Example
+
+    ```
+      dependencyOverlays = [ (sanitizedPluginOverlay inputs) ];
+    ```
   */
   sanitizedPluginOverlay = (import ./autoPluginOverlay.nix).sanitizedPluginOverlay;
 
   /**
-    returns a merged set of definitions, with new overriding old.
-    updates anything it finds that isn't another set.
-
-    this means it works slightly differently for environment variables
-    because each one will be updated individually rather than at a category level.
-
-    Works with both categoryDefinitions and individual packageDefinitions
-  */
-  mergeCatDefs = oldCats: newCats:
-    (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
-
-  /**
-    Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
-    it will merge them together rather than replacing the old one with the new one.
-  */
-  deepmergeCats = oldCats: newCats:
-    (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
-
-  /**
-    recursiveUpdate each overlay output to avoid issues where
-    two overlays output a set of the same name when importing from other nixCats.
-    Merges everything into 1 overlay
-
-    If you have 2 overlays both outputting a set like pkgs.neovimPlugins,
-    The second will replace the first.
-
-    This will merge the results instead.
-  */
-  mergeOverlayLists = oldOverlist: newOverlist: self: super: let
-    oldOversMapped = map (value: value self super) oldOverlist;
-    newOversMapped = map (value: value self super) newOverlist;
-    combinedOversCalled = oldOversMapped ++ newOversMapped;
-    mergedOvers = foldl' lib.recursiveUpdateUntilDRV { } combinedOversCalled;
-  in
-  mergedOvers;
-
-  /**
     if your dependencyOverlays is a list rather than a system-wrapped set,
-    to deal with when other people output an overlay wrapped in a system variable
-    you may call the following function on it.
+    to deal with when other people (incorrectly) output an overlay wrapped
+    in a system variable you may call this function on it.
+
+    # Example
+
+    ```
+      (utils.fixSystemizedOverlay inputs.codeium.overlays
+        (system: inputs.codeium.overlays.${system}.default)
+      )
+    ```    
   */
   fixSystemizedOverlay = overlaysSet: outfunc:
     (final: prev: if !(overlaysSet ? prev.system) then {}
       else (outfunc prev.system) final prev);
-
-  /**
-    Simple helper function for mergeOverlayLists
-
-    If dependencyOverlays is an attrset, system string is required.
-    If dependencyOverlays is a list, system string is ignored.
-    if invalid type or system, returns an empty list
-  */
-  safeOversList = { dependencyOverlays, system ? null }:
-    if isAttrs dependencyOverlays && system == null then
-      throw "dependencyOverlays is a set, but no system was provided"
-    else if isAttrs dependencyOverlays && dependencyOverlays ? system then
-      dependencyOverlays.${system}
-    else if isList dependencyOverlays then
-      dependencyOverlays
-    else [];
 
   mkNixosModules = {
     dependencyOverlays ? null
@@ -222,8 +183,8 @@ with builtins; let lib = import ./lib.nix; in rec {
   inherit (lib) n2l;
 
   /**
-    flake-utils.lib.eachSystem
-    but without the flake input
+    flake-utils.lib.eachSystem but without the flake input
+
     Builds a map from <attr>=value to <attr>.<system>=value for each system
   */
   eachSystem = systems: f: let
@@ -249,6 +210,96 @@ with builtins; let lib = import ./lib.nix; in rec {
     in case someone didn't know that genAttrs is great for dealing with the system variable
   */
   bySystems = lib.genAttrs;
+
+  /**
+    returns a merged set of definitions, with new overriding old.
+    updates anything it finds that isn't another set.
+
+    this means it works slightly differently for environment variables
+    because each one will be updated individually rather than at a category level.
+
+    Works with both categoryDefinitions and individual packageDefinitions
+
+    # Arguments
+
+    `oldCats` (categoryDefinitions | packageDefinitions)
+
+    `newCats` (categoryDefinitions | packageDefinitions)
+  */
+  mergeCatDefs = oldCats: newCats:
+    (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
+
+  /**
+    Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
+    it will merge them together rather than replacing the old one with the new one.
+
+    # Arguments
+
+    `oldCats` (categoryDefinitions | packageDefinitions)
+
+    `newCats` (categoryDefinitions | packageDefinitions)
+  */
+  deepmergeCats = oldCats: newCats:
+    (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
+
+  /**
+    recursiveUpdate each overlay output to avoid issues where
+    two overlays output a set of the same name when importing from other nixCats.
+    Merges everything into 1 overlay
+
+    If you have 2 overlays both outputting a set like pkgs.neovimPlugins,
+    The second will replace the first.
+
+    This will merge the results instead.
+
+    Returns a SINGLE overlay
+
+    # Arguments
+
+    `oldOverlist` (list of overlays)
+
+    `newOverlist` (list of overlays)
+  */
+  mergeOverlayLists = oldOverlist: newOverlist: self: super: let
+    oldOversMapped = map (value: value self super) oldOverlist;
+    newOversMapped = map (value: value self super) newOverlist;
+    combinedOversCalled = oldOversMapped ++ newOversMapped;
+    mergedOvers = foldl' lib.recursiveUpdateUntilDRV { } combinedOversCalled;
+  in
+  mergedOvers;
+
+  /**
+    Simple helper function for mergeOverlayLists
+
+    If you know the prior dependencyOverlays is a list, you dont need this.
+
+    If dependencyOverlays is an attrset, system string is required.
+    If dependencyOverlays is a list, system string is ignored.
+    if invalid type or system, returns an empty list
+
+    # Example
+
+    ```
+        dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
+          (utils.mergeOverlayLists # <-- merging 2 lists requires both to be a list
+            # safeOversList checks if dependencyOverlays is a list or a set
+            (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+            [ # <- and then we add our new list
+              (utils.standardPluginOverlay inputs)
+              # any other flake overlays here.
+            ]
+          )
+        ]);
+    ```
+  */
+  safeOversList = { dependencyOverlays, system ? null }:
+    if isAttrs dependencyOverlays && system == null then
+      throw "dependencyOverlays is a set, but no system was provided"
+    else if isAttrs dependencyOverlays && dependencyOverlays ? system then
+      dependencyOverlays.${system}
+    else if isList dependencyOverlays then
+      dependencyOverlays
+    else [];
 
   /**
     makes a default package and then one for each name in packageDefinitions
