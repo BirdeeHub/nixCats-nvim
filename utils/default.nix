@@ -339,15 +339,15 @@ with builtins; let lib = import ./lib.nix; in rec {
     this means it works slightly differently for environment variables
     because each one will be updated individually rather than at a category level.
 
-    Works with both categoryDefinitions and individual packageDefinitions
+    Works with both `categoryDefinitions` and individual `packageDefinitions`
 
     # Arguments
 
     `oldCats` (`functionTo` `AttrSet`)
-    : categoryDefinitions or a single packageDefinition
+    : accepts `categoryDefinitions` or a single `packageDefinition`
 
     `newCats` (`functionTo` `AttrSet`)
-    : categoryDefinitions or a single packageDefinition
+    : accepts `categoryDefinitions` or a single `packageDefinition`
   */
   mergeCatDefs = oldCats: newCats:
     (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
@@ -359,10 +359,10 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Arguments
 
     `oldCats` (`functionTo` `AttrSet`)
-    : categoryDefinitions or a single packageDefinition
+    : accepts `categoryDefinitions` or a single `packageDefinition`
 
     `newCats` (`functionTo` `AttrSet`)
-    : categoryDefinitions or a single packageDefinition
+    : accepts `categoryDefinitions` or a single `packageDefinition`
   */
   deepmergeCats = oldCats: newCats:
     (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
@@ -394,18 +394,21 @@ with builtins; let lib = import ./lib.nix; in rec {
   mergedOvers;
 
   /**
-    Simple helper function for mergeOverlayLists
+    Simple helper function for `mergeOverlayLists`
 
-    If you know the prior dependencyOverlays is a list, you dont need this.
+    If you know the prior `dependencyOverlays` is a list, you dont need this.
 
-    If dependencyOverlays is an attrset, system string is required.
-    If dependencyOverlays is a list, system string is ignored.
+    If `dependencyOverlays` is an attrset, system string is required.
+    If `dependencyOverlays` is a list, system string is ignored.
     if invalid type or system, returns an empty list
+
+    If you passed in dependencyOverlays as a list to your builder function,
+    it will remain a list.
 
     # Arguments
 
     `system` (`string` or `null`)
-    : Technically optional if you know dependencyOverlays is a list
+    : Technically optional if you know `dependencyOverlays` is a list
     : But the whole function isnt required at that point so, this is effectively required
 
     `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
@@ -435,17 +438,17 @@ with builtins; let lib = import ./lib.nix; in rec {
     else [];
 
   /**
-    makes a default package and then one for each name in packageDefinitions
+    makes a default package and then one for each name in `packageDefinitions`
 
     for constructing flake outputs.
 
     # Arguments
     
     `finalBuilder` (`function`)
-    : `baseBuilder` with all arguments except `name` applied.
+    : this is `baseBuilder` with all arguments except `name` applied.
 
     `packageDefinitions` (`AttrSet`)
-    : the set of packageDefinitions passed to the builder, passed in again.
+    : the set of `packageDefinitions` passed to the builder, passed in again.
 
     `defaultName` (`string`)
     : the name of the package to be output as default in the resulting set of packages.
@@ -455,15 +458,15 @@ with builtins; let lib = import ./lib.nix; in rec {
     // mkExtraPackages finalBuilder packageDefinitions;
 
   /**
-    `mkPackages` but without adding a default package, or the final defaultName argument
+    `mkPackages` but without adding a default package, or the final `defaultName` argument
 
     # Arguments
     
     `finalBuilder` (`function`)
-    : `baseBuilder` with all arguments except `name` applied.
+    : this is `baseBuilder` with all arguments except `name` applied.
 
     `packageDefinitions` (`AttrSet`)
-    : the set of packageDefinitions passed to the builder, passed in again.
+    : the set of `packageDefinitions` passed to the builder, passed in again.
   */
   mkExtraPackages = finalBuilder: packageDefinitions:
   (mapAttrs (name: _: finalBuilder name) packageDefinitions);
@@ -482,10 +485,10 @@ with builtins; let lib = import ./lib.nix; in rec {
   { default = package; } // (mkAllPackages package);
 
   /**
-    like mkExtraPackages but easier.
+    like `mkExtraPackages` but easier.
 
     Pass it a package and it will build all the packages
-    in the packageDefinitions that package was built with.
+    in the `packageDefinitions` that package was built with.
 
     # Arguments
 
@@ -508,14 +511,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in baseBuilder
+    : exactly the same a the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
-    : exactly the same as `categoryDefinitions` in baseBuilder
+    : exactly the same as `categoryDefinitions` in `baseBuilder`
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
-    : exactly the same as `packageDefinitions` in baseBuilder
+    : exactly the same as `packageDefinitions` in `baseBuilder`
 
     `defaultName` (`string`)
   */
@@ -540,7 +543,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     makes a set of overlays from your definitions for exporting from a flake.
 
-    Differs from makeOverlays in that the default overlay is a set of all the packages
+    Differs from `makeOverlays` in that the default overlay is a set of all the packages
 
     default overlay yeilds `pkgs.${defaultName}.${packageName}` with all the packages
 
@@ -549,14 +552,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in baseBuilder
+    : exactly the same a the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
-    : exactly the same as `categoryDefinitions` in baseBuilder
+    : exactly the same as `categoryDefinitions` in `baseBuilder`
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
-    : exactly the same as `packageDefinitions` in baseBuilder
+    : exactly the same as `packageDefinitions` in `baseBuilder`
 
     `defaultName` (`string`)
   */
@@ -592,14 +595,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in baseBuilder
+    : exactly the same a the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
-    : exactly the same as `categoryDefinitions` in baseBuilder
+    : exactly the same as `categoryDefinitions` in `baseBuilder`
 
     `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
-    : exactly the same as `packageDefinitions` in baseBuilder
+    : exactly the same as `packageDefinitions` in `baseBuilder`
 
     `importName` (`string`)
     : when applied, overlay yeilds `pkgs.${importName}.${packageName}`
@@ -640,7 +643,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Arguments
 
     `package` (`NixCats nvim derivation`)
-    : will include all packages in the packageDefinitions the package was built with
+    : will include all packages in the `packageDefinitions` the package was built with
 
     `importName` (`string`)
     : overlay will yield `pkgs.${importName}.${packageName}`
@@ -669,7 +672,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Arguments
 
     `package` (`NixCats nvim derivation`)
-    : will include all packages in the packageDefinitions the package was built with
+    : will include all packages in the `packageDefinitions` the package was built with
 
     # Example
 
@@ -693,7 +696,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Arguments
 
     `package` (`NixCats nvim derivation`)
-    : will include all packages in the packageDefinitions the package was built with
+    : will include all packages in the `packageDefinitions` the package was built with
 
     # Example
 
