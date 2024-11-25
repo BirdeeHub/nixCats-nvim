@@ -163,7 +163,18 @@ in
       };
     };
 
-  }) // {
+  }) // (let
+    # we also export a nixos module to allow reconfiguration from configuration.nix
+    nixosModule = utils.mkNixosModules {
+      inherit defaultPackageName dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
+    };
+    # and the same for home manager
+    homeModule = utils.mkHomeModules {
+      inherit defaultPackageName dependencyOverlays luaPath
+        categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
+    };
+  in {
 
   # these outputs will be NOT wrapped with ${system}
 
@@ -175,16 +186,9 @@ in
     # and also our categoryDefinitions
   } categoryDefinitions packageDefinitions defaultPackageName;
 
-  # we also export a nixos module to allow reconfiguration from configuration.nix
-  nixosModules.default = utils.mkNixosModules {
-    inherit defaultPackageName dependencyOverlays luaPath
-      categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
-  };
-  # and the same for home manager
-  homeModule = utils.mkHomeModules {
-    inherit defaultPackageName dependencyOverlays luaPath
-      categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
-  };
-  inherit utils;
+  nixosModules.default = nixosModule;
+  homeModules.default = homeModule;
+
+  inherit utils nixosModule homeModule;
   inherit (utils) templates;
-}
+})
