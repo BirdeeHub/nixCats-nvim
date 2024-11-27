@@ -91,17 +91,13 @@ it also has a few other things that may prove handy
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
 For instructions on using the lazy wrapper, check out this template example!
-Disclaimer, it uses a new lazy option only
-in pkgs.lazy-nvim from the unstable branch.
-So if you are using nixpkgs stable for your neovim you will
-need to download a newer version of lazy-nvim.
 
 Use the following command in a new directory and check it out!
 >bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#kickstart-nvim
 <
 >lua
-  --the main wrapper
+  --the wrapper
   ---@overload fun(nixLazyPath: string|nil, lazySpec: any, opts: table)
   ---@overload fun(nixLazyPath: string|nil, opts: table)
   require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "lazy.nvim" }), lazySpec, opts)
