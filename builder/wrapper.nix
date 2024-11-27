@@ -30,8 +30,8 @@ neovim-unwrapped:
   , packpathDirs
   , collate_grammars ? false
 
-  # should contain all args but the binary. Can be either a string or list
-  , wrapperArgs ? []
+  # should contain all args but the binary.
+  , wrapperArgsStr ? ""
 
   # I added stuff to the one from nixpkgs
   , nixCats
@@ -112,8 +112,6 @@ let
     "--add-flags" ''--cmd "lua ${providerLuaRc};dofile([[${setupLua}]])"''
   ];
 
-  wrapperArgsStr = if lib.isString wrapperArgs then wrapperArgs else lib.escapeShellArgs wrapperArgs;
-
   # If configure != {}, we can't generate the rplugin.vim file with e.g
   # NVIM_SYSTEM_RPLUGIN_MANIFEST *and* NVIM_RPLUGIN_MANIFEST env vars set in
   # the wrapper. That's why only when configure != {} (tested both here and
@@ -150,7 +148,7 @@ stdenv.mkDerivation {
       --replace-fail 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
   ''
   + lib.optionalString (python3Env != null && withPython3) ''
-    makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 --unset PYTHONPATH ${builtins.concatStringsSep " " extraPython3wrapperArgs}
+    makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 ${builtins.concatStringsSep " " extraPython3wrapperArgs}
   ''
   + lib.optionalString (rubyEnv != null) ''
     ln -s ${rubyEnv}/bin/neovim-ruby-host $out/bin/${nixCats_packageName}-ruby

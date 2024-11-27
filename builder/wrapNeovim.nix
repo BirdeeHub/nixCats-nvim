@@ -105,7 +105,7 @@ let
   };
 in
 (pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {
-    wrapperArgs = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
+    wrapperArgsStr = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     customAliases = aliases;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru

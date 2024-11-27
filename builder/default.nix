@@ -49,6 +49,7 @@ let
     suffix-path = false;
     suffix-LD = false;
     disablePythonSafePath = false;
+    disablePythonPath = true; # <- you almost certainly want this set to true
     collate_grammars = true;
   } // (thisPackage.settings or {});
 
@@ -181,7 +182,7 @@ in
     # and then applied to give us a 1 argument function:
 
     FandF_envVarSet = filterAndFlattenMapInnerAttrs 
-          (name: value: ''--set ${name} "${value}"'');
+          (name: value: ''--set ${pkgs.lib.escapeShellArg name} ${pkgs.lib.escapeShellArg value}'');
 
     # extraPythonPackages and the like require FUNCTIONS that return lists.
     # so we make a function that returns a function that returns lists.
@@ -195,30 +196,27 @@ in
       uniquifiedList);
 
     # cat our args
+    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     extraMakeWrapperArgs = let 
-      linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
-      pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
       preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
+      pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
       preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
-    in builtins.concatStringsSep " " (
-      # this sets the name of the folder to look for nvim stuff in
-      (if settings.configDirName != null
-        && settings.configDirName != ""
-        || settings.configDirName != "nvim"
-        then [ ''--set NVIM_APPNAME "${settings.configDirName}"'' ] else [])
-      # and these are our other now sorted args
-      ++ (if pathEnv != [] 
-            then [ ''--${preORpostPATH} PATH : "${pkgs.lib.makeBinPath pathEnv }"'' ]
-          else [])
-      ++ (if linkables != []
-            then [ ''--${preORpostLD} LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath linkables }"'' ]
-          else [])
-      ++ (pkgs.lib.unique (FandF_envVarSet environmentVariables))
-      ++ (pkgs.lib.unique (filterAndFlatten extraWrapperArgs))
-      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-    );
+      linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
+      envVars = pkgs.lib.unique (FandF_envVarSet environmentVariables);
+      userWrapperArgs = pkgs.lib.unique (filterAndFlatten extraWrapperArgs);
+    in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
+        (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
+        "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
+      ] ++ (pkgs.lib.optionals (pathEnv != []) [
+        "--${preORpostPATH}" "PATH" ":" (pkgs.lib.makeBinPath pathEnv)
+      ]) ++ (pkgs.lib.optionals (linkables != []) [
+        "--${preORpostLD}" "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath linkables)
+      ])) + " " + (builtins.concatStringsSep " " (envVars ++ userWrapperArgs));
 
-    python3wrapperArgs = pkgs.lib.unique ((filterAndFlatten extraPython3wrapperArgs) ++ (if settings.disablePythonSafePath then ["--unset PYTHONSAFEPATH"] else []));
+    python3wrapperArgs = pkgs.lib.unique
+      (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
+      ++ (pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"])
+      ++ (filterAndFlatten extraPython3wrapperArgs));
 
     preWrapperShellCode = if builtins.isString bashBeforeWrapper
       then bashBeforeWrapper
