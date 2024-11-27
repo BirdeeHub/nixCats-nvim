@@ -182,7 +182,7 @@ in
     # and then applied to give us a 1 argument function:
 
     FandF_envVarSet = filterAndFlattenMapInnerAttrs 
-          (name: value: ''--set ${pkgs.lib.escapeShellArg name} ${pkgs.lib.escapeShellArg value}'');
+          (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]);
 
     # extraPythonPackages and the like require FUNCTIONS that return lists.
     # so we make a function that returns a function that returns lists.

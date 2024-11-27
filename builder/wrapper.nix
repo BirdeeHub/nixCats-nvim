@@ -3,6 +3,7 @@
 # Derived from:
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix
 { stdenv
+, pkgs
 , lib
 , makeWrapper
 , writeText
@@ -154,7 +155,7 @@ stdenv.mkDerivation {
     ln -s ${rubyEnv}/bin/neovim-ruby-host $out/bin/${nixCats_packageName}-ruby
   ''
   + lib.optionalString withNodeJs ''
-    ln -s ${nodePackages.neovim}/bin/neovim-node-host $out/bin/${nixCats_packageName}-node
+    ln -s ${pkgs.neovim-node-client or nodePackages.neovim}/bin/neovim-node-host $out/bin/${nixCats_packageName}-node
   ''
   + lib.optionalString (perlEnv != null && withPerl) ''
     ln -s ${perlEnv}/bin/perl $out/bin/${nixCats_packageName}-perl
