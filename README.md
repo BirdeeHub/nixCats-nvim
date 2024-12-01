@@ -312,6 +312,5 @@ I also borrowed code from nixpkgs and made modifications and improvements to bet
   I mentioned it above in the special mentions. As someone with no exposure to functional programming, such a simple example was absolutely fantastic.
 - [`nixPatch-nvim`](https://github.com/NicoElbers/nixPatch-nvim):
   Focused specifically for lazy.nvim. A cool unique concept, uses a zig program to parse lazy.nvim definitions to replace urls with the plugins you put in your nix lists at build time.
-  Useage is somewhat similar to the lazy.nvim wrapper of nixCats in a standalone flake template,
-  but without needing to explicitly pass in a nix-provided ignore list to the wrapper in your lua code itself.
+  Useage is somewhat similar to the lazy.nvim wrapper of nixCats in a standalone flake template.
   It obviously also does not have the categories, modules, multiple packages, the overriding scheme, etc.
