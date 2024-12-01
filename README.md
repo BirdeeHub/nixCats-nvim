@@ -23,7 +23,7 @@ The end result ends up being very comparable if not better than using a regular 
 In this way, it avoids falling into the classic trap of trying to make a module for every plugin somebody might want to use. The neovim plugin ecosystem is very large, and updates are often. This leads to a lot of time spent doing simple translations of lua options to nix options and then maintaining them. Things are missed, new plugins are released that people now have to use a completely different pattern to install due to not yet being included. Problems like this occur because of the size of the task.
 
 It leads to a higher quality experience to interact with the plugin ecosystem as it is, while needing only a single nix file to effectively manage your neovim installations.
-In addition, this means you can make use of the amazing auto completion and other nice features that one can usually use in a neovim configurations.
+In addition, this means you can make use of the amazing auto completion and other nice features that one can usually use in a neovim configuration.
 
 But it is only nicer if you have an easy way to get info from nix to wherever you need it.
 
