@@ -704,6 +704,11 @@ These are the defaults:
       # It works great using https://github.com/nix-community/neovim-nightly-overlay
       # so this seems to be an upstream issue, as all the expected variables
       # are still being set correctly.
+
+      # each package outputs a module via passthru.
+      # this will set the namespace for the module options
+      # by default will be at config.${packagename}
+      moduleNamespace = [ <packagename> ];
     };
 <
 
