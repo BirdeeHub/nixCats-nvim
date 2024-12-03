@@ -3,6 +3,7 @@
 {
   isHomeManager
   , defaultPackageName
+  , moduleNamespace ? [ defaultPackageName ]
   , luaPath ? ""
   , packageDefinitions ? {}
   , nclib
@@ -12,9 +13,7 @@
   pkgDef = nclib.mkCatDefType lib.mkOptionType true;
 in {
 
-  options = with lib; {
-
-    ${defaultPackageName} = {
+  options = with lib; lib.setAttrByPath moduleNamespace ({
 
       nixpkgs_version = mkOption {
         default = null;
@@ -42,7 +41,7 @@ in {
       enable = mkOption {
         default = false;
         type = types.bool;
-        description = "Enable the ${defaultPackageName} module";
+        description = "Enable the ${concatStringsSep "." moduleNamespace} module";
       };
 
       dontInstall = mkOption {
@@ -50,7 +49,7 @@ in {
         type = types.bool;
         description = ''
           If true, do not output to packages list,
-          output only to config.${defaultPackageName}.out
+          output only to config.${concatStringsSep "." moduleNamespace}.out
         '';
       };
 
@@ -253,7 +252,7 @@ in {
             enable = mkOption {
               default = false;
               type = types.bool;
-              description = "Enable the ${defaultPackageName} module for a user";
+              description = "Enable the ${concatStringsSep "." moduleNamespace}.users module for a user";
             };
 
             dontInstall = mkOption {
@@ -261,7 +260,7 @@ in {
               type = types.bool;
               description = ''
                 If true, do not output to packages list,
-                output only to config.${defaultPackageName}.out
+                output only to config.${concatStringsSep "." moduleNamespace}.out.users
               '';
             };
 
@@ -270,7 +269,7 @@ in {
               type = types.nullOr (types.anything);
               description = ''
                 a different nixpkgs import to use for this users nvim.
-                By default will use the one from ${defaultPackageName}.nixpkgs_version, or flake, or system pkgs.
+                By default will use the one from ${concatStringsSep "." moduleNamespace}.nixpkgs_version, or flake, or system pkgs.
               '';
               example = ''
                 nixpkgs_version = inputs.nixpkgs
@@ -284,7 +283,7 @@ in {
                 A list of overlays to make available to
                 this user's nixCats packages from this module but not to your system.
                 Will have access to system overlays regardless of this setting.
-                This per user version of addOverlays is merged with the value of ${defaultPackageName}.addOverlays 
+                This per user version of addOverlays is merged with the value of ${concatStringsSep "." moduleNamespace}.addOverlays 
               '';
               example = ''
                 addOverlays = [ (self: super: { nvimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
@@ -455,7 +454,6 @@ in {
           };
         });
       };
-    });
-  };
+    }));
 
 }

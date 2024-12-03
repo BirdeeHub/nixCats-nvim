@@ -202,6 +202,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     , categoryDefinitions ? (_:{})
     , packageDefinitions ? {}
     , defaultPackageName
+    , moduleNamespace ? [ defaultPackageName ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
     , ... }:
@@ -211,7 +212,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config;
+        packageDefinitions defaultPackageName extra_pkg_config moduleNamespace;
     });
 
   /**
@@ -272,6 +273,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     , categoryDefinitions ? (_:{})
     , packageDefinitions ? {}
     , defaultPackageName
+    , moduleNamespace ? [ defaultPackageName ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
     , ... }:
@@ -281,7 +283,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config;
+        packageDefinitions defaultPackageName extra_pkg_config moduleNamespace;
     });
 
   /**
@@ -727,8 +729,5 @@ with builtins; let lib = import ./lib.nix; in rec {
       }));
   in
   listToAttrs (mapfunc allnames);
-
-  # DEPRECATED
-  inherit (lib) catsWithDefault;
 
 }
