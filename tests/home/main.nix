@@ -21,7 +21,7 @@ in {
   # nixCats module:
   ${packagename} = {
     enable = true;
-    packageNames = [ packagename ];
+    # packageNames = [ packagename ];
     packageDefinitions.replace = {
       ${packagename} = { pkgs, ... }: {
         settings = {

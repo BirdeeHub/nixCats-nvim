@@ -65,7 +65,7 @@ in {
       };
 
       packageNames = mkOption {
-        default = if packageDefinitions ? defaultPackageName then [ "${defaultPackageName}" ] else [];
+        default = if packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
         type = (types.listOf types.str);
         description = ''A list of packages from packageDefinitions to include'';
         example = ''
@@ -302,7 +302,7 @@ in {
             };
 
             packageNames = mkOption {
-              default = if packageDefinitions ? defaultPackageName then [ "${defaultPackageName}" ] else [];
+              default = if packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
               type = (types.listOf types.str);
               description = ''A list of packages from packageDefinitions to include'';
               example = ''
