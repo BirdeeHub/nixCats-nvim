@@ -297,6 +297,13 @@ with builtins; let lib = import ./lib.nix; in rec {
   n2l = lib.n2l;
 
   /**
+    see `h: nixCats.flake.outputs.utils.n2l`
+
+    This is an alias for `n2l.types.inline-safe.mk`
+  */
+  mkLuaInline = lib.n2l.types.inline-safe.mk;
+
+  /**
     `flake-utils.lib.eachSystem` but without the flake input
 
     Builds a map from `<attr>=value` to `<attr>.<system>=value` for each system
@@ -722,7 +729,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   listToAttrs (mapfunc allnames);
 
   # DEPRECATED
-  mkLuaInline = trace "utils.mkLuaInline renamed to utils.n2l.types.inline-safe.mk, due to be removed before 2025" lib.n2l.types.inline-safe.mk;
   inherit (lib) catsWithDefault;
 
 }
