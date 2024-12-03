@@ -166,7 +166,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     `defaultPackageName` (`string`)
     : the only truly required argument
-    : controls the namespace of the generated module and the default package installed
+    : by default controls the namespace of the generated module and the default package installed
+
+    `moduleNamespace` ('listOf string')
+    : can be used to override the namespace of the module options
+    : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
 
     `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
     : default = null
@@ -237,7 +241,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     `defaultPackageName` (`string`)
     : the only truly required argument
-    : controls the namespace of the generated module and the default package installed
+    : by default controls the namespace of the generated module and the default package installed
+
+    `moduleNamespace` ('listOf string')
+    : can be used to override the namespace of the module options
+    : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
 
     `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
     : default = null
