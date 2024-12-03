@@ -299,7 +299,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     see `h: nixCats.flake.outputs.utils.n2l`
 
-    This is an alias for `n2l.types.inline-safe.mk`
+    This is an alias for `utils.n2l.types.inline-safe.mk`
   */
   mkLuaInline = lib.n2l.types.inline-safe.mk;
 
