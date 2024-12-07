@@ -20,11 +20,13 @@
     , ...
   }: let
     packagename = package.nixCats_packageName;
+    moduleNamespace = package.moduleNamespace;
     hmcfg = inputs.home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = {
         inherit
           packagename
+          moduleNamespace
           username
           package
           inputs
@@ -45,7 +47,7 @@
         })
       ];
     };
-  in hmcfg.config.${packagename}.out;
+  in lib.attrByPath ([ "config" ] ++ moduleNamespace ++ [ "out" ]) {} hmcfg;
 
   mkNixOSmodulePkgs = {
     package
@@ -57,6 +59,7 @@
     # so we use lib.evalModules and make our own options to set
     # to mirror the ones the nixCats module uses.
     packagename = package.nixCats_packageName;
+    moduleNamespace = package.moduleNamespace;
     nixoscfg = inputs.nixpkgs.lib.evalModules {
       modules = [
         entrymodule
@@ -82,6 +85,7 @@
       specialArgs = {
         inherit
           packagename
+          moduleNamespace
           pkgs
           lib
           inputs
@@ -90,7 +94,7 @@
           ;
       };
     };
-  in nixoscfg.config.${packagename}.out;
+  in lib.attrByPath ([ "config" ] ++ moduleNamespace ++ [ "out" ]) {} nixoscfg;
 
   mkRunPkgTest = {
     package,

@@ -1,4 +1,4 @@
-{ config, pkgs, package, utils, lib, username, inputs, packagename, ...  }@args: let
+{ config, pkgs, package, utils, lib, username, inputs, packagename, moduleNamespace, ...  }@args: let
 in {
   imports = [
   ];
@@ -17,21 +17,21 @@ in {
   ];
   home.file = {
   };
-
-  # nixCats module:
-  ${packagename} = {
-    enable = true;
-    # packageNames = [ packagename ];
-    packageDefinitions.replace = {
-      ${packagename} = { pkgs, ... }: {
-        settings = {
-        };
-        categories = {
-          nixCats_test_names = {
-            home_hello = true;
-          };
+} //
+# nixCats module:
+(lib.setAttrByPath moduleNamespace {
+  enable = true;
+  # packageNames = [ packagename ];
+  packageDefinitions.replace = {
+    ${packagename} = { pkgs, ... }: {
+      settings = {
+      };
+      categories = {
+        nixCats_test_names = {
+          home_hello = true;
         };
       };
     };
   };
-}
+})
+

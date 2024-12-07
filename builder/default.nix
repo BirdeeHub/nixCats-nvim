@@ -51,6 +51,7 @@ let
     disablePythonSafePath = false;
     disablePythonPath = true; # <- you almost certainly want this set to true
     collate_grammars = true;
+    moduleNamespace = [ name ];
   } // (thisPackage.settings or {});
 
   final_cat_defs_set = ({
@@ -242,16 +243,19 @@ import ./wrapNeovim.nix {
     keepLuaBuilder = utils.baseBuilder luaPath;
     nixCats_packageName = name;
     inherit categoryDefinitions packageDefinitions dependencyOverlays luaPath utils;
+    inherit (settings) moduleNamespace;
     nixosModule = utils.mkNixosModules {
       defaultPackageName = name;
       inherit dependencyOverlays luaPath
         categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
+      inherit (settings) moduleNamespace;
     };
     # and the same for home manager
     homeModule = utils.mkHomeModules {
       defaultPackageName = name;
       inherit dependencyOverlays luaPath
         categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
+      inherit (settings) moduleNamespace;
     };
   });
   inherit pkgs;
