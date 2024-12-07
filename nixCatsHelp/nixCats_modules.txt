@@ -7,6 +7,7 @@ We create the module by exporting the following in our flake outputs.
 
 <mkNixosModules> {
     defaultPackageName = "nixCats";
+    moduleNamespace = [ "nixCats" ];
     luaPath = "${./.}";
     inherit nixpkgs dependencyOverlays
       categoryDefinitions packageDefinitions extra_pkg_config;
@@ -14,14 +15,20 @@ We create the module by exporting the following in our flake outputs.
 
 <mkHomeModules> {
     defaultPackageName = "nixCats";
+    moduleNamespace = [ "nixCats" ];
     luaPath = "${./.}";
     inherit nixpkgs dependencyOverlays
       categoryDefinitions packageDefinitions extra_pkg_config;
 };
 
-where dependencyOverlays is a set of system names
-with lists of overlays in each item. Such that
-the lists would be accessed via dependencyOverlays.${system}
+If moduleNamespace is omitted, it will default to `[ defaultPackageName ]`
+
+moduleNamespace controls the namespace for the module options.
+
+This means if `moduleNamespace = [ "my_mods" "nixCats" ];`
+
+Then you would `my_mods.nixCats.enable = true;`
+and `my_mods.nixCats.packageNames = [ "package" "names" "toinstall" ];`
 
 If you do not have a luaPath, you may pass it a keepLua builder.
 utils.mkNixosModules exports a nixos module with the following options,
