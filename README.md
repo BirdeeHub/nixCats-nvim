@@ -45,7 +45,7 @@ Even if you don't use it for downloading plugins at all, preferring to use lazy 
 It allows you to provide a configuration and any dependency you could need to your neovim in a contained and reproducible way,
 buildable separately from your nixos or home-manager config.
 
-The name `nixCats` is short for nix categories, because the project allows arbitrary categories to be defined for each neovim package exported, and then easily interact with them from lua.
+The name `nixCats` is short for nix categories, because the project allows arbitrary categories of dependencies to be defined for each neovim package exported, and then easily interact with them from lua.
 
 The example neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) is a great example of how to use `nixCats` for yourself.
 
