@@ -128,6 +128,11 @@ let
 
   perlEnv = perl.withPackages (p: [ p.NeovimExt p.Appcpanminus ]);
 
+  # Does this actually do anything? https://neovim.io/doc/user/vim_diff.html#'nocompatible'
+  # I don't think it does. Its only here because nixpkgs does it.
+  # The following is equivalent to the output of calling vimUtils.vimrcContent { customRC = ""; };
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix#L87C18-L87C59
+  # It would need a blank file anyway, its not hurting anything.
   manifestRc = "set nocompatible";
 in
 stdenv.mkDerivation {
