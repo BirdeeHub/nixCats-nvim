@@ -15,6 +15,9 @@
     path = ./module;
     description = ''
       starting point for creating a nixCats module for your system and home-manager
+
+      contains an example home manager module and an example nixos module in
+      separate files.
     '';
   };
   nixExpressionFlakeOutputs = {
