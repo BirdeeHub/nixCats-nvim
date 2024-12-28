@@ -103,7 +103,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   templates = import ../templates;
 
   /**
-    standardPluginOverlay is called with flake inupts or a set of fetched derivations.
+    standardPluginOverlay is called with flake inputs or a set of fetched derivations.
 
     It will extract all items named in the form `plugins-foobar`
 
@@ -113,8 +113,24 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
+    if you had in your flake inputs
+    ```
+      inputs = {
+        plugins-foobar = {
+          url = "github:exampleuser/foobar.nvim";
+          flake = false;
+        }
+      }
+    ```
+
+    you can put the following in your dependencyOverlays
     ```
       dependencyOverlays = [ (standardPluginOverlay inputs) ];
+    ```
+
+    and then 
+    ```
+    pkgs.neovimPlugins.foobar
     ```
   */
   standardPluginOverlay = (import ./autoPluginOverlay.nix).standardPluginOverlay;
@@ -168,7 +184,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : the only truly required argument
     : by default controls the namespace of the generated module and the default package installed
 
-    `moduleNamespace` ('listOf string')
+    `moduleNamespace` (`listOf string`)
     : can be used to override the namespace of the module options
     : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
 
@@ -243,7 +259,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : the only truly required argument
     : by default controls the namespace of the generated module and the default package installed
 
-    `moduleNamespace` ('listOf string')
+    `moduleNamespace` (`listOf string`)
     : can be used to override the namespace of the module options
     : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
 
