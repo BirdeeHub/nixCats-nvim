@@ -22,15 +22,6 @@ Thank you!!!
 
 ### Direction
 
-The modules are much nicer now that they merge properly.
-You can get the packages from the module to export from your system flake;
-this is documented (perhaps incorrectly) at the end of the module help file.
-
-But basically you can grab it from your config set via `self` in the flake.
-You can find it in the REPL, under nixCats.out.packages in the correct config set.
-```
-self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
-```
 
 ---
 
@@ -59,6 +50,17 @@ I won't make you work with my bespoke nvim-based site-gen, but it works quite we
 
 I would like to drastically improve the help and templates for modules,
 and encourage most people to set up nixCats either as a module or a separate flake.
+
+The modules are much nicer now that they merge properly.
+You can get the packages from the module to export from your system flake;
+this is documented (perhaps incorrectly) at the end of the module help file.
+
+But basically you can grab it from your config set via `self` in the flake.
+You can find it in the REPL, under nixCats.out.packages in the correct config set.
+
+```nix
+self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
+```
 
 - In particular, I would like to phase out the [nixExpressionFlakeOutputs](./templates/nixExpressionFlakeOutputs) template.
   *(Note that this won't break the config of anyone using it, since it is just a template.
