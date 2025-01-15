@@ -32,8 +32,9 @@ for the Lua-natic's Neovim config on Nix
 ## Table of Contents
 
 1. [Introduction](#intro)
-2. [Features](#features)
+2. [Getting Started](#getting-started)
 3. [Installation](#installation)
+4. [Features](#features)
 5. [Extra Information](#outro)
 6. [Alternative / Similar Projects](#alternatives)
 - [nixcats.org: Table of Contents](https://nixcats.org/TOC.html)
@@ -80,7 +81,7 @@ Not anymore!
   preferring to use lazy and Mason and deal with issues as they arise,
   this scheme will have useful things for you.
   
-### Getting Started
+## Getting Started <a name="getting-started"></a>
 
 The example Neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) is a great example of how to use `nixCats` for yourself.
 
@@ -130,81 +131,6 @@ so using it will require a little bit of extra setup compared to the 2 above opt
 
 ##### (remember to change your $EDITOR variable if you named your package something other than nvim!)
 
----
-
-## Features <a name="features"></a>
-
-- Allows normal Neovim configuration file scheme to be loaded from the Nix store.
-
-- Configure all downloads from a single Nix file,
-  use a regular Neovim config scheme with full visibility of your Nix!
-
-- Easy-to-use Nix Category system for many configurations in 1 repository!
-  - to use:
-    - Make a new list in the set in the flake for it
-      (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
-    - enable the category for a particular Neovim package in packageDefinitions set.
-    - check for it in your Neovim Lua configuration with `nixCats('attr.path.to.yourList')`
-
-- the [nixCats command](https://nixcats.org/nixCats_plugin.html)
-  is your method of communicating with Neovim from Nix outside of installing plugins.
-  - you can pass any extra info through the same set you define which categories you want to include.
-  - it will be printed verbatim to a table in a Lua file.
-  - Not only will it be easily accessible anywhere from within Neovim via the nixCats command,
-    but also from your category definitions within Nix as well for even more subcategory control.
-
-- Can be configured as a:
-  - flake
-  - in another flake
-  - as a NixOS or Home Manager module
-  - entirely via calling the override function on a nixCats based package.
-  - It can then be imported and reconfigured without duplication and exported again. And again. and again.
-
-- blank flake [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh)
-  that can be  initialized into your existing Neovim config directory to get you started!
-  - because you can mess around with it in its own repo in any directory,
-    this is the lowest barrier of entry,
-    and transitions well into any other template if desired.
-
-- blank [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs)
-  that is called as a Nix expression from any other flake.
-  - It is simply the outputs function of the flake template above but as its own file,
-    callable with your system's flake inputs,
-    and returning all the normal flake outputs the other would have.
-  - great for integrating into a system config
-    and still being able to output the finished packages from your system flake.
-
-- blank override [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite)
-  that achieves functionality the same as the above two,
-  but entirely via using the override function on the example nvim package from the nixCats flake.
-
-- blank module [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module)
-  that exports the configuration of your packages in module form,
-  inherits values from your other template and can be reconfigured.
-  Similar to override, but as a module.
-
-- luaUtils [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/luaUtils)
-  template containing the tools for detecting if Nix loaded your config or not,
-  and integrating with lazy.nvim or other plugin managers.
-  - this is an optional, additional template.
-  - proper useage of this template can yield a configuration that you can use both with or without Nix.
-  - contains the lazy.nvim wrapper.
-
-- other templates containing examples of how to do other things with nixCats,
-  and even one that implements the entirety of
-  [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim)
-  using the lazy wrapper!
-  (for a full list see
-  [:help nixCats.templates](https://nixcats.org/nixCats_installation.html#nixCats.templates))
-
-- ability to call override as many times as you like to fully recustomize or combine packages
-
-- [Extensive in-editor help.](https://nixcats.org/TOC.html)
-
-- I mentioned the templates already but if you want to see them all on GitHub they are here:
-  [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates)
-
----
 
 ## Installation <a name="installation"></a>
 
@@ -337,6 +263,78 @@ importing your new Nix Neovim configuration into a Nix system or Home Manager co
 There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
 ---
+
+## Features <a name="features"></a>
+
+- Allows normal Neovim configuration file scheme to be loaded from the Nix store.
+
+- Configure all downloads from a single Nix file,
+  use a regular Neovim config scheme with full visibility of your Nix!
+
+- Easy-to-use Nix Category system for many configurations in 1 repository!
+  - to use:
+    - Make a new list in the set in the flake for it
+      (i.e. if its a plugin you want to load on startup, put it in startupPlugins in categoryDefinitions)
+    - enable the category for a particular Neovim package in packageDefinitions set.
+    - check for it in your Neovim Lua configuration with `nixCats('attr.path.to.yourList')`
+
+- the [nixCats command](https://nixcats.org/nixCats_plugin.html)
+  is your method of communicating with Neovim from Nix outside of installing plugins.
+  - you can pass any extra info through the same set you define which categories you want to include.
+  - it will be printed verbatim to a table in a Lua file.
+  - Not only will it be easily accessible anywhere from within Neovim via the nixCats command,
+    but also from your category definitions within Nix as well for even more subcategory control.
+
+- Can be configured as a:
+  - flake
+  - in another flake
+  - as a NixOS or Home Manager module
+  - entirely via calling the override function on a nixCats based package.
+  - It can then be imported and reconfigured without duplication and exported again. And again. and again.
+
+- blank flake [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh)
+  that can be  initialized into your existing Neovim config directory to get you started!
+  - because you can mess around with it in its own repo in any directory,
+    this is the lowest barrier of entry,
+    and transitions well into any other template if desired.
+
+- blank [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/nixExpressionFlakeOutputs)
+  that is called as a Nix expression from any other flake.
+  - It is simply the outputs function of the flake template above but as its own file,
+    callable with your system's flake inputs,
+    and returning all the normal flake outputs the other would have.
+  - great for integrating into a system config
+    and still being able to output the finished packages from your system flake.
+
+- blank override [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/overwrite)
+  that achieves functionality the same as the above two,
+  but entirely via using the override function on the example nvim package from the nixCats flake.
+
+- blank module [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/module)
+  that exports the configuration of your packages in module form,
+  inherits values from your other template and can be reconfigured.
+  Similar to override, but as a module.
+
+- luaUtils [template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/luaUtils)
+  template containing the tools for detecting if Nix loaded your config or not,
+  and integrating with lazy.nvim or other plugin managers.
+  - this is an optional, additional template.
+  - proper useage of this template can yield a configuration that you can use both with or without Nix.
+  - contains the lazy.nvim wrapper.
+
+- other templates containing examples of how to do other things with nixCats,
+  and even one that implements the entirety of
+  [kickstart.nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim)
+  using the lazy wrapper!
+  (for a full list see
+  [:help nixCats.templates](https://nixcats.org/nixCats_installation.html#nixCats.templates))
+
+- ability to call override as many times as you like to fully recustomize or combine packages
+
+- [Extensive in-editor help.](https://nixcats.org/TOC.html)
+
+- I mentioned the templates already but if you want to see them all on GitHub they are here:
+  [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates)
 
 ## Extra Information: <a name="outro"></a>
 
