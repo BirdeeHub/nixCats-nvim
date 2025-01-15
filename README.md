@@ -15,11 +15,15 @@
 
 `nixCats` is a Neovim package manager written in Nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from Nix to Lua.
 
+> Nix is for downloading. Lua is for configuring.
+
 It can be configured in a flake, as a derivation, or as a module, can be set up so that you can have normal Lua reloading while editing, and allows you to easily output multiple configured packages that are variations of your main config.
 
-Unlike `nixvim`, whose goal is to Nixify everything Neovim they can, `nixCats` takes the opposite approach. Make it as easy to interact with the normal scheme as possible while using Nix to install things, and add useful meta features in Nix in addition to your normal Neovim config that can be optionally used.
+### Approach
 
-The end result ends up being very comparable if not better than using a regular Neovim package manager + Mason, and certainly has more overall capability to be ran in a portable way.
+Unlike `nixvim`, which aims to Nixify Neovim as much as possible, `nixCats` takes the opposite approach. Make it as easy to interact with the normal scheme as possible while using Nix to install things, and add useful meta features in Nix in addition to your normal Neovim config that can be optionally used.
+
+The end result ends up being very comparable to &mdash; if not better than &mdash; using a regular Neovim package manager + Mason, and certainly has more overall capability to be ran in a portable way.
 
 In this way, it avoids falling into the classic trap of trying to make a module for every plugin somebody might want to use. The Neovim plugin ecosystem is very large, and updates are often. This leads to a lot of time spent doing simple translations of Lua options to Nix options and then maintaining them. Things are missed, new plugins are released that people now have to use a completely different pattern to install due to not yet being included. Problems like this occur because of the size of the task.
 
@@ -31,8 +35,6 @@ But it is only nicer if you have an easy way to get info from Nix to wherever yo
 This is where Home Manager and `pkgs.wrapNeovim` start to fall short.
 It is not uncommon to see a mess of global variables written in Nix strings,
 and a bunch of files called via `dofile` that are not properly detected by Neovim tooling with these methods.
-
-Nix is for downloading. Lua is for configuring.
 
 But to pass info from Nix to Lua, you must `''${interpolate a string}'';`.
 So you need to write some Lua in strings in Nix. Right?
