@@ -114,23 +114,21 @@ but follow that link and read the info about it before deciding to take that rou
 `lazy.nvim` is known for not playing well in conjunction with other package managers,
 so using it will require a little bit of extra setup compared to the 2 above options.
 
-## Attention <a name="attention"></a>
+### Important note on package names
 
-> You may launch your Neovim built via nixCats with any name you would like to choose.
+You may launch your Neovim built via nixCats with any name you would like to choose.
+The default launch name is given by package name in `packageDefinitions`.
 
-> The default launch name is the package name in the packageDefinitions set in flake.nix for that package.
-> You may then make any other aliases that you please as long as they do not conflict.
+In particular, the desktop file follows the package name, so programs like git will only know where to look if you set that as your `$EDITOR` variable.
 
-> This means that your $EDITOR variable should match the name in your packageDefinitions set in flake.nix so that stuff like git opens the right thing, because that is what the desktop file is called.
+You may then make any other aliases that you please as long as they do not conflict.
+If you try to install conflicting aliases to your path via `home.packages` or `environment.systemPackages`, you will get a collision error.
 
-> If your aliases conflict and you try to install them both to your path via home.packages or environment.systemPackages, it will throw a collision error.
+Neovim does not know about the wrapper script.
+It is still at `<store_path>/bin/nvim` and is aware of that.
+Therefore this should not cause any issues beyond how Neovim is normally wrapped in nixpkgs.
 
-> Nvim does not know about the wrapper script.
-> It is still at `<store_path>/bin/nvim` and is aware of that.
-> Thus, this should not cause any issues beyond the way nvim is normally wrapped via the wrappers in nixpkgs.
-
-##### (remember to change your $EDITOR variable if you named your package something other than nvim!)
-
+**Remember to change your `$EDITOR` variable if you named your package something other than nvim!**
 
 ## Installation <a name="installation"></a>
 
