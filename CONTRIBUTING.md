@@ -20,9 +20,6 @@ and the READMEs within should help explain things somewhat.
 
 Thank you!!!
 
-### Direction
-
-
 ---
 
 ### Documentation
