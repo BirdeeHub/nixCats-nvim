@@ -1,5 +1,26 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's Neovim config on Nix!
 
+`nixCats` is a Neovim package manager written in Nix.
+
+- **Nix is for downloading. Lua is for configuring.**
+  Keep your existing Lua config directory,
+  while Nix provides any dependency in a contained and reproducible way.
+
+- **Multiple Neovim executables.**
+  Easily output multiple configured packages that are variations of your main config.
+
+- **Best of both worlds.**
+  Use the Nix Store for full reproducibility and `nix run`,
+  or switch to live reloading with `wrapRc = false`.
+  Or make one package for each.
+  
+- **No need for Lua in Nix strings.**
+  The name `nixCats` is short for 'Nix Categories':
+  define arbitrary categories of dependencies in Nix, and interact them straight from Lua.
+  
+- **Integrates with NixOS or Home Manager,** but buildable separately.
+  Configure in a flake, as a derivation, or as a module.
+
 ## Table of Contents
 
 1. [Introduction](#intro)
@@ -13,71 +34,63 @@
 
 ## Introduction <a name="intro"></a>
 
-`nixCats` is a Neovim package manager written in Nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from Nix to Lua.
-
-> Nix is for downloading. Lua is for configuring.
-
-It can be configured in a flake, as a derivation, or as a module,
-can be set up so that you can have normal Lua reloading while editing,
-and allows you to easily output multiple configured packages that are variations of your main config.
-
-### Approach
-
-Unlike `nixvim`, which aims to Nixify Neovim as much as possible, `nixCats` takes the opposite approach.
-Make it as easy to interact with the normal scheme as possible while using Nix to install things,
-and add useful meta features in Nix in addition to your normal Neovim config that can be optionally used.
+The goal of `nixCats` is to make it as easy as possible to interact with the normal configuration scheme,
+while using Nix to install things and add useful meta-features.
+This is the opposite approach to projects like [nixvim](#nixvim),
+which aim to Nixify Neovim as much as possible.
 
 The end result ends up being very comparable to
-&mdash; if not better than &mdash;
-using a regular Neovim package manager + Mason,
-and certainly has more overall capability to be ran in a portable way.
+&mdash; if not better &mdash;
+using a regular Neovim package manager with
+[Mason](https://github.com/williamboman/mason.nvim).
+And it is much more portable.
 
-In this way, it avoids falling into the classic trap of trying to make a module for every plugin somebody might want to use.
+It also avoids falling into the trap of trying to make a module for every plugin somebody might want to use.
 The Neovim plugin ecosystem is very large, and updates are often.
-This leads to a lot of time spent doing simple translations of Lua options to Nix options and then maintaining them.
-Things are missed, new plugins are released that people now have to use a completely different pattern to install due to not yet being included.
-Problems like this occur because of the size of the task.
+This leads to a lot of time spent doing and maintaining simple translations of Lua options into Nix.
 
-It leads to a higher quality experience to interact with the plugin ecosystem as it is,
-while needing only a single Nix file to effectively manage your Neovim installations.
-In addition, this means you can make use of the amazing auto completion and other nice features that one can usually use in a Neovim configuration.
+Instead, `nixCats` aims for a higher quality experience interacting with the plugin ecosystem as it is,
+and it only needs a single Nix file to effectively manage your Neovim installation.
+In addition, you can still make use of the nice features and Lua autocompletion usual for a Neovim configuration.
 
-But it is only nicer if you have an easy way to get info from Nix to wherever you need it.
+> But what if you want to pass information from Nix to the rest of your Neovim configuration?
 
 This is where Home Manager and `pkgs.wrapNeovim` start to fall short.
 It is not uncommon to see a mess of global variables written in Nix strings,
 and a bunch of files called via `dofile` that are not properly detected by Neovim tooling with these methods.
-
-But to pass info from Nix to Lua, you must `''${interpolate a string}'';`.
+To pass info from Nix to Lua, you must `''${interpolate a string}'';`.
 So you need to write some Lua in strings in Nix.
 Right?
 
-Not anymore you don't!
+Not anymore!
 
-If you like the normal Neovim configuration scheme,
-but want your config to be runnable via `nix run` and have an easier time dealing with dependency issues,
-this repo is for you.
+- If you like the normal Neovim configuration scheme,
+  but want your config to be runnable via `nix run` and have an easier time dealing with dependency issues,
+  this repo is for you.
 
-Even if you don't use it for downloading plugins at all,
-preferring to use lazy and Mason and deal with issues as they arise,
-this scheme will have useful things for you.
-
-It allows you to provide a configuration and any dependency you could need to your Neovim in a contained and reproducible way,
-buildable separately from your NixOS or Home Manager config.
-
-The name `nixCats` is short for 'Nix Categories',
-because the project allows arbitrary categories of dependencies to be defined for each Neovim package exported,
-and then easily interact with them from Lua.
+- Even if you don't use it for downloading plugins at all,
+  preferring to use lazy and Mason and deal with issues as they arise,
+  this scheme will have useful things for you.
+  
+### Getting Started
 
 The example Neovim config [here](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example) is a great example of how to use `nixCats` for yourself.
 
-You should stop and take a moment to read the [overview](https://nixcats.org/nixCats_installation.html#nixCats.overview) while looking at the above example configuration and/or the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix) to get a feel of what this package management scheme has to offer!
+You should stop and take a moment to read the [overview](https://nixcats.org/nixCats_installation.html#nixCats.overview)
+while looking at the above example configuration and/or the [default template](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/fresh/flake.nix) to get a feel of what this package management scheme has to offer!
 
-Everything in [./templates](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) is also either a starter template, or more examples.
-The [in-editor help](https://nixcats.org/TOC.html) will be available in any Neovim that uses the `nixCats` builder, or at the [website](https://nixcats.org/)!
+Everything in
+[./templates](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates)
+is also either a starter template, or more examples.
+The
+[in-editor help](https://nixcats.org/TOC.html)
+will be available in any Neovim that uses the `nixCats` builder, or at the
+[website](https://nixcats.org/)!
 There is significantly more help and example in this repository than there is actual functional code for the nixCats wrapper.
 
-When you are ready, start with a [template](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates) and include your normal configuration,
+When you are ready, start with a
+[template](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates)
+and include your normal configuration,
 and refer back here or to the in-editor help or the other templates for guidance!
 
 All config folders like `ftplugin/`, `pack/` and `after/` work as designed (see `:h rtp`),
@@ -437,7 +450,7 @@ I also borrowed code from nixpkgs and made modifications and improvements to bet
   and you still want to be able to run it in Nix shells,
   this is the way to go.
 
-- [`NixVim`](https://github.com/nix-community/nixvim):
+- [`NixVim`](https://github.com/nix-community/nixvim): <a name="nixvim"></a>
   A Neovim module scheme semi-comparable to Home Manager for Neovim.
   They try to have a module for as many packages as they can and do a great job,
   but you can always fall back to the programs.neovim syntax if something is missing.
