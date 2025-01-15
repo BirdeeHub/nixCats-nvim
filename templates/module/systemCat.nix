@@ -23,8 +23,6 @@ in {
       packageNames = [ "myNixModuleNvim" ];
 
       luaPath = "${./.}";
-      # you could also import lua from the flake though,
-      # which we do for user config after this config for root
 
       # packageDef is your settings and categories for this package.
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one

@@ -23,7 +23,6 @@ in {
       packageNames = [ "myHomeModuleNvim" ];
 
       luaPath = "${./.}";
-      # you could also import lua from the flake though, by not including this.
 
       # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
       categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
