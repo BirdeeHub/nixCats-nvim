@@ -1,6 +1,14 @@
-# [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's Neovim config on Nix!
+<div align="center">
 
-`nixCats` is a Neovim package manager written in Nix.
+# [nixCats](https://nixcats.org)
+
+for the Lua-natic's Neovim config on Nix
+
+</div>
+
+<br/>
+
+- A Neovim package manager written in Nix.
 
 - **Nix is for downloading. Lua is for configuring.**
   Keep your existing Lua config directory,
@@ -15,7 +23,7 @@
   Or make one package for each.
   
 - **No need for Lua in Nix strings.**
-  The name `nixCats` is short for 'Nix Categories':
+  The name is short for 'Nix Categories':
   define arbitrary categories of dependencies in Nix, and interact them straight from Lua.
   
 - **Integrates with NixOS or Home Manager,** but buildable separately.
