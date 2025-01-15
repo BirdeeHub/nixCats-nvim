@@ -59,9 +59,7 @@ You can find it in the REPL, under nixCats.out.packages in the correct config se
 self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
 ```
 
-- In particular, I would like to phase out the [nixExpressionFlakeOutputs](./templates/nixExpressionFlakeOutputs) template.
-  *(Note that this won't break the config of anyone using it, since it is just a template.
-  Doing it that way will continue to work as it has.)*
+- In particular, I would like to feature the [nixExpressionFlakeOutputs](./templates/nixExpressionFlakeOutputs) template less heavily.
 
 I feel that providing proper help for these two options as a main path of installation
 provides a better onboarding path for new users.
