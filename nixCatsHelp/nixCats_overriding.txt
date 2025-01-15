@@ -154,14 +154,14 @@ are not a set or a derivation and adding any new values.
               })
             '';
           }
-          # the home manager syntax for plugins is supported by nixCats
+          # The Home Manager syntax for plugins is supported by nixCats,
           # which is useful for one-off cases like this.
-          # here we use it to lazy load neorg on neorg filetype
+          # Here we use it to lazy load neorg on neorg filetype.
         ];
       };
-      # in addiion to the home-manager syntax,
+      # In addition to the Home Manager syntax,
       # you could also source the current directory ON TOP of the one in luaPath.
-      # if you want to make it also respect wrapRc, you can access the value
+      # If you want to make it also respect wrapRc, you can access the value
       # of wrapRc in the settings set provided to the function.
       # optionalLuaAdditions = {
       #   newcat = let
@@ -185,7 +185,7 @@ are not a set or a derivation and adding any new values.
     });
   });
 <
-Ok so we have a new category. But it isnt enabled!
+Okay, so we have a new category. But it isn't enabled!
 
 We need to make a package with the `newcat` category enabled!
 
@@ -240,8 +240,8 @@ within a flake, or a devShell or anywhere else.
 You could have a base configuration, with a bunch of categories disabled by
 default, and enable only the ones you need in project shells if you wanted.
 
-You can have a package based on any of your other packages but with wrapRc =
-false for testing lua without rebuild.
+You can have a package based on any of your other packages but with `wrapRc =
+false` for testing Lua without rebuild.
 
 The packages themselves also output modules via passthru.
 You can still output modules and overlays from a package built for only a
@@ -260,7 +260,7 @@ even easier. Just dont merge anything from prev.
 As you can see, overriding provides a very powerful way to customize your
 packages upon import somewhere else, and works very effectively with the
 nixCats category scheme. Overriding just the packageDefinitions set
-alone can produce wildly different neovim packages, and the more attention
+alone can produce wildly different Neovim packages, and the more attention
 paid to how you categorize, the better those options become.
 
 Have fun!

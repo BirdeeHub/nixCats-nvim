@@ -1,22 +1,22 @@
 =======================================================================================
 NIX CATEGORIES                                                       *nixCats*
 
-For help with the nix flake files, see :help |nixCats.flake|
+For help with the Nix flake files, see :help |nixCats.flake|.
 
 *******************************************************
 AN IMPORTANT NOTE:
 
 <1> When editing the files within the flake directory,
-nix will not package a new file if it isn't staged in git.
-run git add before rebuilding it whenever adding a new file.
-Using wrapRc = true would mean this also applies to lua files.
-In fact, when wrapRc = true, even changes within a lua file
-will not be reflected unless you run git add.
+Nix will not package a new file if it isn't staged in git.
+run `git add` before rebuilding it whenever adding a new file.
+Using `wrapRc = true` would mean this also applies to Lua files.
+In fact, when `wrapRc = true`, even changes within a Lua file
+will not be reflected unless you run `git add`.
 *******************************************************
 
-nixCats: returns category names included by nix for this package 
+nixCats: returns category names included by Nix for this package
 
-Use a dot-separated string to check if this neovim was packaged with 
+Use a dot-separated string to check if this Neovim was packaged with
 a particular category included:
 >lua
     if nixCats('lua.someSubcategory') then
@@ -24,10 +24,10 @@ a particular category included:
     end
 <
 Checking a category that is not present rather than false,
-will still return false from this if statement because nil in lua is "falsey"
-I.e. if nix was not a category you included a value true or false for,
+will still return false from this if statement because `nil` in Lua is "falsey".
+That is, if Nix was not a category you included a value true or false for,
 it would evaluate as if it was false.
-if your category has an illegal lua name you may instead use this syntax
+If your category has an illegal Lua name you may instead use this syntax
 >lua
     nixCats { 'attr-set', "path", "to", [[valu.e'!#$@]] }
 <
@@ -58,7 +58,6 @@ They will be replaced.
 If in your flake, your package definition looked like this:
   see :help |nixCats.flake.outputs.packageDefinitions|
 >nix
-
   packageDefinitions = {
     nixCats = { pkgs, ... }@misc: {
       settings = settings.nixCats; 
@@ -73,13 +72,13 @@ If in your flake, your package definition looked like this:
           subtest1 = true;
         };
         debug = false;
-        # this does not have an associated category of plugins, 
-        # but lua can still check for it
+        # This does not have an associated category of plugins,
+        # but Lua can still check for it.
         lspDebugMode = false;
-        # by default, we dont want lazy.nvim
-        # we could omit this for the same effect
+        # By default, we don't want lazy.nvim.
+        # We could omit this for the same effect.
         lazy = false;
-        # you could also pass something else:
+        # You could also pass something else:
         themer = true;
         colorscheme = "onedark";
         theBestCat = "says meow!!";
@@ -97,7 +96,6 @@ If in your flake, your package definition looked like this:
       };
     };
   };
-
 <
 Using:
 >vim
@@ -148,8 +146,8 @@ null will become nil
 numbers will remain numbers
 derivations will become store paths
 
-everything that isnt true, false, null, 
-a list, or a set becomes a lua string.
+everything that isn't true, false, null,
+a list, or a set becomes a Lua string.
 it uses "[[${builtins.toString value}]]"
 in order to achieve this.
 It will throw an error if you pass an uncalled function.
@@ -183,19 +181,17 @@ You could use it to pass information like port numbers or paths
 Or whatever else you want.
 
 In addition to `nixCats.cats`, nixCats also contains other info.
-
 >lua
   nixCats.pawsible
     -- contains a final set of all the plugins included
     -- in the package and their paths, and the path to treesitter parsers.
-    -- does not include lsps and runtime dependencies,
+    -- does not include LSPs and runtime dependencies,
     -- you can retrieve their paths with vim.fn.exepath if needed.
 
   nixCats.settings
     -- contains the settings set for the package
 <
-
-you can view these for debugging purposes with `:NixCats settings` and
+You can view these for debugging purposes with `:NixCats settings` and
 `:NixCats pawsible` user commands.
 
 You may also use the following to debug. Using
@@ -205,8 +201,7 @@ will print the value of `nixCats('path.to.value')` for debugging purposes.
 In addition to the user commands, you may access these items directly within
 vimscript!
 
-`GetNixCat(value)` is equivalent to the `nixCats(value)` command in
-lua.
+`GetNixCat(value)` is equivalent to the `nixCats(value)` command in Lua.
 
 `GetNixSettings()` is `require('nixCats').settings`
 
