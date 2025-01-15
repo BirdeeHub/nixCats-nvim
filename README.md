@@ -334,7 +334,7 @@ There are *MANY*, thanks to the virtues of the category scheme of this flake.
 - I mentioned the templates already but if you want to see them all on GitHub they are here:
   [templates](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates)
 
-## Extra Information: <a name="outro"></a>
+## Extra Information <a name="outro"></a>
 
 ### Challenges
 
