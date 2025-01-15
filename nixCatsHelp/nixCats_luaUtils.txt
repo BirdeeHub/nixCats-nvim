@@ -2,22 +2,22 @@
                                                             *nixCats.luaUtils*
 ---------------------------------------------------------------------------------
                                                       *nixCats.luaUtils.intro*
-nixCats has good integration with pckr and other similar neovim package
+nixCats has good integration with pckr and other similar Neovim package
 managers.
 
-Keep in mind they may not work so well on nixos,
-so when you are on nixOS you should load neovim via nix
-(not sure if that part needs stating)
+Keep in mind they may not work so well on NixOS,
+so when you are on NixOS you should load Neovim via Nix
+(not sure if that part needs stating).
 
-to get your lua utils run
+To get your Lua utils, run
 >bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
 <
-ALSO keep in mind, if you are not using nix, you will have to download
-all your non-plugin, non-lsp dependencies manually, and this may suck.
+ALSO keep in mind, if you are not using Nix, you will have to download
+all your non-plugin, non-LSP dependencies manually, and this may suck.
 Therefore, all this stuff about package managers may be of limited utility.
 
-I have written some lua utilities to enable this.
+I have written some Lua utilities to enable this.
 There is a template for them, and you can use the flake init -t
 variable to import the luaUtils template in the root directory of your config
 to add it to your project in the correct place.
@@ -29,20 +29,20 @@ flake. The main init.lua in it contains a `require("nixCatsUtils").setup`
 function, and a `require("nixCatsUtils").isNixCats` variable.
 
 The `require("nixCatsUtils").isNixCats` variable is true if
-you installed neovim via nix, and otherwise it is false.
-This is used to enable package managers only when not loaded via nix.
+you installed Neovim via Nix, and otherwise it is false.
+This is used to enable package managers only when not loaded via Nix.
 
 You run the `setup` function in your init.lua file at the start, and tell it
 what nixCats global command should default to if isNixCats is false.
 The default is true.
 
 IF YOU DO NOT DO THIS SETUP CALL:
-the result will be that, when you load this folder without using nix,
+the result will be that, when you load this folder without using Nix,
 the global nixCats function which you use everywhere
 to check for categories will throw an error.
 This setup function will give it a default value.
-Of course, if you only ever download nvim with nix, this isnt needed.
-But it cant hurt to include anyway.
+Of course, if you only ever download Neovim with Nix, this isn't needed.
+But it can't hurt to include anyway.
 >lua
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
@@ -61,9 +61,9 @@ it also has a few other things that may prove handy
   ---@overload fun(v: any): any|nil
   ---@overload fun(v: any, o: any): any
   require('nixCatsUtils').lazyAdd(v, o)
-  -- if not nix, return the first thing.
-  -- If it is nix, return the second, or nil if not provided.
-  -- used for disabling things like lazy build steps on nix when needed
+  -- If not Nix, return the first thing.
+  -- If it is Nix, return the second, or nil if not provided.
+  -- used for disabling things like lazy build steps on Nix when needed
 
   ---@overload fun(v: string|string[]): boolean
   ---@overload fun(v: string|string[], default: boolean): boolean
@@ -71,22 +71,22 @@ it also has a few other things that may prove handy
 
   -- v will be passed to nixCats function.
   -- If the value fetched by nixCats is nil or false,
-  -- return false, otherwise return true
-  -- if not loaded by nix, return the default value,
+  -- return false, otherwise return true.
+  -- If not loaded by Nix, return the default value,
   -- or fall back on the nixCats default value provided by
-  -- the require("nixCatsUtils").setup function mentioned above
+  -- the require("nixCatsUtils").setup function mentioned above.
 
   ---@param v string|string[]
   ---@param default any
   ---@return any
   require('nixCatsUtils').getCatOrDefault(v, default)
-  ---if nix, return value of nixCats(v) else return default
-  ---Exists to specify a different non_nix_value than the one in setup()
+  -- If Nix, return value of nixCats(v) else return default.
+  -- Exists to specify a different non_nix_value than the one in setup().
 
   ---@type string
   require('nixCatsUtils').packageBinPath
-  ---Useful for things such as vim-startuptime which must reference the wrapper's actual path
-  ---If not using nix, this will simply return vim.v.progpath
+  -- Useful for things such as vim-startuptime which must reference the wrapper's actual path.
+  -- If not using Nix, this will simply return vim.v.progpath.
 <
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
@@ -101,10 +101,10 @@ Use the following command in a new directory and check it out!
   ---@overload fun(nixLazyPath: string|nil, lazySpec: any, opts: table)
   ---@overload fun(nixLazyPath: string|nil, opts: table)
   require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "lazy.nvim" }), lazySpec, opts)
-  -- as long as you call the require('nixCatsUtils').setup function first,
+  -- As long as you call the require('nixCatsUtils').setup function first,
   -- nixCats.pawsible will not throw an error even
-  -- if no nix was used to load your config
-  -- this is covered in the mentioned template
+  -- if no Nix was used to load your config.
+  -- This is covered in the mentioned template.
 <
 The tutorial:
 >nix
@@ -112,7 +112,7 @@ The tutorial:
       path = ./kickstart-nvim;
       description = ''
         The entirety of kickstart.nvim implemented as a nixCats flake.
-        With additional nix lsps for editing the nix part.
+        With additional Nix LSPs for editing the Nix part.
         This is to serve as the tutorial for using the nixCats lazy wrapper.
       '';
     };
@@ -122,11 +122,11 @@ with the string: `NOTE: nixCats:` so to find all of the info, search for that.
 
 One other note.
 
-If you install your grammars via `lazy.nvim` rather than `nix`,
+If you install your grammars via `lazy.nvim` rather than `Nix`,
 you will need to add a c compiler to your `lspsAndRuntimeDeps` section
-in your `categoryDefinitions`
+in your `categoryDefinitions`.
 
-If you install your grammars via nix rather than `lazy.nvim`,
+If you install your grammars via Nix rather than `lazy.nvim`,
 the only methods supported via the `lazy.nvim` wrapper are the following.
 >nix
   pkgs.vimPlugins.nvim-treesitter.withAllGrammars
@@ -147,33 +147,31 @@ Summary: as long as `pkgs.neovimUtils.grammarToPlugin` is called on it somehow, 
 
 Any other ways will still work in nixCats if they would work in other schemes,
 but not necessarily when using the lazy wrapper,
-because the lazy wrapper has to be given their paths from nix,
+because the lazy wrapper has to be given their paths from Nix,
 and thus need to be sorted from other plugins somehow.
 
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.paq-nvim*
-load the plugins via paq-nvim when not on nix
+Load the plugins via paq-nvim when not on Nix
 YOU are in charge of putting the plugin
-urls and build steps in there, which will only be used when not on nix,
+urls and build steps in there, which will only be used when not on Nix,
 and you should keep any setup functions
 OUT of that file, as they are ONLY loaded when this
-configuration is NOT loaded via nix.
+configuration is NOT loaded via Nix.
 
-The way to think of this is, its very
-similar to the main nix file for nixCats
+The way to think of this is as very similar to the main Nix file for nixCats.
 
-It can be used to download your plugins,
-and it has an opt for optional plugins.
+It can be used to download your plugins, and it has an opt for optional plugins.
 
-we will do all our loading and configuring
+We will do all our loading and configuring
 elsewhere in our configuration, so that
-we dont have to write it twice.
+we don't have to write it twice.
 
 All the rest of the setup will be done using the normal setup functions later,
 thus working regardless of what method loads the plugins.
 only stuff pertaining to downloading and building should be added to paq.
 >lua
-  require('nixCatsUtils.catPacker').setup({
+  require('NixCatsUtils.catPacker').setup({
     { "BirdeeHub/lze", },
     { "stevearc/oil.nvim", },
     { 'joshdick/onedark.vim', },
@@ -188,14 +186,14 @@ only stuff pertaining to downloading and building should be added to paq.
     { 'nvim-telescope/telescope-ui-select.nvim', opt = true, },
     {'nvim-telescope/telescope.nvim', opt = true, },
 
-    -- lsp
+    -- LSP
     { 'williamboman/mason.nvim', opt = true, },
     { 'williamboman/mason-lspconfig.nvim', opt = true, },
     { 'j-hui/fidget.nvim', opt = true, },
     { 'neovim/nvim-lspconfig', opt = true, },
 
     --  NOTE:  we take care of lazy loading elsewhere in an autocommand
-      -- so that we can use the same code on and off nix.
+      -- so that we can use the same code on and off Nix.
       -- so here we just tell it not to auto load it
     { 'folke/lazydev.nvim', opt = true, },
 
@@ -203,8 +201,8 @@ only stuff pertaining to downloading and building should be added to paq.
     { 'onsails/lspkind.nvim', opt = true, },
 
     -- NOTE: when lazy loading, you might need to make the name
-    -- match the name from nix, so that you can call
-    -- packadd with the same name both on and off nix.
+    -- match the name from Nix, so that you can call
+    -- packadd with the same name both on and off Nix.
     { 'L3MON4D3/LuaSnip', opt = true, as = "luasnip", },
 
     { 'saadparwaiz1/cmp_luasnip', opt = true, },
@@ -249,7 +247,7 @@ only stuff pertaining to downloading and building should be added to paq.
 
   })
 <
-  OK, again, none of the stuff in this file is needed
-  if you only load this setup via nix, but it is an option.
+  Okay, again, none of the stuff in this file is needed
+  if you only load this setup via Nix, but it is an option.
 =================================================================================
 vim:tw=78:ts=8:ft=help:norl:

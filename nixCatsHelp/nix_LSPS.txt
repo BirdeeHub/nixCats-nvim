@@ -3,10 +3,10 @@ MASON AND LSPCONFIG                                             *nixCats.LSPs*
                                                           *nixCats.LSPs.mason*
 
 This is a method you may use to make sure mason only tries to download stuff
-when you did not install neovim via nixCats
+when you did not install Neovim via nixCats
 
 It functions the same as what kickstart.nvim does for its mason setup.
-However, when loaded via nix,
+However, when loaded via Nix,
 it skips mason and passes them straight to nvim-lspconfig
 
 When installing via pckr, install mason via pckr. Then wherever you set up
@@ -15,7 +15,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
 
 >lua
   if nixCats('neonixdev') then
-    -- NOTE: Lazydev will make your lua lsp stronger for neovim config
+    -- NOTE: Lazydev will make your Lua LSP stronger for Neovim config
     -- NOTE: we are also using this as an opportunity to show you how to lazy load plugins!
     -- This plugin was added to the optionalPlugins section of the main flake.nix of this repo.
     -- Thus, it is not loaded and must be packadded.
@@ -23,7 +23,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
       group = vim.api.nvim_create_augroup('nixCats-lazydev', { clear = true }),
       pattern = { 'lua' },
       callback = function(event)
-        -- NOTE: Use `:NixCats pawsible` to see the names of all plugins downloaded via nix for packadd
+        -- NOTE: Use `:nixCats pawsible` to see the names of all plugins downloaded via Nix for packad.
         vim.cmd.packadd('lazydev.nvim')
         require('lazydev').setup({
           library = {
@@ -116,8 +116,8 @@ The stuff added to servers table is what is passed to lspconfig/mason
   end
 
   -- This is this flake's version of what kickstarter has set up for mason handlers.
-  -- This is a convenience function that calls lspconfig on the lsps we downloaded via nix
-  -- This will not download your lsp. Nix does that.
+  -- This is a convenience function that calls lspconfig on the LSPs we downloaded via nix
+  -- This will not download your LSP --- Nix does that.
 
   --  Add any additional override configuration in the following tables. They will be passed to
   --  the `settings` field of the server config. You must look up that documentation yourself.
@@ -183,7 +183,7 @@ The above snippet mentions another file at the end.
 
 caps-on_attach.lua or 'myLuaConf.LSPs.caps-on_attach'
 
-It is simply a file containing the function we want to run on lsp attach, and a
+It is simply a file containing the function we want to run on LSP attach, and a
 function to return our completion capabilities object.
 
 It looks like this:
