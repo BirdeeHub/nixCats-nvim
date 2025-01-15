@@ -1,6 +1,7 @@
 # [nixCats-nvim](https://github.com/BirdeeHub/nixCats-nvim): for the Lua-natic's Neovim config on Nix!
 
-## Table of Contents:
+## Table of Contents
+
 1. [Introduction](#intro)
 2. [Features](#features)
 3. [Installation](#installation)
@@ -10,7 +11,7 @@
 
 ---
 
-## Introduction: <a name="intro"></a>
+## Introduction <a name="intro"></a>
 
 `nixCats` is a Neovim package manager written in Nix that allows for using a normal config directory structure without sacrificing the ability to easily pass data from Nix to Lua.
 
@@ -64,7 +65,8 @@ For lazy loading in your configuration, I strongly recommend using [lze](https:/
 However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but follow that link and read the info about it before deciding to take that route.
 `lazy.nvim` is known for not playing well in conjunction with other package managers, so using it will require a little bit of extra setup compared to the 2 above options.
 
-## Attention: <a name="attention"></a>
+## Attention <a name="attention"></a>
+
 > You may launch your Neovim built via nixCats with any name you would like to choose.
 
 > The default launch name is the package name in the packageDefinitions set in flake.nix for that package. You may then make any other aliases that you please as long as they do not conflict.
@@ -79,7 +81,8 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but 
 
 ---
 
-## Features: <a name="features"></a>
+## Features <a name="features"></a>
+
 - Allows normal Neovim configuration file scheme to be loaded from the Nix store.
 - Configure all downloads from a single Nix file, use a regular Neovim config scheme with full visibility of your Nix!
 - Easy-to-use Nix Category system for many configurations in 1 repository!
@@ -115,8 +118,9 @@ However there is a [lazy.nvim](#outro) wrapper that can be used if desired, but 
 
 ---
 
-## Installation: <a name="installation"></a>
-see :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html#nixCats.installation_options)
+## Installation <a name="installation"></a>
+
+See :help [nixCats.installation_options](https://nixcats.org/nixCats_installation.html#nixCats.installation_options)
 for more info, including a list of templates available (as well as a 100 line overview of what nixCats is and how to use it)
 
 The installation info here is simply a repetition of the info there, and I would suggest viewing it there instead.
@@ -226,9 +230,9 @@ There are *MANY*, thanks to the virtues of the category scheme of this flake.
 
 ## Extra Information: <a name="outro"></a>
 
-### Challenges:
+### Challenges
 
-#### [Mason](https://github.com/williamboman/mason.nvim):
+#### [Mason](https://github.com/williamboman/mason.nvim)
 
 Mason does not work on NixOS although it does on other OS options.
 
@@ -244,7 +248,7 @@ However you can make it work with SharedLibraries and lspsAndRuntimeDeps options
 
 ---
 
-#### [lazy.nvim](https://github.com/folke/lazy.nvim):
+#### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 `lze` and `lz.n`, unlike `lazy.nvim`, are not plugin managers.
 They stick to the task of lazy loading and do it well, with a very similar plugin spec style to `lazy.nvim`
@@ -283,9 +287,9 @@ and quite like the result. The main example configuration in this repo uses it f
 
 ---
 
-### Special mentions:
+### Special mentions
 
-#### For getting me started:
+#### For getting me started
 
 Many thanks to Quoteme for a great repo to teach me the basics of Nix!!! I borrowed some code from it as well because I couldn't have written it better.
 
@@ -295,7 +299,7 @@ Thank you!!! I literally did not even know what an overlay was yet and you taugh
 
 I also borrowed code from nixpkgs and made modifications and improvements to better fit nixCats.
 
-## Alternative / similar projects: <a name="alternatives"></a>
+## Alternative / similar projects <a name="alternatives"></a>
 
 - [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
   This project was the start of my Neovim journey and I would 100% suggest it over this one to anyone new to Neovim.
