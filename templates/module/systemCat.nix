@@ -16,6 +16,8 @@ in {
       addOverlays = /* (import ./overlays inputs) ++ */ [
         (utils.standardPluginOverlay inputs)
       ];
+      # see the packageDefinitions below.
+      # This says which of those to install.
       packageNames = [ "myNixModuleNvim" ];
 
       luaPath = "${./.}";
