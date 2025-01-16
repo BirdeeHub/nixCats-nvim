@@ -22,7 +22,8 @@ in {
 
       luaPath = "${./.}";
 
-      # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
+      # the .replace vs .merge options are for modules based on existing configurations,
+      # they refer to how multiple categoryDefinitions get merged together by the module.
       categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
         lspsAndRuntimeDeps = {
           general = [];
