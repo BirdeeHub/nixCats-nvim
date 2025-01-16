@@ -8,10 +8,6 @@ in {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
     # it will be the namespace for your options.
     nixCats = {
-      # these are some of the options. For the rest see
-      # :help nixCats.flake.outputs.utils.mkNixosModules
-      # you do not need to use every option here, anything you do not define
-      # will be pulled from the flake instead.
       enable = true;
       nixpkgs_version = inputs.nixpkgs;
       # this will add the overlays from ./overlays and also,
@@ -20,11 +16,15 @@ in {
       addOverlays = /* (import ./overlays inputs) ++ */ [
         (utils.standardPluginOverlay inputs)
       ];
+      # see the packageDefinitions below.
+      # This says which of those to install.
       packageNames = [ "myHomeModuleNvim" ];
 
       luaPath = "${./.}";
 
-      # categoryDefinitions.replace will replace the whole categoryDefinitions with a new one
+      # the .replace vs .merge options are for modules based on existing configurations,
+      # they refer to how multiple categoryDefinitions get merged together by the module.
+      # for useage of this section, refer to :h nixCats.flake.outputs.categories
       categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
         lspsAndRuntimeDeps = {
           general = [];
