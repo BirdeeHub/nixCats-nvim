@@ -48,7 +48,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
       ```nix
       {
-        nvim = { pkgs, mkNvimPlugin, ... }: { settings = {}; categories = {}; extra = {}; };
+        nvim = { pkgs, mkNvimPlugin, ... }: {
+          settings = {};
+          categories = {};
+          extra = {};
+        };
       }
       ```
 
