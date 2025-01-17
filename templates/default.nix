@@ -11,13 +11,18 @@
     path = ./example;
     description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
   };
-  module = {
-    path = ./module;
+  home-manager = {
+    path = ./home-manager;
     description = ''
-      starting point for creating a nixCats module for your system and home-manager
+      demonstration of importing and using the nixCats module for home-manager
+    '';
+  };
+  nixos = {
+    path = ./nixos;
+    description = ''
+      demonstration of importing and using the nixCats module for nixos (and nix-darwin)
 
-      contains an example home manager module and an example nixos module in
-      separate files.
+      same as home manager, but has the options repeated for per-user configurations
     '';
   };
   nixExpressionFlakeOutputs = {

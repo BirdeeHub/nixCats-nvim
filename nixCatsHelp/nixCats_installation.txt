@@ -15,80 +15,98 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
   # Choose one of the following:
   # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
+  # If using zsh with extra regexing, be sure to escape the #
+<
+The flake template will be easiest to run from anywhere via nix run,
+and most self explanatory for new users.
+
+However, nixCats also offers modules.
+
+Unfortunately, using the module, if you wish to export
+the packages constructed by the module from your system flake
+to run via nix run, you will need to grab them from the config variable of
+your finished system configuration.
+>bash
+  # home-manager module template:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#home-manager
+  # nixos/nix-darwin module template:
+  nix flake init -t github:BirdeeHub/nixCats-nvim#nixos
+<
+
+And this method, called the nixExpressionFlakeOutputs is somewhere in between.
+It is the outputs function of the flake template, but as its own file.
+Thus, it is an expression that returns the outputs of the flake. Hence the
+name. You call it like a function with your inputs, and recieve all normal flake outputs.
+
+This makes it as easier to export for running via nix run,
+but is slightly more difficult than using the module is for first time users.
+>bash
   # the outputs function of the flake template but as its own file
   # callable with import ./the/dir { inherit inputs; }
   # to recieve all normal flake outputs
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
+<
+Initializing a template will create a skeleton flake.nix or default.nix for you to fill in.
 
-  # for utilities for functionality without nix
-  # added at lua/nixCatsUtils also run:
+If you are unfamiliar with Neovim and want a ready-made starter config,
+you should instead use the following template:
+>bash
+  nix flake init -t github:BirdeeHub/nixCats-nvim#example
+<
+
+If you want the lazy.nvim wrapper and various utilities for functionality without Nix
+added at lua/nixCatsUtils also run:
+>bash
   nix flake init -t github:BirdeeHub/nixCats-nvim#luaUtils
   # contains things like "is this nix?" "do this if not nix, else do that"
   # needs to be in your config at lua/nixCatsUtils,
   # because if you dont use nix to load neovim,
   # nixCats (obviously) can't provide you with anything from nix!
-
-  # If using zsh with extra regexing, be sure to escape the #
 <
-This will create an empty version of flake.nix (or default.nix) for you to fill in.
-
-If you are unfamiliar with nvim and want a ready-made starter config,
-you should instead use the following template:
->bash
-  nix flake init -t github:BirdeeHub/nixCats-nvim#example
-<
-If you added the luaUtils template, you should also have that at lua/nixCatsUtils
-
 Re-enter the nixCats nvim version by typing nixCats . and take a look!
 Reference the `:help nixCats` docs and nixCats-nvim itself as a guide for importing your setup.
 
-You add plugins to the flake.nix, call whatever setup function is required by the plugin,
+You add plugins to the nix file, call whatever lua setup function is required by the plugins,
 and use lspconfig to set up lsps. You may optionally choose to set up a plugin
 only when that particular category is enabled in the current package
 <
 It is a similar process to migrating to a new neovim plugin manager.
 
-Use a template, and migrate your plugins into the flake.nix file provided.
+Use a template, and migrate your plugins into the nix file provided.
 
 Then configure in lua with the configuration options provided by the plugin.
 
-It is suggested to start with the default template so that you can mess around with it in
-a separate repository/directory,
+It is suggested to start with the default flake template
+or one of the example configurations so that you
+can mess around with it in a separate repository/directory,
 and easily use nix repl to see what it exports.
 Just use `nix repl` in the directory, `:lf .` and type `outputs.` and
 autocomplete to see the exported items!
-
-Then move to the nixExpressionFlakeOutputs template to
-integrate it with your main nix config when you are happy with it!
-
-This is because the nixExpressionFlakeOutputs template
-is simply the outputs function of the default template. You then move the
-inputs to your main system inputs, and retrieve all the normal flake outputs
-with yournvim = import ./the/dir/with/template { inherit inputs; };
-You can then install them with yournvim.packages.${system}.nvimpackagename,
-use the modules they export to modify them further before installing them,
-install them via overlay, export them from your system flake so you can still
-access them from anywhere via nix run, etc...
-
-Use the help and the example config in nixCats-nvim itself that you just ran as an example.
-The help will still be accessible in your version of the editor.
-
-When you have your plugins added, you can build it using nix build and it
-will build to a result directory, or nix profile install to install it to your
-profile. Make sure you run `git add .` first as anything not staged will not
-be added to the store and thus not be findable by either nix or neovim.
+You can use `nix build --show-trace .` to build to a result directory
+to test your setup in isolation.
 See nix documentation on how to use these commands further at:
 [the nix command reference manual]
 (https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
 
-When you have a working version, you can begin to explore the many
-options made available for importing your new nix neovim configuration
-into a nix system or home manager configuration.
-There are MANY, thanks to the virtues of the category scheme of this flake.
+To install that flake in your system flake, you simply add it to your system flake's inputs,
+and then grab `inputs.yourflake.packages.${system}.<packagename>`
+and place it in your `environment.systemPackages` list (or equivalent)
 
-It is made to be customized into your own portable nix neovim distribution 
-with as many options as you wish, while requiring you to leave the normal
-nvim configuration scheme as little as possible.
+If you then wish to integrate the directory into your main system flake,
+it is suggested to then move to the nixExpressionFlakeOutputs template.
+
+This is because the nixExpressionFlakeOutputs template
+is simply the outputs function of the default template.
+So it will be most familiar.
+
+However the modules are also great options, and instructions for still
+exporting the package from your system flake are at :h |nixCats.module|
+
+Use the help and the example configs in nixCats-nvim as an example.
+The help will still be accessible in your version of the editor.
+
+Make sure you run `git add .` before building as anything not staged will not
+be added to the store and thus not be findable by either nix or neovim.
 
 ---------------------------------------------------------------------------------------
 How it works in 100 lines:                                  *nixCats.overview*
@@ -213,17 +231,18 @@ You may initialize them into the current directory via >bash
       path = ./fresh;
       description = "starting point template for making your neovim flake";
     };
-    example = {
-      path = ./example;
-      description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
-    };
-    module = {
-      path = ./module;
+    home-manager = {
+      path = ./home-manager;
       description = ''
-        starting point for creating a nixCats module for your system and home-manager
+        demonstration of importing and using the nixCats module for home-manager
+      '';
+    };
+    nixos = {
+      path = ./nixos;
+      description = ''
+        demonstration of importing and using the nixCats module for nixos (and nix-darwin)
 
-        contains an example home manager module and an example nixos module in
-        separate files.
+        same as home manager, but has the options repeated for per-user configurations
       '';
     };
     nixExpressionFlakeOutputs = {
@@ -237,6 +256,18 @@ You may initialize them into the current directory via >bash
         It creates a new one instead to use, just like the flake template does.
 
         Call it from your system flake and call it with inputs as arguments.
+      '';
+    };
+    example = {
+      path = ./example;
+      description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
+    };
+    kickstart-nvim = {
+      path = ./kickstart-nvim;
+      description = ''
+        The entirety of kickstart.nvim implemented as a nixCats flake.
+        With additional nix lsps for editing the nix part.
+        This is to serve as the tutorial for using the nixCats lazy wrapper.
       '';
     };
     overwrite = {
@@ -258,14 +289,6 @@ You may initialize them into the current directory via >bash
       description = ''
         A template that includes lua utils for using neovim package managers
         when your config file is not loaded via nix.
-      '';
-    };
-    kickstart-nvim = {
-      path = ./kickstart-nvim;
-      description = ''
-        The entirety of kickstart.nvim implemented as a nixCats flake.
-        With additional nix lsps for editing the nix part.
-        This is to serve as the tutorial for using the nixCats lazy wrapper.
       '';
     };
     overriding = {
