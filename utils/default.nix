@@ -118,22 +118,22 @@ with builtins; let lib = import ./lib.nix; in rec {
     # Example
 
     if you had in your flake inputs
-    ```
-      inputs = {
-        plugins-foobar = {
-          url = "github:exampleuser/foobar.nvim";
-          flake = false;
-        }
-      }
+    ```nix
+    inputs = {
+      plugins-foobar = {
+        url = "github:exampleuser/foobar.nvim";
+        flake = false;
+      };
+    };
     ```
 
     you can put the following in your dependencyOverlays
-    ```
-      dependencyOverlays = [ (standardPluginOverlay inputs) ];
+    ```nix
+    dependencyOverlays = [ (standardPluginOverlay inputs) ];
     ```
 
     and then 
-    ```
+    ```nix
     pkgs.neovimPlugins.foobar
     ```
   */
@@ -145,8 +145,8 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-      dependencyOverlays = [ (sanitizedPluginOverlay inputs) ];
+    ```nix
+    dependencyOverlays = [ (sanitizedPluginOverlay inputs) ];
     ```
   */
   sanitizedPluginOverlay = (import ./autoPluginOverlay.nix).sanitizedPluginOverlay;
@@ -158,10 +158,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-      (utils.fixSystemizedOverlay inputs.codeium.overlays
-        (system: inputs.codeium.overlays.${system}.default)
-      )
+    ```nix
+    (utils.fixSystemizedOverlay inputs.codeium.overlays
+      (system: inputs.codeium.overlays.${system}.default)
+    )
     ```    
   */
   fixSystemizedOverlay = overlaysSet: outfunc:
@@ -320,7 +320,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     you can use this to make values in the tables generated
     for the nixCats plugin using lua literals.
 
-    ```
+    ```nix
     cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
     ```
   */
@@ -458,17 +458,17 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-        dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
-          (utils.mergeOverlayLists # <-- merging 2 lists requires both to be a list
-            # safeOversList checks if dependencyOverlays is a list or a set
-            (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
-            [ # <- and then we add our new list
-              (utils.standardPluginOverlay inputs)
-              # any other flake overlays here.
-            ]
-          )
-        ]);
+    ```nix
+    dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
+      (utils.mergeOverlayLists # <-- merging 2 lists requires both to be a list
+        # safeOversList checks if dependencyOverlays is a list or a set
+        (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
+        [ # <- and then we add our new list
+          (utils.standardPluginOverlay inputs)
+          # any other flake overlays here.
+        ]
+      )
+    ]);
     ```
   */
   safeOversList = { dependencyOverlays, system ? null }:
@@ -554,7 +554,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in `baseBuilder`
+    : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
@@ -595,7 +595,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in `baseBuilder`
+    : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
@@ -638,7 +638,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     `luaPath` (`function` or `stringWithContext`)
 
     `pkgsParams` (`AttrSet`)
-    : exactly the same a the `pkgsParams` in `baseBuilder`
+    : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
     `categoryDefinitions` (`FunctionTo` `AttrSet`)
@@ -693,10 +693,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-      easyMultiOverlayNamespaced self.packages.x86_64-linux.${packageName} packageName
-      # The `system` chosen DOES NOT MATTER.
-      # The overlay utilizes override to change it to match `prev.system`
+    ```nix
+    easyMultiOverlayNamespaced self.packages.x86_64-linux.${packageName} packageName
+    # The `system` chosen DOES NOT MATTER.
+    # The overlay utilizes override to change it to match `prev.system`
     ```
   */
   easyMultiOverlayNamespaced = package: importName: let
@@ -719,10 +719,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-      easyMultiOverlay self.packages.x86_64-linux.${packageName}
-      # The `system` chosen DOES NOT MATTER.
-      # The overlay utilizes override to change it to match `prev.system`
+    ```nix
+    easyMultiOverlay self.packages.x86_64-linux.${packageName}
+    # The `system` chosen DOES NOT MATTER.
+    # The overlay utilizes override to change it to match `prev.system`
     ```
   */
   easyMultiOverlay = package: let
@@ -743,10 +743,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     # Example
 
-    ```
-      easyMultiOverlay self.packages.x86_64-linux.${packageName}
-      # The `system` chosen DOES NOT MATTER.
-      # The overlay utilizes override to change it to match `prev.system`
+    ```nix
+    easyMultiOverlay self.packages.x86_64-linux.${packageName}
+    # The `system` chosen DOES NOT MATTER.
+    # The overlay utilizes override to change it to match `prev.system`
     ```
   */
   easyNamedOvers = package: let
