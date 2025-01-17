@@ -1,36 +1,49 @@
 {
   default = {
     path = ./fresh;
-    description = "starting point template for making your neovim flake";
+    description = "Starting point template for making your Neovim flake";
   };
   fresh = {
     path = ./fresh;
-    description = "starting point template for making your neovim flake";
+    description = "Starting point template for making your Neovim flake";
   };
-  example = {
-    path = ./example;
-    description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
-  };
-  module = {
-    path = ./module;
+  home-manager = {
+    path = ./home-manager;
     description = ''
-      starting point for creating a nixCats module for your system and home-manager
+      demonstration of importing and using the nixCats module for Home-Manager
+    '';
+  };
+  nixos = {
+    path = ./nixos;
+    description = ''
+      demonstration of importing and using the nixCats module for NixOS (and nix-darwin)
 
-      contains an example home manager module and an example nixos module in
-      separate files.
+      same as home manager, but has the options repeated for per-user configurations
     '';
   };
   nixExpressionFlakeOutputs = {
     path = ./nixExpressionFlakeOutputs;
     description = ''
-      how to import as just the outputs section of the flake, so that you can export
-      its outputs with your system outputs
+      How to import as just the outputs section of the flake, so that you can export
+      its outputs with your system outputs.
 
-      It is best practice to avoid using the system pkgs and its overlays in this method
+      It is best practice to avoid using the system pkgs and its overlays in this method,
       as then you could not output packages for systems not defined in your system flake.
       It creates a new one instead to use, just like the flake template does.
 
       Call it from your system flake and call it with inputs as arguments.
+    '';
+  };
+  example = {
+    path = ./example;
+    description = "an idiomatic nixCats example configuration using lze for lazy loading and paq.nvim for backup when not using nix";
+  };
+  kickstart-nvim = {
+    path = ./kickstart-nvim;
+    description = ''
+      The entirety of kickstart.nvim implemented as a nixCats flake.
+      With additional Nix LSPs for editing the nix part.
+      This is to serve as the tutorial for using the nixCats lazy wrapper.
     '';
   };
   overwrite = {
@@ -54,14 +67,6 @@
       when your config file is not loaded via nix.
     '';
   };
-  kickstart-nvim = {
-    path = ./kickstart-nvim;
-    description = ''
-      The entirety of kickstart.nvim implemented as a nixCats flake.
-      With additional nix lsps for editing the nix part.
-      This is to serve as the tutorial for using the nixCats lazy wrapper.
-    '';
-  };
   overriding = {
     path = ./overriding;
     description = ''
@@ -72,7 +77,7 @@
       In addition, it is also a demonstration of how to export a nixCats configuration
       as an AppImage.
 
-      It is a 2 for 1 example of 2 SEPARATE things one could do.
+      It is a two-for-one example of two SEPARATE things one could do.
     '';
   };
   overlayHub = {
