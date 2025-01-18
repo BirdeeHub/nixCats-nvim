@@ -1,11 +1,8 @@
-[utils/default.nix](./default.nix) is the interface through which the entire nixCats library is accessed.
+[nixCats.utils](./default.nix) is the interface through which the entire `nixCats` library is accessed.
 
-As such:
+It has no dependencies, or arguments.
 
-This directory is in charge of exporting the [builder](../builder) and the [templates](../templates) as well as any associated utilities for:
+It contains the main builder function, functions for creating modules and other flake outputs,
+and various other utilities for working with `nixCats` that you may want to use.
 
-[Importing non-nix plugins without build steps from flake inputs](./autoPluginOverlay.nix)
-
-exporting [modules](./mkModules.nix) based on an existing nixCats-based package
-
-[as well as anything else you should need for manipulating overlays from other flakes, managing the system variable, making overlays, making packages, and making other outputs from the builder,](./default.nix)
+[docs](https://nixCats.org/TOC.html)
