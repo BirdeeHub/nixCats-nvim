@@ -336,7 +336,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     `flake-utils.lib.eachSystem` but without the flake input
 
-    Builds a map from `<attr>=value` to `<attr>.<system>=value` for each system
+    Builds a map from `<attr> = value` to `<attr>.<system> = value` for each system
 
     ## Arguments
 
