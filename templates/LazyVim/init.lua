@@ -8,8 +8,8 @@ require('nixCatsUtils').setup {
 
 -- NOTE: You might want to move the lazy-lock.json file
 local function getlockfilepath()
-  if require('nixCatsUtils').isNixCats and type(require('nixCats').settings.unwrappedCfgPath) == 'string' then
-    return require('nixCats').settings.unwrappedCfgPath .. '/lazy-lock.json'
+  if require('nixCatsUtils').isNixCats and type(nixCats.settings.unwrappedCfgPath) == 'string' then
+    return nixCats.settings.unwrappedCfgPath .. '/lazy-lock.json'
   else
     return vim.fn.stdpath 'config' .. '/lazy-lock.json'
   end
