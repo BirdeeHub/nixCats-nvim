@@ -102,6 +102,7 @@
           lazy-nvim
           LazyVim
           bufferline-nvim
+          lazydev-nvim
           cmp-buffer
           cmp-nvim-lsp
           cmp-path
@@ -247,6 +248,8 @@
         extra = {};
       };
       # an extra test package with normal lua reload for fast edits
+      # nix doesnt provide the config in this package, allowing you free reign to edit it.
+      # then you can swap back to the normal pure package when done.
       testnvim = { pkgs, mkNvimPlugin, ... }: {
         settings = {
           wrapRc = false;
@@ -267,6 +270,7 @@
 
   # see :help nixCats.flake.outputs.exports
   forEachSystem (system: let
+    # the builder function that makes it all work
     nixCatsBuilder = utils.baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions packageDefinitions;
