@@ -82,12 +82,13 @@
       lspsAndRuntimeDeps = with pkgs; {
         general = [
           universal-ctags
+          curl
+          lazygit
           ripgrep
           fd
           stdenv.cc.cc
-          nix-doc
           lua-language-server
-          nixd
+          nil # I would go for nixd but lazy chooses this one idk
           stylua
         ];
       };
