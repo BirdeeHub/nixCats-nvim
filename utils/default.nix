@@ -5,12 +5,12 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     `utils.baseBuilder` is the main builder function of nixCats.
 
-    # Arguments
+    ## Arguments
 
-    ## **luaPath** (`path` or `stringWithContext`)
+    ### **luaPath** (`path` or `stringWithContext`)
       STORE PATH to your `~/.config/nvim` replacement.
 
-    ## **pkgsParams** (`AttrSet`)
+    ### **pkgsParams** (`AttrSet`)
       set of items for building the pkgs that builds your neovim.
 
       - accepted attributes are:
@@ -37,13 +37,13 @@ with builtins; let lib = import ./lib.nix; in rec {
       : default = {}
       : attrset of extra stuff for finalPackage.passthru
 
-    ## **categoryDefinitions** (`functionTo` `AttrSet`)
+    ### **categoryDefinitions** (`functionTo` `AttrSet`)
       type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
       returns: set of sets of categories of dependencies
 
       see `:h nixCats.flake.outputs.categories`
 
-    ## **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
+    ### **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
       set of functions that each represent the settings and included categories for a package.
 
       ```nix
@@ -60,10 +60,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
       see `:h nixCats.flake.outputs.settings`
 
-    ## **name** (`string`)
+    ### **name** (`string`)
       name of the package to build from `packageDefinitions`
 
-    # Note:
+    ## Note:
 
     When using override, all values shown above will
     be top level attributes of prev, none will be nested.
@@ -115,7 +115,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     After adding the overlay returned, you can access them using `pkgs.neovimPlugins.foobar`
 
-    # Example
+    ## Example
 
     if you had in your flake inputs
     ```nix
@@ -143,7 +143,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     same as standardPluginOverlay except if you give it `plugins-foo.bar`
     you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
 
-    # Example
+    ## Example
 
     ```nix
     dependencyOverlays = [ (sanitizedPluginOverlay inputs) ];
@@ -156,7 +156,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     to deal with when other people (incorrectly) output an overlay wrapped
     in a system variable you may call this function on it.
 
-    # Example
+    ## Example
 
     ```nix
     (utils.fixSystemizedOverlay inputs.codeium.overlays
@@ -182,7 +182,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     The module will be able to combine any definitions passed in with new ones defined in the module correctly.
 
-    # Arguments
+    ## Arguments
 
     `defaultPackageName` (`string`)
     : the only truly required argument
@@ -257,7 +257,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Except there are no per-user arguments, because the module installs for the home manager user
 
-    # Arguments
+    ## Arguments
 
     `defaultPackageName` (`string`)
     : the only truly required argument
@@ -338,7 +338,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Builds a map from `<attr>=value` to `<attr>.<system>=value` for each system
 
-    # Arguments
+    ## Arguments
 
     `systems` (`listOf strings`)
 
@@ -367,7 +367,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     in case someone didn't know that genAttrs is great for dealing with the system variable,
     this is literally just nixpkgs.lib.genAttrs
 
-    # Arguments
+    ## Arguments
 
     `systems` (`listOf strings`)
 
@@ -384,7 +384,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Works with both `categoryDefinitions` and individual `packageDefinitions`
 
-    # Arguments
+    ## Arguments
 
     `oldCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
@@ -399,7 +399,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
     it will merge them together rather than replacing the old one with the new one.
 
-    # Arguments
+    ## Arguments
 
     `oldCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
@@ -422,7 +422,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     Returns a SINGLE overlay
 
-    # Arguments
+    ## Arguments
 
     `oldOverlist` (`listOf` `overlays`)
 
@@ -448,7 +448,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     If you passed in dependencyOverlays as a list to your builder function,
     it will remain a list.
 
-    # Arguments
+    ## Arguments
 
     `system` (`string` or `null`)
     : Technically optional if you know `dependencyOverlays` is a list
@@ -456,7 +456,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
 
-    # Example
+    ## Example
 
     ```nix
     dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
@@ -485,7 +485,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     for constructing flake outputs.
 
-    # Arguments
+    ## Arguments
     
     `finalBuilder` (`function`)
     : this is `baseBuilder` with all arguments except `name` applied.
@@ -503,7 +503,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     `mkPackages` but without adding a default package, or the final `defaultName` argument
 
-    # Arguments
+    ## Arguments
     
     `finalBuilder` (`function`)
     : this is `baseBuilder` with all arguments except `name` applied.
@@ -520,7 +520,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     Pass it a package and it will make that the default, and build all the packages
     in the packageDefinitions that package was built with.
 
-    # Arguments
+    ## Arguments
 
     `package` (`NixCats nvim derivation`)
   */
@@ -533,7 +533,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     Pass it a package and it will build all the packages
     in the `packageDefinitions` that package was built with.
 
-    # Arguments
+    ## Arguments
 
     `package` (`NixCats nvim derivation`)
   */
@@ -549,7 +549,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     defaultName is the package name for the default overlay
 
-    # Arguments
+    ## Arguments
 
     `luaPath` (`function` or `stringWithContext`)
 
@@ -590,7 +590,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     default overlay yeilds `pkgs.${defaultName}.${packageName}` with all the packages
 
-    # Arguments
+    ## Arguments
 
     `luaPath` (`function` or `stringWithContext`)
 
@@ -633,7 +633,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     contains all the packages named in `namesIncList` (the last argument)
 
-    # Arguments
+    ## Arguments
 
     `luaPath` (`function` or `stringWithContext`)
 
@@ -683,7 +683,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     `makeMultiOverlay` except it takes only 2 arguments.
 
-    # Arguments
+    ## Arguments
 
     `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
@@ -691,7 +691,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     `importName` (`string`)
     : overlay will yield `pkgs.${importName}.${packageName}`
 
-    # Example
+    ## Example
 
     ```nix
     easyMultiOverlayNamespaced self.packages.x86_64-linux.${packageName} packageName
@@ -712,12 +712,12 @@ with builtins; let lib = import ./lib.nix; in rec {
     makes a single overlay with all the packages
     in `packageDefinitions` from the package as `pkgs.${packageName}`
 
-    # Arguments
+    ## Arguments
 
     `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
 
-    # Example
+    ## Example
 
     ```nix
     easyMultiOverlay self.packages.x86_64-linux.${packageName}
@@ -736,12 +736,12 @@ with builtins; let lib = import ./lib.nix; in rec {
     makes a separate overlay for each of the packages
     in `packageDefinitions` from the package as `pkgs.${packageName}`
 
-    # Arguments
+    ## Arguments
 
     `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
 
-    # Example
+    ## Example
 
     ```nix
     easyMultiOverlay self.packages.x86_64-linux.${packageName}
