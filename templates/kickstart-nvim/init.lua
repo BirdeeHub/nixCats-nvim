@@ -496,7 +496,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         opts = {
           library = {
             -- adds type hints for nixCats global
-            { path = (require('nixCats').nixCatsPath or "") .. '/lua', words = { "nixCats" } },
+            { path = (nixCats.nixCatsPath or "") .. '/lua', words = { "nixCats" } },
           },
         }
       },
