@@ -46,6 +46,13 @@
       This is to serve as the tutorial for using the nixCats lazy wrapper.
     '';
   };
+  LazyVim = {
+    path = ./LazyVim;
+    description = ''
+      How to get the LazyVim distribution up and running
+      see the kickstart-nvim template for more info on the lazy wrapper or other utilities used.
+    '';
+  };
   overwrite = {
     path = ./overwrite;
     description = ''
