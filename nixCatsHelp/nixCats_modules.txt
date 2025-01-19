@@ -318,14 +318,5 @@ The read-only config value will be in the same set your other options are declar
 I have condensed it here, but notice at the end it outputs
 all the same options for each user when in a nixosModule as well?
 
-In addition, there are some config values that can be used to reference the
-configs made in the module
->nix
-  config.${defaultPackageName}.out.packages.<PACKAGE_NAME>
-<
-and if using the NixOS module there is ALSO
->nix
-  config.${defaultPackageName}.out.users.<USER_NAME>.packages.<PACKAGE_NAME>
-<
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
