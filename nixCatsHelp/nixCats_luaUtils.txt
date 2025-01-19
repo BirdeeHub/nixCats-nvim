@@ -171,7 +171,7 @@ All the rest of the setup will be done using the normal setup functions later,
 thus working regardless of what method loads the plugins.
 only stuff pertaining to downloading and building should be added to paq.
 >lua
-  require('nixCatsUtils.catPacker').setup({
+  require('NixCatsUtils.catPacker').setup({
     { "BirdeeHub/lze", },
     { "stevearc/oil.nvim", },
     { 'joshdick/onedark.vim', },
