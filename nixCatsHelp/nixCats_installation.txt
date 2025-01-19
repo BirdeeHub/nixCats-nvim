@@ -20,7 +20,7 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
 The flake template will be easiest to run from anywhere via `nix run`,
 and most self explanatory for new users.
 
-However, nixCats also offers modules.
+nixCats also offers modules to be used with NixOS, Home-Manager, and nix-darwin.
 
 If you wish to export the packages constructed
 by the module from your system flake as a package to be
@@ -48,6 +48,12 @@ but is slightly more difficult to install than using the module is for first tim
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixExpressionFlakeOutputs
 <
 Initializing a template will create a skeleton flake.nix or default.nix for you to fill in.
+
+All the above templates use the same builder function eventually. Either
+directly in the flake templates, or behind the scenes in the module one.
+
+So swapping between them is easy if you picked one you dont like for any
+reason.
 
 If you are unfamiliar with Neovim and want a ready-made starter config,
 you should instead use the following template:
