@@ -315,7 +315,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     });
 
   /**
-    see `:h nixCats.flake.outputs.utils.n2l`
+    see :h [nixCats.flake.outputs.utils.n2l](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.utils.n2l)
 
     you can use this to make values in the tables generated
     for the nixCats plugin using lua literals.
