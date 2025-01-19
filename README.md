@@ -143,7 +143,7 @@ unless you also add it to a `lazy.nvim` plugin spec
 ### Important note on package names
 
 You may launch your Neovim built via `nixCats` with any name you would like to choose.
-The default launch name is given by package name in `packageDefinitions`.
+The default launch name is given by package name in [`packageDefinitions`](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.packageDefinitions).
 
 In particular, the desktop file follows the package name, so programs like git will only know where to look if you set that as your `$EDITOR` variable.
 
@@ -177,7 +177,7 @@ Luckily you also don't need it.
 
 All Mason does is download it to your path, and call [`lspconfig`](https://github.com/neovim/nvim-lspconfig) on the result.
 
-You can install them via the `lspsAndRuntimeDeps` field in your `categoryDefinitions`.
+You can install them via the `lspsAndRuntimeDeps` field in your [`categoryDefinitions`](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.categories).
 
 Then call [`lspconfig`](https://github.com/neovim/nvim-lspconfig) yourself in your Lua.
 
