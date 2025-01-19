@@ -22,10 +22,11 @@ and most self explanatory for new users.
 
 However, nixCats also offers modules.
 
-Unfortunately, using the module, if you wish to export
-the packages constructed by the module from your system flake
-to run via `nix run`, you will need to grab them from the config variable of
+If you wish to export the packages constructed
+by the module from your system flake as a package to be
+ran via `nix run`, you will need to grab them from the config variable of
 your finished system configuration.
+Instructions for doing this are at :h |nixCats.module|
 >bash
   # home-manager module template:
   nix flake init -t github:BirdeeHub/nixCats-nvim#home-manager
