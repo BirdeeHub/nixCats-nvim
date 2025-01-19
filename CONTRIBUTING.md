@@ -7,11 +7,11 @@
 - Help with docs and readme! I find writing docs hard.
   Being clear in writing and getting your point across is an art.
 
-- If you suspect a bug, please leave an [issue](https://github.com/BirdeeHub/nixCats-nvim/issues) so that we can address it.
+- If you suspect a bug, please leave an [issue](https://github.com/BirdeeHub/nixCats-nvim/issues) (or a PR if you know what it is) so that we can address it.
 
 - Improving and standardising the templates.
 
-- Adding tests.
+- Adding more tests.
 
 See below sections for more details.
 Any other contributions and fixes are also welcome.
@@ -39,7 +39,9 @@ The README is converted using Pandoc and GitHub Flavored Markdown.
 - The site generation for the in-editor docs will look exactly how it does in the editor,
 and helptag links will work.
 
-The in-editor docs are generated into html using a nixCats neovim package. Yes, you heard that right.
+The in-editor docs are generated into html using a nixCats neovim package.
+
+Yes, you heard that right. As I said, they will look exactly how they do in the editor.
 
 Some other docs such as the templates, nix utils, and module helps are generated from the code via other techniques such as nix-doc
 
@@ -47,8 +49,6 @@ Some other docs such as the templates, nix utils, and module helps are generated
 
 I would like to drastically improve the help and templates for modules,
 and encourage most people to set up nixCats either as a module or a separate flake.
-
-The modules are much nicer now that they merge properly.
 
 But I am not sure the best way to explain how to export
 the result of a module from your system flake so you can run it via `nix run`
@@ -60,9 +60,17 @@ You can find it in the REPL, under nixCats.out.packages in the correct config se
 self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
 ```
 
-The reason I am having trouble explaining this, is because you can change the modulenamespace of the nixCats options.
+The reason I am having trouble explaining this, is because you can change the module namespace of the nixCats options.
+
+It could be at `self.homeConfigurations."<home_config_name>".config.mysupercoolmodules.my-neovim.out.packages.<packagename>` or whatever.
+
+Or even `self.legacyPackages.x86_64-linux.homeConfigurations."<home_config_name>".config.mysupercoolmodules.my-neovim.out.packages.<packagename>`.
 
 It's a cool feature but how do I explain that now...
+
+The module namespace can be set when you call `utils.mkNixosModules` or `utils.mkHomeModules`
+
+and how to grab it from your config depends on where your config gets exported from your flake.
 
 I welcome any help in making this happen.
 
