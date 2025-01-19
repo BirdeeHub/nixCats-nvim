@@ -4,9 +4,10 @@
 
 - If you have any questions that you don't think are bugs, please post them in [discussions](https://github.com/BirdeeHub/nixCats-nvim/discussions) so that others may benefit from any answers in the future.
 
-- If you suspect a bug, please leave an [issue](https://github.com/BirdeeHub/nixCats-nvim/issues) so that we can address it.
+- Help with docs and readme! I find writing docs hard.
+  Being clear in writing and getting your point across is an art.
 
-- PLEASE HELP WITH DOCS AND README!!!
+- If you suspect a bug, please leave an [issue](https://github.com/BirdeeHub/nixCats-nvim/issues) so that we can address it.
 
 - Improving and standardising the templates.
 
@@ -24,8 +25,6 @@ Thank you!!!
 
 ### Documentation
 
-I'm just trying to get information on the page as best as I can.
-
 The in-editor help is defined in [nixCatsHelp](./nixCatsHelp).
 
 The [nixCats website](https://nixcats.org) is automatically generated from the help files and the main [README](./README.md).
@@ -40,8 +39,9 @@ The README is converted using Pandoc and GitHub Flavored Markdown.
 - The site generation for the in-editor docs will look exactly how it does in the editor,
 and helptag links will work.
 
-So feel free to just send any changes to those my way.
-I won't make you work with my bespoke nvim-based site-gen, but it works quite well!
+The in-editor docs are generated into html using a nixCats neovim package. Yes, you heard that right.
+
+Some other docs such as the templates, nix utils, and module helps are generated from the code via other techniques such as nix-doc
 
 ### Templates
 
@@ -49,23 +49,20 @@ I would like to drastically improve the help and templates for modules,
 and encourage most people to set up nixCats either as a module or a separate flake.
 
 The modules are much nicer now that they merge properly.
-You can get the packages from the module to export from your system flake;
-this is documented (perhaps incorrectly) at the end of the module help file.
 
-But basically you can grab it from your config set via `self` in the flake.
+But I am not sure the best way to explain how to export
+the result of a module from your system flake so you can run it via `nix run`
+
+You can grab it from your config set via `self` in the flake.
 You can find it in the REPL, under nixCats.out.packages in the correct config set.
 
 ```nix
 self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
 ```
 
-- In particular, I would like to feature the [nixExpressionFlakeOutputs](./templates/nixExpressionFlakeOutputs) template less heavily.
+The reason I am having trouble explaining this, is because you can change the modulenamespace of the nixCats options.
 
-I feel that providing proper help for these two options as a main path of installation
-provides a better onboarding path for new users.
-They are likely to be familiar with modules
-and standalone flakes, but not weird mixes of the two.
-I feel like throwing in the weird mix as an option just confuses people.
+It's a cool feature but how do I explain that now...
 
 I welcome any help in making this happen.
 
