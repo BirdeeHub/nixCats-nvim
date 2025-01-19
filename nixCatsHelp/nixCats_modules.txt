@@ -3,7 +3,8 @@ Nix OS Module                                    *nixCats.module*
                                   *nixCats.module.mkNixosModules*
                                    *nixCats.module.mkHomeModules*
 
-We create the module by exporting the following in our flake outputs.
+We can create modules based on a configuration
+by exporting the following in our flake outputs.
 
 <mkNixosModules> {
     defaultPackageName = "nixCats";
@@ -30,10 +31,12 @@ This means if `moduleNamespace = [ "my_mods" "nixCats" ];`
 Then you would `my_mods.nixCats.enable = true;`
 and `my_mods.nixCats.packageNames = [ "package" "names" "toinstall" ];`
 
+More specifically, the options will be here:
+>nix
+  options = with lib; lib.setAttrByPath moduleNamespace ({ /* nixCats options */ });
+<
+
 If you do not have a luaPath, you may pass it a keepLua builder.
-utils.mkNixosModules exports a NixOS module with the following options,
-and utils.mkHomeModules exports a Home Manager module with the SAME EXACT options
-as the NixOS module has for system, but for the user managed by Home Manager.
 
 IMPORTANT
 By default, the module inherits pkgs.config from the system's pkgs object,
@@ -41,7 +44,15 @@ and its overlays AND the flake's overlays and nixCats config,
 as well as the flake's nixpkgs source (by default).
 It will inherit things from your system,
 but your system will not inherit things from nixCats,
-other than the packages themselves in config.${defaultPackageName}.out.
+other than the packages themselves in config.${defaultPackageName}.out
+
+-------------------------------------------------------------------------------
+Module Options
+
+Home-Manager https://nixcats.org/nixCats_hm_options.html
+
+NixOS and nix-darwin https://nixcats.org/nixCats_nixos_options.html
+Same options as home manager but also has the same options defineable per user
 
 -------------------------------------------------------------------------------
 Accessing the finished packages for running via nix run
@@ -78,245 +89,5 @@ set the `moduleNamespace` to whatever you want.
 This will also change where you grab the package from.
 The read-only config value will be in the same set your other options are declared in.
 
--------------------------------------------------------------------------------
-
->nix
-  options = with lib; {
-
-    # Set these with ${defaultPackageName} in your configuration.nix
-    ${defaultPackageName} = {
-
-      nixpkgs_version = mkOption {
-        default = null;
-        type = types.nullOr (types.anything);
-        description = ''
-          A different nixpkgs import to use. By default will use the one from the flake, or `pkgs.path`.
-        '';
-        example = ''
-          nixpkgs_version = inputs.nixpkgs
-        '';
-      };
-
-      addOverlays = mkOption {
-        default = [];
-        type = (types.listOf types.anything);
-        description = ''
-          A list of overlays to make available to any nixCats package from this module but not to your system.
-          Will have access to system overlays regardless of this setting.
-        '';
-        example = (lib.literalExpression ''
-          addOverlays = [ (self: super: { nvimPlugins = { pluginDerivationName = pluginDerivation; }; }) ]
-        '');
-      };
-
-      enable = mkOption {
-        default = false;
-        type = types.bool;
-        description = "Enable the ${defaultPackageName} module.";
-      };
-
-      dontInstall = mkOption {
-        default = false;
-        type = types.bool;
-        description = ''
-          If true, do not output to packages list,
-          output only to config.${defaultPackageName}.out.
-        '';
-      };
-
-      luaPath = mkOption {
-        default = luaPath;
-        type = types.oneOf [ types.str types.path ];
-        description = (literalExpression ''
-          The path to your Neovim config directory in the store.
-          In the base nixCats flake, this is "${./.}".
-        '');
-        example = (literalExpression "${./.}/userLuaConfig");
-      };
-
-      packageNames = mkOption {
-        default = if packageDefinitions ? defaultPackageName then [ "${defaultPackageName}" ] else [];
-        type = (types.listOf types.str);
-        description = ''A list of packages from packageDefinitions to include.'';
-        example = ''
-          packageNames = [ "nixCats" ]
-        '';
-      };
-
-      categoryDefinitions = {
-        existing = mkOption {
-          default = "replace";
-          type = types.enum [ "replace" "merge" "discard" ];
-          description = ''
-            The merge strategy to use for categoryDefinitions inherited from the package this module was based on.
-            Choose between "replace", "merge" or "discard":
-            - replace uses utils.mergeCatDefs
-            - merge uses utils.deepmergeCats
-            - discard does not inherit.
-            See :help nixCats.flake.outputs.exports for more info on the merge strategy options.
-          '';
-        };
-        replace = mkOption {
-          default = null;
-          type = types.nullOr (catDef "replace");
-          description = (literalExpression ''
-            See :help nixCats.flake.outputs.categories.
-            Uses utils.mergeCatDefs to recursively update old categories with new values.
-            See :help nixCats.flake.outputs.exports for more info on the merge strategy options.
-          '');
-          example = ''
-            # see :help nixCats.flake.outputs.categories
-            categoryDefinitions.replace = { pkgs, settings, categories, name, ... }@packageDef: { }
-          '';
-        };
-        merge = mkOption {
-          default = null;
-          type = types.nullOr (catDef "merge");
-          description = ''
-            See :help nixCats.flake.outputs.categories.
-            Uses utils.deepmergeCats to recursively update and merge category lists if duplicates are defined.
-            See :help nixCats.flake.outputs.exports for more info on the merge strategy options.
-          '';
-          example = ''
-            # see :help nixCats.flake.outputs.categories
-            categoryDefinitions.merge = { pkgs, settings, categories, name, ... }@packageDef: { }
-          '';
-        };
-      };
-
-      packageDefinitions = {
-        existing = mkOption {
-          default = "replace";
-          type = types.enum [ "replace" "merge" "discard" ];
-          description = ''
-            The merge strategy to use for packageDefinitions inherited from the package this module was based on.
-            Choose between "replace", "merge" or "discard":
-            - replace uses utils.mergeCatDefs
-            - merge uses utils.deepmergeCats
-            - discard does not inherit.
-            See :help nixCats.flake.outputs.exports for more info on the merge strategy options.
-          '';
-        };
-        merge = mkOption {
-          default = null;
-          description = ''
-            VERY IMPORTANT when setting aliases for each package,
-            they must not be the same as ANY other Neovim package for that user.
-            It will cause a build conflict.
-
-            You can have as many nixCats installed per user as you want,
-            as long as you obey that rule.
-
-            For information on the values you may return,
-            see :help nixCats.flake.outputs.settings
-            and :help nixCats.flake.outputs.categories
-          '';
-          type = with types; nullOr (attrsOf (catDef "merge"));
-          example = ''
-            nixCats.packages = { 
-              nixCats = { pkgs, ... }: {
-                settings = {
-                  wrapRc = true;
-                  configDirName = "nixCats-nvim";
-                  # nvimSRC = inputs.neovim;
-                  aliases = [ "vim" "nixCats" ];
-                };
-                categories = {
-                  generalBuildInputs = true;
-                  markdown = true;
-                  gitPlugins = true;
-                  general = true;
-                  custom = true;
-                  neonixdev = true;
-                  debug = false;
-                  test = true;
-                  lspDebugMode = false;
-                  themer = true;
-                  colorscheme = "onedark";
-                };
-              };
-            }
-          '';
-        };
-        replace = mkOption {
-          default = null;
-          description = ''
-            VERY IMPORTANT when setting aliases for each package,
-            they must not be the same as ANY other Neovim package for that user.
-            It will cause a build conflict.
-
-            You can have as many nixCats installed per user as you want,
-            as long as you obey that rule.
-
-            For information on the values you may return,
-            see :help nixCats.flake.outputs.settings
-            and :help nixCats.flake.outputs.categories
-          '';
-          type = with types; nullOr (attrsOf (catDef "replace"));
-          example = ''
-            nixCats.packages = { 
-              nixCats = { pkgs, ... }: {
-                settings = {
-                  wrapRc = true;
-                  configDirName = "nixCats-nvim";
-                  # nvimSRC = inputs.neovim;
-                  aliases = [ "vim" "nixCats" ];
-                };
-                categories = {
-                  generalBuildInputs = true;
-                  markdown = true;
-                  gitPlugins = true;
-                  general = true;
-                  custom = true;
-                  neonixdev = true;
-                  debug = false;
-                  test = true;
-                  lspDebugMode = false;
-                  themer = true;
-                  colorscheme = "onedark";
-                };
-              };
-            }
-          '';
-        };
-      };
-
-      # in addition, the NixOS module also has per-user options if desired.
-
-      users = mkOption {
-        default = {};
-        description = ''
-          Same as system config but per user instead.
-        '';
-        type = with types; attrsOf (submodule {
-          options = {
-            enable = mkOption {
-              default = false;
-              type = types.bool;
-              description = "Enable the ${defaultPackageName} module for a user";
-            };
-
-            luaPath = mkOption {
-              default = luaPath;
-              type = types.str;
-              description = ''
-                The path to your Neovim config directory in the store.
-                In the base nixCats flake, this is "''${./.}".
-              '';
-              example = ''"''${./.}/userLuaConfig"'';
-            };
-
-            # the same options but per user....
-            # Not shown here because its the same.
-          };
-        });
-      };
-    };
-  };
-<
-
-I have condensed it here, but notice at the end it outputs
-all the same options for each user when in a nixosModule as well?
-
----------------------------------------------------------------------------------------
+=================================================================================
 vim:tw=78:ts=8:ft=help:norl:
