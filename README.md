@@ -56,7 +56,7 @@ which aim to "nixify" Neovim as much as possible.
 
 The end result ends up being very comparable to
 &mdash; if not better than &mdash;
-using a regular Neovim package manager + [Mason](https://github.com/williamboman/mason.nvim).
+using a regular Neovim package manager + [Mason](#mason).
 And it is much more portable.
 
 It also avoids falling into the trap of trying to make a module for every plugin somebody might want to use.
@@ -169,9 +169,9 @@ Also, familiarize yourself with the [flake schema](https://nixos.wiki/wiki/Flake
 
 This knowledge will be useful when installing flake based nixCats configurations into your main configuration.
 
-### [Mason](https://github.com/williamboman/mason.nvim)
+### [Mason](https://github.com/williamboman/mason.nvim) <a name="mason"></a>
 
-Mason does readily not work on NixOS (although it does on other OS options).
+Mason does not readily work on NixOS (although it does on other OS options).
 
 Luckily you also don't need it.
 
