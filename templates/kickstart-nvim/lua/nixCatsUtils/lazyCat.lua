@@ -1,4 +1,12 @@
+--[[
+  This directory is the luaUtils template.
+  You can choose what things from it that you would like to use.
+  And then delete the rest.
+  Everything in this directory is optional.
+--]]
+
 local M = {}
+-- NOTE: If you don't use lazy.nvim, you don't need this file.
 
 ---lazy.nvim wrapper
 ---@overload fun(nixLazyPath: string|nil, lazySpec: any, opts: table)

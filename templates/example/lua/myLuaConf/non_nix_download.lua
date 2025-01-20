@@ -4,6 +4,9 @@
 -- and you should keep any setup functions
 -- OUT of that file, as they are ONLY loaded when this
 -- configuration is NOT loaded via nix.
+
+-- again, you dont need this file if you only use nix to load the config,
+-- this is a fallback only, and is optional.
 require('nixCatsUtils.catPacker').setup({
 --[[ ------------------------------------------ ]]
 --[[ The way to think of this is, its very      ]]

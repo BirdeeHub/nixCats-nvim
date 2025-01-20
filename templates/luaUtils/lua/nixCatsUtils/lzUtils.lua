@@ -1,4 +1,15 @@
+--[[
+  This directory is the luaUtils template.
+  You can choose what things from it that you would like to use.
+  And then delete the rest.
+  Everything in this directory is optional.
+--]]
+
 local M = {}
+-- NOTE: This file contains 2 utilities for making good use of lze and lz.n with nixCats
+-- The function for loading after directories is useful for both plugins, and also for lazy loading without a plugin,
+-- but the custom handler will only work with lze.
+-- If you dont use these plugins, you probably don't need this file.
 
 ---This function is useful for sourcing the after directories of lazily loaded plugins
 ---because vim.cmd.packadd does not do this for you.

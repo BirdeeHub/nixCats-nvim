@@ -1,4 +1,15 @@
+--[[
+  This directory is the luaUtils template.
+  You can choose what things from it that you would like to use.
+  And then delete the rest.
+  Everything in this directory is optional.
+--]]
+
 local M = {}
+-- NOTE: This function is for defining a paq.nvim fallback method of downloading plugins
+-- when nixCats was not used to install your config.
+-- If you only ever load your config using nixCats, you don't need this file.
+
 -- it literally just only runs it when not on nixCats
 -- all neovim package managers that use the regular plugin loading scheme
 -- can be used this way, just do whatever the plugin manager needs to put it in the

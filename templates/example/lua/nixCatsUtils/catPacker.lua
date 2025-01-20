@@ -1,25 +1,41 @@
+--[[
+  This directory is the luaUtils template.
+  You can choose what things from it that you would like to use.
+  And then delete the rest.
+  Everything in this directory is optional.
+--]]
+
 local M = {}
+-- NOTE: This function is for defining a paq.nvim fallback method of downloading plugins
+-- when nixCats was not used to install your config.
+-- If you only ever load your config using nixCats, you don't need this file.
+
 -- it literally just only runs it when not on nixCats
 -- all neovim package managers that use the regular plugin loading scheme
 -- can be used this way, just do whatever the plugin manager needs to put it in the
 -- opt directory for lazy loading, and add the build steps so that when theres no nix the steps are ran
 function M.setup(v)
   if not require('nixCatsUtils').isNixCats then
-    local function bootstrap_paq()
-      local paq_path = vim.fn.stdpath("data") .. "/site/pack/paqs/start/paq-nvim"
 
-      if not vim.loop.fs_stat(paq_path) then
-        vim.fn.system({ "git", "clone", "--depth=1", "https://github.com/savq/paq-nvim.git", paq_path })
+    local function bootstrap_pckr()
+      local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
+
+      if not vim.loop.fs_stat(pckr_path) then
+        vim.fn.system({
+          'git',
+          'clone',
+          "--filter=blob:none",
+          'https://github.com/lewis6991/pckr.nvim',
+          pckr_path
+        })
       end
 
-      vim.opt.rtp:prepend(paq_path)
+      vim.opt.rtp:prepend(pckr_path)
     end
 
-    bootstrap_paq()
-    vim.cmd.packadd("paq-nvim")
-    local paq = require("paq")
-    paq(v)
-    paq.install()
+    bootstrap_pckr()
+
+    require('pckr').add(v)
   end
 end
 return M
