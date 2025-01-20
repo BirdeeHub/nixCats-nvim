@@ -10,7 +10,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     ## Arguments
 
     ### **luaPath** (`path` or `stringWithContext`)
-      STORE PATH to your `~/.config/nvim` replacement.
+    STORE PATH to your `~/.config/nvim` replacement.
 
     ### **pkgsParams** (`AttrSet`)
     set of items for building the pkgs that builds your neovim.
