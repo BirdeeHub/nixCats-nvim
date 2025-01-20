@@ -1,8 +1,13 @@
 ---------------------------------------------------------------------------------------
 INSTALLATION:                                                   *nixCats.installation_options*
 
+Try it out! Run the example config with the following:
 >bash
   nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
+
+  # NOTE: If using zsh with extendedglob AND nomatch turned on,
+  # you will need to escape the #
+
   # then launch with
   nixCats
 <
@@ -15,9 +20,6 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
   # Choose one of the following:
   # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
-
-  # NOTE: If using zsh with extendedglob AND nomatch turned on,
-  # you will need to escape the #
 <
 The flake template will be easiest to run from anywhere via `nix run`,
 and most self explanatory for new users.
