@@ -145,9 +145,11 @@ stdenv.mkDerivation {
   # Remove the symlinks created by symlinkJoin which we need to perform
   # extra actions upon
   # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
-  postBuild = lib.optionalString stdenv.isLinux ''
-    mkdir -p $out/share/applications
+  postBuild = ''
     mkdir -p $out/bin
+  ''
+  + lib.optionalString stdenv.isLinux ''
+    mkdir -p $out/share/applications
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
       --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
       --replace-fail 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
