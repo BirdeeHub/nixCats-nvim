@@ -4,7 +4,6 @@ INSTALLATION:                                                   *nixCats.install
 Try it out! Run the example config with the following:
 >bash
   nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
-
   # then launch with
   nixCats
 <
