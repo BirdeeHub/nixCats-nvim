@@ -15,7 +15,9 @@ run your choice of the following commands (don't worry! It doesnt overwrite):
   # Choose one of the following:
   # flake template:
   nix flake init -t github:BirdeeHub/nixCats-nvim
-  # If using zsh with extra regexing, be sure to escape the #
+
+  # NOTE: If using zsh with extendedglob AND nomatch turned on,
+  # you will need to escape the #
 <
 The flake template will be easiest to run from anywhere via `nix run`,
 and most self explanatory for new users.
