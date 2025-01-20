@@ -5,9 +5,6 @@ Try it out! Run the example config with the following:
 >bash
   nix shell github:BirdeeHub/nixCats-nvim?dir=templates/example
 
-  # NOTE: If using zsh with extendedglob AND nomatch turned on,
-  # you will need to escape the #
-
   # then launch with
   nixCats
 <
@@ -36,6 +33,9 @@ Instructions for doing this are at :h |nixCats.module|
   nix flake init -t github:BirdeeHub/nixCats-nvim#home-manager
   # nixos/nix-darwin module template:
   nix flake init -t github:BirdeeHub/nixCats-nvim#nixos
+
+  # NOTE: If using zsh with extendedglob AND nomatch turned on,
+  # you will need to escape the #
 <
 
 And this method, called the nixExpressionFlakeOutputs is somewhere in between.
