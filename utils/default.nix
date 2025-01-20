@@ -13,57 +13,57 @@ with builtins; let lib = import ./lib.nix; in rec {
       STORE PATH to your `~/.config/nvim` replacement.
 
     ### **pkgsParams** (`AttrSet`)
-      set of items for building the pkgs that builds your neovim.
+    set of items for building the pkgs that builds your neovim.
 
-      - accepted attributes are:
+    accepted attributes are:
 
-      `nixpkgs` (`path` | `input` | `channel`)
-      : required. allows path, input, or channel
-      : channel means a resolved pkgs variable
-      : will not grab overlays from pkgs type variable
-      : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
+    - `nixpkgs` (`path` | `input` | `channel`)
+    : required. allows path, input, or channel
+    : channel means a resolved pkgs variable
+    : will not grab overlays from pkgs type variable
+    : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
 
-      `system` (`string`)
-      : required unless nixpkgs is a resolved channel
-      : or using --impure argument
+    - `system` (`string`)
+    : required unless nixpkgs is a resolved channel
+    : or using --impure argument
 
-      `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
-      : default = null
+    - `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
+    : default = null
 
-      `extra_pkg_config` (`AttrSet`)
-      : default = {}
-      : the attrset passed to:
-      : `import nixpkgs { config = extra_pkg_config; inherit system; }`
+    - `extra_pkg_config` (`AttrSet`)
+    : default = {}
+    : the attrset passed to:
+    : `import nixpkgs { config = extra_pkg_config; inherit system; }`
 
-      `nixCats_passthru` (`AttrSet`)
-      : default = {}
-      : attrset of extra stuff for finalPackage.passthru
+    - `nixCats_passthru` (`AttrSet`)
+    : default = {}
+    : attrset of extra stuff for finalPackage.passthru
 
     ### **categoryDefinitions** (`functionTo` `AttrSet`)
-      type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
-      returns: set of sets of categories of dependencies
+    type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
+    returns: set of sets of categories of dependencies
 
-      see `:h nixCats.flake.outputs.categories`
+    see `:h nixCats.flake.outputs.categories`
 
     ### **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
-      set of functions that each represent the settings and included categories for a package.
+    set of functions that each represent the settings and included categories for a package.
 
-      ```nix
-      {
-        nvim = { pkgs, mkNvimPlugin, ... }: {
-          settings = {};
-          categories = {};
-          extra = {};
-        };
-      }
-      ```
+    ```nix
+    {
+      nvim = { pkgs, mkNvimPlugin, ... }: {
+        settings = {};
+        categories = {};
+        extra = {};
+      };
+    }
+    ```
 
-      see `:h nixCats.flake.outputs.packageDefinitions`
+    see `:h nixCats.flake.outputs.packageDefinitions`
 
-      see `:h nixCats.flake.outputs.settings`
+    see `:h nixCats.flake.outputs.settings`
 
     ### **name** (`string`)
-      name of the package to build from `packageDefinitions`
+    name of the package to build from `packageDefinitions`
 
     ## Note:
 
