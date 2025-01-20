@@ -147,6 +147,7 @@ stdenv.mkDerivation {
   # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
   postBuild = lib.optionalString stdenv.isLinux ''
     mkdir -p $out/share/applications
+    mkdir -p $out/bin
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
       --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
       --replace-fail 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
