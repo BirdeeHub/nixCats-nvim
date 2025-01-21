@@ -28,6 +28,7 @@ let
   mkNvimPlugin = src: pname:
     pkgs.vimUtils.buildVimPlugin {
       inherit pname src;
+      doCheck = false;
       version = builtins.toString (src.lastModifiedDate or "master");
     };
   thisPackage = packageDefinitions.${name} { inherit pkgs mkNvimPlugin; };

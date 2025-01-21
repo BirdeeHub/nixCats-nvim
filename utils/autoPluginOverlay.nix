@@ -21,6 +21,7 @@
     buildPlug = name: buildVimPlugin rec {
       pname = plugName name;
       src = builtins.getAttr name inputs;
+      doCheck = false;
       version = toString (src.lastModified or "master");
     };
   in
@@ -50,6 +51,7 @@
     buildPlug = name: buildVimPlugin rec {
       pname = plugName name;
       src = builtins.getAttr name inputs;
+      doCheck = false;
       version = toString (src.lastModified or "master");
     };
   in
