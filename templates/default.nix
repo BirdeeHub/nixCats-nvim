@@ -45,7 +45,7 @@
       An idiomatic nixCats example configuration using
       lze for lazy loading and paq.nvim for backup when not using nixCats-nvim.
 
-      See also https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example#README.md.
+      See also [templates/example/README.md](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/example/README.md).
       '';
   };
   kickstart-nvim = {
@@ -55,7 +55,7 @@
       With additional Nix LSPs for editing the Nix part.
       This is to serve as the tutorial for using the nixCats lazy wrapper.
 
-      See also https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/kickstart-nvim#README.md.
+      See also [templates/kickstart-nvim/README.md](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/kickstart-nvim/README.md).
     '';
   };
   LazyVim = {
