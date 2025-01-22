@@ -101,22 +101,22 @@
     recursiveUpdatePickShallower = recUpUntilWpicker {
       picker = left: right: if ! isAttrs left then left else right; };
 
-    applyExtraCatsInternal = prev: xtracats: pkgcats: let
-      filteredCatPaths = filterAndFlatten pkgcats xtracats;
+    applyExtraCatsInternal = prev: xtracats: let
+      filteredCatPaths = filterAndFlatten prev xtracats;
       # remove if already included
       checkPath = atpath: if atpath == [] then true
-        else if lib.attrByPath atpath null pkgcats == true
+        else if lib.attrByPath atpath null prev == true
         then false
         else checkPath (lib.init atpath);
       filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
       toMerge = map (v: lib.setAttrByPath v true) filtered;
-      firstRes = foldl' recursiveUpdatePickShallower {} (toMerge ++ [ pkgcats ]);
+      firstRes = foldl' recursiveUpdatePickShallower {} (toMerge ++ [ prev ]);
       # recurse until it doesnt change, so that values applying
       # to the newly enabled categories can have an effect.
     in if firstRes == prev then firstRes
-      else applyExtraCatsInternal firstRes xtracats firstRes;
+      else applyExtraCatsInternal firstRes xtracats;
 
   in if extraCats == {} then packageCats
-    else applyExtraCatsInternal packageCats extraCats packageCats;
+    else applyExtraCatsInternal packageCats extraCats;
 
 }
