@@ -126,9 +126,4 @@ function M.lazyAdd(v, o)
   end
 end
 
----Useful for things such as vim-startuptime which must reference the wrapper's actual path
----If not using nix, this will simply return vim.v.progpath
----@type string
-M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
-
 return M

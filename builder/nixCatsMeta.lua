@@ -22,6 +22,7 @@ error("Cannot import a meta module")
 ---@field nixCatsPath string
 ---@field vimPackDir string
 ---@field configDir string
+---Useful for things such as vim-startuptime which must reference the wrapper's actual path
 ---@field packageBinPath string
 ---internal: this creates the nixCats global commands
 ---@field addGlobals fun() 
