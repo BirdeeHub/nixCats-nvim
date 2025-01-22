@@ -91,7 +91,11 @@ The Nix Category scheme is simple:
 Your package definitions are not only how you enable categories per package,
 but they also allow you to pass arbitrary information to Neovim, and grab it just as easily.
 
-No more wondering how you are going to get info into lua without ruining your normal neovim directory by writing lua in nix strings!
+Simply put your Nix data into the set in your package definitions, and access it in Lua as a Lua data structure.
+
+You can pass anything that is not an _uncalled_ Nix function. Lua interpreters can't run Nix code.
+
+No more wondering how you are going to get info into Lua without ruining your normal Neovim directory by writing Lua in nix strings!
 
 - If you like the normal Neovim configuration scheme,
   but want your config to be runnable via `nix run` and have an easier time dealing with dependency issues,
