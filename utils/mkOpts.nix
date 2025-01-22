@@ -7,6 +7,7 @@
   , luaPath ? ""
   , packageDefinitions ? {}
   , nclib
+  , utils
 }:
 { lib, ... }: let
   catDef = nclib.mkCatDefType lib.mkOptionType false;
@@ -214,6 +215,13 @@ in {
             }
           '';
         };
+      };
+
+      utils = mkOption {
+        default = utils;
+        type = types.attrsOf types.anything;
+        readOnly = true;
+        description = "nixCats utils set";
       };
 
       out = {

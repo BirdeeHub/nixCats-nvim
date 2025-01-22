@@ -18,7 +18,7 @@
 { config, pkgs, lib, ... }: {
 
   imports = [ (import ./mkOpts.nix {
-    inherit nclib defaultPackageName luaPath packageDefinitions isHomeManager moduleNamespace;
+    inherit utils nclib defaultPackageName luaPath packageDefinitions isHomeManager moduleNamespace;
   }) ];
 
   config = let
