@@ -101,8 +101,8 @@
     recursiveUpdatePickShallower = recUpUntilWpicker {
       picker = left: right: if ! isAttrs left then left else right; };
 
-    applyExtraCatsInternal = prev: xtracats: let
-      filteredCatPaths = filterAndFlatten prev xtracats;
+    applyExtraCatsInternal = prev: let
+      filteredCatPaths = filterAndFlatten prev extraCats;
       # remove if already included
       checkPath = atpath: if atpath == [] then true
         else if lib.attrByPath atpath null prev == true
@@ -114,9 +114,9 @@
       # recurse until it doesnt change, so that values applying
       # to the newly enabled categories can have an effect.
     in if firstRes == prev then firstRes
-      else applyExtraCatsInternal firstRes xtracats;
+      else applyExtraCatsInternal firstRes;
 
   in if extraCats == {} then packageCats
-    else applyExtraCatsInternal packageCats extraCats;
+    else applyExtraCatsInternal packageCats;
 
 }
