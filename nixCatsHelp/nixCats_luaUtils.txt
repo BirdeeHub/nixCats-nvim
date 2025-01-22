@@ -82,11 +82,6 @@ it also has a few other things that may prove handy
   require('nixCatsUtils').getCatOrDefault(v, default)
   -- If Nix, return value of nixCats(v) else return default.
   -- Exists to specify a different non_nix_value than the one in setup().
-
-  ---@type string
-  require('nixCatsUtils').packageBinPath
-  -- Useful for things such as vim-startuptime which must reference the wrapper's actual path.
-  -- If not using Nix, this will simply return vim.v.progpath.
 <
 ---------------------------------------------------------------------------------
                                                        *nixCats.luaUtils.lazy*
