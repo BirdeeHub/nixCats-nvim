@@ -221,6 +221,7 @@ in {
         default = utils;
         type = types.attrsOf types.anything;
         readOnly = true;
+        visible = false;
         description = "nixCats utils set";
       };
 
