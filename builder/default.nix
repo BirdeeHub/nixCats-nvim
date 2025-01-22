@@ -24,13 +24,15 @@ let
     { inherit system config overlays; }
   else import ./builder_error.nix;
 
-  ncTools = pkgs.callPackage ./ncTools.nix { };
   mkNvimPlugin = src: pname:
     pkgs.vimUtils.buildVimPlugin {
       inherit pname src;
       doCheck = false;
       version = builtins.toString (src.lastModifiedDate or "master");
     };
+
+  ncTools = pkgs.callPackage ./ncTools.nix { };
+
   thisPackage = packageDefinitions.${name} { inherit pkgs mkNvimPlugin; };
   settings = {
     wrapRc = true;
@@ -90,153 +92,149 @@ let
 
   categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
   extraTableLua = thisPackage.extra or {};
+  all_cat_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
+
+  # this is what allows for dynamic packaging in flake.nix
+  # It includes categories marked as true, then flattens to a single list
+  filterAndFlatten = ncTools.filterAndFlatten categories;
+  # For wrapperArgs:
+  # This one filters and flattens like above but for attrs of attrs 
+  # and then maps name and value
+  # into a list based on the function we provide it.
+  # its like a flatmap function but with a built in filter for category.
+  filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
+  # This one filters and flattens attrs of lists and then maps value
+  # into a list of strings based on the function we provide it.
+  # it the same as above but for a mapping function with 1 argument
+  # because the inner is a list not a set.
+  filterAndFlattenMapInner = ncTools.filterAndFlattenMapInner categories;
+
+  # and then applied to give us a 1 argument function:
+
+  FandF_envVarSet = filterAndFlattenMapInnerAttrs 
+        (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]);
+
+  # extraPythonPackages and the like require FUNCTIONS that return lists.
+  # so we make a function that returns a function that returns lists.
+  # this is used for the fields in the wrapper where the default value is (_: [])
+  combineCatsOfFuncs = section:
+    (x: let
+      appliedfunctions = filterAndFlattenMapInner (value: value x ) section;
+      combinedFuncRes = builtins.concatLists appliedfunctions;
+      uniquifiedList = pkgs.lib.unique combinedFuncRes;
+    in
+    uniquifiedList);
+
+  # see :help nixCats
+  # this function gets passed all the way into the wrapper so that we can also add
+  # other dependencies that get resolved later in the process such as treesitter grammars.
+  nixCats = allPluginDeps: pkgs.stdenv.mkDerivation (let
+    isUnwrappedCfgPath = settings.wrapRc == false && builtins.isString settings.unwrappedCfgPath;
+    isStdCfgPath = settings.wrapRc == false && ! builtins.isString settings.unwrappedCfgPath;
+
+    nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
+      else if isStdCfgPath then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
+      else "${luaPath}";
+
+    categoriesPlus = categories // {
+      nixCats_wrapRc = settings.wrapRc;
+      nixCats_packageName = name;
+      inherit nixCats_config_location;
+    };
+    settingsPlus = settings // {
+      nixCats_packageName = name;
+      inherit nixCats_config_location;
+    };
+
+    cats = ncTools.mkLuaFileWithMeta "cats.lua" categoriesPlus;
+    settingsTable = ncTools.mkLuaFileWithMeta "settings.lua" settingsPlus;
+    petShop = ncTools.mkLuaFileWithMeta "petShop.lua" all_cat_names;
+    depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
+    extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
+  in {
+    name = "nixCats";
+    builder = pkgs.writeText "builder.sh" /*bash*/ ''
+      source $stdenv/setup
+      mkdir -p $out/lua/nixCats
+      mkdir -p $out/doc
+      cp ${./nixCats.lua} $out/lua/nixCats/init.lua
+      cp ${./nixCatsMeta.lua} $out/lua/nixCats/meta.lua
+      cp ${cats} $out/lua/nixCats/cats.lua
+      cp ${settingsTable} $out/lua/nixCats/settings.lua
+      cp ${depsTable} $out/lua/nixCats/pawsible.lua
+      cp ${petShop} $out/lua/nixCats/petShop.lua
+      cp ${extraItems} $out/lua/nixCats/extra.lua
+      cp -r ${../nixCatsHelp}/* $out/doc/
+    '';
+  });
+
+  buildInputs = pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
+  start = pkgs.lib.unique (filterAndFlatten startupPlugins);
+  opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
+
+  customRC = let
+    optLuaPre = let
+      lua = if builtins.isString optionalLuaPreInit
+        then optionalLuaPreInit
+        else builtins.concatStringsSep "\n"
+        (pkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
+    in if lua != "" then "dofile([[${pkgs.writeText "optLuaPre.lua" lua}]])" else "";
+    optLuaAdditions = let
+      lua = if builtins.isString optionalLuaAdditions
+        then optionalLuaAdditions
+        else builtins.concatStringsSep "\n"
+        (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+    in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
+  in/*lua*/''
+    ${optLuaPre}
+    if vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
+      vim.cmd.source(require('nixCats').configDir .. "/init.vim")
+    end
+    if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
+      dofile(require('nixCats').configDir .. "/init.lua")
+    end
+    ${optLuaAdditions}
+  '';
+
+  # cat our args
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+  extraMakeWrapperArgs = let 
+    preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
+    pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
+    preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
+    linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
+    envVars = pkgs.lib.unique (FandF_envVarSet environmentVariables);
+    userWrapperArgs = pkgs.lib.unique (filterAndFlatten extraWrapperArgs);
+  in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
+      (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
+      "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
+    ] ++ (pkgs.lib.optionals (pathEnv != []) [
+      "--${preORpostPATH}" "PATH" ":" (pkgs.lib.makeBinPath pathEnv)
+    ]) ++ (pkgs.lib.optionals (linkables != []) [
+      "--${preORpostLD}" "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath linkables)
+    ])) + " " + (builtins.concatStringsSep " " (envVars ++ userWrapperArgs));
+
+  python3wrapperArgs = pkgs.lib.unique
+    (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
+    ++ (pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"])
+    ++ (filterAndFlatten extraPython3wrapperArgs));
+
+  preWrapperShellCode = if builtins.isString bashBeforeWrapper
+    then bashBeforeWrapper
+    else builtins.concatStringsSep "\n" ([/*bash*/''
+      NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
+      export NVIM_WRAPPER_PATH_NIX
+    ''] ++ (pkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
+
+  # add our propagated build dependencies
+  baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
+  myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
+    src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
+    propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
+  }) else baseNvimUnwrapped;
 
 in
-  let
-    # see :help nixCats
-    # this function gets passed all the way into the wrapper so that we can also add
-    # other dependencies that get resolved later in the process such as treesitter grammars.
-    nixCats = allPluginDeps: pkgs.stdenv.mkDerivation (let
-      isUnwrappedCfgPath = settings.wrapRc == false && builtins.isString settings.unwrappedCfgPath;
-      isStdCfgPath = settings.wrapRc == false && ! builtins.isString settings.unwrappedCfgPath;
-
-      nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
-        else if isStdCfgPath then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
-        else "${luaPath}";
-
-      categoriesPlus = categories // {
-        nixCats_wrapRc = settings.wrapRc;
-        nixCats_packageName = name;
-        inherit nixCats_config_location;
-      };
-      settingsPlus = settings // {
-        nixCats_packageName = name;
-        inherit nixCats_config_location;
-      };
-      all_def_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
-
-      cats = ncTools.mkLuaFileWithMeta "cats.lua" categoriesPlus;
-      settingsTable = ncTools.mkLuaFileWithMeta "settings.lua" settingsPlus;
-      petShop = ncTools.mkLuaFileWithMeta "petShop.lua" all_def_names;
-      depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
-      extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
-    in {
-      name = "nixCats";
-      builder = pkgs.writeText "builder.sh" /*bash*/ ''
-        source $stdenv/setup
-        mkdir -p $out/lua/nixCats
-        mkdir -p $out/doc
-        cp ${./nixCats.lua} $out/lua/nixCats/init.lua
-        cp ${./nixCatsMeta.lua} $out/lua/nixCats/meta.lua
-        cp ${cats} $out/lua/nixCats/cats.lua
-        cp ${settingsTable} $out/lua/nixCats/settings.lua
-        cp ${depsTable} $out/lua/nixCats/pawsible.lua
-        cp ${petShop} $out/lua/nixCats/petShop.lua
-        cp ${extraItems} $out/lua/nixCats/extra.lua
-        cp -r ${../nixCatsHelp}/* $out/doc/
-      '';
-    });
-
-    customRC = let
-      optLuaPre = let
-        lua = if builtins.isString optionalLuaPreInit
-          then optionalLuaPreInit
-          else builtins.concatStringsSep "\n"
-          (pkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
-      in if lua != "" then "dofile([[${pkgs.writeText "optLuaPre.lua" lua}]])" else "";
-      optLuaAdditions = let
-        lua = if builtins.isString optionalLuaAdditions
-          then optionalLuaAdditions
-          else builtins.concatStringsSep "\n"
-          (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
-      in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
-    in/*lua*/''
-      ${optLuaPre}
-      if vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
-        vim.cmd.source(require('nixCats').configDir .. "/init.vim")
-      end
-      if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
-        dofile(require('nixCats').configDir .. "/init.lua")
-      end
-      ${optLuaAdditions}
-    '';
-
-    # this is what allows for dynamic packaging in flake.nix
-    # It includes categories marked as true, then flattens to a single list
-    filterAndFlatten = ncTools.filterAndFlatten categories;
-
-    buildInputs = pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
-    start = pkgs.lib.unique (filterAndFlatten startupPlugins);
-    opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
-
-    # For wrapperArgs:
-    # This one filters and flattens like above but for attrs of attrs 
-    # and then maps name and value
-    # into a list based on the function we provide it.
-    # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
-    # This one filters and flattens attrs of lists and then maps value
-    # into a list of strings based on the function we provide it.
-    # it the same as above but for a mapping function with 1 argument
-    # because the inner is a list not a set.
-    filterAndFlattenMapInner = ncTools.filterAndFlattenMapInner categories;
-
-    # and then applied to give us a 1 argument function:
-
-    FandF_envVarSet = filterAndFlattenMapInnerAttrs 
-          (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]);
-
-    # extraPythonPackages and the like require FUNCTIONS that return lists.
-    # so we make a function that returns a function that returns lists.
-    # this is used for the fields in the wrapper where the default value is (_: [])
-    combineCatsOfFuncs = section:
-      (x: let
-        appliedfunctions = filterAndFlattenMapInner (value: value x ) section;
-        combinedFuncRes = builtins.concatLists appliedfunctions;
-        uniquifiedList = pkgs.lib.unique combinedFuncRes;
-      in
-      uniquifiedList);
-
-    # cat our args
-    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-    extraMakeWrapperArgs = let 
-      preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
-      pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
-      preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
-      linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
-      envVars = pkgs.lib.unique (FandF_envVarSet environmentVariables);
-      userWrapperArgs = pkgs.lib.unique (filterAndFlatten extraWrapperArgs);
-    in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
-        (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
-        "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
-      ] ++ (pkgs.lib.optionals (pathEnv != []) [
-        "--${preORpostPATH}" "PATH" ":" (pkgs.lib.makeBinPath pathEnv)
-      ]) ++ (pkgs.lib.optionals (linkables != []) [
-        "--${preORpostLD}" "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath linkables)
-      ])) + " " + (builtins.concatStringsSep " " (envVars ++ userWrapperArgs));
-
-    python3wrapperArgs = pkgs.lib.unique
-      (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
-      ++ (pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"])
-      ++ (filterAndFlatten extraPython3wrapperArgs));
-
-    preWrapperShellCode = if builtins.isString bashBeforeWrapper
-      then bashBeforeWrapper
-      else builtins.concatStringsSep "\n" ([/*bash*/''
-        NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
-        export NVIM_WRAPPER_PATH_NIX
-      ''] ++ (pkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
-
-    # add our propagated build dependencies
-    baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
-    myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
-      src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
-      propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
-    }) else baseNvimUnwrapped;
-
-  in
-  # add our lsps and plugins and our config, and wrap it all up!
-  # nothing goes past this file that hasnt been sorted
+# NOTE: nothing goes past this file that hasnt been sorted
 import ./wrapNeovim.nix {
   nixCats_passthru = nixCats_passthru // (let
     utils = (import ../utils);
