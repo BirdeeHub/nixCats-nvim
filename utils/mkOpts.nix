@@ -7,12 +7,14 @@
   , luaPath ? ""
   , packageDefinitions ? {}
   , nclib
-  , utils
+  , utils ? import ./.
 }:
 { lib, ... }: let
   catDef = nclib.mkCatDefType lib.mkOptionType false;
   pkgDef = nclib.mkCatDefType lib.mkOptionType true;
 in {
+
+  config = lib.setAttrByPath moduleNamespace { inherit utils; };
 
   options = with lib; lib.setAttrByPath moduleNamespace ({
 
@@ -218,11 +220,9 @@ in {
       };
 
       utils = mkOption {
-        default = utils;
         type = types.attrsOf types.anything;
         readOnly = true;
-        visible = false;
-        description = "nixCats utils set";
+        description = "[nixCats utils set](https://nixcats.org/nixCats_utils.html)";
       };
 
       out = {
