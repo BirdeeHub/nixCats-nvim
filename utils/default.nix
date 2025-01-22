@@ -110,7 +110,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     ---
 
-    a set of templates to get you started. See :h nixCats.templates
+    a set of templates to get you started. See [the template list](https://nixcats.org/nixCats_templates.html).
 
     ---
   */
