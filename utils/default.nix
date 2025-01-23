@@ -50,6 +50,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       };
       startupPlugins = {
         general = with pkgs.vimPlugins; [ ];
+        some_other_name = [];
       };
       # ...
     }
@@ -64,7 +65,10 @@ with builtins; let lib = import ./lib.nix; in rec {
     {
       nvim = { pkgs, mkNvimPlugin, ... }: {
         settings = {};
-        categories = {};
+        categories = {
+          general = true;
+          some_other_name = true;
+        };
         extra = {};
       };
     }
