@@ -9,15 +9,19 @@
 
 - If you suspect a bug, please leave an [issue](https://github.com/BirdeeHub/nixCats-nvim/issues) (or a PR if you know what it is) so that we can address it.
 
-- Improving and standardising the templates.
+- Improving and standardising the [templates](./templates).
 
-- Adding more tests.
+- Adding more [tests](#tests).
 
 See below sections for more details.
 Any other contributions and fixes are also welcome.
 
-The core of the code for nixCats is in the [utils](./utils) and [builder](./builder) directories,
-and the READMEs within should help explain things somewhat.
+All code for nixCats is in these places: [utils](./utils) and [builder](./builder) and [luaUtils](./templates/luaUtils/lua/nixCatsUtils).
+(with the exception of [default.nix](./templates/default.nix) in the templates directory)
+
+All tests are in [tests](./tests)
+
+And all docs are either in [nixCatsHelp](./nixCatsHelp), or generated from Nix files, or [templates](./templates).
 
 Thank you!!!
 
@@ -27,7 +31,7 @@ Thank you!!!
 
 The in-editor help is defined in [nixCatsHelp](./nixCatsHelp).
 
-The [nixCats website](https://nixcats.org) is automatically generated from the help files and the main [README](./README.md).
+The [nixCats website](https://nixcats.org) is [automatically generated](https://github.com/BirdeeHub/nixCats-doc) from the help files and the main readme.
 The README is converted using Pandoc and GitHub Flavored Markdown.
 
 - Any updates only need to be made here.
@@ -44,6 +48,8 @@ The in-editor docs are generated into html using a nixCats neovim package.
 Yes, you heard that right. As I said, they will look exactly how they do in the editor.
 
 Some other docs such as the templates, nix utils, and module helps are generated from the code via other techniques such as nix-doc
+
+These other docs are generated into markdown and then pandoc converts them to html.
 
 ### Templates
 
