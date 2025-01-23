@@ -61,6 +61,8 @@ with builtins; let lib = import ./lib.nix; in rec {
     ### **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
     set of functions that each represent the settings and included categories for a package.
 
+    Among other info, things declared in settings, categories, and extra will be available in lua.
+
     ```nix
     {
       nvim = { pkgs, mkNvimPlugin, ... }: {
