@@ -44,7 +44,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     Called with the contents of the current package definition as arguments
 
     ```nix
-    categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+    { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
       lspsAndRuntimeDeps = {
         general = with pkgs; [ ];
       };
