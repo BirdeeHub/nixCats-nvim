@@ -40,10 +40,22 @@ with builtins; let lib = import ./lib.nix; in rec {
     : attrset of extra stuff for finalPackage.passthru
 
     ### **categoryDefinitions** (`functionTo` `AttrSet`)
-    type: function with args `{ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }:`
-    returns: set of sets of categories of dependencies
+    type: function that returns set of sets of categories of dependencies.
+    Called with the contents of the current package definition as arguments
 
-    see `:h nixCats.flake.outputs.categories`
+    ```nix
+    categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+      lspsAndRuntimeDeps = {
+        general = with pkgs; [ ];
+      };
+      startupPlugins = {
+        general = with pkgs.vimPlugins; [ ];
+      };
+      # ...
+    }
+    ```
+
+    see :h [nixCats.flake.outputs.categories](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.categories)
 
     ### **packageDefinitions** (`AttrsOf` `functionTo` `AttrSet`)
     set of functions that each represent the settings and included categories for a package.
@@ -58,9 +70,9 @@ with builtins; let lib = import ./lib.nix; in rec {
     }
     ```
 
-    see `:h nixCats.flake.outputs.packageDefinitions`
+    see :h [nixCats.flake.outputs.packageDefinitions](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.packageDefinitions)
 
-    see `:h nixCats.flake.outputs.settings`
+    see :h [nixCats.flake.outputs.settings](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.settings)
 
     ### **name** (`string`)
     name of the package to build from `packageDefinitions`
