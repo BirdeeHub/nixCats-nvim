@@ -435,7 +435,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : controls the way individual categories are merged between definitions
 
     `definitions` (`listOf` `functionTo` `AttrSet`)
-    : accepts a `categoryDefinitions` or a single `packageDefinition`
+    : accepts a list of `categoryDefinitions` or a list of individual `packageDefinition`
 
     ---
   */
