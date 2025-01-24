@@ -109,7 +109,7 @@
         else if lib.attrByPath atpath null prev == true
         then false
         else checkPath (lib.init atpath);
-      firstRes = lib.pipe extraCats [
+      nextCats = lib.pipe extraCats [
         (filterAndFlatten prev)
         (filter (v: checkPath v))
         lib.unique
@@ -119,8 +119,8 @@
       ];
       # recurse until it doesnt change, so that values applying
       # to the newly enabled categories can have an effect.
-    in if firstRes == prev then firstRes
-      else applyExtraCatsInternal firstRes;
+    in if nextCats == prev then nextCats
+      else applyExtraCatsInternal nextCats;
 
   in if extraCats == {} then categories
     else applyExtraCatsInternal categories;
