@@ -925,7 +925,7 @@ can be found here:
 https://nixcats.org/nixCats_utils.html
 
 Missing from that list however,
-is an explanation of the internal library
+is an explanation of the internal <n2l> library
 nixCats uses to create the nixCats Lua plugin!
 
 The library fully escapes all items passed to it,
@@ -934,16 +934,18 @@ But you may still explicitly pass it lua code to execute at runtime
 by declaring them as inline lua types!
 
 An intricate explanation of the full set
-of features this library contains are below.
+of features the <n2l> library contains are below.
 
 All other functions made available by
-the utils set are explained in the documentation
+the <utils> set are explained in the documentation
 at https://nixcats.org/nixCats_utils.html
 
                                   *nixCats.flake.outputs.utils.n2l*
 <n2l> This is the Nix to Lua library nixCats
 uses to create the nixCats Lua plugin
 You may wish to use some functions from it.
+
+The library is exported from the <utils> set as `utils.n2l`
 
 It contains <toLua> and <prettyLua> and <uglyLua> which convert Nix to Lua.
 
