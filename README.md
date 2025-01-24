@@ -1,6 +1,6 @@
 <div align="center">
 
-# [nixCats](https://github.com/BirdeeHub/nixCats-nvim)
+# [nixCats](https://nixcats.org)
 
 for the Lua-natic's Neovim config on Nix
 
