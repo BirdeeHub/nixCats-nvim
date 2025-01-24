@@ -9,10 +9,10 @@ with builtins; let
     (filter (x: x != null && x != ""))
     (map stringLength)
     (foldl' (max: x: if x > max then x else max) 0)
-    (longBoiLen: longBoiLen - 2)
+    (add (-2))
     (eqno: if eqno >= 0 then eqno + 1 else 0)
     (genStr "=")
-    (body: "[" + body + "[" + str + "]" + body + "]")
+    (body: "[${body}[${str}]${body}]")
   ];
 
   mkEnum = id: proto: let
