@@ -3,8 +3,6 @@
 # NOTE: This file exports the entire public interface for nixCats
 with builtins; let lib = import ./lib.nix; in rec {
   /**
-  ---
-
     `utils.baseBuilder` is the main builder function of nixCats.
 
     ## Arguments
@@ -126,8 +124,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     };
 
   /**
-    ---
-
     a set of templates to get you started. See [the template list](https://nixcats.org/nixCats_templates.html).
 
     ---
@@ -135,8 +131,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   templates = import ../templates;
 
   /**
-    ---
-
     standardPluginOverlay is called with flake inputs or a set of fetched derivations.
 
     It will extract all items named in the form `plugins-foobar`
@@ -172,8 +166,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   standardPluginOverlay = (import ./autoPluginOverlay.nix).standardPluginOverlay;
 
   /**
-    ---
-
     same as standardPluginOverlay except if you give it `plugins-foo.bar`
     you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
 
@@ -188,8 +180,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   sanitizedPluginOverlay = (import ./autoPluginOverlay.nix).sanitizedPluginOverlay;
 
   /**
-    ---
-
     if your dependencyOverlays is a list rather than a system-wrapped set,
     to deal with when other people (incorrectly) output an overlay wrapped
     in a system variable you may call this function on it.
@@ -209,8 +199,6 @@ with builtins; let lib = import ./lib.nix; in rec {
       else (outfunc prev.system) final prev);
 
   /**
-    ---
-
     takes all the arguments of the main builder function but as a single set
 
     Instead of name it needs defaultPackageName
@@ -284,8 +272,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     });
 
   /**
-    ---
-
     takes all the arguments of the main builder function but as a single set
 
     Instead of name it needs defaultPackageName
@@ -363,8 +349,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     });
 
   /**
-    ---
-
     see :h [nixCats.flake.outputs.utils.n2l](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.utils.n2l)
 
     you can use this to make values in the tables generated
@@ -379,8 +363,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   n2l = lib.n2l;
 
   /**
-    ---
-
     see `h: nixCats.flake.outputs.utils.n2l`
 
     This is an alias for `utils.n2l.types.inline-safe.mk`
@@ -390,8 +372,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   mkLuaInline = lib.n2l.types.inline-safe.mk;
 
   /**
-    ---
-
     `flake-utils.lib.eachSystem` but without the flake input
 
     Builds a map from `<attr> = value` to `<attr>.<system> = value` for each system
@@ -424,8 +404,6 @@ with builtins; let lib = import ./lib.nix; in rec {
       else []));
 
   /**
-    ---
-
     in case someone didn't know that genAttrs is great for dealing with the system variable,
     this is literally just nixpkgs.lib.genAttrs
 
@@ -440,8 +418,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   bySystems = lib.genAttrs;
 
   /**
-    ---
-
     returns a merged set of definitions, with new overriding old.
     updates anything it finds that isn't another set.
 
@@ -464,8 +440,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
 
   /**
-    ---
-
     Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
     it will merge them together rather than replacing the old one with the new one.
 
@@ -483,8 +457,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
 
   /**
-    ---
-
     recursiveUpdate each overlay output to avoid issues where
     two overlays output a set of the same name when importing from other nixCats.
     Merges everything into 1 overlay
@@ -513,8 +485,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   mergedOvers;
 
   /**
-    ---
-
     Simple helper function for `mergeOverlayLists`
 
     If you know the prior `dependencyOverlays` is a list, you dont need this.
@@ -561,8 +531,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     else [];
 
   /**
-    ---
-
     makes a default package and then one for each name in `packageDefinitions`
 
     for constructing flake outputs.
@@ -585,8 +553,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     // mkExtraPackages finalBuilder packageDefinitions;
 
   /**
-    ---
-
     `mkPackages` but without adding a default package, or the final `defaultName` argument
 
     ## Arguments
@@ -603,8 +569,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   (mapAttrs (name: _: finalBuilder name) packageDefinitions);
 
   /**
-    ---
-
     like mkPackages but easier.
 
     Pass it a package and it will make that the default, and build all the packages
@@ -620,8 +584,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   { default = package; } // (mkAllPackages package);
 
   /**
-    ---
-
     like `mkExtraPackages` but easier.
 
     Pass it a package and it will build all the packages
@@ -641,8 +603,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   ) allnames);
 
   /**
-    ---
-
     makes a set of overlays from your definitions for exporting from a flake.
 
     defaultName is the package name for the default overlay
@@ -684,8 +644,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     in overlays;
 
   /**
-    ---
-
     makes a set of overlays from your definitions for exporting from a flake.
 
     Differs from `makeOverlays` in that the default overlay is a set of all the packages
@@ -731,8 +689,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     in overlays;
 
   /**
-    ---
-
     makes a set of overlays from your definitions for exporting from a flake.
 
     overlay yeilds `pkgs.${importName}.${packageName}`
@@ -789,8 +745,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     );
 
   /**
-    ---
-
     `makeMultiOverlay` except it takes only 2 arguments.
 
     ## Arguments
@@ -821,8 +775,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   });
 
   /**
-    ---
-
     makes a single overlay with all the packages
     in `packageDefinitions` from the package as `pkgs.${packageName}`
 
@@ -849,8 +801,6 @@ with builtins; let lib = import ./lib.nix; in rec {
   ) allnames));
 
   /**
-    ---
-
     makes a separate overlay for each of the packages
     in `packageDefinitions` from the package as `pkgs.${packageName}`
 
