@@ -908,162 +908,37 @@ They look something like this:
       inherit dependencyOverlays luaPath defaultPackageName
         categoryDefinitions packageDefinitions nixpkgs;
     };
+    # and we export these so its super easy to grab them later.
     inherit utils;
     inherit (utils) templates;
   };
 <
                                   *nixCats.flake.outputs.utils*
 
-We also export the <utils> set so we can get it easier later,
-along with <templates> which are inside it.
-The <utils> is also exported by the passthru of all packages based on nixCats
-but exporting it separately makes it easier to get again later.
-
-It also contains all the other functions used in creating the format in the
+The <utils> set exports all the functions used in creating the format in the
 templates, including the main builder!
 (see :h |nixCats.flake.outputs.builder| for builder explanation)
 
-In addition to the templates and the builder function, the utils set contains:
+In the interests of not repeating ourselves,
+a list of most functions exported in the <utils> set
+can be found here:
+https://nixcats.org/nixCats_utils.html
 
-<standardPluginOverlay> inputs:
-allows for inputs named plugins-something to be
-turned into an overlay containing them as plugins automatically
+Missing from that list however,
+is an explanation of the internal library
+nixCats uses to create the nixCats Lua plugin!
 
-<sanitizedPluginOverlay> inputs:
-optional replacement for `utils.standardPluginOverlay`.
-If you give it an input named `plugins-foo.bar`
-you can get it at `pkgs.neovimPlugins.foo-bar`
-and still `packadd foo.bar` because it keeps the folder name the same.
-To use, in your overlays section:
-Replace `(utils.standardPluginOverlay inputs)`
-with `(utils.sanitizedPluginOverlay inputs)`
+The library fully escapes all items passed to it,
+so usually you can't execute lua code in them.
+But you may still explicitly pass it lua code to execute at runtime
+by declaring them as inline lua types!
 
-<fixSystemizedOverlay> overlaysSet: outfunc:
-takes 2 arguments.
-a set of system-wrapped overlays,
-and a function (system: overlays.${system}.<desired_overlay>)
-returns the desired overlay, with the system resolved.
+An intricate explanation of the full set
+of features this library contains are below.
 
-<mergeCatDefs> oldCats: newCats:
-for merging `categoryDefinitions` and individual packages in `packageDefinitions`,
-will recursively update up to the first thing not an attrset.
-For our purposes, we do not consider derivations to be attrsets.
-It takes 2 functions that return sets and returns
-a function which calls them both and merges the result as desired above.
-
-<deepmergeCats> oldCats: newCats:
-same as `utils.mergeCatDefs` except will merge duplicate
-category lists together instead of replacing them
-
-<mergeOverlayLists> oldOverlist: newOverlist: self: super:
-for merging lists of overlays together properly
-to avoid naming conflict issues.
-Takes 2 lists of overlays, returns a single merged overlay.
-Merging logic is the same as mergeCatDefs
-
-<safeOversList> { dependencyOverlays, system ? null }:
-Simple helper function for mergeOverlayLists
-Pass it the inherited `dependencyOverlays`, always recieve a list back.
-Then feed it to `mergeOverlayLists`.
-If dependencyOverlays is an attrset, system string is required.
-If dependencyOverlays is a list, system string is ignored
-If invalid type or system, returns an empty list
-
-<mkNixosModules> {
-    defaultPackageName = "nixCats";
-    luaPath = "${./.}";
-    inherit nixpkgs dependencyOverlays
-      categoryDefinitions packageDefinitions extra_pkg_config;
-};
-Will create a NixOS module that you can import in `configuration.nix`.
-If you do not have a `luaPath`, you may pass it a `keepLua` builder
-See :help |nixCats.flake.outputs.exports.mkNixosModules|.
-The packages also export a module with `defaultPackageName1`
-set to THEIR package name via their passthru variable using this function.
-
-<mkHomeModules>
-The same as mkNixosModules above, but for Home Manager.
-
-<mkAllWithDefault> package:
-makes each package in the packageDefinitions this package was made from
-and also a default one out of the one passed in.
-
-<mkAllPackages> package:
-makes each package in the packageDefinitions this package was made from
-
-<mkPackages> finalBuilder: packageDefinitions: defaultName:
-makes each package in packageDefinitions and also a default one
-where finalBuilder is the builder function with all but the name applied
-
-<mkExtraPackages> finalBuilder: packageDefinitions:
-mkPackages just calls this and adds a default one.
-where finalBuilder is the builder function with all but the name applied
-
-<makeOverlays> luaPath: {
-        nixpkgs
-        , extra_pkg_config ? {}
-        , dependencyOverlays ? null
-        , nixCats_passthru ? {}
-        , ...
-      }@pkgsParams: categoryDefFunction: packageDefinitions:
-      defaultName:
-makes an overlay for each package and also a default one
-These are basically the same as the arguments to utils.baseBuilder
-dependencyOverlays may be dependencyOverlays.${system} = [ list of overlays ];
-or simply dependencyOverlays = [ list of overlays ];
-
-<makeMultiOverlay> <same args as makeOverlays BUT with the following 2 args INSTEAD of `defaultName`>:
-            `importName:` `namesIncList:`
-Instead of taking a defaultName, it takes an importName and a list of names.
-It will output them in an overlay where they will be accessible by pkgs.${importName}.${name}
-
-<makeOverlaysWithMultiDefault> utils.makeOverlays but the default overlay
-uses makeMultiOverlay. So that after adding it, all your packages from packageDefinitions will
-be accessible at `pkgs.${defaultPackageName}.${packageName}`
-Can be swapped out 1 for 1 with `utils.makeOverlays` if preferred
-
-<easyMultiOverlay> package:
-i.e. if you had a package named nvim1 and a package named nvim2,
-would output an overlay containing both `pkgs.nvim1` and `pkgs.nvim2`
-
-Takes as its argument only a finished nixCats package.
-Utilizes override to avoid wrapping the overlay with ${system} variable.
-
-Slightly different from makeMultiOverlay in that
-makeMultiOverlay would output at `pkgs.${importName}.nvim1`
-instead of `pkgs.nvim1` like this one does.
-
-<easyMultiOverlayNamespaced> package: importName:
-If you had a package named nvim1 and a package named nvim2,
-would output an overlay containing
-both `pkgs.${importName}.nvim1` and `pkgs.${importName}.nvim2`
-
-Takes as its argument only a finished nixCats package.
-Utilizes override to avoid wrapping the overlay with ${system} variable.
-
-identical output to `makeMultiOverlay`
-
-<easyNamedOvers> package:
-Same output as makeOverlays except without a default package.
-i.e. if you had a package named nvim1 and a package named nvim2,
-would make an overlay named nvim1 and an overlay named nvim2
-
-Takes as its argument only a finished nixCats package.
-Utilizes override to avoid wrapping the overlay with ${system} variable
-
-<eachSystem> systems: f:
-just flake-utils.lib.eachSystem copied here to remove the final input outside
-of nixpkgs itself.
-
-<bySystem> systems: f:
-similar to flake-utils.lib.eachSystem but for only 1 variable. If used for the
-whole outputs section instead of eachSystem, it would add the
-`${system}` to the start like `${system}.packages.default` and not
-`packages.${system}.default` so instead it is used for only a single output like:
-`{ packages = utils.bySystem nixpkgs.lib.platforms.all (system: { default = ...; }) }`
-
-It is the same thing as `nixpkgs.lib.genAttrs`, renamed so that people know
-how to use it.
+All other functions made available by
+the utils set are explained in the documentation
+at https://nixcats.org/nixCats_utils.html
 
                                   *nixCats.flake.outputs.utils.n2l*
 <n2l> This is the Nix to Lua library nixCats
@@ -1195,38 +1070,5 @@ Some more useage examples:
     newtable = null; # <- default val, sets metatable of tablevar
   });
 <
----------------------------------------------------------------------------------------
-NixOS Module                      *nixCats.flake.outputs.exports.mkNixosModules*
-                                  *nixCats.flake.outputs.exports.mkHomeModules*
-
-We create the module by exporting the following in our flake outputs.
-More information on the modules can be found at :h |nixCats.module|.
->nix
-  <mkNixosModules> {
-      defaultPackageName = "nixCats";
-      luaPath = "${./.}";
-      inherit nixpkgs dependencyOverlays
-        categoryDefinitions packageDefinitions extra_pkg_config;
-  };
-
-  <mkHomeModules> {
-      defaultPackageName = "nixCats";
-      luaPath = "${./.}";
-      inherit nixpkgs dependencyOverlays
-        categoryDefinitions packageDefinitions extra_pkg_config;
-  };
-<
-`dependencyOverlays` may be >nix
-  dependencyOverlays.${system} = [ list of overlays ];
-or simply `dependencyOverlays = [ list of overlays ];`.
-
-IMPORTANT
-By default, the module inherits your flake or `nixExpressionFlakeOutputs nixpkgs object`,
-its overlays, and everything else.
-It will still inherit your system overlays and config set and system value,
-but your system will not inherit overlays added to the nixCats module option.
-
-More information on the modules can be found at :h |nixCats.module|.
-
 ---------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
