@@ -415,12 +415,47 @@ with builtins; let lib = import ./lib.nix; in rec {
   bySystems = lib.genAttrs;
 
   /**
-    returns a merged set of definitions, with new overriding old.
-    updates anything it finds that isn't another set.
+    Returns a merged definition from a list of definitions.
 
-    this means it works slightly differently for environment variables
+    Works with both `categoryDefinitions` and individual `packageDefinitions`
+
+    If "replace" is chosen, it updates anything it finds that isn't another set
+    (with head being "older" and tail being "newer")
+
+    If "merge" is chosen, if it encounters a list in both functions,
+    (usually representing a category)
+    it will merge them together rather than replacing the old one with the new one.
+
+    This means it works slightly differently for environment variables
     because each one will be updated individually rather than at a category level.
 
+    ## Arguments
+
+    `type` (`enumOf` `"replace" | "merge"`)
+    : controls the way individual categories are merged between definitions
+
+    `definitions` (`listOf` `functionTo` `AttrSet`)
+    : accepts a `categoryDefinitions` or a single `packageDefinition`
+
+    ---
+  */
+  mergeDefs = type: definitions:
+    args: let
+      mergefunc = if type == "replace"
+      then lib.recUpdateHandleInlineORdrv 
+      else if type == "merge"
+      then lib.recursiveUpdateWithMerge
+      else throw ''
+        `merged_definition = utils.mergeDefs type [ definitions ];`
+        valid values of `type` are: "replace" or "merge"
+      '';
+    in lib.pipe definitions [
+      (map (v: v args))
+      (foldl' mergefunc {})
+    ];
+
+  /**
+    alias for `utils.mergeDefs "replace" [ oldCats newCats ]`
     Works with both `categoryDefinitions` and individual `packageDefinitions`
 
     ## Arguments
@@ -434,11 +469,11 @@ with builtins; let lib = import ./lib.nix; in rec {
     ---
   */
   mergeCatDefs = oldCats: newCats:
-    (packageDef: lib.recUpdateHandleInlineORdrv (oldCats packageDef) (newCats packageDef));
+    mergeDefs "replace" [ oldCats newCats ];
 
   /**
-    Same as `mergeCatDefs` but if it encounters a list (usually representing a category)
-    it will merge them together rather than replacing the old one with the new one.
+    alias for `utils.mergeDefs "merge" [ oldCats newCats ]`
+    Works with both `categoryDefinitions` and individual `packageDefinitions`
 
     ## Arguments
 
@@ -451,7 +486,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     ---
   */
   deepmergeCats = oldCats: newCats:
-    (packageDef: lib.recursiveUpdateWithMerge (oldCats packageDef) (newCats packageDef));
+    mergeDefs "merge" [ oldCats newCats ];
 
   /**
     recursiveUpdate each overlay output to avoid issues where
