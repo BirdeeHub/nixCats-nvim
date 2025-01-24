@@ -385,23 +385,20 @@ with builtins; let lib = import ./lib.nix; in rec {
     ---
   */
   eachSystem = systems: f: let
-    # Merge together the outputs for all systems.
+    # get function result and insert system variable
     op = attrs: system: let
       ret = f system;
-      op = attrs: key: attrs //
-          {
-            ${key} = (attrs.${key} or { })
-              // { ${system} = ret.${key}; };
-          }
-      ;
+      op = attrs: key: attrs // {
+        ${key} = (attrs.${key} or { })
+          // { ${system} = ret.${key}; };
+      };
     in foldl' op attrs (attrNames ret);
-  in foldl' op { } (systems
-    ++ # add the current system if --impure is used
-      (if builtins ? currentSystem then
-         if elem currentSystem systems
-         then []
-         else [ currentSystem ]
-      else []));
+  # Merge together the outputs for all systems.
+  in foldl' op { } (systems ++
+    (if builtins ? currentSystem && !(elem builtins.currentSystem systems)
+    # add the current system if --impure is used
+    then [ builtins.currentSystem ]
+    else []));
 
   /**
     in case someone didn't know that genAttrs is great for dealing with the system variable,
@@ -476,13 +473,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  mergeOverlayLists = oldOverlist: newOverlist: self: super: let
-    oldOversMapped = map (value: value self super) oldOverlist;
-    newOversMapped = map (value: value self super) newOverlist;
-    combinedOversCalled = oldOversMapped ++ newOversMapped;
-    mergedOvers = foldl' lib.recursiveUpdateUntilDRV { } combinedOversCalled;
-  in
-  mergedOvers;
+  mergeOverlayLists = oldOverlist: newOverlist: self: super:
+    lib.pipe (oldOverlist ++ newOverlist) [
+      (map (value: value self super))
+      (foldl' lib.recursiveUpdateUntilDRV {})
+    ];
 
   /**
     Simple helper function for `mergeOverlayLists`
@@ -595,12 +590,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  mkAllPackages = package: let
-    allnames = attrNames package.passthru.packageDefinitions;
-  in
-  listToAttrs (map (name:
-    lib.nameValuePair name (package.override { inherit name; })
-  ) allnames);
+  mkAllPackages = package: lib.pipe package.passthru.packageDefinitions [
+    attrNames
+    (map (name: lib.nameValuePair name (package.override { inherit name; })))
+    listToAttrs
+  ];
 
   /**
     makes a set of overlays from your definitions for exporting from a flake.
@@ -820,12 +814,14 @@ with builtins; let lib = import ./lib.nix; in rec {
     ---
   */
   easyNamedOvers = package: let
-    allnames = attrNames package.passthru.packageDefinitions;
     mapfunc = map (name:
       lib.nameValuePair name (final: prev: {
         ${name} = package.override { inherit (prev) system; };
       }));
-  in
-  listToAttrs (mapfunc allnames);
+  in lib.pipe package.passthru.packageDefinitions [
+    attrNames
+    mapfunc
+    listToAttrs
+  ];
 
 }

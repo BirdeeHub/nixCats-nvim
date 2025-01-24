@@ -32,6 +32,7 @@
   collate_grammars ? false,
 }:
 let
+  inherit (pkgs) lib;
   # accepts 4 different plugin syntaxes, specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
   parsepluginspec = opt: p: let
     optional = if builtins.isBool (p.optional or null) then p.optional else opt;
@@ -81,14 +82,20 @@ let
   genPluginList = packageName: { start ? [ ], opt ? [ ], }:
     (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
-  pluginsWithConfig = pkgs.lib.flatten (pkgs.lib.mapAttrsToList genPluginList pluginsOG);
+  pluginsWithConfig = lib.flatten (lib.mapAttrsToList genPluginList pluginsOG);
 
   # we process plugin spec style configurations here ourselves rather than using makeNeovimConfig for that.
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
-  lcfgs = builtins.filter (v: v != null) (map (v: if v.type or "" == "lua" then v.config else null) pluginsWithConfig);
-  vcfgs = builtins.filter (v: v != null) (map (v: if v.type or "" == "viml" then v.config else null) pluginsWithConfig);
-  luaPluginConfigs = builtins.concatStringsSep "\n" lcfgs;
-  vimlPluginConfigs = builtins.concatStringsSep "\n" vcfgs;
+  luaPluginConfigs = with builtins; lib.pipe pluginsWithConfig [
+    (map (v: if v.type or "" == "lua" then v.config else null))
+    (filter (v: v != null))
+    (concatStringsSep "\n")
+  ];
+  vimlPluginConfigs = with builtins; lib.pipe pluginsWithConfig [
+    (map (v: if v.type or "" == "viml" then v.config else null))
+    (filter (v: v != null))
+    (concatStringsSep "\n")
+  ];
 
   # was once neovimUtils.makeNeovimConfig
   res = import ./wrapenvs.nix {
@@ -105,7 +112,7 @@ let
   };
 in
 (pkgs.callPackage ./wrapper.nix { }) neovim-unwrapped ( res // {
-    wrapperArgsStr = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
+    wrapperArgsStr = lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     customAliases = aliases;
     inherit (nixCats_passthru) nixCats_packageName;
     inherit withPerl extraPython3wrapperArgs nixCats nixCats_passthru

@@ -39,9 +39,6 @@
   filterAndFlattenMapInnerAttrs = categories: twoArgFunc: categoryDefs:
     flattenAttrMapLeaves twoArgFunc (RecFilterCats categories categoryDefs);
 
-  filterAndFlattenMapInner = categories: oneArgFunc: SetOfCategoryLists:
-    map oneArgFunc (filterAndFlatten categories SetOfCategoryLists);
-
   # Overlays values in place of true values in categories
   RecFilterCats = categories: categoryDefs: let
     # remove all things that are not true, or an attribute set that is not also a derivation
@@ -92,25 +89,34 @@
       picker = left: right: if isNonDrvSet left then left else right;
     in recUpUntilWpicker { inherit pred picker; } lhs rhs;
     # get the names of the categories but not the values, to avoid evaluating anything.
-    mapfunc = path: mapAttrs (name: value: if isAttrs value && ! lib.isDerivation value then mapfunc (path ++ [ name ]) value else path ++ [ name ]);
-    mapped = map (mapfunc []) listOfSections;
-  in
-  foldl' recursiveUpdatePickDeeper { } mapped;
+    mapfunc = path: mapAttrs (name: value:
+      if isAttrs value && ! lib.isDerivation value
+      then mapfunc (path ++ [ name ]) value
+      else path ++ [ name ]);
+
+  in lib.pipe listOfSections [
+    (map (mapfunc []))
+    (foldl' recursiveUpdatePickDeeper {})
+  ];
 
   applyExtraCats = categories: extraCats: let
     recursiveUpdatePickShallower = recUpUntilWpicker {
       picker = left: right: if ! isAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: let
-      filteredCatPaths = filterAndFlatten prev extraCats;
-      # remove if already included
+      # filter if already present in categories
       checkPath = atpath: if atpath == [] then true
         else if lib.attrByPath atpath null prev == true
         then false
         else checkPath (lib.init atpath);
-      filtered = lib.unique (filter (v: checkPath v) filteredCatPaths);
-      toMerge = map (v: lib.setAttrByPath v true) filtered;
-      firstRes = foldl' recursiveUpdatePickShallower {} (toMerge ++ [ prev ]);
+      firstRes = lib.pipe extraCats [
+        (filterAndFlatten prev)
+        (filter (v: checkPath v))
+        lib.unique
+        (map (v: lib.setAttrByPath v true))
+        (v: v ++ [ prev ])
+        (foldl' recursiveUpdatePickShallower {})
+      ];
       # recurse until it doesnt change, so that values applying
       # to the newly enabled categories can have an effect.
     in if firstRes == prev then firstRes

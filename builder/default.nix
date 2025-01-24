@@ -97,33 +97,31 @@ let
   # this is what allows for dynamic packaging in flake.nix
   # It includes categories marked as true, then flattens to a single list
   filterAndFlatten = ncTools.filterAndFlatten categories;
-  # For wrapperArgs:
   # This one filters and flattens like above but for attrs of attrs 
   # and then maps name and value
   # into a list based on the function we provide it.
   # its like a flatmap function but with a built in filter for category.
   filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
-  # This one filters and flattens attrs of lists and then maps value
-  # into a list of strings based on the function we provide it.
-  # it the same as above but for a mapping function with 1 argument
-  # because the inner is a list not a set.
-  filterAndFlattenMapInner = ncTools.filterAndFlattenMapInner categories;
 
-  # and then applied to give us a 1 argument function:
+  # for the env vars section
+  FandF_envVarSet = set: pkgs.lib.pipe set [
+    (filterAndFlattenMapInnerAttrs (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]))
+    pkgs.lib.unique
+  ];
 
-  FandF_envVarSet = filterAndFlattenMapInnerAttrs 
-        (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]);
+  # shorthand to reduce lispyness
+  filterFlattenUnique = s: pkgs.lib.unique (filterAndFlatten s);
 
   # extraPythonPackages and the like require FUNCTIONS that return lists.
   # so we make a function that returns a function that returns lists.
   # this is used for the fields in the wrapper where the default value is (_: [])
   combineCatsOfFuncs = section:
-    (x: let
-      appliedfunctions = filterAndFlattenMapInner (value: value x ) section;
-      combinedFuncRes = builtins.concatLists appliedfunctions;
-      uniquifiedList = pkgs.lib.unique combinedFuncRes;
-    in
-    uniquifiedList);
+    x: pkgs.lib.pipe section [
+      filterAndFlatten
+      (map (value: value x))
+      builtins.concatLists
+      pkgs.lib.unique
+    ];
 
   # see :help nixCats
   # this function gets passed all the way into the wrapper so that we can also add
@@ -168,22 +166,22 @@ let
     '';
   });
 
-  buildInputs = pkgs.lib.unique (filterAndFlatten propagatedBuildInputs);
-  start = pkgs.lib.unique (filterAndFlatten startupPlugins);
-  opt = pkgs.lib.unique (filterAndFlatten optionalPlugins);
+  buildInputs = filterFlattenUnique propagatedBuildInputs;
+  start = filterFlattenUnique startupPlugins;
+  opt = filterFlattenUnique optionalPlugins;
 
   customRC = let
     optLuaPre = let
       lua = if builtins.isString optionalLuaPreInit
         then optionalLuaPreInit
         else builtins.concatStringsSep "\n"
-        (pkgs.lib.unique (filterAndFlatten optionalLuaPreInit));
+        (filterFlattenUnique optionalLuaPreInit);
     in if lua != "" then "dofile([[${pkgs.writeText "optLuaPre.lua" lua}]])" else "";
     optLuaAdditions = let
       lua = if builtins.isString optionalLuaAdditions
         then optionalLuaAdditions
         else builtins.concatStringsSep "\n"
-        (pkgs.lib.unique (filterAndFlatten optionalLuaAdditions));
+        (filterFlattenUnique optionalLuaAdditions);
     in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
   in/*lua*/''
     ${optLuaPre}
@@ -200,11 +198,11 @@ let
   # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
   extraMakeWrapperArgs = let 
     preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
-    pathEnv = pkgs.lib.unique (filterAndFlatten lspsAndRuntimeDeps);
+    pathEnv = filterFlattenUnique lspsAndRuntimeDeps;
     preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
-    linkables = pkgs.lib.unique (filterAndFlatten sharedLibraries);
-    envVars = pkgs.lib.unique (FandF_envVarSet environmentVariables);
-    userWrapperArgs = pkgs.lib.unique (filterAndFlatten extraWrapperArgs);
+    linkables = filterFlattenUnique sharedLibraries;
+    envVars = FandF_envVarSet environmentVariables;
+    userWrapperArgs = filterFlattenUnique extraWrapperArgs;
   in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
       (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
       "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
@@ -224,7 +222,7 @@ let
     else builtins.concatStringsSep "\n" ([/*bash*/''
       NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
       export NVIM_WRAPPER_PATH_NIX
-    ''] ++ (pkgs.lib.unique (filterAndFlatten bashBeforeWrapper)));
+    ''] ++ (filterFlattenUnique bashBeforeWrapper));
 
   # add our propagated build dependencies
   baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;

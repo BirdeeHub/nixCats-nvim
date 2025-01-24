@@ -9,17 +9,21 @@ with builtins; rec {
     descriptionClass = "noun";
     check = v: isFunction v;
     merge = loc: defs: let
-      values = map (v: v.value) defs;
       mergefunc = if subtype == "replace"
       then recUpdateHandleInlineORdrv 
       else if subtype == "merge"
       then recursiveUpdateWithMerge
       else throw "invalid catDef subtype";
     in
-    arg: foldl' mergefunc {} (map (v: v arg) values);
+    arg: pipe defs [
+      (map (v: v.value arg))
+      (foldl' mergefunc {})
+    ];
   };
 
   n2l = import ./n2l.nix;
+
+  pipe = builtins.foldl' (x: f: f x);
 
   isDerivation = value: value.type or null == "derivation";
 
@@ -43,9 +47,13 @@ with builtins; rec {
       # category lists can contain mixes of sets and derivations.
       # But they are both attrsets according to typeOf, so we dont need a check for that.
       else if isList left && all (lv: typeOf lv == typeOf right) left then
-        if elem right left then left else left ++ [ right ]
+        if elem right left
+        then left
+        else left ++ [ right ]
       else if isList right && all (rv: typeOf rv == typeOf left) right then
-        if elem left right then right else [ left ] ++ right
+        if elem left right
+        then right
+        else [ left ] ++ right
       else right;
   };
 
@@ -59,7 +67,10 @@ with builtins; rec {
     value:
     { inherit name value; };
 
-  recUpUntilWpicker = { pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh), picker ? (l: r: r) }: lhs: rhs: let
+  recUpUntilWpicker = {
+    pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh),
+    picker ? (l: r: r)
+  }: lhs: rhs: let
     f = attrPath:
       zipAttrsWith (n: values:
         let here = attrPath ++ [n]; in

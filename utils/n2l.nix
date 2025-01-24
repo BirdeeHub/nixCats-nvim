@@ -1,25 +1,19 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
 with builtins; let
+  pipe = foldl' (x: f: f x);
   genStr = str: num: concatStringsSep "" (genList (_: str) num);
-  luaEnclose = inString: let
-    measureLongBois = inString: let
-      normalize_split = list: filter (x: x != null && x != "")
-          (concatMap (x: if isList x then x else [ ]) list);
-      splitter = str: normalize_split (split "(\\[=*\\[)|(]=*])" str);
-      counter = str: map stringLength (splitter str);
-      getMax = str: foldl' (max: x: if x > max then x else max) 0 (counter str);
-      getEqSigns = str: (getMax str) - 2;
-      longBoiLength = getEqSigns inString;
-    in
-    if longBoiLength >= 0 then longBoiLength + 1 else 0;
-
-    eqNum = measureLongBois inString;
-    eqStr = genStr "=" eqNum;
-    bL = "[" + eqStr + "[";
-    bR = "]" + eqStr + "]";
-  in
-  bL + inString + bR;
+  luaEnclose = str: pipe str [
+    (split "(\\[=*\\[)|(]=*])")
+    (concatMap (x: if isList x then x else []))
+    (filter (x: x != null && x != ""))
+    (map stringLength)
+    (foldl' (max: x: if x > max then x else max) 0)
+    (longBoiLen: longBoiLen - 2)
+    (eqno: if eqno >= 0 then eqno + 1 else 0)
+    (genStr "=")
+    (body: "[" + body + "[" + str + "]" + body + "]")
+  ];
 
   mkEnum = id: proto: let
     filterAttrs = pred: set:
@@ -135,23 +129,18 @@ with builtins; let
         (throw "Lua cannot run nix functions. Either call your function first, or make a lua function using `utils.n2l.types.function-safe.mk`.")
       else replacer (luaEnclose (toString value));
 
-    luaTablePrinter = level: attrSet: let
-      nameandstringmap = mapAttrs (n: value: let
-        name = "[ " + (luaEnclose "${n}") + " ]";
-      in
-        "${name} = ${doSingleLuaValue (level + 1) value}") attrSet;
-      resultList = attrValues nameandstringmap;
-      catset = concatStringsSep ",${nl_spc (level + 1)}" resultList;
-      LuaTable = "{${nl_spc (level + 1)}" + catset + "${nl_spc level}}";
-    in
-    LuaTable;
+    luaTablePrinter = level: set: pipe set [
+      (mapAttrs (n: v: "[ ${luaEnclose "${n}"} ] = ${doSingleLuaValue (level + 1) v}"))
+      attrValues
+      (concatStringsSep ",${nl_spc (level + 1)}")
+      (str: "{${nl_spc (level + 1)}" + str + "${nl_spc level}}")
+    ];
 
-    luaListPrinter = level: theList: let
-      stringlist = map (doSingleLuaValue (level + 1)) theList;
-      catlist = concatStringsSep ",${nl_spc (level + 1)}" stringlist;
-      LuaList = "{${nl_spc (level + 1)}" + catlist + "${nl_spc level}}";
-    in
-    LuaList;
+    luaListPrinter = level: list: pipe list [
+      (map (doSingleLuaValue (level + 1)))
+      (concatStringsSep ",${nl_spc (level + 1)}")
+      (str: "{${nl_spc (level + 1)}" + str + "${nl_spc level}}")
+    ];
 
   in
   doSingleLuaValue _level input;
