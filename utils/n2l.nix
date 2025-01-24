@@ -12,7 +12,7 @@ with builtins; let
     (add (-2))
     (eqno: if eqno >= 0 then eqno + 1 else 0)
     (genStr "=")
-    (body: "[${body}[${str}]${body}]")
+    (eqs: "[${eqs}[${str}]${eqs}]")
   ];
 
   mkEnum = id: proto: let
