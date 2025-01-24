@@ -111,8 +111,8 @@
         else checkPath (lib.init atpath);
       nextCats = lib.pipe extraCats [
         (filterAndFlatten prev)
-        (filter (v: checkPath v))
         lib.unique
+        (filter (v: checkPath v))
         (map (v: lib.setAttrByPath v true))
         (v: v ++ [ prev ])
         (foldl' recursiveUpdatePickShallower {})
