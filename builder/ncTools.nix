@@ -42,22 +42,26 @@
   # Overlays values in place of true values in categories
   RecFilterCats = categories: categoryDefs: let
     # remove all things that are not true, or an attribute set that is not also a derivation
-    filterLayer = attr: (lib.filterAttrs (name: value:
+    filterLayer = lib.filterAttrs (name: value:
         if isBool value
         then value
         else if isAttrs value && !lib.isDerivation value
         then true
         else false
-      ) attr);
+      );
     # overlay value from categoryDefs if the value in categories is true, else recurse
-    mapper = subCats: defAttrs: mapAttrs 
-        (name: value: let
+    mapper = subCats: defAttrs: let
+      mapfunc = name: value: let
           newDefAttr = getAttr name defAttrs;
         in
         if !(isAttrs value && isAttrs newDefAttr) || lib.isDerivation newDefAttr
         then newDefAttr
-        else mapper value newDefAttr)
-      (intersectAttrs defAttrs (filterLayer subCats));
+        else mapper value newDefAttr;
+    in lib.pipe subCats [
+      filterLayer
+      (intersectAttrs defAttrs)
+      (mapAttrs mapfunc)
+    ];
   in
   mapper categories categoryDefs;
 
