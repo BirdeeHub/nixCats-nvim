@@ -9,7 +9,7 @@ with builtins; let
     (filter (x: x != null))
     (map stringLength)
     (foldl' (max: x: if x > max then x else max) 0)
-    (maxlen: if maxlen >= 2 then maxlen - 1 else if maxlen == 1 then 1 else 0)
+    (maxlen: if maxlen > 1 then maxlen - 1 else if maxlen == 1 then 1 else 0)
     (genStr "=")
     (eqs: "[${eqs}[${str}]${eqs}]")
   ];
