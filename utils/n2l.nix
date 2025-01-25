@@ -44,7 +44,7 @@ with builtins; let
     funccheck = v: if ! isString (v.expr.body or null)
       then "body attribute must be a string"
       else if ! isList (v.expr.args or null)
-        || any (val: ! isString val || builtins.match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' val == null) v.expr.args
+        || any (val: ! isString val || match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' val == null) v.expr.args
       then "args attribute must be a list of strings containing valid lua identifier names"
       else true;
   in {
@@ -81,7 +81,7 @@ with builtins; let
         if ! isAttrs (v.expr.table or null) || ! isAttrs (v.expr.meta or null) then 
           "both 'table' and 'meta' attributes are required and must be tables"
         else if ! isString (v.expr.tablevar or null)
-          || builtins.match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' v.expr.tablevar == null then 
+          || match ''^([A-Za-z_][A-Za-z0-9_]*|\.\.\.)$'' v.expr.tablevar == null then 
           "'tablevar' must be a valid lua identifier name"
         else 
           true;
