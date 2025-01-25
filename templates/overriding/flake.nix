@@ -58,9 +58,9 @@
         # utils.safeOversList just checks if dependencyOverlays is a list or a set of lists,
         # and always returns a list
         dependencyOverlays = forSystems (system: [
-          (utils.mergeOverlayLists
-            (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
-            (/* (import ./overlays inputs) ++ */[
+          (utils.mergeOverlays
+            ((utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; }) ++
+            /* (import ./overlays inputs) ++ */[
               (utils.standardPluginOverlay inputs)
               # any other flake overlays here.
             ])

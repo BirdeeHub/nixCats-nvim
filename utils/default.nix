@@ -502,17 +502,31 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
+    `overlist` (`listOf` `overlays`)
+
+    ---
+  */
+  mergeOverlays = overlist: self: super:
+    lib.pipe overlist [
+      (map (value: value self super))
+      (foldl' lib.recursiveUpdateUntilDRV {})
+    ];
+
+  /**
+    equivalent to `utils.mergeOverlays (oldOverlist ++ newOverlist)`
+
+    returns a SINGLE overlay
+
+    ## Arguments
+
     `oldOverlist` (`listOf` `overlays`)
 
     `newOverlist` (`listOf` `overlays`)
 
     ---
   */
-  mergeOverlayLists = oldOverlist: newOverlist: self: super:
-    lib.pipe (oldOverlist ++ newOverlist) [
-      (map (value: value self super))
-      (foldl' lib.recursiveUpdateUntilDRV {})
-    ];
+  mergeOverlayLists = oldOverlist: newOverlist:
+    mergeOverlays (oldOverlist ++ newOverlist);
 
   /**
     Simple helper function for `mergeOverlayLists`
