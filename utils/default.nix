@@ -395,7 +395,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     in foldl' op attrs (attrNames ret);
   # Merge together the outputs for all systems.
   in foldl' op { } (systems ++
-    (if builtins ? currentSystem && !(elem builtins.currentSystem systems)
+    (if builtins ? currentSystem && ! elem builtins.currentSystem systems
     # add the current system if --impure is used
     then [ builtins.currentSystem ]
     else []));

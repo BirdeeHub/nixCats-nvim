@@ -132,13 +132,13 @@ with builtins; let
       (mapAttrs (n: v: "[ ${luaEnclose "${n}"} ] = ${doSingleLuaValue (level + 1) v}"))
       attrValues
       (concatStringsSep ",${nl_spc (level + 1)}")
-      (str: "{${nl_spc (level + 1)}" + str + "${nl_spc level}}")
+      (str: "{${nl_spc (level + 1)}${str}${nl_spc level}}")
     ];
 
     luaListPrinter = level: list: pipe list [
       (map (doSingleLuaValue (level + 1)))
       (concatStringsSep ",${nl_spc (level + 1)}")
-      (str: "{${nl_spc (level + 1)}" + str + "${nl_spc level}}")
+      (str: "{${nl_spc (level + 1)}${str}${nl_spc level}}")
     ];
 
   in
