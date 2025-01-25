@@ -4,13 +4,13 @@ with builtins; let
   pipe = foldl' (x: f: f x);
   genStr = str: num: concatStringsSep "" (genList (_: str) num);
   luaEnclose = str: pipe str [
-    (split "(\\[=*\\[)|(]=*])")
+    (split "(\\[=*\\[)|(]=*])|(]$)")
     (concatMap (x: if isList x then x else []))
-    (filter (x: x != null && x != ""))
+    (filter (x: x != null))
     (map stringLength)
     (foldl' (max: x: if x > max then x else max) 0)
     (add (-2))
-    (eqno: if eqno >= 0 then eqno + 1 else 0)
+    (eqno: if eqno >= 0 then eqno + 1 else if eqno == -1 then 1 else 0)
     (genStr "=")
     (eqs: "[${eqs}[${str}]${eqs}]")
   ];
