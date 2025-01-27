@@ -121,7 +121,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
 
   --  Add any additional override configuration in the following tables. They will be passed to
   --  the `settings` field of the server config. You must look up that documentation yourself.
-  --  All of them are listed in https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+  --  All of them are listed in https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
   --
   --  If you want to override the default filetypes that your language server will attach to you can
   --  define the property 'filetypes' to the map in question.
