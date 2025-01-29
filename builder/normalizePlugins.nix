@@ -50,8 +50,8 @@
       r_mapped = lib.unique (map (v: v.cfg) right);
       l_mapped = lib.unique (map (v: v.cfg) wrong);
     in {
-      preInlineConfigs = builtins.concatStringsSep "\n" r_mapped;
-      inlineConfigs = builtins.concatStringsSep "\n" (lib.subtractLists r_mapped l_mapped);
+      preInlineConfigs = concatStringsSep "\n" r_mapped;
+      inlineConfigs = concatStringsSep "\n" (lib.subtractLists r_mapped l_mapped);
     })
   ];
 
