@@ -10,7 +10,7 @@
     typeToSet = type: cfg: if type == "viml"
       then { vim = cfg; }
       else { ${type} = cfg; };
-
+  in {
     config = if ! (p ? plugin) then null
     else if isAttrs (p.config or null) && checkAttrs p.config
       then p.config
@@ -20,8 +20,6 @@
       then { vim = p.config; }
     else null;
 
-  in {
-    inherit config;
     optional = if isBool (p.optional or null)
       then p.optional else opt;
     priority = if isInt (p.priority or null)
