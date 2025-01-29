@@ -27,6 +27,7 @@
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
     inherit config;
+    pre = if p ? plugin then p.pre or false else false;
   };
 
   inherit (import ../utils/n2l.nix) toLua;
