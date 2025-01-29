@@ -23,7 +23,7 @@
   in {
     optional = if isBool (p.optional or null) then p.optional else opt;
     priority = if isInt (p.priority or null) then p.priority else 150;
-    pre = v.pre or false;
+    pre = p.pre or false;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
