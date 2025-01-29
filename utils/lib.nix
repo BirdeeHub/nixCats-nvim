@@ -37,8 +37,6 @@ with builtins; rec {
 
   recUpdateHandleInlineORdrv = recUpUntilWpicker { pred = updateUntilPred; };
 
-  unique = foldl' (acc: e: if elem e acc then acc else acc ++ [ e ]) [];
-
   recursiveUpdateWithMerge = recUpUntilWpicker {
     pred = updateUntilPred;
     picker = left: right:
