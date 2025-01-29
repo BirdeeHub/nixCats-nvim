@@ -21,26 +21,36 @@
 
   in {
     optional = if isBool (p.optional or null) then p.optional else opt;
+    priority = if isInt (p.priority or null) then p.priority else 150;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
     inherit config;
   };
 
+  inherit (import ../utils/n2l.nix) toLua;
+  setToString = cfg: let
+    lua = cfg.lua;
+    vim = lib.optionalString (cfg ? vim) "vim.cmd(${toLua cfg.vim})";
+  in ''
+    ${lua}
+    ${vim}
+  '';
+  get_and_sort = plugins: with builtins; lib.pipe plugins [
+    (map (v: if isAttrs (v.config or null) then { inherit (v) config priority; } else null))
+    (filter (v: v != null))
+    (sort (a: b: a.priority < b.priority))
+    (map (v: setToString v.config))
+    lib.unique
+    (concatStringsSep "\n")
+  ];
+
   genPluginList = { start ? [ ], opt ? [ ], }:
     (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
   pluginsWithConfig = genPluginList pluginsOG;
 
-  getConfigsOfType = type: plugins: with builtins; lib.pipe plugins [
-    (map (v: if isString (v.config.${type} or null) then v.config.${type} else null))
-    (filter (v: v != null))
-    lib.unique
-    (concatStringsSep "\n")
-  ];
-
 in {
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
-  luaPluginConfigs = getConfigsOfType "lua" pluginsWithConfig;
-  vimlPluginConfigs = getConfigsOfType "vim" pluginsWithConfig;
+  inlineConfigs = get_and_sort pluginsWithConfig;
 }

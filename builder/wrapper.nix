@@ -38,8 +38,7 @@
   , customRC ? ""
   , luaEnv
   , extraPython3wrapperArgs ? []
-  , luaPluginConfigs ? ""
-  , vimlPluginConfigs ? ""
+  , inlineConfigs ? ""
   , ...
 }:
 assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
@@ -74,10 +73,8 @@ let
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
     ${customRC}
-    ${luaPluginConfigs}
-  '' + (lib.optionalString (vimlPluginConfigs != "") ''
-    vim.cmd.source([[${writeText "vim_configs_from_nix.vim" vimlPluginConfigs}]])
-  '');
+    ${inlineConfigs}
+  '';
 
   providerLuaRc = generateProviderRc {
     inherit withPython3 withNodeJs withPerl;

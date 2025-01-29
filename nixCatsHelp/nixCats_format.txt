@@ -407,9 +407,16 @@ single derivation.
       { plugin = derivation; config = ""; type = "<viml or lua>"; }
       { plugin = derivation; config = ""; } # defaults to viml
       { plugin = derivation; }
+
       # all the above options can also accept an optional = bool;
       # to override its presence in either startupPlugins or optionalPlugins
-      # and they can also accept a name = string; to override its name
+
+      # they can also accept a name = string; to override its name
+
+      # they can also accept a priority = integer; with low being first
+      # and default of 150
+      # if they contain a config value, it will be ran in that order.
+
       derivation
       # plain derivation does not need to be in a list, but it should be
       # anyway. It could be on its own though and would act as its own

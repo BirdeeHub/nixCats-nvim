@@ -52,7 +52,7 @@ in
     wrapperArgsStr = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     customAliases = aliases;
     inherit (nixCats_passthru) nixCats_packageName;
-    inherit (normalized) luaPluginConfigs vimlPluginConfigs;
+    inherit (normalized) inlineConfigs;
     inherit withPerl extraPython3wrapperArgs nixCats_passthru
       customRC preWrapperShellCode collate_grammars;
   }
