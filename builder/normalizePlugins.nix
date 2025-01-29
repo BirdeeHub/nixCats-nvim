@@ -5,10 +5,7 @@
   # accepts several plugin syntaxes,
   # specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
   parsepluginspec = opt: p: with builtins; let
-    checkAttrs = attrs: lib.pipe attrs [
-      attrValues
-      (all (v: isString v))
-    ];
+    checkAttrs = attrs: all (v: isString v) (attrValues attrs);
     typeToSet = type: cfg: if type == "viml"
       then { vim = cfg; }
       else { ${type} = cfg; };
