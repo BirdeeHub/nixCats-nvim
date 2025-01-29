@@ -33,7 +33,7 @@
 
   inherit (import ../utils/n2l.nix) toLua;
   setToString = cfg: let
-    lua = cfg.lua;
+    lua = cfg.lua or "";
     vim = lib.optionalString (cfg ? vim) "vim.cmd(${toLua cfg.vim})";
   in ''
     ${lua}
