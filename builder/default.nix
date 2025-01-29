@@ -172,7 +172,7 @@ let
   # https://github.com/BirdeeHub/nixCats-nvim/pull/89
   start = filterAndFlatten startupPlugins;
   opt = filterAndFlatten optionalPlugins;
-  normalized = pkgs.callPackage ./normalizePlugins.nix { inherit start opt; };
+  normalized = pkgs.callPackage ./normalizePlugins.nix { inherit start opt; inherit (ncTools) toLua; };
 
   customRC = let
     optLuaPre = let

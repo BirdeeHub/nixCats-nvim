@@ -2,6 +2,7 @@
   start ? [],
   opt ? [],
   lib,
+  toLua,
 }: let
   # accepts several plugin syntaxes,
   # specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
@@ -31,7 +32,6 @@
       else p.plugin or p;
   };
 
-  inherit (import ../utils/n2l.nix) toLua;
   setToString = cfg: let
     lua = cfg.lua or "";
     vim = lib.optionalString (cfg ? vim) "vim.cmd(${toLua cfg.vim})";
