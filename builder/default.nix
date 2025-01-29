@@ -268,7 +268,7 @@ import ./wrapNeovim.nix {
   inherit pkgs;
   neovim-unwrapped = myNeovimUnwrapped;
   nixCats_passthru = nc_passthru;
-  inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
+  inherit extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars;
   inherit (normalized) plugins;
     /* the function you would have passed to python.withPackages */

@@ -23,6 +23,7 @@
   plugins ? [],
   # I passed some more stuff in also
   nixCats,
+  ncTools,
   aliases,
   nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
@@ -43,7 +44,7 @@ let
     inherit pkgs;
     inherit gem_path;
     inherit collate_grammars;
-    inherit nixCats;
+    inherit nixCats ncTools;
     inherit plugins;
   };
 in

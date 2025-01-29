@@ -18,6 +18,7 @@
 
 # function to pass to vim-pack-dir that creates nixCats plugin
 , nixCats
+, ncTools
 
 , neovim-unwrapped
 , pkgs
@@ -79,7 +80,7 @@ let
     ];
 
   vimPackDir = (pkgs.callPackage ./vim-pack-dir.nix {
-    inherit collate_grammars nixCats;
+    inherit collate_grammars nixCats ncTools;
     python3Env = if allPython3Dependencies pkgs.python3.pkgs == [] then null else python3Env;
     startup = lib.unique start;
     opt = lib.unique opt;
@@ -87,7 +88,7 @@ let
 
 in
 
-builtins.removeAttrs args ["plugins" "nixCats" "pkgs"] // {
+builtins.removeAttrs args ["plugins" "nixCats" "ncTools" "pkgs"] // {
   wrapperArgs = makeWrapperArgs;
   inherit vimPackDir;
   inherit python3Env;
