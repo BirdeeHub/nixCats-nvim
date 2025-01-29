@@ -21,13 +21,15 @@
     else null;
 
   in {
-    optional = if isBool (p.optional or null) then p.optional else opt;
-    priority = if isInt (p.priority or null) then p.priority else 150;
+    inherit config;
+    optional = if isBool (p.optional or null)
+      then p.optional else opt;
+    priority = if isInt (p.priority or null)
+      then p.priority else 150;
+    pre = if isBool (p.pre or null) then p.pre else false;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
-    inherit config;
-    pre = if p ? plugin then p.pre or false else false;
   };
 
   inherit (import ../utils/n2l.nix) toLua;
@@ -46,7 +48,7 @@
     ))
     (filter (v: v != null))
     (sort (a: b: a.priority < b.priority))
-    (lib.partition (v: v.pre or false == true))
+    (lib.partition (v: v.pre == true))
     ({ right ? [], wrong ? []}: let
       r_mapped = lib.unique (map (v: v.cfg) right);
       l_mapped = lib.unique (map (v: v.cfg) wrong);
