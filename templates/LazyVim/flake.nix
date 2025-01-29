@@ -125,7 +125,6 @@
           nvim-lspconfig
           nvim-notify
           nvim-spectre
-          nvim-treesitter
           nvim-treesitter-context
           nvim-treesitter-textobjects
           nvim-ts-autotag
@@ -142,7 +141,6 @@
           vim-startuptime
           which-key-nvim
           snacks-nvim
-
           nvim-treesitter-textobjects
           nvim-treesitter.withAllGrammars
           # This is for if you only want some of the grammars
