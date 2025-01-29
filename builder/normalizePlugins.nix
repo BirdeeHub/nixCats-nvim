@@ -23,6 +23,7 @@
   in {
     optional = if isBool (p.optional or null) then p.optional else opt;
     priority = if isInt (p.priority or null) then p.priority else 150;
+    pre = v.pre or false;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
@@ -40,12 +41,12 @@
   get_and_sort = plugins: with builtins; lib.pipe plugins [
     (map (v:
       if isAttrs (v.config or null)
-      then { inherit (v) priority; cfg = setToString v.config; }
+      then { inherit (v) priority pre; cfg = setToString v.config; }
       else null
     ))
     (filter (v: v != null))
     (sort (a: b: a.priority < b.priority))
-    (lib.partition (v: v.priority < 50))
+    (lib.partition (v: v.pre == true))
     ({ right ? [], wrong ? []}: let
       r_mapped = lib.unique (map (v: v.cfg) right);
       l_mapped = lib.unique (map (v: v.cfg) wrong);
