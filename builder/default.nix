@@ -190,7 +190,7 @@ let
   in/*lua*/''
     -- optionalLuaPreInit
     ${optLuaPre}
-    -- lua from nix with priority < 50
+    -- lua from nix with pre = true
     ${normalized.preInlineConfigs}
     -- run the init.lua (or init.vim)
     if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
