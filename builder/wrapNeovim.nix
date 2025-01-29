@@ -20,8 +20,7 @@
   viAlias ? false,
   extraName ? "",
   customRC ? "",
-  # this used to be called configure, and have customRC in it
-  pluginsOG ? { },
+  pluginsOG ? { start = []; opt = []; },
   # I passed some more stuff in also
   nixCats,
   aliases,
