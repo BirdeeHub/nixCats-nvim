@@ -417,6 +417,8 @@ single derivation.
       # and default of 150
       # if they contain a config value, it will be ran in that order.
 
+      # if priority is less than 50, it will be ran BEFORE init.lua
+
       derivation
       # plain derivation does not need to be in a list, but it should be
       # anyway. It could be on its own though and would act as its own

@@ -38,17 +38,28 @@
     ${vim}
   '';
   get_and_sort = plugins: with builtins; lib.pipe plugins [
-    (map (v: if isAttrs (v.config or null) then { inherit (v) config priority; } else null))
+    (map (v:
+      if isAttrs (v.config or null)
+      then { inherit (v) priority; cfg = setToString v.config; }
+      else null
+    ))
     (filter (v: v != null))
     (sort (a: b: a.priority < b.priority))
-    (map (v: setToString v.config))
-    lib.unique
-    (concatStringsSep "\n")
+    (lib.partition (v: v.priority < 50))
+    ({ right ? [], wrong ? []}: let
+      r_mapped = lib.unique (map (v: v.cfg) right);
+      l_mapped = lib.unique (map (v: v.cfg) wrong);
+    in {
+      preInlineConfigs = builtins.concatStringsSep "\n" r_mapped;
+      inlineConfigs = builtins.concatStringsSep "\n" (lib.subtractLists r_mapped l_mapped);
+    })
   ];
 
   pluginsWithConfig = (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
+  plugin_configs = get_and_sort pluginsWithConfig;
+
 in {
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
-  inlineConfigs = get_and_sort pluginsWithConfig;
+  inherit (plugin_configs) preInlineConfigs inlineConfigs;
 }

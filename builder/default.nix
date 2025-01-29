@@ -188,13 +188,19 @@ let
         (filterFlattenUnique optionalLuaAdditions);
     in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
   in/*lua*/''
+    -- optionalLuaPreInit
     ${optLuaPre}
+    -- lua from nix with priority < 50
+    ${normalized.preInlineConfigs}
+    -- run the init.lua (or init.vim)
     if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
       dofile(require('nixCats').configDir .. "/init.lua")
     elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
       vim.cmd.source(require('nixCats').configDir .. "/init.vim")
     end
+    -- all other lua from nix plugin specs
     ${normalized.inlineConfigs}
+    -- optionalLuaAdditions
     ${optLuaAdditions}
   '';
 
