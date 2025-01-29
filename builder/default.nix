@@ -188,11 +188,10 @@ let
     in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
   in/*lua*/''
     ${optLuaPre}
-    if vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
-      vim.cmd.source(require('nixCats').configDir .. "/init.vim")
-    end
     if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
       dofile(require('nixCats').configDir .. "/init.lua")
+    elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
+      vim.cmd.source(require('nixCats').configDir .. "/init.vim")
     end
     ${optLuaAdditions}
   '';
