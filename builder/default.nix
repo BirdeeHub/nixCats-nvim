@@ -119,7 +119,7 @@ let
     x: pkgs.lib.pipe section [
       filterAndFlatten
       (map (value: value x))
-      builtins.concatLists
+      pkgs.lib.flatten
       pkgs.lib.unique
     ];
 
@@ -167,8 +167,11 @@ let
   });
 
   buildInputs = filterFlattenUnique propagatedBuildInputs;
-  start = filterFlattenUnique startupPlugins;
-  opt = filterFlattenUnique optionalPlugins;
+
+  #NOTE: only call unique on these 2 after you normalize and pull the dependencies out
+  # https://github.com/BirdeeHub/nixCats-nvim/pull/89
+  start = filterAndFlatten startupPlugins;
+  opt = filterAndFlatten optionalPlugins;
 
   customRC = let
     optLuaPre = let

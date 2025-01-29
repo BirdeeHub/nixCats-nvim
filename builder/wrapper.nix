@@ -9,33 +9,28 @@
 , writeText
 , nodePackages
 , python3
-, callPackage
 , perl
 }:
-neovim-unwrapped:
 {
+  neovim-unwrapped
   # lets you append stuff to the derivation name so that you can search for it in the store easier
-  extraName ? ""
+  , extraName ? ""
 
   , withPython2 ? false
-  , withPython3 ? true,  python3Env ? python3
+  , withPython3 ? true
+  , python3Env ? python3
   , withNodeJs ? false
   , withPerl ? false
   , rubyEnv ? null
   , vimAlias ? false
   , viAlias ? false
 
-  # vim-pack-dir gets called on this
-  # to resolve dependencies and other things
-  # from plugins. It has all the plugins in it.
-  , packpathDirs
-  , collate_grammars ? false
+  , vimPackDir
 
   # should contain all args but the binary.
   , wrapperArgsStr ? ""
 
   # I added stuff to the one from nixpkgs
-  , nixCats
   , nixCats_packageName
   , customAliases ? null
   , nixCats_passthru ? {}
@@ -76,8 +71,6 @@ let
   in
     lib.concatStringsSep ";" hostProviderLua;
 
-  finalPackDir = (callPackage ./vim-pack-dir.nix { inherit collate_grammars; }) nixCats packpathDirs;
-
   # modified to allow more control over running things FIRST and also in which language.
   luaRcContent = ''
     ${customRC}
@@ -95,9 +88,9 @@ let
 
   generatedWrapperArgs = let
     setupLua = writeText "setup.lua" /*lua*/''
-      vim.opt.packpath:prepend([[${finalPackDir}]])
-      vim.opt.runtimepath:prepend([[${finalPackDir}]])
-      vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${finalPackDir}]]
+      vim.opt.packpath:prepend([[${vimPackDir}]])
+      vim.opt.runtimepath:prepend([[${vimPackDir}]])
+      vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]
       vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
       local configdir = vim.fn.stdpath('config')
       vim.opt.packpath:remove(configdir)
@@ -231,7 +224,7 @@ stdenv.mkDerivation {
     # makeWrapper will still behave if the variables are not set
     source ${neovim-unwrapped.lua}/nix-support/utils.sh || true
     # added after release 24.05 so also ignore errors on this function
-    _addToLuaPath "${finalPackDir}" || true
+    _addToLuaPath "${vimPackDir}" || true
     echo "propagated dependency path for plugins: $LUA_PATH"
     echo "propagated dependency cpath for plugins: $LUA_CPATH"
     makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \

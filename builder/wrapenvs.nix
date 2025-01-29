@@ -8,6 +8,7 @@
 , withNodeJs ? false
 , withRuby ? true
 , gem_path ? null
+, collate_grammars ? true
 /* the function you would have passed to lua.withPackages */
 , extraLuaPackages ? (_: [ ])
 
@@ -15,12 +16,21 @@
 # expects { plugin=far-vim; optional = false; }
 , plugins ? []
 
+# function to pass to vim-pack-dir that creates nixCats plugin
+, nixCats
+
 , neovim-unwrapped
 , pkgs
 , ...
 }@args:
 let
   inherit (pkgs) lib;
+  # gets plugin.dependencies from
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
+  findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
+  transitiveClosure = plugin:
+    [ plugin ] ++ (builtins.concatLists (map transitiveClosure plugin.dependencies or []));
+
   gemPath = if gem_path != null then gem_path else "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
   rubyEnv = pkgs.bundlerEnv {
     name = "neovim-ruby-env";
@@ -30,26 +40,25 @@ let
     gemdir = gemPath;
   };
 
-  requiredPluginsForPackage = { start ? [], opt ? []}:
-    start ++ opt;
+  # get dependencies of plugins
   pluginsPartitioned = lib.partition (x: x.optional == true) plugins;
-  requiredPlugins = requiredPluginsForPackage myVimPackage;
-  getDeps = attrname: map (plugin: plugin.${attrname} or (_: [ ]));
-  myVimPackage = {
-        start = map (x: x.plugin) pluginsPartitioned.wrong;
-        opt = map (x: x.plugin) pluginsPartitioned.right;
-  };
+  opt = map (x: x.plugin) pluginsPartitioned.right;
+  depsOfOptionalPlugins = lib.subtractLists opt (findDependenciesRecursively opt);
+  startWithDeps = lib.pipe pluginsPartitioned.wrong [
+    (map (x: x.plugin))
+    findDependenciesRecursively
+  ];
+  start = startWithDeps ++ depsOfOptionalPlugins;
 
-  pluginPython3Packages = getDeps "python3Dependencies" requiredPlugins;
-  python3Env = pkgs.python3Packages.python.withPackages (ps:
-    [ ps.pynvim ]
-    ++ (extraPython3Packages ps)
-    ++ (lib.concatMap (f: f ps) pluginPython3Packages));
-
+  allPython3Dependencies = ps: lib.pipe (start ++ opt) [
+    (map (plugin: (plugin.python3Dependencies or (_: [])) ps))
+    lib.flatten
+    (res: (if withPython3 then [ ps.pynvim ] ++ (extraPython3Packages ps) else []) ++ res)
+    lib.unique
+  ];
+  python3Env = pkgs.python3Packages.python.withPackages allPython3Dependencies;
   luaEnv = neovim-unwrapped.lua.withPackages extraLuaPackages;
 
-  # as expected by packdir
-  packpathDirs.myNeovimPackages = myVimPackage;
   ## Here we calculate all of the arguments to the 1st call of `makeWrapper`
   # We start with the executable itself NOTE we call this variable "initial"
   # because if configure != {} we need to call makeWrapper twice, in order to
@@ -69,11 +78,18 @@ let
       "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
     ];
 
+  vimPackDir = (pkgs.callPackage ./vim-pack-dir.nix {
+    inherit collate_grammars nixCats;
+    python3Env = if allPython3Dependencies pkgs.python3.pkgs == [] then null else python3Env;
+    startup = lib.unique start;
+    opt = lib.unique opt;
+  });
+
 in
 
-builtins.removeAttrs args ["plugins"] // {
+builtins.removeAttrs args ["plugins" "nixCats" "pkgs"] // {
   wrapperArgs = makeWrapperArgs;
-  inherit packpathDirs;
+  inherit vimPackDir;
   inherit python3Env;
   inherit luaEnv;
   inherit withNodeJs;

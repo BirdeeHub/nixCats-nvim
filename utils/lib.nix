@@ -43,17 +43,13 @@ with builtins; rec {
     pred = updateUntilPred;
     picker = left: right:
       if isList left && isList right
-        then unique (left ++ right)
+        then left ++ right
       # category lists can contain mixes of sets and derivations.
       # But they are both attrsets according to typeOf, so we dont need a check for that.
       else if isList left && all (lv: typeOf lv == typeOf right) left then
-        if elem right left
-        then left
-        else left ++ [ right ]
+        left ++ [ right ]
       else if isList right && all (rv: typeOf rv == typeOf left) right then
-        if elem left right
-        then right
-        else [ left ] ++ right
+        [ left ] ++ right
       else right;
   };
 

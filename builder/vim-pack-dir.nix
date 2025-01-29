@@ -2,16 +2,25 @@
 # Licensed under the MIT license 
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/ae5d2af73efa5e25bf9bf43672cd3d8d99c613d0/pkgs/applications/editors/vim/plugins/vim-utils.nix#L136-L207
-{ lib, buildEnv, writeTextFile
+{ lib
+  , buildEnv
+  , writeTextFile
   , runCommand
-  , python3
   , symlinkJoin
   , linkFarm
-  , collate_grammars ? false
-}: let
-  # NOTE: define helpers for packDir function here:
 
-  grammarPackName = "myNeovimGrammars";
+  , nixCats
+  , startup ? []
+  , opt ? []
+  , packageName ? "myNeovimPackages"
+  , grammarPackName ? "myNeovimGrammars"
+  , python3Env ? null
+  , collate_grammars ? true
+  , ...
+}: let
+  vimFarm = prefix: name: drvs:
+    let mkEntryFromDrv = drv: { name = "${prefix}/${lib.getName drv}"; path = drv; };
+    in linkFarm name (map mkEntryFromDrv drvs);
 
   grammarMatcher = yes: builtins.filter (drv: let
     # NOTE: matches if pkgs.neovimUtils.grammarToPlugin was called on it.
@@ -27,11 +36,9 @@
   callNixCats = nixCats:
     {
       ts_grammar_plugin_combined
-      , startPlugins
+      , start
       , opt
-      , python3link
-      , packageName
-      , allPython3Dependencies
+      , python3link ? null
       , ...
     }:
   let
@@ -43,11 +50,11 @@
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {
       allPlugins = {
-        start = builtins.listToAttrs (map mkEntryFromDrv startPlugins);
+        start = builtins.listToAttrs (map mkEntryFromDrv start);
         opt = builtins.listToAttrs (map mkEntryFromDrv opt);
         inherit ts_grammar_path;
       };
-      python3Path = if (allPython3Dependencies python3.pkgs == []) then null
+      python3Path = if (python3link == null) then null
         else ''${python3link}/pack/${packageName}/start/__python3_dependencies/python3'';
     };
     nixCatsDir = nixCatsDRV: (writeTextFile {
@@ -63,77 +70,42 @@
   in # add fully called nixCats plugin along with another to save its path.
   [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
 
-  # gets plugin.dependencies from
-  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
-  findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
-  transitiveClosure = plugin:
-    [ plugin ] ++ (
-      lib.unique (builtins.concatLists (map transitiveClosure plugin.dependencies or []))
-    );
+  # filter out all the grammars so we can group them up
+  start = grammarMatcher false startup;
 
-  vimFarm = prefix: name: drvs:
-    let mkEntryFromDrv = drv: { name = "${prefix}/${lib.getName drv}"; path = drv; };
-    in linkFarm name (map mkEntryFromDrv drvs);
+  # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
+  collected_grammars = grammarMatcher true startup;
 
-in
+  ts_grammar_plugin_combined = symlinkJoin {
+    name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
+    paths = map (e: e.outPath) collected_grammars;
+  };
 
+  packdirGrammar = vimFarm "pack/${grammarPackName}/start" "packdir-grammar" (if collate_grammars then [ ts_grammar_plugin_combined ] else collected_grammars);
 
-# recieves the nixCats plugin FUNCTION from builder/default.nix as the first argument
-# then the normal packages = { start ? [], opt ? [] }
-# argument to neovimUtils.packDir as the second argument
-nixCats: packages: let
+  #creates the nixCats plugin from the function definition in builder/default.nix
+  resolvedCats = callNixCats nixCats {
+    inherit start opt python3link packageName
+    python3Env ts_grammar_plugin_combined;
+  };
 
-  packageLinks = packageName: {start ? [], opt ? []}: let
-    # get dependencies of plugins
-    depsOfOptionalPlugins = lib.subtractLists opt (findDependenciesRecursively opt);
-    startWithDeps = findDependenciesRecursively start;
+  packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (start ++ resolvedCats);
 
-    allPlugins = lib.unique (startWithDeps ++ depsOfOptionalPlugins);
+  packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
 
-    allPython3Dependencies = ps:
-      lib.flatten (builtins.map (plugin: (plugin.python3Dependencies or (_: [])) ps) allPlugins);
-    python3Env = python3.withPackages allPython3Dependencies;
-
-    # filter out all the grammars so we can group them up
-    startPlugins = grammarMatcher false allPlugins;
-
-    # group them all up so that adding them back when clearing the rtp for lazy isnt painful.
-    collected_grammars = grammarMatcher true allPlugins;
-
-    ts_grammar_plugin_combined = symlinkJoin {
-      name = "vimplugin-treesitter-grammar-ALL-INCLUDED";
-      paths = map (e: e.outPath) collected_grammars;
-    };
-
-    packdirGrammar = [
-      (vimFarm "pack/${grammarPackName}/start" "packdir-grammar" (if collate_grammars then [ ts_grammar_plugin_combined ] else collected_grammars))
-    ];
-
-    #creates the nixCats plugin from the function definition in builder/default.nix
-    resolvedCats = callNixCats nixCats {
-      inherit startPlugins opt python3link packageName
-      allPython3Dependencies ts_grammar_plugin_combined;
-    };
-
-    packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (startPlugins ++ resolvedCats);
-
-    packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
-
-    # Assemble all python3 dependencies into a single `site-packages` to avoid doing recursive dependency collection
-    # for each plugin.
-    # This directory is only for python import search path, and will not slow down the startup time.
-    # see :help python3-directory for more details
-    python3link = runCommand "vim-python3-deps" {} ''
-      mkdir -p $out/pack/${packageName}/start/__python3_dependencies
-      ln -s ${python3Env}/${python3Env.sitePackages} $out/pack/${packageName}/start/__python3_dependencies/python3
-    '';
-  in
-    [ packdirStart packdirOpt ] ++ packdirGrammar ++ lib.optional (allPython3Dependencies python3.pkgs != []) python3link;
+  # Assemble all python3 dependencies into a single `site-packages` to avoid doing recursive dependency collection
+  # for each plugin.
+  # This directory is only for python import search path, and will not slow down the startup time.
+  # see :help python3-directory for more details
+  python3link = if python3Env == null then null else runCommand "vim-python3-deps" {} ''
+    mkdir -p $out/pack/${packageName}/start/__python3_dependencies
+    ln -s ${python3Env}/${python3Env.sitePackages} $out/pack/${packageName}/start/__python3_dependencies/python3
+  '';
 
 in
 buildEnv {
   name = "vim-pack-dir";
-  paths = (lib.flatten (lib.mapAttrsToList packageLinks packages));
+  paths = [ packdirStart packdirOpt packdirGrammar ] ++ lib.optional (python3link != null) python3link;
   # gather all propagated build inputs from packDir
   postBuild = ''
     mkdir $out/nix-support
