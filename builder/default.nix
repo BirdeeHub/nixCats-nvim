@@ -241,10 +241,7 @@ let
     propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
   }) else baseNvimUnwrapped;
 
-in
-# NOTE: nothing goes past this file that hasnt been sorted
-import ./wrapNeovim.nix {
-  nixCats_passthru = nixCats_passthru // (let
+  nc_passthru = nixCats_passthru // (let
     utils = (import ../utils);
   in {
     keepLuaBuilder = utils.baseBuilder luaPath;
@@ -265,8 +262,12 @@ import ./wrapNeovim.nix {
       inherit (settings) moduleNamespace;
     };
   });
+in
+# NOTE: nothing goes past this file that hasnt been sorted
+import ./wrapNeovim.nix {
   inherit pkgs;
   neovim-unwrapped = myNeovimUnwrapped;
+  nixCats_passthru = nc_passthru;
   inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars;
   inherit (normalized) plugins;
