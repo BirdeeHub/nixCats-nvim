@@ -152,18 +152,17 @@
           # ))
 
           # sometimes you have to fix some names
+          { plugin = luasnip; name = "LuaSnip"; }
+          { plugin = catppuccin-nvim; name = "catppuccin"; }
+          { plugin = mini-ai; name = "mini.ai"; }
+          { plugin = mini-icons; name = "mini.icons"; }
+          { plugin = mini-bufremove; name = "mini.bufremove"; }
+          { plugin = mini-comment; name = "mini.comment"; }
+          { plugin = mini-indentscope; name = "mini.indentscope"; }
+          { plugin = mini-pairs; name = "mini.pairs"; }
+          { plugin = mini-surround; name = "mini.surround"; }
           # you could do this within the lazy spec instead if you wanted
           # and get the new names from `:NixCats pawsible` debug command
-          # but it works the same either way.
-          (luasnip.overrideAttrs { name = "LuaSnip"; })
-          (catppuccin-nvim.overrideAttrs { name = "catppuccin"; })
-          (mini-ai.overrideAttrs { name = "mini.ai"; })
-          (mini-icons.overrideAttrs { name = "mini.icons"; })
-          (mini-bufremove.overrideAttrs { name = "mini.bufremove"; })
-          (mini-comment.overrideAttrs { name = "mini.comment"; })
-          (mini-indentscope.overrideAttrs { name = "mini.indentscope"; })
-          (mini-pairs.overrideAttrs { name = "mini.pairs"; })
-          (mini-surround.overrideAttrs { name = "mini.surround"; })
         ];
       };
 
