@@ -23,7 +23,6 @@
   in {
     optional = if isBool (p.optional or null) then p.optional else opt;
     priority = if isInt (p.priority or null) then p.priority else 150;
-    pre = p.pre or false;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
       else p.plugin or p;
@@ -46,7 +45,7 @@
     ))
     (filter (v: v != null))
     (sort (a: b: a.priority < b.priority))
-    (lib.partition (v: v.pre == true))
+    (lib.partition (v: v.pre or false == true))
     ({ right ? [], wrong ? []}: let
       r_mapped = lib.unique (map (v: v.cfg) right);
       l_mapped = lib.unique (map (v: v.cfg) wrong);
