@@ -4,6 +4,12 @@ It gets exported by the utils set in [utils/default.nix](../utils/default.nix)
 
 These files drive the category and message passing scheme.
 
-[./default.nix](./default.nix), which depends on [./ncTools.nix](./ncTools.nix) and [./nixCats.lua](./nixCats.lua) and [./nixCatsMeta.lua](./nixCatsMeta.lua) and [./builder_error.nix](./builder_error.nix)
+[./default.nix](./default.nix), which depends on
+- [./ncTools.nix](./ncTools.nix)
+- [./nixCats.lua](./nixCats.lua)
+- [./nixCatsMeta.lua](./nixCatsMeta.lua)
+- [./normalizePlugins.nix](./normalizePlugins.nix)
+- [./builder_error.nix](./builder_error.nix)
+- [nixCatsHelp](../nixCatsHelp)
 
-It also imports the help files at [nixCatsHelp](../nixCatsHelp) so that all versions of nixCats have help.
+Then default.nix passes on the sorted arguments for wrapping to [./wrapNeovim.nix](./wrapNeovim.nix).

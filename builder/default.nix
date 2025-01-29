@@ -173,6 +173,7 @@ let
   start = filterAndFlatten startupPlugins;
   opt = filterAndFlatten optionalPlugins;
 
+  normalized = pkgs.callPackage ./normalizePlugins.nix { inherit start opt; };
   customRC = let
     optLuaPre = let
       lua = if builtins.isString optionalLuaPreInit
@@ -193,6 +194,7 @@ let
     elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
       vim.cmd.source(require('nixCats').configDir .. "/init.vim")
     end
+    ${normalized.inlineConfigs}
     ${optLuaAdditions}
   '';
 
@@ -261,9 +263,7 @@ import ./wrapNeovim.nix {
   neovim-unwrapped = myNeovimUnwrapped;
   inherit extraMakeWrapperArgs nixCats preWrapperShellCode customRC;
   inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars;
-  pluginsOG = {
-    inherit start opt;
-  };
+  inherit (normalized) plugins;
     /* the function you would have passed to python.withPackages */
   # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
     /* the function you would have passed to python.withPackages */

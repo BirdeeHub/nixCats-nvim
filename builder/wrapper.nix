@@ -38,7 +38,6 @@
   , customRC ? ""
   , luaEnv
   , extraPython3wrapperArgs ? []
-  , inlineConfigs ? ""
   , ...
 }:
 assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
@@ -69,12 +68,6 @@ let
     hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
   in
     lib.concatStringsSep ";" hostProviderLua;
-
-  # modified to allow more control over running things FIRST and also in which language.
-  luaRcContent = ''
-    ${customRC}
-    ${inlineConfigs}
-  '';
 
   providerLuaRc = generateProviderRc {
     inherit withPython3 withNodeJs withPerl;
@@ -112,7 +105,7 @@ let
   finalMakeWrapperArgs =
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-    ++ [ "--add-flags" ''-u ${writeText "init.lua" luaRcContent}'' ]
+    ++ [ "--add-flags" ''-u ${writeText "init.lua" customRC}'' ]
     ++ generatedWrapperArgs
     ;
 

@@ -20,7 +20,7 @@
   viAlias ? false,
   extraName ? "",
   customRC ? "",
-  pluginsOG ? { start = []; opt = []; },
+  plugins ? [],
   # I passed some more stuff in also
   nixCats,
   aliases,
@@ -31,7 +31,6 @@
   collate_grammars ? true,
 }:
 let
-  normalized = pkgs.callPackage ./normalizePlugins.nix { inherit pluginsOG; };
   # was once neovimUtils.makeNeovimConfig
   res = import ./wrapenvs.nix {
     inherit withPython3 extraPython3Packages;
@@ -45,14 +44,13 @@ let
     inherit gem_path;
     inherit collate_grammars;
     inherit nixCats;
-    inherit (normalized) plugins;
+    inherit plugins;
   };
 in
 (pkgs.callPackage ./wrapper.nix { }) (res // {
     wrapperArgsStr = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
     customAliases = aliases;
     inherit (nixCats_passthru) nixCats_packageName;
-    inherit (normalized) inlineConfigs;
     inherit withPerl extraPython3wrapperArgs nixCats_passthru
       customRC preWrapperShellCode collate_grammars;
   }

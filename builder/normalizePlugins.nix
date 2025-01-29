@@ -1,5 +1,6 @@
 {
-  pluginsOG,
+  start ? [],
+  opt ? [],
   lib,
 }: let
   # accepts several plugin syntaxes,
@@ -45,10 +46,7 @@
     (concatStringsSep "\n")
   ];
 
-  genPluginList = { start ? [ ], opt ? [ ], }:
-    (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
-
-  pluginsWithConfig = genPluginList pluginsOG;
+  pluginsWithConfig = (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
 
 in {
   plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
