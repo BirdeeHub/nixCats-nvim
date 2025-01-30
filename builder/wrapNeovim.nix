@@ -99,14 +99,7 @@ let
   };
 
 in
-(pkgs.callPackage ./wrapper.nix { }) ((builtins.removeAttrs args [
-  "extraMakeWrapperArgs"
-  "plugins"
-  "nixCats"
-  "ncTools"
-  "aliases"
-  "pkgs"
-]) // {
+(pkgs.callPackage ./wrapper.nix { }) (args // {
   wrapperArgsStr = pkgs.lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
   inherit vimPackDir;
   inherit python3Env;
