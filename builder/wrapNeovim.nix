@@ -1,58 +1,119 @@
-# Copyright (c) 2023 BirdeeHub 
-# Licensed under the MIT license 
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
 # derived from:
-# https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L126-L164
+# https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L26-L122
 {
-  pkgs,
-  neovim-unwrapped,
-  extraMakeWrapperArgs ? "",
-  # the function you would have passed to python.withPackages
-  # , extraPythonPackages ? (_: [])
-  # the function you would have passed to python.withPackages
-  withPython3 ? true,
-  extraPython3Packages ? (_: [ ]),
-  # the function you would have passed to lua.withPackages
-  extraLuaPackages ? (_: [ ]),
   withPerl ? false,
-  withNodeJs ? false,
-  withRuby ? true,
   vimAlias ? false,
   viAlias ? false,
   extraName ? "",
   customRC ? "",
-  plugins ? [],
-  # I passed some more stuff in also
-  nixCats,
-  ncTools,
-  aliases,
-  nixCats_passthru ? { },
   extraPython3wrapperArgs ? [ ],
   preWrapperShellCode ? "",
+  withPython3 ? true,
+  # the function you would have passed to python3.withPackages
+  extraPython3Packages ? (_: [ ]),
+  withNodeJs ? false,
+  withRuby ? true,
   gem_path ? null,
   collate_grammars ? true,
-}:
+  # the function you would have passed to lua.withPackages
+  extraLuaPackages ? (_: [ ]),
+  nixCats_passthru ? { },
+  neovim-unwrapped,
+
+  aliases ? null,
+  extraMakeWrapperArgs ? "",
+  # expects a list of sets with plugin and optional
+  # expects { plugin=far-vim; optional = false; }
+  plugins ? [ ],
+  # function to pass to vim-pack-dir that creates nixCats plugin
+  nixCats,
+  ncTools,
+  pkgs,
+  ...
+}@args:
 let
-  # was once neovimUtils.makeNeovimConfig
-  res = import ./wrapenvs.nix {
-    inherit withPython3 extraPython3Packages;
-    inherit withNodeJs withRuby viAlias vimAlias;
-    inherit extraLuaPackages;
-    inherit extraName;
-    # but now it gets the luaEnv from the actual neovim-unwrapped you used
-    # instead of the one in the neovim-unwrapped from the nixpkgs you used
-    inherit neovim-unwrapped;
-    inherit pkgs;
-    inherit gem_path;
-    inherit collate_grammars;
-    inherit nixCats ncTools;
-    inherit plugins;
+  inherit (pkgs) lib;
+  # gets plugin.dependencies from
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
+  findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
+  transitiveClosure = plugin:
+    [ plugin ] ++ (builtins.concatLists (map transitiveClosure plugin.dependencies or []));
+
+  gemPath = if gem_path != null then gem_path
+    else "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
+  rubyEnv = pkgs.bundlerEnv {
+    name = "neovim-ruby-env";
+    postBuild = ''
+      ln -sf ${pkgs.ruby}/bin/* $out/bin
+    '';
+    gemdir = gemPath;
   };
+
+  # get dependencies of plugins
+  pluginsPartitioned = lib.partition (x: x.optional == true) plugins;
+  opt = map (x: x.plugin) pluginsPartitioned.right;
+  depsOfOptionalPlugins = lib.subtractLists opt (findDependenciesRecursively opt);
+  startWithDeps = lib.pipe pluginsPartitioned.wrong [
+    (map (x: x.plugin))
+    findDependenciesRecursively
+  ];
+  start = startWithDeps ++ depsOfOptionalPlugins;
+
+  allPython3Dependencies = ps: lib.pipe (start ++ opt) [
+    (map (plugin: (plugin.python3Dependencies or (_: [])) ps))
+    lib.flatten
+    (res: (if withPython3 then [ ps.pynvim ] ++ (extraPython3Packages ps) else []) ++ res)
+    lib.unique
+  ];
+  python3Env = pkgs.python3Packages.python.withPackages allPython3Dependencies;
+  luaEnv = neovim-unwrapped.lua.withPackages extraLuaPackages;
+
+  ## Here we calculate all of the arguments to the 1st call of `makeWrapper`
+  # We start with the executable itself NOTE we call this variable "initial"
+  # because if configure != {} we need to call makeWrapper twice, in order to
+  # avoid double wrapping, see comment near finalMakeWrapperArgs
+  makeWrapperArgs =
+    let
+      binPath = lib.makeBinPath (
+        lib.optionals withRuby [ rubyEnv ] ++ lib.optionals withNodeJs [ pkgs.nodejs ]
+      );
+    in
+    [
+      "--inherit-argv0"
+    ] ++ lib.optionals withRuby [
+      "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}"
+    ] ++ lib.optionals (binPath != "") [
+      "--suffix" "PATH" ":" binPath
+    ] ++ lib.optionals (luaEnv != null) [
+      "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
+      "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
+    ];
+
+  vimPackDir = pkgs.callPackage ./vim-pack-dir.nix {
+    inherit collate_grammars nixCats ncTools;
+    python3Env = if allPython3Dependencies pkgs.python3.pkgs == [ ] then null else python3Env;
+    startup = lib.unique start;
+    opt = lib.unique opt;
+  };
+
 in
-(pkgs.callPackage ./wrapper.nix { }) (res // {
-    wrapperArgsStr = pkgs.lib.escapeShellArgs res.wrapperArgs + " " + extraMakeWrapperArgs;
-    customAliases = aliases;
-    inherit (nixCats_passthru) nixCats_packageName;
-    inherit withPerl extraPython3wrapperArgs nixCats_passthru
-      customRC preWrapperShellCode collate_grammars;
-  }
-)
+(pkgs.callPackage ./wrapper.nix { }) ((builtins.removeAttrs args [
+  "extraMakeWrapperArgs"
+  "plugins"
+  "nixCats"
+  "ncTools"
+  "aliases"
+  "pkgs"
+]) // {
+  wrapperArgsStr = pkgs.lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
+  inherit vimPackDir;
+  inherit python3Env;
+  inherit luaEnv;
+  inherit withNodeJs;
+  customAliases = aliases;
+  inherit (nixCats_passthru) nixCats_packageName;
+} // lib.optionalAttrs withRuby {
+  inherit rubyEnv;
+})

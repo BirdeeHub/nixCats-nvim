@@ -116,8 +116,9 @@ with builtins; let lib = import ./lib.nix; in rec {
           lib = nixpkgs.lib or import "${nixpkgspath}/lib";
           outPath = nixpkgspath;
         };
+      builder = import ../builder { nclib = lib; utils = import ./.; };
     in
-    newnixpkgs.lib.makeOverridable (import ../builder) {
+    newnixpkgs.lib.makeOverridable builder {
       nixpkgs = newnixpkgs;
       inherit luaPath categoryDefinitions packageDefinitions name
       system extra_pkg_config dependencyOverlays nixCats_passthru;

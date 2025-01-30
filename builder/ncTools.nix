@@ -1,6 +1,6 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
-{ lib, writeText, ... }: with builtins; let nclib = import ../utils/lib.nix; in rec {
+{ lib, writeText, nclib, ... }: with builtins; rec {
 # NIX CATS INTERNAL UTILS:
 
   inherit (nclib.n2l) toLua types;
