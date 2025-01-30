@@ -1,5 +1,9 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
+{
+  nclib
+  , utils
+}:
 { luaPath
 , categoryDefinitions
 , packageDefinitions
@@ -31,7 +35,7 @@ let
       version = builtins.toString (src.lastModifiedDate or "master");
     };
 
-  ncTools = pkgs.callPackage ./ncTools.nix { };
+  ncTools = pkgs.callPackage ./ncTools.nix { inherit nclib; };
 
   thisPackage = packageDefinitions.${name} { inherit pkgs mkNvimPlugin; };
   settings = {
@@ -168,7 +172,8 @@ let
 
   buildInputs = filterFlattenUnique propagatedBuildInputs;
 
-  #NOTE: only call unique on these 2 after you normalize and pull the dependencies out
+  #NOTE: only call unique on these 2 after you normalize,
+  # and then pull the dependencies out in ./wrapNeovim.nix
   # https://github.com/BirdeeHub/nixCats-nvim/pull/89
   start = filterAndFlatten startupPlugins;
   opt = filterAndFlatten optionalPlugins;
@@ -241,9 +246,7 @@ let
     propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
   }) else baseNvimUnwrapped;
 
-  nc_passthru = nixCats_passthru // (let
-    utils = (import ../utils);
-  in {
+  nc_passthru = nixCats_passthru // {
     keepLuaBuilder = utils.baseBuilder luaPath;
     nixCats_packageName = name;
     inherit categoryDefinitions packageDefinitions dependencyOverlays luaPath utils;
@@ -261,7 +264,7 @@ let
         categoryDefinitions packageDefinitions extra_pkg_config nixpkgs;
       inherit (settings) moduleNamespace;
     };
-  });
+  };
 in
 # NOTE: nothing goes past this file that hasnt been sorted
 import ./wrapNeovim.nix {
