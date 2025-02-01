@@ -182,70 +182,90 @@ Or whatever else you want.
 
 In addition to `nixCats.cats`, nixCats also contains other info.
 >lua
-  nixCats.pawsible
-    -- contains a final set of all the plugins included
-    -- in the package and their paths, and the path to treesitter parsers.
-    -- does not include LSPs and runtime dependencies,
-    -- you can retrieve their paths with vim.fn.exepath if needed.
-
-  nixCats.settings
-    -- contains the settings set for the package
-<
-You can view these for debugging purposes with `:NixCats settings` and
-`:NixCats pawsible` user commands.
-
-You may also use the following to debug. Using
-`:NixCats cat path.to.value` or `:NixCats cat path to value`
-will print the value of `nixCats('path.to.value')` for debugging purposes.
-
-In addition to the user commands, you may access these items directly within
-vimscript!
-
-`GetNixCat(value)` is equivalent to the `nixCats(value)` command in Lua.
-
-`GetNixSettings()` is `require('nixCats').settings`
-
-`GetNixPawsible()` is `require('nixCats').pawsible`
-
-`GetAllNixCats()` is `require('nixCats').cats`
-
-All of the following may be accessed by `require('nixCats').<item>`,
-or :NixCats <item>, except the :NixCats user command also
-has the `cat` subcommand to preview the value from `nixCats("catname")`,
->lua
   ---@class nixCats.main
+  ---
   ---See :h nixCats.flake.outputs.packageDefinitions
   ---Function form will return vim.tbl_get for the attrpath
   ---@field cats table|fun(attrpath: string|string[]): any
+  ---
   ---See :h nixCats.flake.outputs.settings
   ---Function form will return vim.tbl_get for the attrpath
   ---@field settings table|fun(attrpath: string|string[]): any
+  ---
   ---See :h nixCats.flake.outputs.packageDefinitions
   ---Function form will return vim.tbl_get for the attrpath
   ---@field extra table|fun(attrpath: string|string[]): any
+  ---
   ---Contains the final set of plugins added for this package
   ---Function form will return vim.tbl_get for the attrpath
   ---@field pawsible table|fun(attrpath: string|string[]): any
+  ---
   ---Contains all the defined categories that you COULD enable from nix
   ---Function form will return vim.tbl_get for the attrpath
   ---@field petShop table|fun(attrpath: string|string[]): any
-  ---@field nixCatsPath string
-  ---@field vimPackDir string
+  ---
+  ---The path to your configuration for the package
   ---@field configDir string
+  ---
+  ---Path to the nixCats wrapper script that launches nvim
   ---@field packageBinPath string
+  ---
+  ---The path to the packpath directory with all your plugins from nix
+  ---Useful for things such as vim-startuptime which must reference the wrapper's actual path
+  ---@field vimPackDir string
+  ---
+  ---The path to the nixCats plugin
+  ---@field nixCatsPath string
+  ---
   ---internal: this creates the nixCats global commands
   ---@field addGlobals fun() 
+  ---
   ---:h nixCats
   ---This function will return the nearest parent category value, unless the nearest
   ---parent is a table, in which case that means a different subcategory
   ---was enabled but this one was not. In that case it returns nil.
   ---@field get fun(category: string|string[]): any
 
-  ---:h nixCats
-  ---This function will return the nearest parent category value, unless the nearest
-  ---parent is a table, in which case that means a different subcategory
-  ---was enabled but this one was not. In that case it returns nil.
+  ---The main nixCats("cat.name") function
+  ---It is an alias for `nixCats.get("cat.name")`
   ---@alias nixCats nixCats.main | fun(category: string|string[]): any
 <
+All of the above may be accessed in lua via
+`nixCats.<item>`, or `require('nixCats').<item>`, or `:NixCats` <item>,
+and the `:NixCats` user command also
+has the `cat` subcommand to preview the value from `nixCats("catname")`
+You can view these for debugging purposes with `:NixCats settings` and
+`:NixCats pawsible` user commands.
+
+Everything provided by the nixCats plugin can be printed
+for debugging purposes via the `:NixCats` user command.
+e.g. `:NixCats cats` shown above will print the `nixCats.cats` table.
+
+Using `:NixCats cat path.to.value` or `:NixCats cat path to value`
+will print the value of `nixCats('path.to.value')
+
+The debug command by default will create
+a popup window to display the information.
+
+If you don't like that, or are using neovim embedded
+in another application without buffer or window support,
+(such as vscode), you may set
+`vim.g.nixcats_debug_ui = false`
+which will cause it to do a simple `print(vim.inspect(value))` instead.
+Or, you can simply print them yourself!
+`print(vim.inspect(nixCats.cats))`
+
+In addition, you may also access these items directly within vimscript! >vim
+  v:lua.require('nixCats').cats
+<
+There are some helper functions included in the plugin that call that for you,
+but if you are going to use vimscript in neovim, knowing how to call lua is
+important. So, I showed the general way first.
+
+`GetNixCat(value)` is equivalent to the `nixCats(value)` command in Lua.
+`GetNixSettings()` is `require('nixCats').settings`
+`GetNixPawsible()` is `require('nixCats').pawsible`
+`GetAllNixCats()` is `require('nixCats').cats`
+
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:
