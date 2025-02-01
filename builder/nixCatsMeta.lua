@@ -19,20 +19,24 @@ error("Cannot import a meta module")
 ---Contains all the defined categories that you COULD enable from nix
 ---Function form will return vim.tbl_get for the attrpath
 ---@field petShop table|fun(attrpath: string|string[]): any
----@field nixCatsPath string
----@field vimPackDir string
+---The path to your configuration for the package
 ---@field configDir string
+---Path to the nixCats wrapper script that launches nvim
 ---Useful for things such as vim-startuptime which must reference the wrapper's actual path
 ---@field packageBinPath string
+---The path to the packpath directory with all your plugins from nix
+---@field vimPackDir string
+---The path to the nixCats plugin
+---@field nixCatsPath string
 ---internal: this creates the nixCats global commands
----@field addGlobals fun() 
----:h nixCats
+---@field addGlobals fun()
+---See :h nixCats
 ---This function will return the nearest parent category value, unless the nearest
 ---parent is a table, in which case that means a different subcategory
 ---was enabled but this one was not. In that case it returns nil.
 ---@field get fun(category: string|string[]): any
 
----:h nixCats
+---See :h nixCats
 ---This function will return the nearest parent category value, unless the nearest
 ---parent is a table, in which case that means a different subcategory
 ---was enabled but this one was not. In that case it returns nil.
