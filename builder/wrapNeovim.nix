@@ -3,17 +3,18 @@
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L26-L122
 {
-  withPerl ? false,
+  extraName ? "",
   vimAlias ? false,
   viAlias ? false,
-  extraName ? "",
+  aliases ? null,
   customRC ? "",
-  extraPython3wrapperArgs ? [ ],
   preWrapperShellCode ? "",
+  extraPython3wrapperArgs ? [ ],
   withPython3 ? true,
   # the function you would have passed to python3.withPackages
   extraPython3Packages ? (_: [ ]),
   withNodeJs ? false,
+  withPerl ? false,
   withRuby ? true,
   gem_path ? null,
   collate_grammars ? true,
@@ -22,7 +23,6 @@
   nixCats_passthru ? { },
   neovim-unwrapped,
 
-  aliases ? null,
   extraMakeWrapperArgs ? "",
   # expects a list of sets with plugin and optional
   # expects { plugin=far-vim; optional = false; }
@@ -98,14 +98,15 @@ let
     opt = lib.unique opt;
   };
 
+  customAliases = lib.unique (
+    lib.optional viAlias "vi"
+    ++ lib.optional vimAlias "vim"
+    ++ lib.optionals (aliases != null) aliases
+  );
 in
 (pkgs.callPackage ./wrapper.nix { }) (args // {
-  wrapperArgsStr = pkgs.lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
-  inherit vimPackDir;
-  inherit python3Env;
-  inherit luaEnv;
-  inherit withNodeJs;
-  customAliases = aliases;
+  wrapperArgsStr = lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
+  inherit vimPackDir python3Env luaEnv withNodeJs customAliases;
   inherit (nixCats_passthru) nixCats_packageName;
 } // lib.optionalAttrs withRuby {
   inherit rubyEnv;
