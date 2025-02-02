@@ -8,12 +8,19 @@
     (utils.standardPluginOverlay inputs)
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    environmentVariables = {
+      testvars = {
+        TEST = "test";
+        TEST2 = pkgs.bash;
+      };
+    };
   };
   packageDefinitions = {
     ${packagename} = { pkgs, ... }: {
       settings = {
       };
       categories = {
+        testvars = true;
       };
       extra = {
         typetests = rec {

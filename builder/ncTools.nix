@@ -73,11 +73,11 @@
     ) (attrValues attrset);
 
   flattenAttrMapLeaves = twoArgFunc: attrset: let
-    mapAttrValues = attr: attrValues (mapAttrs (name: value:
-        if (isAttrs value)
+    mapAttrValues = lib.mapAttrsToList (name: value:
+        if isAttrs value && !lib.isDerivation value
         then value
         else (twoArgFunc name value)
-      ) attr);
+      );
     flatten = attr: concatMap (v:
         if isAttrs v && !lib.isDerivation v then flatten v
         else if isList v then v
