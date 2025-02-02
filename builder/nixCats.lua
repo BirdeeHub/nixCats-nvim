@@ -63,6 +63,7 @@ function M.addGlobals()
                 vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, contents)
                 vim.bo[bufnr].modifiable = false
                 vim.bo[bufnr].readonly = true
+                vim.bo[bufnr].filetype = "lua"
 
                 -- Get maximum width of text
                 local width = 0
@@ -92,6 +93,14 @@ function M.addGlobals()
 
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
                 vim.api.nvim_buf_set_keymap(bufnr, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
+
+                vim.api.nvim_create_autocmd("BufLeave", {
+                    buffer = bufnr,
+                    once = true,
+                    callback = function()
+                        vim.api.nvim_win_close(win_id, true)
+                    end,
+                })
             end
             local ok, msg = pcall(mk_popup, input)
             if not ok then
