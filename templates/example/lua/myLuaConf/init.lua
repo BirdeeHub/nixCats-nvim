@@ -3,7 +3,7 @@
 require('myLuaConf.opts_and_keys')
 
 -- NOTE: register an extra lze handler with the spec_field 'for_cat'
--- NOTE: that makes enabling an lze spec for a category slightly nicer
+-- that makes enabling an lze spec for a category slightly nicer
 require("lze").register_handlers(require('nixCatsUtils.lzUtils').for_cat)
 
 -- NOTE: general plugins
