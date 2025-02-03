@@ -103,7 +103,7 @@ let
   perlEnv = perl.withPackages (p: [ p.NeovimExt p.Appcpanminus ]);
 in
 stdenv.mkDerivation {
-  name = "neovim-${lib.getVersion neovim-unwrapped}${extraName}";
+  name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
 
   meta = neovim-unwrapped.meta // {
     mainProgram = "${nixCats_packageName}";
