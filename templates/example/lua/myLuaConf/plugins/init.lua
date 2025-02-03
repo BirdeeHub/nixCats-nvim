@@ -7,6 +7,19 @@ end
 -- this is just an example, feel free to do a better job!
 vim.cmd.colorscheme(colorschemeName)
 
+local ok, notify = pcall(require, "notify")
+if ok then
+  notify.setup({
+    on_open = function(win)
+      vim.api.nvim_win_set_config(win, { focusable = false })
+    end,
+  })
+  vim.notify = notify
+  vim.keymap.set("n", "<Esc>", function()
+      notify.dismiss({ silent = true, })
+  end, { desc = "dismiss notify popup and clear hlsearch" })
+end
+
 -- NOTE: you can check if you included the category with the thing wherever you want.
 if nixCats('general.extra') then
   -- I didnt want to bother with lazy loading this.
@@ -18,6 +31,9 @@ if nixCats('general.extra') then
   vim.g.loaded_netrwPlugin = 1
   require("oil").setup({
     default_file_explorer = true,
+    view_options = {
+      show_hidden = true
+    },
     columns = {
       "icon",
       "permissions",

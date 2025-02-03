@@ -2,9 +2,8 @@
 -- NOTE: various, non-plugin config
 require('myLuaConf.opts_and_keys')
 
--- NOTE: register the extra lze handlers because we want to use them.
-require("lze").register_handlers(require('lze.x'))
--- NOTE: also add another one that makes enabling a spec for a category nicer
+-- NOTE: register an extra lze handler with the spec_field 'for_cat'
+-- NOTE: that makes enabling an lze spec for a category slightly nicer
 require("lze").register_handlers(require('nixCatsUtils.lzUtils').for_cat)
 
 -- NOTE: general plugins
@@ -12,7 +11,6 @@ require("myLuaConf.plugins")
 
 -- NOTE: obviously, more plugins, but more organized by what they do below
 
--- I dont need to explain why this is called lsp right?
 require("myLuaConf.LSPs")
 
 -- NOTE: we even ask nixCats if we included our debug stuff in this setup! (we didnt)

@@ -119,7 +119,8 @@ stdenv.mkDerivation {
   preferLocalBuild = true;
 
   # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
-  postBuild = /*bash*/ ''
+  buildPhase = /*bash*/ ''
+    runHook preBuild
     mkdir -p $out/bin
     [ -d ${neovim-unwrapped}/nix-support ] && \
     mkdir -p $out/nix-support && \
@@ -198,5 +199,6 @@ stdenv.mkDerivation {
     tail -n +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
     cat $BASHCACHE > ${placeholder "out"}/bin/${nixCats_packageName}
     rm $BASHCACHE
+    runHook postBuild
   '';
 }

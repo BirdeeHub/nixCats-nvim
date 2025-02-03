@@ -65,6 +65,7 @@ return {
     -- event = "",
     -- ft = "",
     keys = {
+      { "<leader>sM", '<cmd>Telescope notify<CR>', mode = {"n"}, desc = '[S]earch [M]essage', },
       { "<leader>sp",live_grep_git_root, mode = {"n"}, desc = '[S]earch git [P]roject root', },
       { "<leader>/", function()
         -- Slightly advanced example of overriding default behavior and theme

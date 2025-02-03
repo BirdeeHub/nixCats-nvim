@@ -150,6 +150,7 @@
             lze
             vim-repeat
             plenary-nvim
+            nvim-notify
           ];
           extra = [
             oil-nvim
