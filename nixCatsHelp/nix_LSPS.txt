@@ -9,7 +9,7 @@ It functions the same as what kickstart.nvim does for its mason setup.
 However, when loaded via Nix,
 it skips mason and passes them straight to nvim-lspconfig
 
-When installing via pckr, install mason via pckr. Then wherever you set up
+When installing via paq-nvim, install mason via paq-nvim. Then wherever you set up
 mason, do this.
 The stuff added to servers table is what is passed to lspconfig/mason
 

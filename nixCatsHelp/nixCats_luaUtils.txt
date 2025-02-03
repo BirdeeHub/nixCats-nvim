@@ -2,7 +2,7 @@
                                                             *nixCats.luaUtils*
 ---------------------------------------------------------------------------------
                                                       *nixCats.luaUtils.intro*
-nixCats has good integration with pckr and other similar Neovim package
+nixCats has good integration with paq-nvim and other similar Neovim package
 managers.
 
 Keep in mind they may not work so well on NixOS,
