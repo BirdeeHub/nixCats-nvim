@@ -51,14 +51,7 @@ function M.make_load_with_after(dirs, load)
     end
     ---@param plugin_names string[]|string
     return function(plugin_names)
-        local names
-        if type(plugin_names) == "table" then
-            names = plugin_names
-        elseif type(plugin_names) == "string" then
-            names = { plugin_names }
-        else
-            return
-        end
+        local names = type(plugin_names) == "table" and plugin_names or { plugin_names }
         local to_source = {}
         for _, name in ipairs(names) do
             if type(name) == "string" then
@@ -66,8 +59,7 @@ function M.make_load_with_after(dirs, load)
                 if type(path) == "string" then
                     table.insert(to_source, { name = name, path = path })
                 else
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    local ok, err = pcall(vim.cmd, "packadd " .. name)
+                    local ok, err = pcall(vim.cmd.packadd, name)
                     if ok then
                         table.insert(to_source, { name = name, path = nil })
                     else
