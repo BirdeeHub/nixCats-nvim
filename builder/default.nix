@@ -130,7 +130,7 @@ let
   # see :help nixCats
   # this function gets passed all the way into the wrapper so that we can also add
   # other dependencies that get resolved later in the process such as treesitter grammars.
-  nixCats = allPluginDeps: pkgs.stdenv.mkDerivation (let
+  nixCats = allPluginDeps: let
     isUnwrappedCfgPath = settings.wrapRc == false && builtins.isString settings.unwrappedCfgPath;
     isStdCfgPath = settings.wrapRc == false && ! builtins.isString settings.unwrappedCfgPath;
 
@@ -153,7 +153,7 @@ let
     petShop = ncTools.mkLuaFileWithMeta "petShop.lua" all_cat_names;
     depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
     extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
-  in {
+  in pkgs.stdenv.mkDerivation {
     name = "nixCats";
     builder = pkgs.writeText "builder.sh" /*bash*/ ''
       source $stdenv/setup
@@ -168,7 +168,7 @@ let
       cp ${extraItems} $out/lua/nixCats/extra.lua
       cp -r ${../nixCatsHelp}/* $out/doc/
     '';
-  });
+  };
 
   buildInputs = filterFlattenUnique propagatedBuildInputs;
 
