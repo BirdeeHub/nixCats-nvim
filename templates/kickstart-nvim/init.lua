@@ -658,6 +658,8 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         --
 
       -- NOTE: nixCats: nixd is not available on mason.
+      -- Feel free to check the nixd docs for more configuration options:
+      -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
       if require('nixCatsUtils').isNixCats then
         servers.nixd = {}
       else
@@ -689,7 +691,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         for server_name,_ in pairs(servers) do
           require('lspconfig')[server_name].setup({
             capabilities = capabilities,
-            settings = servers[server_name],
+            settings = (servers[server_name] or {}).settings,
             filetypes = (servers[server_name] or {}).filetypes,
             cmd = (servers[server_name] or {}).cmd,
             root_pattern = (servers[server_name] or {}).root_pattern,
