@@ -13,6 +13,7 @@ if nixCats('neonixdev') then
         },
       },
       telemetry = { enabled = false },
+
     }
     filetypes = { 'lua' },
   }
@@ -46,14 +47,14 @@ if nixCats('neonixdev') then
       local flakePath = nixCats.extra("nixdExtras.flake-path")
       if nixCats.extra("nixdExtras.systemCFGname") then
         -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
-        servers.nixd.nixd.options.nixos = {
+        servers.nixd.settings.nixd.options.nixos = {
           expr = [[(builtins.getFlake "]] .. flakePath ..  [[").nixosConfigurations."]] ..
             nixCats.extra("nixdExtras.systemCFGname") .. [[".options]]
         }
       end
       if nixCats.extra("nixdExtras.homeCFGname") then
         -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
-        servers.nixd.nixd.options["home-manager"] = {
+        servers.nixd.settings.nixd.options["home-manager"] = {
           expr = [[(builtins.getFlake "]] .. flakePath .. [[").homeConfigurations."]]
             .. nixCats.extra("nixdExtras.homeCFGname") .. [[".options]]
         }
