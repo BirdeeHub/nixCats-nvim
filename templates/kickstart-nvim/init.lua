@@ -689,7 +689,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         for server_name,_ in pairs(servers) do
           require('lspconfig')[server_name].setup({
             capabilities = capabilities,
-            settings = servers[server_name],
+            settings = (servers[server_name] or {}).settings,
             filetypes = (servers[server_name] or {}).filetypes,
             cmd = (servers[server_name] or {}).cmd,
             root_pattern = (servers[server_name] or {}).root_pattern,

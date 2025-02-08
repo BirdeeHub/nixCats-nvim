@@ -1,33 +1,38 @@
 local servers = {}
 if nixCats('neonixdev') then
   servers.lua_ls = {
-    Lua = {
-      formatters = {
-        ignoreComments = true,
+    settings = {
+      Lua = {
+        formatters = {
+          ignoreComments = true,
+        },
+        signatureHelp = { enabled = true },
+        diagnostics = {
+          globals = { 'nixCats' },
+          disable = { 'missing-fields' },
+        },
       },
-      signatureHelp = { enabled = true },
-      diagnostics = {
-        globals = { 'nixCats' },
-        disable = { 'missing-fields' },
-      },
-    },
-    telemetry = { enabled = false },
+      telemetry = { enabled = false },
+    }
     filetypes = { 'lua' },
   }
   if require('nixCatsUtils').isNixCats then
     servers.nixd = {
-      nixd = {
-        nixpkgs = {
-          -- nixd requires some configuration in flake based configs.
-          -- luckily, the nixCats plugin is here to pass whatever we need!
-          expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
-        },
-        formatting = {
-          command = { "nixfmt" }
-        },
-        diagnostic = {
-          suppress = {
-            "sema-escaping-with"
+      settings = {
+        nixd = {
+          nixpkgs = {
+            -- nixd requires some configuration in flake based configs.
+            -- luckily, the nixCats plugin is here to pass whatever we need!
+            -- we passed this in via the `extra` table in our packageDefinitions
+            expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
+          },
+          formatting = {
+            command = { "nixfmt" }
+          },
+          diagnostic = {
+            suppress = {
+              "sema-escaping-with"
+            }
           }
         }
       }
@@ -117,7 +122,7 @@ require('lze').load {
             capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
             -- this line is interchangeable with the above LspAttach autocommand
             -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-            settings = cfg,
+            settings = (cfg or {}).settings,
             filetypes = (cfg or {}).filetypes,
             cmd = (cfg or {}).cmd,
             root_pattern = (cfg or {}).root_pattern,
@@ -135,7 +140,7 @@ require('lze').load {
               capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
               -- this line is interchangeable with the above LspAttach autocommand
               -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-              settings = servers[server_name],
+              settings = (servers[server_name] or {}).settings,
               filetypes = (servers[server_name] or {}).filetypes,
             }
           end,
