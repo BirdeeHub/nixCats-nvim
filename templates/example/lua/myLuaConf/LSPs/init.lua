@@ -1,33 +1,37 @@
 local servers = {}
 if nixCats('neonixdev') then
   servers.lua_ls = {
-    Lua = {
-      formatters = {
-        ignoreComments = true,
+    settings = {
+      Lua = {
+        formatters = {
+          ignoreComments = true,
+        },
+        signatureHelp = { enabled = true },
+        diagnostics = {
+          globals = { 'nixCats' },
+          disable = { 'missing-fields' },
+        },
       },
-      signatureHelp = { enabled = true },
-      diagnostics = {
-        globals = { 'nixCats' },
-        disable = { 'missing-fields' },
-      },
+      telemetry = { enabled = false },
     },
-    telemetry = { enabled = false },
     filetypes = { 'lua' },
   }
   if require('nixCatsUtils').isNixCats then
     servers.nixd = {
-      nixd = {
-        nixpkgs = {
-          -- nixd requires some configuration in flake based configs.
-          -- luckily, the nixCats plugin is here to pass whatever we need!
-          expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
-        },
-        formatting = {
-          command = { "nixfmt" }
-        },
-        diagnostic = {
-          suppress = {
-            "sema-escaping-with"
+      settings = {
+        nixd = {
+          nixpkgs = {
+            -- nixd requires some configuration in flake based configs.
+            -- luckily, the nixCats plugin is here to pass whatever we need!
+            expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
+          },
+          formatting = {
+            command = { "nixfmt" }
+          },
+          diagnostic = {
+            suppress = {
+              "sema-escaping-with"
+            }
           }
         }
       }
@@ -41,14 +45,14 @@ if nixCats('neonixdev') then
       local flakePath = nixCats.extra("nixdExtras.flake-path")
       if nixCats.extra("nixdExtras.systemCFGname") then
         -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
-        servers.nixd.nixd.options.nixos = {
+        servers.nixd.settings.nixd.options.nixos = {
           expr = [[(builtins.getFlake "]] .. flakePath ..  [[").nixosConfigurations."]] ..
             nixCats.extra("nixdExtras.systemCFGname") .. [[".options]]
         }
       end
       if nixCats.extra("nixdExtras.homeCFGname") then
         -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
-        servers.nixd.nixd.options["home-manager"] = {
+        servers.nixd.settings.nixd.options["home-manager"] = {
           expr = [[(builtins.getFlake "]] .. flakePath .. [[").homeConfigurations."]]
             .. nixCats.extra("nixdExtras.homeCFGname") .. [[".options]]
         }
