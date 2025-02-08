@@ -117,7 +117,7 @@ require('lze').load {
             capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
             -- this line is interchangeable with the above LspAttach autocommand
             -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-            settings = cfg,
+            settings = (cfg or {}).settings,
             filetypes = (cfg or {}).filetypes,
             cmd = (cfg or {}).cmd,
             root_pattern = (cfg or {}).root_pattern,
@@ -135,7 +135,7 @@ require('lze').load {
               capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
               -- this line is interchangeable with the above LspAttach autocommand
               -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-              settings = servers[server_name],
+              settings = (servers[server_name] or {}).settings,
               filetypes = (servers[server_name] or {}).filetypes,
             }
           end,

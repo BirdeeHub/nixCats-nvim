@@ -169,7 +169,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
           capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
           -- this line is interchangeable with the above LspAttach autocommand
           -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-          settings = servers[server_name],
+          settings = (servers[server_name] or {}).settings,
           filetypes = (servers[server_name] or {}).filetypes,
         }
       end,
