@@ -14,7 +14,7 @@ if nixCats('neonixdev') then
       },
       telemetry = { enabled = false },
 
-    }
+    },
     filetypes = { 'lua' },
   }
   if require('nixCatsUtils').isNixCats then
