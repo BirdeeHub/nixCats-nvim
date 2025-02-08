@@ -13,7 +13,8 @@ if nixCats('neonixdev') then
         },
       },
       telemetry = { enabled = false },
-    },
+
+    }
     filetypes = { 'lua' },
   }
   if require('nixCatsUtils').isNixCats then
@@ -23,6 +24,7 @@ if nixCats('neonixdev') then
           nixpkgs = {
             -- nixd requires some configuration in flake based configs.
             -- luckily, the nixCats plugin is here to pass whatever we need!
+            -- we passed this in via the `extra` table in our packageDefinitions
             expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
           },
           formatting = {
