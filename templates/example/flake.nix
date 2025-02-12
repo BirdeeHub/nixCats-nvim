@@ -44,6 +44,11 @@
     #   flake = false;
     # };
 
+    "plugins-lzextras" = {
+      url = "github:BirdeeHub/lzextras";
+      flake = false;
+    };
+
     # neovim-nightly-overlay = {
     #   url = "github:nix-community/neovim-nightly-overlay";
     # };
@@ -148,6 +153,7 @@
           # (always isnt a special name, just the one I chose for this subcategory)
           always = [
             lze
+            pkgs.neovimPlugins.lzextras
             vim-repeat
             plenary-nvim
             nvim-notify
