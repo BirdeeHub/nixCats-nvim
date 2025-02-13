@@ -11,8 +11,10 @@ local M = {}
 -- require('lze').register_handlers(require('nixCatsUtils.lzUtils').for_cat)
 -- before any calls to require('lze').load using the handler have been made.
 -- accepts:
--- for_cat = { "your" "cat" }; for_cat = { cat = { "your" "cat" }, default = bool }
--- for_cat = "your.cat"; for_cat = { cat = "your.cat", default = bool }
+-- for_cat = { "your" "cat" };
+-- for_cat = { cat = { "your" "cat" }, default = bool }
+-- for_cat = "your.cat";
+-- for_cat = { cat = "your.cat", default = bool }
 -- where default is an alternate value for when nixCats was NOT used to install the config
 M.for_cat = {
     spec_field = "for_cat",
