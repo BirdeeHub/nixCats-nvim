@@ -60,7 +60,7 @@ let
 
       hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
     in
-      lib.concatStringsSep ";" hostProviderLua;
+      lib.concatStringsSep "\n" hostProviderLua;
 
     providerLuaRc = generateProviderRc {
       inherit withPython3 withNodeJs withPerl;
@@ -68,6 +68,7 @@ let
     };
 
     setupLua = writeText "setup.lua" /*lua*/''
+      ${providerLuaRc}
       vim.opt.packpath:prepend([[${vimPackDir}]])
       vim.opt.runtimepath:prepend([[${vimPackDir}]])
       vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]
@@ -83,7 +84,7 @@ let
     '';
   in [
     # vim accepts a limited number of commands so we join them all
-    "--add-flags" ''--cmd "lua ${providerLuaRc};dofile([[${setupLua}]])"''
+    "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"''
   ];
 
   # If configure != {}, we can't generate the rplugin.vim file with e.g
