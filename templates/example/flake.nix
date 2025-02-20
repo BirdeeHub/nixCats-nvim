@@ -44,6 +44,10 @@
     #   flake = false;
     # };
 
+    "plugins-lze" = {
+      url = "github:BirdeeHub/lze";
+      flake = false;
+    };
     "plugins-lzextras" = {
       url = "github:BirdeeHub/lzextras";
       flake = false;
@@ -152,7 +156,7 @@
           # you can make subcategories!!!
           # (always isnt a special name, just the one I chose for this subcategory)
           always = [
-            lze
+            pkgs.neovimPlugins.lze
             pkgs.neovimPlugins.lzextras
             vim-repeat
             plenary-nvim

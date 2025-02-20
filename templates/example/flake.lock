@@ -17,11 +17,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1739138025,
-        "narHash": "sha256-M4ilIfGxzbBZuURokv24aqJTbdjPA9K+DtKUzrJaES4=",
+        "lastModified": 1739863612,
+        "narHash": "sha256-UbtgxplOhFcyjBcNbTVO8+HUHAl/WXFDOb6LvqShiZo=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "b2243f41e860ac85c0b446eadc6930359b294e79",
+        "rev": "632f04521e847173c54fa72973ec6c39a371211c",
         "type": "github"
       },
       "original": {
@@ -31,10 +31,44 @@
         "type": "github"
       }
     },
+    "plugins-lze": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740008281,
+        "narHash": "sha256-g57D+up+xy3H34EXQCfieNyJcvVIg91OrYaL8tTIisM=",
+        "owner": "BirdeeHub",
+        "repo": "lze",
+        "rev": "ef6a03163f6ca1b94c879cd451d9211b687fee87",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "lze",
+        "type": "github"
+      }
+    },
+    "plugins-lzextras": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740019961,
+        "narHash": "sha256-+pVS5jHFKkLpv8bjPPxLW8Xr3idPaiHAUvvD+tJNlt8=",
+        "owner": "BirdeeHub",
+        "repo": "lzextras",
+        "rev": "695ef5d365f902f95818ddd5c3b7c8650f09bdd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "lzextras",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "nixCats": "nixCats",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "plugins-lze": "plugins-lze",
+        "plugins-lzextras": "plugins-lzextras"
       }
     }
   },

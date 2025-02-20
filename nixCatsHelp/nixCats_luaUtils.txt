@@ -168,6 +168,7 @@ only stuff pertaining to downloading and building should be added to paq.
 >lua
   require('nixCatsUtils.catPacker').setup({
     { "BirdeeHub/lze", },
+    { "BirdeeHub/lzextras", },
     { "stevearc/oil.nvim", },
     { 'joshdick/onedark.vim', },
     { 'nvim-tree/nvim-web-devicons', },

@@ -24,6 +24,7 @@ require('nixCatsUtils.catPacker').setup({
 --[[ we dont have to write it twice.            ]]
 --[[ ------------------------------------------ ]]
   { "BirdeeHub/lze", },
+  { "BirdeeHub/lzextras", },
   { "stevearc/oil.nvim", },
   { 'joshdick/onedark.vim', },
   { 'nvim-tree/nvim-web-devicons', },
