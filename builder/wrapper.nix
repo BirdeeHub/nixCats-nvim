@@ -9,7 +9,6 @@
 , writeText
 , nodePackages
 , python3
-, perl
 }:
 {
   neovim-unwrapped
@@ -18,6 +17,7 @@
   , python3Env ? python3
   , withNodeJs ? false
   , withPerl ? false
+  , perlEnv ? null
   , rubyEnv ? null
   , vimPackDir
   , wrapperArgsStr ? ""
@@ -101,7 +101,6 @@ let
     ;
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
-  perlEnv = perl.withPackages (p: [ p.NeovimExt p.Appcpanminus ]);
 in
 stdenv.mkDerivation {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
