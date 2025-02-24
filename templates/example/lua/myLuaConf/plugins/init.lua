@@ -68,19 +68,6 @@ require('lze').load {
   { import = "myLuaConf.plugins.treesitter", },
   { import = "myLuaConf.plugins.completion", },
   {
-    "lazydev.nvim",
-    for_cat = 'neonixdev',
-    cmd = { "LazyDev" },
-    ft = "lua",
-    after = function(plugin)
-      require('lazydev').setup({
-        library = {
-          { words = { "nixCats" }, path = (require('nixCats').nixCatsPath or "") .. '/lua' },
-        },
-      })
-    end,
-  },
-  {
     "markdown-preview.nvim",
     -- NOTE: for_cat is a custom handler that just sets enabled value for us,
     -- based on result of nixCats('cat.name') and allows us to set a different default if we wish

@@ -148,6 +148,7 @@
           # (always isnt a special name, just the one I chose for this subcategory)
           always = [
             lze
+            lzextras
             vim-repeat
             plenary-nvim
             nvim-notify

@@ -1,6 +1,15 @@
+local function faster_get_path(name)
+  local path = vim.tbl_get(package.loaded, "nixCats", "pawsible", "allPlugins", "opt", name)
+  if path then
+    vim.cmd.packadd(name)
+    return path
+  end
+  return nil -- nil will make it default to normal behavior
+end
+
 ---packadd + after/plugin
 ---@type fun(names: string[]|string)
-local load_w_after_plugin = require('nixCatsUtils.lzUtils').make_load_with_after({ "plugin" })
+local load_w_after_plugin = require('lzextras').make_load_with_afters({ "plugin" }, faster_get_path)
 
 -- NOTE: packadd doesnt load after directories.
 -- hence, the above function that you can get from luaUtils that exists to make that easy.

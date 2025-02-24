@@ -69,6 +69,7 @@ let
   ];
   python3Env = pkgs.python3Packages.python.withPackages allPython3Dependencies;
   luaEnv = neovim-unwrapped.lua.withPackages extraLuaPackages;
+  perlEnv = pkgs.perl.withPackages (p: [ p.NeovimExt p.Appcpanminus ]);
 
   ## Here we calculate all of the arguments to the 1st call of `makeWrapper`
   # We start with the executable itself NOTE we call this variable "initial"
@@ -106,7 +107,7 @@ let
 in
 (pkgs.callPackage ./wrapper.nix { }) (args // {
   wrapperArgsStr = lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
-  inherit vimPackDir python3Env luaEnv withNodeJs customAliases;
+  inherit vimPackDir python3Env luaEnv withNodeJs perlEnv customAliases;
   inherit (nixCats_passthru) nixCats_packageName;
 } // lib.optionalAttrs withRuby {
   inherit rubyEnv;

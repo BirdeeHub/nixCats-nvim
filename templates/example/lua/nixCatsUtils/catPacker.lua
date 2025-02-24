@@ -15,7 +15,7 @@ local M = {}
 -- can be used this way, just do whatever the plugin manager needs to put it in the
 -- opt directory for lazy loading, and add the build steps so that when theres no nix the steps are ran
 function M.setup(v)
-  if not require('nixCatsUtils').isNixCats then
+  if not vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] then
     local function clone_paq()
       local path = vim.fn.stdpath("data") .. "/site/pack/paqs/start/paq-nvim"
       local is_installed = vim.fn.empty(vim.fn.glob(path)) == 0
