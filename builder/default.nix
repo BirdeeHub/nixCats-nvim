@@ -172,12 +172,14 @@ let
 
   buildInputs = filterFlattenUnique propagatedBuildInputs;
 
-  #NOTE: only call unique on these 2 after you normalize,
-  # and then pull the dependencies out in ./wrapNeovim.nix
-  # https://github.com/BirdeeHub/nixCats-nvim/pull/89
-  start = filterAndFlatten startupPlugins;
-  opt = filterAndFlatten optionalPlugins;
-  normalized = pkgs.callPackage ./normalizePlugins.nix { inherit start opt; inherit (ncTools) toLua; };
+  normalized = pkgs.callPackage ./normalizePlugins.nix {
+    #NOTE: only call unique on these 2 after you normalize,
+    # and then pull the dependencies out in ./wrapNeovim.nix
+    # https://github.com/BirdeeHub/nixCats-nvim/pull/89
+    start = filterAndFlatten startupPlugins;
+    opt = filterAndFlatten optionalPlugins;
+    inherit (ncTools) toLua;
+  };
 
   customRC = let
     optLuaPre = let
