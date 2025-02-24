@@ -11,14 +11,14 @@
     __call = function(self, attrpath)
       local strtable = {}
       if type(attrpath) == "table" then
-          strtable = attrpath
+        strtable = attrpath
       elseif type(attrpath) == "string" then
-          for key in attrpath:gmatch("([^%.]+)") do
-              table.insert(strtable, key)
-          end
+        for key in attrpath:gmatch("([^%.]+)") do
+          table.insert(strtable, key)
+        end
       else
-          print('function requires a { "list", "of", "strings" } or a "dot.separated.string"')
-          return
+        print('function requires a { "list", "of", "strings" } or a "dot.separated.string"')
+        return
       end
       if #strtable == 0 then return nil end
       local tbl = self;
