@@ -64,20 +64,35 @@ They can be grabbed in your flake.nix via the self variable.
 
 Within your config that you grab from your self variable, the packages will be
 here:
-
 >nix
-  config.${defaultPackageName}.out.packages.<PACKAGE_NAME>
+  config."<defaultPackageName>".out.packages."<PACKAGE_NAME>"
 <
 and if using the NixOS module there is ALSO
 >nix
-  config.${defaultPackageName}.out.users.<USER_NAME>.packages.<PACKAGE_NAME>
+  config."<defaultPackageName>".out.users."<USER_NAME>".packages."<PACKAGE_NAME>"
 <
+Which can be useful! Say, for example, you installed your nvim via a home
+manager module. You can then set your EDITOR variable like this!
+>nix
+  home.sessionVariables.EDITOR = let
+    nvimpkg = config."<defaultPackageName>".out.packages."<PACKAGE_NAME>";
+  in "${nvimpkg}/bin/${nvimpkg.nixCats_packageName}";
+<
+
+When exporting the package from your system's flake.nix,
+you will need to get `config` from `self` first.
 
 To find your package from the self variable, it will look something like
 this:
-
 >nix
+  # getting it from a home manager configuration
   self.homeConfigurations."<home_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
+
+  # getting it from a nixos configuration
+  self.nixosConfigurations."<system_config_name>".config."<defaultPackageName>".out.packages."<package_name>"
+
+  # getting home manager package when home manager is a nixos module
+  self.nixosConfigurations."<system_config_name>".config.home-manager.users."<username>"."<defaultPackageName>".out.packages."<package_name>"
 <
 
 You can then export that from your flake as
