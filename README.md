@@ -242,3 +242,4 @@ I also borrowed code from [nixpkgs](https://github.com/NixOS/nixpkgs) and made m
 
 - [`nvf`](https://github.com/NotAShelf/nvf): <a name="nvf"></a>
   An alternative to NixVim. Another project that attempts to "nixify" everything.
+  Different from NixVim in that it allows you to order the generated configuration (via a directed acyclic graph).
