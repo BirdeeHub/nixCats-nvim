@@ -1,2 +1,3 @@
 # who needs flake-compat when you have no inputs?
-(import ./utils)
+# everything you will need is in utils.
+import ./utils

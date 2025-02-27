@@ -2,8 +2,8 @@
 # Licensed under the MIT license
 {
   isHomeManager
-  , defaultPackageName
-  , moduleNamespace ? [ defaultPackageName ]
+  , defaultPackageName ? null
+  , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
   , luaPath ? ""
   , packageDefinitions ? {}
   , nclib
@@ -67,7 +67,7 @@ in {
       };
 
       packageNames = mkOption {
-        default = if packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
+        default = if defaultPackageName != null && packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
         type = (types.listOf types.str);
         description = ''A list of packages from packageDefinitions to include'';
         example = ''
@@ -310,7 +310,7 @@ in {
             };
 
             packageNames = mkOption {
-              default = if packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
+              default = if defaultPackageName != null && packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
               type = (types.listOf types.str);
               description = ''A list of packages from packageDefinitions to include'';
               example = ''

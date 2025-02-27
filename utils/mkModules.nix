@@ -2,8 +2,8 @@
 # Licensed under the MIT license
 {
   isHomeManager
-  , defaultPackageName
-  , moduleNamespace ? [ defaultPackageName ]
+  , defaultPackageName ? null
+  , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
   , oldDependencyOverlays ? null
   , luaPath ? ""
   , keepLuaBuilder ? null

@@ -207,46 +207,48 @@ with builtins; let lib = import ./lib.nix; in rec {
     This will control the namespace of the generated modules
     as well as the default package name to be enabled if only enable = true is present.
 
-    Unlike in the baseBuilder, all other arguments are optional
-
-    But if you want the module to actually contain configured packages, they are not optional.
+    Unlike in the baseBuilder, arguments are optional,
+    but if you want the module to be preloaded with configured packages,
+    they are not.
 
     The module will be able to combine any definitions passed in with new ones defined in the module correctly.
 
     ## Arguments
 
-    `defaultPackageName` (`string`)
-    : the only truly required argument
-    : by default controls the namespace of the generated module and the default package installed
+    - `defaultPackageName` (`string`)
+    : default = null
+    : sets the default package to install when module is enabled.
+    : if set, by default controls the namespace of the generated module
 
-    `moduleNamespace` (`listOf string`)
-    : can be used to override the namespace of the module options
-    : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
+    - `moduleNamespace` (`listOf string`)
+    : default = if `defaultPackageName != null` then `[ defaultPackageName ]` else `[ "nixCats" ]`
+    : can be used to override the namespace of the module options,
+    : meaning `[ "programs" "nixCats" ]` would create options like `programs.nixCats.enable = true`.
 
-    `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    - `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
     : default = null
 
-    `luaPath` (`path` or `stringWithContext`)
+    - `luaPath` (`path` or `stringWithContext`)
     : default = ""
     : store path to your ~/.config/nvim replacement within your nix config.
 
-    `keepLuaBuilder` (`function`)
+    - `keepLuaBuilder` (`function`)
     : default = null
     : baseBuilder with luaPath argument applied, can be used instead of luaPath
 
-    `extra_pkg_config` (`attrs`)
+    - `extra_pkg_config` (`attrs`)
     : default = {}
     : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
 
-    `nixpkgs` (`path` or `attrs`)
+    - `nixpkgs` (`path` or `attrs`)
     : default = null
     : nixpkgs flake input, channel path, or pkgs variable
 
-    `categoryDefinitions` (`functionTo` `AttrSet`)
+    - `categoryDefinitions` (`functionTo` `AttrSet`)
     : default = (_:{})
     : same as for the baseBuilder
 
-    `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
+    - `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
     : default = {}
     : same as for the baseBuilder
 
@@ -258,8 +260,8 @@ with builtins; let lib = import ./lib.nix; in rec {
     , keepLuaBuilder ? null
     , categoryDefinitions ? (_:{})
     , packageDefinitions ? {}
-    , defaultPackageName
-    , moduleNamespace ? [ defaultPackageName ]
+    , defaultPackageName ? null
+    , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
     , ... }:
@@ -280,9 +282,9 @@ with builtins; let lib = import ./lib.nix; in rec {
     This will control the namespace of the generated modules
     as well as the default package name to be enabled if only enable = true is present.
 
-    Unlike in the baseBuilder, all other arguments are optional
-
-    But if you want the module to actually contain configured packages, they are not optional.
+    Unlike in the baseBuilder, arguments are optional,
+    but if you want the module to be preloaded with configured packages,
+    they are not.
 
     The module will be able to combine any definitions passed in with new ones defined in the module correctly.
 
@@ -292,38 +294,40 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `defaultPackageName` (`string`)
-    : the only truly required argument
-    : by default controls the namespace of the generated module and the default package installed
+    - `defaultPackageName` (`string`)
+    : default = null
+    : sets the default package to install when module is enabled.
+    : if set, by default controls the namespace of the generated module
 
-    `moduleNamespace` (`listOf string`)
-    : can be used to override the namespace of the module options
-    : `[ "programs" "nixCats" ]` would mean options like `programs.nixCats.enable = true`
+    - `moduleNamespace` (`listOf string`)
+    : default = if `defaultPackageName != null` then `[ defaultPackageName ]` else `[ "nixCats" ]`
+    : can be used to override the namespace of the module options,
+    : meaning `[ "programs" "nixCats" ]` would create options like `programs.nixCats.enable = true`.
 
-    `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    - `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
     : default = null
 
-    `luaPath` (`path` or `stringWithContext`)
+    - `luaPath` (`path` or `stringWithContext`)
     : default = ""
     : store path to your ~/.config/nvim replacement within your nix config.
 
-    `keepLuaBuilder` (`function`)
+    - `keepLuaBuilder` (`function`)
     : default = null
     : baseBuilder with luaPath argument applied, can be used instead of luaPath
 
-    `extra_pkg_config` (`attrs`)
+    - `extra_pkg_config` (`attrs`)
     : default = {}
     : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
 
-    `nixpkgs` (`path` or `attrs`)
+    - `nixpkgs` (`path` or `attrs`)
     : default = null
     : nixpkgs flake input, channel path, or pkgs variable
 
-    `categoryDefinitions` (`functionTo` `AttrSet`)
+    - `categoryDefinitions` (`functionTo` `AttrSet`)
     : default = (_:{})
     : same as for the baseBuilder
 
-    `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
+    - `packageDefinitions` (`AttrsOf` `functionTo` `AttrSet`)
     : default = {}
     : same as for the baseBuilder
 
@@ -335,8 +339,8 @@ with builtins; let lib = import ./lib.nix; in rec {
     , keepLuaBuilder ? null
     , categoryDefinitions ? (_:{})
     , packageDefinitions ? {}
-    , defaultPackageName
-    , moduleNamespace ? [ defaultPackageName ]
+    , defaultPackageName ? null
+    , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
     , ... }:
@@ -379,9 +383,9 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `systems` (`listOf strings`)
+    - `systems` (`listOf strings`)
 
-    `f` (`functionTo` `AttrSet`)
+    - `f` (`functionTo` `AttrSet`)
 
     ---
   */
@@ -407,9 +411,9 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `systems` (`listOf strings`)
+    - `systems` (`listOf strings`)
 
-    `f` (`function`)
+    - `f` (`function`)
 
     ---
   */
@@ -432,10 +436,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `type` (`enumOf` `"replace" | "merge"`)
+    - `type` (`enumOf` `"replace" | "merge"`)
     : controls the way individual categories are merged between definitions
 
-    `definitions` (`listOf` `functionTo` `AttrSet`)
+    - `definitions` (`listOf` `functionTo` `AttrSet`)
     : accepts a list of `categoryDefinitions` or a list of individual `packageDefinition`
 
     ---
@@ -461,10 +465,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `oldCats` (`functionTo` `AttrSet`)
+    - `oldCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
 
-    `newCats` (`functionTo` `AttrSet`)
+    - `newCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
 
     ---
@@ -478,10 +482,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `oldCats` (`functionTo` `AttrSet`)
+    - `oldCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
 
-    `newCats` (`functionTo` `AttrSet`)
+    - `newCats` (`functionTo` `AttrSet`)
     : accepts `categoryDefinitions` or a single `packageDefinition`
 
     ---
@@ -503,7 +507,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `overlist` (`listOf` `overlays`)
+    - `overlist` (`listOf` `overlays`)
 
     ---
   */
@@ -520,9 +524,9 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `oldOverlist` (`listOf` `overlays`)
+    - `oldOverlist` (`listOf` `overlays`)
 
-    `newOverlist` (`listOf` `overlays`)
+    - `newOverlist` (`listOf` `overlays`)
 
     ---
   */
@@ -543,11 +547,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `system` (`string` or `null`)
+    - `system` (`string` or `null`)
     : Technically optional if you know `dependencyOverlays` is a list
     : But the whole function isnt required at that point so, this is effectively required
 
-    `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
+    - `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
 
     ## Example
 
@@ -582,13 +586,13 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
     
-    `finalBuilder` (`function`)
+    - `finalBuilder` (`function`)
     : this is `baseBuilder` with all arguments except `name` applied.
 
-    `packageDefinitions` (`AttrSet`)
+    - `packageDefinitions` (`AttrSet`)
     : the set of `packageDefinitions` passed to the builder, passed in again.
 
-    `defaultName` (`string`)
+    - `defaultName` (`string`)
     : the name of the package to be output as default in the resulting set of packages.
 
     ---
@@ -602,10 +606,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
     
-    `finalBuilder` (`function`)
+    - `finalBuilder` (`function`)
     : this is `baseBuilder` with all arguments except `name` applied.
 
-    `packageDefinitions` (`AttrSet`)
+    - `packageDefinitions` (`AttrSet`)
     : the set of `packageDefinitions` passed to the builder, passed in again.
 
     ---
@@ -621,7 +625,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `package` (`NixCats nvim derivation`)
+    - `package` (`NixCats nvim derivation`)
 
     ---
   */
@@ -636,7 +640,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `package` (`NixCats nvim derivation`)
+    - `package` (`NixCats nvim derivation`)
 
     ---
   */
@@ -653,19 +657,19 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `luaPath` (`function` or `stringWithContext`)
+    - `luaPath` (`function` or `stringWithContext`)
 
-    `pkgsParams` (`AttrSet`)
+    - `pkgsParams` (`AttrSet`)
     : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
-    `categoryDefinitions` (`FunctionTo` `AttrSet`)
+    - `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in `baseBuilder`
 
-    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    - `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
     : exactly the same as `packageDefinitions` in `baseBuilder`
 
-    `defaultName` (`string`)
+    - `defaultName` (`string`)
 
     ---
   */
@@ -696,19 +700,19 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `luaPath` (`function` or `stringWithContext`)
+    - `luaPath` (`function` or `stringWithContext`)
 
-    `pkgsParams` (`AttrSet`)
+    - `pkgsParams` (`AttrSet`)
     : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
-    `categoryDefinitions` (`FunctionTo` `AttrSet`)
+    - `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in `baseBuilder`
 
-    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    - `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
     : exactly the same as `packageDefinitions` in `baseBuilder`
 
-    `defaultName` (`string`)
+    - `defaultName` (`string`)
 
     ---
   */
@@ -741,22 +745,22 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `luaPath` (`function` or `stringWithContext`)
+    - `luaPath` (`function` or `stringWithContext`)
 
-    `pkgsParams` (`AttrSet`)
+    - `pkgsParams` (`AttrSet`)
     : exactly the same as the `pkgsParams` in `baseBuilder`
     : except without `system`
 
-    `categoryDefinitions` (`FunctionTo` `AttrSet`)
+    - `categoryDefinitions` (`FunctionTo` `AttrSet`)
     : exactly the same as `categoryDefinitions` in `baseBuilder`
 
-    `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
+    - `packageDefinitions` (`AttrSet` `functionTo` `AttrSet`)
     : exactly the same as `packageDefinitions` in `baseBuilder`
 
-    `importName` (`string`)
+    - `importName` (`string`)
     : when applied, overlay yeilds `pkgs.${importName}.${packageName}`
 
-    `namesIncList` (`listOf` `string`)
+    - `namesIncList` (`listOf` `string`)
     : the names of packages to include in the set yeilded by the overlay
 
     ---
@@ -793,10 +797,10 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `package` (`NixCats nvim derivation`)
+    - `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
 
-    `importName` (`string`)
+    - `importName` (`string`)
     : overlay will yield `pkgs.${importName}.${packageName}`
 
     ## Example
@@ -824,7 +828,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `package` (`NixCats nvim derivation`)
+    - `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
 
     ## Example
@@ -850,7 +854,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ## Arguments
 
-    `package` (`NixCats nvim derivation`)
+    - `package` (`NixCats nvim derivation`)
     : will include all packages in the `packageDefinitions` the package was built with
 
     ## Example
