@@ -18,6 +18,8 @@
   packageDefinitions = {
     ${packagename} = { pkgs, ... }: {
       settings = {
+        withNodeJs = true;
+        withPython3 = true;
       };
       categories = {
         testvars = true;
