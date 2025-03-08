@@ -47,7 +47,9 @@
 
       You may use `.override` on the returned package
       to change which package you are building from your packageDefinitions by changing `name`.
-      Each package exports everything you may need.
+
+      There are other tricks you can do with override too!
+      Every package is its own nixCats, but with its own base configuration!
     '';
   };
   example = {
