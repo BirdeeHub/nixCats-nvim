@@ -124,5 +124,5 @@
 in utils.baseBuilder luaPath {
   inherit dependencyOverlays extra_pkg_config;
   inherit (pkgs) system;
-  nixpkgs = pkgs; # <- accepts pkgs, inputs.nixpkgs, or pkgs.path
+  nixpkgs = pkgs; # <- accepts pkgs, <nixpkgs>, inputs.nixpkgs, or pkgs.path
 } categoryDefinitions packageDefinitions defaultPackageName
