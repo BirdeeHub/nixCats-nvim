@@ -390,7 +390,7 @@
           # but you can pass all the same stuff in any of these sets and access it in lua
           nixdExtras = {
             nixpkgs = pkgs.path;
-            # or nixpkgs = nixpkgs;
+            # or inherit nixpkgs;
           };
         };
       };
@@ -434,7 +434,7 @@
           # this is to mimic the concept of "subcategories" but may get in the way of just fetching values.
           nixdExtras = {
             nixpkgs = pkgs.path;
-            # or nixpkgs = nixpkgs;
+            # or inherit nixpkgs;
           };
           # yes even tortured inputs work.
           theBestCat = "says meow!!";
