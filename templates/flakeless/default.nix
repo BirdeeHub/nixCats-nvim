@@ -15,7 +15,8 @@
   extra_pkg_config = {
     # allowUnfree = true;
   };
-  dependencyOverlays = [];
+  # will apply to only nvim
+  dependencyOverlays = /* pkgs.overlays ++ */ [];
 
   # see :help nixCats.flake.outputs.categories
   categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
