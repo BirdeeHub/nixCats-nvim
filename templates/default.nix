@@ -39,6 +39,17 @@
       Call it from your system flake and call it with inputs as arguments.
     '';
   };
+  flakeless = {
+    path = ./flakeless;
+    description = ''
+      nixCats starter template without flakes, as a simple nix expression.
+      Returns just a nixCats neovim derivation with your config.
+
+      You may use `.override` on the returned package
+      to change which package you are building from your packageDefinitions by changing `name`.
+      Each package exports everything you may need.
+    '';
+  };
   example = {
     path = ./example;
     description = ''
