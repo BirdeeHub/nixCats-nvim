@@ -1,10 +1,12 @@
 {
   pkgs ? import <nixpkgs> {}
-  , utils ? import (builtins.fetchGit {
+  , nixCats ? builtins.fetchGit {
     url = "https://github.com/BirdeeHub/nixCats-nvim";
-  }) # equivalent to `utils ? inputs.nixCats.utils`, contains all of nixCats
+  }
   , ...
 }: let
+  # get the nixCats library with the builder function (and everything else) in it
+  utils = import nixCats;
   # path to your new .config/nvim
   luaPath = ./.;
   # the following extra_pkg_config contains any values
