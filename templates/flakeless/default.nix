@@ -1,4 +1,5 @@
-{
+{ # NOTE: dont use pkgs.callPackage on this file
+  # or you will be overriding these with .override instead of the package!
   pkgs ? import <nixpkgs> {}
   , nixCats ? builtins.fetchGit {
     url = "https://github.com/BirdeeHub/nixCats-nvim";
