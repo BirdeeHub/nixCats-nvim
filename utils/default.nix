@@ -95,7 +95,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   baseBuilder =
     luaPath:
     {
-      nixpkgs
+      nixpkgs ? <nixpkgs>
       , system ? (nixpkgs.system or builtins.system or import ../builder/builder_error.nix)
       , extra_pkg_config ? {}
       , dependencyOverlays ? null
