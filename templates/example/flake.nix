@@ -433,7 +433,8 @@
           # even though path.to.cat would be an indexing error in that case.
           # this is to mimic the concept of "subcategories" but may get in the way of just fetching values.
           nixdExtras = {
-            nixpkgs = nixpkgs;
+            nixpkgs = pkgs.path;
+            # or nixpkgs = nixpkgs;
           };
           # yes even tortured inputs work.
           theBestCat = "says meow!!";
