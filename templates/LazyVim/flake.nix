@@ -83,7 +83,13 @@
         general = [
           universal-ctags
           curl
-          lazygit
+          # NOTE:
+          # lazygit
+          # Apparently lazygit cant create its own config file
+          # but we can add one from nix!
+          (pkgs.writeShellScriptBin "lazygit" ''
+            exec ${pkgs.lazygit}/bin/lazygit --use-config-file ${pkgs.writeText "lazygit_config.yml" ""} "$@"
+          '')
           ripgrep
           fd
           stdenv.cc.cc
