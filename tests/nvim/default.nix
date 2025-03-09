@@ -14,6 +14,22 @@
         TEST2 = pkgs.bash;
       };
     };
+    extraCats = {
+      foo = [
+        [ "foo" "default" ]
+      ];
+      cowboy = [
+        [ "bee" "bop" ]
+        {
+          cat = [ "foo" "bar" ];
+          cond = [
+            [ "fi" "fie" ]
+            [ "foe" "fum" ]
+            [ "fi" "te" "me" ]
+          ];
+        }
+      ];
+    };
   };
   packageDefinitions = {
     ${packagename} = { pkgs, ... }: {

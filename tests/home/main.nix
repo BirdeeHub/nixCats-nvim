@@ -27,6 +27,9 @@ in {
       settings = {
       };
       categories = {
+        fi = true;
+        foe = true;
+        cowboy = true;
         nixCats_test_names = {
           home_hello = true;
         };
