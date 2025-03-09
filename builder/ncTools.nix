@@ -127,7 +127,7 @@
     applyExtraCatsInternal = prev: let
       checkPath = item: if isList item then true
         # checks if all in spec.cond are enabled, if so,
-        # it returns true if spec.cat is not already in prev
+        # it returns true if spec.cat is valid
         else lib.pipe (item.cond or []) (let
           # true if enabled by categories
           condcheck = atpath: lib.pipe atpath [
