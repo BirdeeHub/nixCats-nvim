@@ -543,12 +543,35 @@ default values above in an interesting way.
       ];
       # and if go is enabled, it enables debug.go
       # which then enables debug.default
-      go = [
-        [ "debug" "go" ] # yes it has to be a list of lists
+      go = [ # <- must be in a list
+        [ "debug" "go" ]
       ];
     };
   };
 <
+If you wish to only enable a value via extraCats if multiple other categories
+are enabled, the categories in extraCats also accept a set form!
+>nix
+  extraCats = {
+    target.cat = [ # <- categories must be a list of (sets or list of strings)
+      [ "to" "enable" ] # <- can be a list of strings
+      { # <- or a set!
+        cat = [ "other" "toenable" ]; #<- required if providing the set form
+        # enable cat only if all in cond are enabled
+        cond = [
+          [ "other" "category" ] # <- cond must be a list of list of strings
+        ];
+      }
+    ];
+  };
+<
+The set form must contain a list of strings as `cat`, the category to enable.
+It may also contain a `cond` attribute which will contain a list of list of
+strings.
+
+If the category with the set is included,
+it will check that ALL of the categories in `cond` have been enabled,
+and if so, then `cat` will be enabled.
 ---------------------------------------------------------------------------------------
 Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
 

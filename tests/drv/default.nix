@@ -23,6 +23,7 @@ stdenv.mkDerivation {
         nixCats_fields = true;
         remote-host = true;
         n2l_tests = true;
+        extraCats = true;
       };
     };
   in /*bash*/ ''

@@ -7,6 +7,7 @@ lib.setAttrByPath moduleNamespace {
       settings = {
       };
       categories = {
+        cowboy = true;
         nixCats_test_names = {
           nixos_hello = true;
         };
@@ -21,6 +22,8 @@ lib.setAttrByPath moduleNamespace {
         settings = {
         };
         categories = {
+          cowboy = true;
+          fi = true;
           nixCats_test_names = {
             nixos_user_hello = true;
           };

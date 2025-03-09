@@ -103,21 +103,50 @@
     (foldl' recursiveUpdatePickDeeper {})
   ];
 
-  applyExtraCats = categories: extraCats: let
+  applyExtraCats = categories: extraCats: if extraCats == {} then categories else let
+    errormsg = ''
+      # ERROR: incorrect extraCats syntax in categoryDefinitions:
+      # USAGE:
+      extraCats = {
+        target.cat = [ # <- categories must be a list of (sets or list of strings)
+          [ "to" "enable" ]
+          {
+            cat = [ "other" "toenable" ]; #<- required if providing the set form
+            # enable cat only if all in cond are enabled
+            cond = [
+              [ "other" "category" ] # <- cond must be a list of list of strings
+            ];
+          }
+        ];
+      };
+    '';
+
     recursiveUpdatePickShallower = recUpUntilWpicker {
       picker = left: right: if ! isAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: let
-      # filter if already present in categories
-      checkPath = atpath: if atpath == [] then true
-        else if lib.attrByPath atpath null prev == true
-        then false
-        else checkPath (lib.init atpath);
+      checkPath = item: if isList item then true
+        # checks if all in spec.cond are enabled, if so,
+        # it returns true if spec.cat is valid
+        else lib.pipe (item.cond or []) (let
+          # true if enabled by categories
+          condcheck = atpath: lib.pipe atpath [
+            (atp: if isList atp then atp else throw errormsg)
+            (atp: lib.setAttrByPath atp true)
+            (filterAndFlatten prev)
+            (v: v != [])
+          ];
+        in [
+          (map condcheck)
+          (foldl' (acc: v: if acc then v else false) true) # <- defaults to true if no cond specified
+          (enabled: enabled && (if isList (item.cat or null) then true else throw errormsg))
+        ]);
+
       nextCats = lib.pipe extraCats [
         (filterAndFlatten prev)
         lib.unique
-        (filter (v: checkPath v))
-        (map (v: lib.setAttrByPath v true))
+        (filter checkPath)
+        (map (v: lib.setAttrByPath (v.cat or v) true))
         (v: v ++ [ prev ])
         (foldl' recursiveUpdatePickShallower {})
       ];
@@ -126,7 +155,6 @@
     in if nextCats == prev then nextCats
       else applyExtraCatsInternal nextCats;
 
-  in if extraCats == {} then categories
-    else applyExtraCatsInternal categories;
+  in applyExtraCatsInternal categories;
 
 }

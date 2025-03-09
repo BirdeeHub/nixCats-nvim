@@ -23,6 +23,7 @@ in stdenv.mkDerivation {
         test_libT_vars = true;
         nested_test = true;
         nixCats_fields = true;
+        extraCats = true;
       };
     };
   in /*bash*/ ''
