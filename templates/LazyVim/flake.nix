@@ -85,7 +85,7 @@
           curl
           # NOTE:
           # lazygit
-          # Apparently lazygit cant create its own config file
+          # Apparently lazygit when launched via snacks cant create its own config file
           # but we can add one from nix!
           (pkgs.writeShellScriptBin "lazygit" ''
             exec ${pkgs.lazygit}/bin/lazygit --use-config-file ${pkgs.writeText "lazygit_config.yml" ""} "$@"
