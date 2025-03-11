@@ -50,7 +50,7 @@ require('lze').load {
   {
     -- name of the lsp
     "lua_ls",
-    enabled = nixCats('lua') or nixCats('neonixdev'),
+    enabled = nixCats('lua') or nixCats('neonixdev') or false,
     -- provide a table containing filetypes,
     -- and then whatever your functions defined in the function type specs expect.
     -- in our case, it just expects the normal lspconfig setup options,
@@ -99,21 +99,20 @@ require('lze').load {
   },
   {
     "nixd",
-    enabled = catUtils.isNixCats and (nixCats('nix') or nixCats('neonixdev')),
+    enabled = catUtils.isNixCats and (nixCats('nix') or nixCats('neonixdev')) or false,
     lsp = {
       filetypes = { 'nix' },
       settings = {
         nixd = {
-          -- nixd requires some configuration in flake based configs.
+          -- nixd requires some configuration.
           -- luckily, the nixCats plugin is here to pass whatever we need!
           -- we passed this in via the `extra` table in our packageDefinitions
           -- for additional configuration options, refer to:
           -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
           nixpkgs = {
-            expr = nixCats.extra("nixdExtras.nixpkgs") and ([[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }]]) or [[import <nixpkgs> {}]],
-          },
-          formatting = {
-            command = { "nixfmt" }
+            -- in the extras set of your package definition:
+            -- nixdExtras.nixpkgs = ''import ${pkgs.path} {}''
+            expr = nixCats.extra("nixdExtras.nixpkgs") or [[import <nixpkgs> {}]],
           },
           options = {
             -- If you integrated with your system flake,
@@ -121,16 +120,19 @@ require('lze').load {
             -- that way it will ALWAYS work, regardless
             -- of where your config actually was.
             nixos = {
-              -- ''(builtins.getFlake "${inputs.self}").nixosConfigurations.configname.options''
+              -- nixdExtras.nixos_options = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.configname.options''
               expr = nixCats.extra("nixdExtras.nixos_options")
             },
             -- If you have your config as a separate flake, inputs.self would be referring to the wrong flake.
             -- You can override the correct one into your package definition on import in your main configuration,
             -- or just put an absolute path to where it usually is and accept the impurity.
             ["home-manager"] = {
-              -- ''(builtins.getFlake "${inputs.self}").homeConfigurations.configname.options''
+              -- nixdExtras.home_manager_options = ''(builtins.getFlake "${inputs.self}").homeConfigurations.configname.options''
               expr = nixCats.extra("nixdExtras.home_manager_options")
             }
+          },
+          formatting = {
+            command = { "nixfmt" }
           },
           diagnostic = {
             suppress = {

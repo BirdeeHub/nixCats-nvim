@@ -59,16 +59,35 @@ The stuff added to servers table is what is passed to lspconfig/mason
       filetypes = { 'lua' },
     }
   if require('nixCatsUtils').isNixCats then
+    -- nixd requires some configuration.
+    -- luckily, the nixCats plugin is here to pass whatever we need!
+    -- we passed this in via the `extra` table in our packageDefinitions
+    -- for additional configuration options, refer to:
+    -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
     servers.nixd = {
       settings = {
         nixd = {
           nixpkgs = {
-            -- nixd requires some configuration in flake based configs.
-            -- luckily, the nixCats plugin is here to pass whatever we need!
-            -- we passed this in via the `extra` table in our packageDefinitions
-            -- for additional configuration options, refer to:
-            -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
-            expr = nixCats.extra("nixdExtras.nixpkgs") and ([[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }]]) or [[import <nixpkgs> {}]],
+            -- in the extras set of your package definition:
+            -- nixdExtras.nixpkgs = ''import ${pkgs.path} {}''
+            expr = nixCats.extra("nixdExtras.nixpkgs") or [[import <nixpkgs> {}]],
+          },
+          options = {
+            -- If you integrated with your system flake,
+            -- you should use inputs.self as the path to your system flake
+            -- that way it will ALWAYS work, regardless
+            -- of where your config actually was.
+            nixos = {
+              -- nixdExtras.nixos_options = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.configname.options''
+              expr = nixCats.extra("nixdExtras.nixos_options")
+            },
+            -- If you have your config as a separate flake, inputs.self would be referring to the wrong flake.
+            -- You can override the correct one into your package definition on import in your main configuration,
+            -- or just put an absolute path to where it usually is and accept the impurity.
+            ["home-manager"] = {
+              -- nixdExtras.home_manager_options = ''(builtins.getFlake "${inputs.self}").homeConfigurations.configname.options''
+              expr = nixCats.extra("nixdExtras.home_manager_options")
+            }
           },
           formatting = {
             command = { "nixfmt" }
@@ -81,35 +100,6 @@ The stuff added to servers table is what is passed to lspconfig/mason
         }
       }
     }
-    -- If you integrated with your system flake,
-    -- you should pass inputs.self as nixdExtras.flake-path
-    -- that way it will ALWAYS work, regardless
-    -- of where your config actually was.
-
-    -- If you are using a standalone flake, but installed it in your system
-    -- config, you may use override to add these values as well.
-    -- for more info on that, cd to an empty directory and run:
-    -- nix flake init -t github:BirdeeHub/nixCats-nvim#overriding
-    -- for a walkthrough of useage.
-
-    -- otherwise flake-path could be an absolute path to your system flake, or nil or false
-    if nixCats.extra("nixdExtras.flake-path") then
-      local flakePath = nixCats.extra("nixdExtras.flake-path")
-      if nixCats.extra("nixdExtras.systemCFGname") then
-        -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
-        servers.nixd.settings.nixd.options.nixos = {
-          expr = [[(builtins.getFlake "]] .. flakePath ..  [[").nixosConfigurations."]] ..
-            nixCats.extra("nixdExtras.systemCFGname") .. [[".options]]
-        }
-      end
-      if nixCats.extra("nixdExtras.homeCFGname") then
-        -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
-        servers.nixd.settings.nixd.options["home-manager"] = {
-          expr = [[(builtins.getFlake "]] .. flakePath .. [[").homeConfigurations."]]
-            .. nixCats.extra("nixdExtras.homeCFGname") .. [[".options]]
-        }
-      end
-    end
   else
     servers.rnix = {}
     servers.nil_ls = {}
