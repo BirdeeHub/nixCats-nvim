@@ -68,7 +68,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
             -- we passed this in via the `extra` table in our packageDefinitions
             -- for additional configuration options, refer to:
             -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
-            expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
+            expr = nixCats.extra("nixdExtras.nixpkgs") and ([[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }]]) or [[import <nixpkgs> {}]],
           },
           formatting = {
             command = { "nixfmt" }

@@ -1,9 +1,7 @@
 -- load the plugins via paq-nvim when not on nix
 -- YOU are in charge of putting the plugin
--- urls and build steps in there, which will only be used when not on nix,
--- and you should keep any setup functions
--- OUT of that file, as they are ONLY loaded when this
--- configuration is NOT loaded via nix.
+-- urls and build steps in here, which will only be used when not on nix.
+-- and you should keep any setup functions OUT of this file
 
 -- again, you dont need this file if you only use nix to load the config,
 -- this is a fallback only, and is optional.

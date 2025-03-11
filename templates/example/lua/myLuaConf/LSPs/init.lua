@@ -25,7 +25,7 @@ require('lze').load {
     -- only run it when not on nix
     enabled = not catUtils.isNixCats,
     -- dep_of handler ensures we have mason-lspconfig set up before nvim-lspconfig
-    dep_of = { "nvim-lspconfig" },
+    on_plugin = { "nvim-lspconfig" },
     load = function(name)
       vim.cmd.packadd(name)
       vim.cmd.packadd("mason-lspconfig.nvim")
@@ -111,7 +111,7 @@ require('lze').load {
           -- for additional configuration options, refer to:
           -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
           nixpkgs = {
-            expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
+            expr = nixCats.extra("nixdExtras.nixpkgs") and ([[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }]]) or [[import <nixpkgs> {}]],
           },
           formatting = {
             command = { "nixfmt" }
