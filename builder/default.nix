@@ -23,7 +23,7 @@ let
       else dependencyOverlays.${system} or [];
   in if isAttrs extra_pkg_config && isAttrs nixCats_passthru
     && isFunction categoryDefinitions && isAttrs packageDefinitions && isString name
-    && (isPath luaPath || (isString luaPath && hasContext luaPath))
+    && (isPath luaPath || (isString luaPath && hasContext luaPath) || luaPath.outPath or null != null)
   then import (nixpkgs.path or nixpkgs.outPath or nixpkgs)
     { inherit system config overlays; }
   else import ./builder_error.nix;
