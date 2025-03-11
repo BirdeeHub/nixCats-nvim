@@ -131,12 +131,9 @@ let
   # this function gets passed all the way into the wrapper so that we can also add
   # other dependencies that get resolved later in the process such as treesitter grammars.
   nixCats = allPluginDeps: let
-    isUnwrappedCfgPath = settings.wrapRc == false && builtins.isString settings.unwrappedCfgPath;
-    isStdCfgPath = settings.wrapRc == false && ! builtins.isString settings.unwrappedCfgPath;
-
-    nixCats_config_location = if isUnwrappedCfgPath then "${settings.unwrappedCfgPath}"
-      else if isStdCfgPath then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
-      else "${luaPath}";
+    nixCats_config_location = if settings.wrapRc == true then luaPath
+      else if settings.unwrappedCfgPath == null then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
+      else settings.unwrappedCfgPath;
 
     categoriesPlus = categories // {
       nixCats_wrapRc = settings.wrapRc;
