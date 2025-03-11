@@ -121,6 +121,7 @@ with builtins; let
       else if inline.member value then let
           res = inline.resolve value;
         in if isFunction res then res (opts // { _level = level; }) else replacer res
+      else if isPath value then luaEnclose "${value}"
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
       else if isAttrs value then "${luaTablePrinter level value}"
