@@ -58,7 +58,7 @@ in {
 
       luaPath = mkOption {
         default = luaPath;
-        type = types.oneOf [ types.str types.path ];
+        type = types.oneOf [ types.str types.path types.package ];
         description = ''
           The path to your nvim config directory in the store.
           In templates, this is "./."
@@ -301,7 +301,7 @@ in {
 
             luaPath = mkOption {
               default = luaPath;
-              type = types.oneOf [ types.str types.path ];
+              type = types.oneOf [ types.str types.path types.package ];
               description = ''
                 The path to your nvim config directory in the store.
                 In templates, this is "./."
