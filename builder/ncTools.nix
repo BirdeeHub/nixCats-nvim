@@ -3,11 +3,10 @@
 { lib, writeText, nclib, ... }: with builtins; rec {
 # NIX CATS INTERNAL UTILS:
 
-  inherit (nclib.n2l) toLua types;
-  inherit (nclib) recUpUntilWpicker;
+  inherit nclib;
 
   mkLuaFileWithMeta = filename: table: writeText filename /*lua*/ ''
-  return setmetatable(${toLua table}, {
+  return setmetatable(${nclib.n2l.toLua table}, {
     __call = function(self, attrpath)
       local strtable = {}
       if type(attrpath) == "table" then
@@ -91,7 +90,7 @@
       isNonDrvSet = v: isAttrs v && !lib.isDerivation v;
       pred = path: lh: rh: ! isNonDrvSet lh || ! isNonDrvSet rh;
       picker = left: right: if isNonDrvSet left then left else right;
-    in recUpUntilWpicker { inherit pred picker; } lhs rhs;
+    in nclib.recUpUntilWpicker { inherit pred picker; } lhs rhs;
     # get the names of the categories but not the values, to avoid evaluating anything.
     mapfunc = path: mapAttrs (name: value:
       if isAttrs value && ! lib.isDerivation value
@@ -121,7 +120,7 @@
       };
     '';
 
-    recursiveUpdatePickShallower = recUpUntilWpicker {
+    recursiveUpdatePickShallower = nclib.recUpUntilWpicker {
       picker = left: right: if ! isAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: let

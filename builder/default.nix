@@ -132,7 +132,7 @@ let
   # other dependencies that get resolved later in the process such as treesitter grammars.
   nixCats = allPluginDeps: let
     nixCats_config_location = if settings.wrapRc == true then luaPath
-      else if settings.unwrappedCfgPath == null then ncTools.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
+      else if settings.unwrappedCfgPath == null then utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
       else settings.unwrappedCfgPath;
 
     categoriesPlus = categories // {
@@ -175,7 +175,7 @@ let
     # https://github.com/BirdeeHub/nixCats-nvim/pull/89
     start = filterAndFlatten startupPlugins;
     opt = filterAndFlatten optionalPlugins;
-    inherit (ncTools) toLua;
+    inherit (utils) n2l;
   };
 
   customRC = let

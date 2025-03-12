@@ -2,7 +2,7 @@
   start ? [],
   opt ? [],
   lib,
-  toLua,
+  n2l,
 }: let
   # accepts several plugin syntaxes,
   # specified in :h nixCats.flake.outputs.categoryDefinitions.scheme
@@ -34,7 +34,7 @@
 
   setToString = cfg: let
     lua = cfg.lua or "";
-    vim = lib.optionalString (cfg ? vim) "vim.cmd(${toLua cfg.vim})";
+    vim = lib.optionalString (cfg ? vim) "vim.cmd(${n2l.toLua cfg.vim})";
   in ''
     ${lua}
     ${vim}

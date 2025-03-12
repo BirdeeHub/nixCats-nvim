@@ -43,10 +43,11 @@
       , ...
     }:
   let
-    inherit (ncTools.types) inline-unsafe;
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if collate_grammars then ts_grammar_plugin_combined else
-      inline-unsafe.mk { body = "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]"; };
+      ncTools.nclib.n2l.types.inline-unsafe.mk {
+        body = "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
+      };
 
     mkEntryFromDrv = drv: { name = "${lib.getName drv}"; value = drv; };
     fullDeps = {
