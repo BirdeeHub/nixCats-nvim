@@ -132,7 +132,8 @@ let
   # other dependencies that get resolved later in the process such as treesitter grammars.
   nixCats = allPluginDeps: let
     nixCats_config_location = if settings.wrapRc == true then luaPath
-      else if settings.unwrappedCfgPath == null then utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
+      else if settings.unwrappedCfgPath == null
+        then utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
       else settings.unwrappedCfgPath;
 
     categoriesPlus = categories // {
