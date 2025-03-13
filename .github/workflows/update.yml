@@ -1,0 +1,35 @@
+name: update-flake-lock
+on:
+  workflow_dispatch: # allows manual triggering
+  schedule:
+    - cron: '0 0 * * 0' # runs weekly on Sunday at 00:00
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - name: Update test lockfile
+        run: |
+          nix flake update --flake ./tests
+      - name: Update example config lockfile
+        run: |
+          nix flake update --flake ./templates/example
+      - name: Update LazyVim template lockfile
+        run: |
+          nix flake update --flake ./templates/LazyVim
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.PAT }}
+          branch: 'update-flake-lock'
+          delete-branch: true
+          base: main
+          title: "chore(deps): update flake.lock files"
+          body: "This PR updates the Nix flake.lock files automatically."
+          labels: "dependencies,automated"

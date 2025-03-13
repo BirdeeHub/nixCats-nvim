@@ -1,0 +1,12 @@
+name: "Nix build"
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@v9
+    - run: nix flake check -L --impure ./tests
