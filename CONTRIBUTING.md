@@ -25,6 +25,10 @@ And all docs are either in [nixCatsHelp](./nixCatsHelp), or generated from Nix f
 
 Thank you!!!
 
+All commits should be named following [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
+
+This ensures that the release-please bot can then make a release for it if needed.
+
 ---
 
 ### Documentation
