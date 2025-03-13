@@ -24,11 +24,12 @@ jobs:
         run: |
           nix flake update --flake ./templates/LazyVim
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PAT }}
           branch: 'update-flake-lock'
           delete-branch: true
+          commit-message: "chore(deps): update flake.lock files"
           base: main
           title: "chore(deps): update flake.lock files"
           body: "This PR updates the Nix flake.lock files automatically."
