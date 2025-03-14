@@ -1,0 +1,43 @@
+name: update-website
+on:
+  workflow_dispatch: # allows manual triggering
+  repository_dispatch: # or triggering from another repo
+    types: [update-nixcats-website]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - name: Update Site
+        run: |
+          mkdir -p ./_site
+          nix run --override-input nixCats ./. --show-trace github:BirdeeHub/nixCats-doc -- ./_site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.PAT }}
