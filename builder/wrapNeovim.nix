@@ -22,11 +22,13 @@
   extraLuaPackages ? (_: [ ]),
   nixCats_passthru ? { },
   neovim-unwrapped,
+  autowrapRuntimeDeps ? "suffix",
 
   extraMakeWrapperArgs ? "",
   # expects a list of sets with plugin and optional
   # expects { plugin=far-vim; optional = false; }
-  plugins ? [ ],
+  start ? [ ],
+  opt ? [ ],
   # function to pass to vim-pack-dir that creates nixCats plugin
   nixCats,
   ncTools,
@@ -35,12 +37,6 @@
 }@args:
 let
   inherit (pkgs) lib;
-  # gets plugin.dependencies from
-  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
-  findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
-  transitiveClosure = plugin:
-    [ plugin ] ++ (builtins.concatLists (map transitiveClosure plugin.dependencies or []));
-
   gemPath = if gem_path != null then gem_path
     else "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
   rubyEnv = pkgs.bundlerEnv {
@@ -52,15 +48,6 @@ let
   };
 
   # get dependencies of plugins
-  pluginsPartitioned = lib.partition (x: x.optional == true) plugins;
-  opt = map (x: x.plugin) pluginsPartitioned.right;
-  depsOfOptionalPlugins = lib.subtractLists opt (findDependenciesRecursively opt);
-  startWithDeps = lib.pipe pluginsPartitioned.wrong [
-    (map (x: x.plugin))
-    findDependenciesRecursively
-  ];
-  start = startWithDeps ++ depsOfOptionalPlugins;
-
   allPython3Dependencies = ps: lib.pipe (start ++ opt) [
     (map (plugin: (plugin.python3Dependencies or (_: [])) ps))
     lib.flatten
@@ -77,8 +64,16 @@ let
   # avoid double wrapping, see comment near finalMakeWrapperArgs
   makeWrapperArgs =
     let
+      autowrapped = lib.pipe (start ++ opt) [
+        (builtins.foldl' (acc: v: acc ++ v.runtimeDeps or []) [])
+        lib.unique
+      ];
       binPath = lib.makeBinPath (
-        lib.optionals withRuby [ rubyEnv ] ++ lib.optionals withNodeJs [ pkgs.nodejs ]
+        lib.optionals withRuby [
+          rubyEnv
+        ] ++ lib.optionals withNodeJs [
+          pkgs.nodejs
+        ] ++ lib.optionals (autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) autowrapped
       );
     in
     [
@@ -87,6 +82,8 @@ let
       "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}"
     ] ++ lib.optionals (binPath != "") [
       "--suffix" "PATH" ":" binPath
+    ] ++ lib.optionals (autowrapRuntimeDeps == "prefix") [
+      "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
     ] ++ lib.optionals (luaEnv != null) [
       "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
       "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)

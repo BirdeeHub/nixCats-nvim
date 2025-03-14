@@ -1,6 +1,6 @@
 {
-  start ? [],
-  opt ? [],
+  startup ? [],
+  optional ? [],
   lib,
   n2l,
 }: let
@@ -57,11 +57,33 @@
     })
   ];
 
-  pluginsWithConfig = (map (parsepluginspec false) start) ++ (map (parsepluginspec true) opt);
+  pluginsWithConfig = (map (parsepluginspec false) startup) ++ (map (parsepluginspec true) optional);
+  user_plugin_configs = get_and_sort pluginsWithConfig;
 
-  plugin_configs = get_and_sort pluginsWithConfig;
+  opt = lib.pipe pluginsWithConfig [
+    (builtins.filter (v: v.optional))
+    (map (v: v.plugin))
+  ];
+  start = let
+    # gets plugin.dependencies from
+    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
+    findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
+    transitiveClosure = plugin:
+      [ plugin ] ++ (builtins.concatLists (map transitiveClosure plugin.dependencies or []));
 
+  in lib.pipe pluginsWithConfig [
+    (builtins.filter (v: ! v.optional))
+    (map (st: st.plugin))
+    (st: st ++ findDependenciesRecursively st ++ lib.subtractLists opt (findDependenciesRecursively opt))
+  ];
+
+  passthru_initLua = with builtins; lib.pipe (start ++ opt) [
+    (map (v: v.passthru.initLua or null))
+    (filter (v: v != null))
+    lib.unique
+    (concatStringsSep "\n")
+  ];
 in {
-  plugins = map (v: { inherit (v) plugin optional; }) pluginsWithConfig;
-  inherit (plugin_configs) preInlineConfigs inlineConfigs;
+  inherit start opt passthru_initLua;
+  inherit (user_plugin_configs) preInlineConfigs inlineConfigs;
 }

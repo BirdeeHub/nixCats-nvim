@@ -50,6 +50,8 @@ let
     withPython3 = true;
     configDirName = "nvim";
     unwrappedCfgPath = null;
+    autowrapRuntimeDeps = "suffix";
+    autoconfigure = "prefix";
     aliases = null;
     nvimSRC = null;
     neovim-unwrapped = null;
@@ -171,11 +173,8 @@ let
   buildInputs = filterFlattenUnique propagatedBuildInputs;
 
   normalized = pkgs.callPackage ./normalizePlugins.nix {
-    #NOTE: only call unique on these 2 after you normalize,
-    # and then pull the dependencies out in ./wrapNeovim.nix
-    # https://github.com/BirdeeHub/nixCats-nvim/pull/89
-    start = filterAndFlatten startupPlugins;
-    opt = filterAndFlatten optionalPlugins;
+    startup = filterAndFlatten startupPlugins;
+    optional = filterAndFlatten optionalPlugins;
     inherit (utils) n2l;
   };
 
@@ -192,7 +191,8 @@ let
         else builtins.concatStringsSep "\n"
         (filterFlattenUnique optionalLuaAdditions);
     in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
-  in/*lua*/''
+  in /*lua*/''
+    ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
     -- optionalLuaPreInit
     ${optLuaPre}
     -- lua from nix with pre = true
@@ -207,6 +207,7 @@ let
     ${normalized.inlineConfigs}
     -- optionalLuaAdditions
     ${optLuaAdditions}
+    ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
   '';
 
   # cat our args
@@ -272,8 +273,8 @@ import ./wrapNeovim.nix {
   neovim-unwrapped = myNeovimUnwrapped;
   nixCats_passthru = nc_passthru;
   inherit extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
-  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars;
-  inherit (normalized) plugins;
+  inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
+  inherit (normalized) start opt;
     /* the function you would have passed to python.withPackages */
   # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
     /* the function you would have passed to python.withPackages */

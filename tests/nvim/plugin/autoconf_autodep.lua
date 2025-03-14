@@ -1,0 +1,6 @@
+make_test("autoconf", function()
+    assert.truthy(vim.g.autoconf_test_nixCats)
+end)
+make_test("autodeps", function()
+    assert.truthy(vim.fn.executable("autodeps_test_nixCats") == 1)
+end)

@@ -8,6 +8,26 @@
     (utils.standardPluginOverlay inputs)
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    startupPlugins = {
+      autoconf = [
+        ((pkgs.runCommandNoCC "autoconftest" {} ''mkdir -p $out'').overrideAttrs (prev: {
+          passthru = prev.passthru or {} // {
+            initLua = ''
+              vim.g.autoconf_test_nixCats = true
+            '';
+          };
+        }))
+      ];
+      autodeps = [
+        ((pkgs.runCommandNoCC "autodepstest" {} ''mkdir -p $out'').overrideAttrs (prev: {
+          runtimeDeps = prev.runtimeDeps or [] ++ [
+            (pkgs.writeShellScriptBin "autodeps_test_nixCats" ''
+              echo "HELLO WORLD I HAVE BEEN AUTOINCLUDED"
+            '')
+          ];
+        }))
+      ];
+    };
     environmentVariables = {
       testvars = {
         TEST = "test";
@@ -39,6 +59,8 @@
       };
       categories = {
         testvars = true;
+        autoconf = true;
+        autodeps = true;
       };
       extra = {
         typetests = rec {

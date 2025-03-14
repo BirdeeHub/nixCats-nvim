@@ -24,6 +24,8 @@ stdenv.mkDerivation {
         remote-host = true;
         n2l_tests = true;
         extraCats = true;
+        autoconf = true;
+        autodeps = true;
       };
     };
   in /*bash*/ ''
