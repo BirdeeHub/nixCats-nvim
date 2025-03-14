@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.4.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.3.1...v6.4.0) (2025-03-14)
+
+
+### Features
+
+* **autoconf:** autoconfigure and autowrapRuntimeDeps support to match pkgs.wrapNeovim ([#127](https://github.com/BirdeeHub/nixCats-nvim/issues/127)) ([a7eb442](https://github.com/BirdeeHub/nixCats-nvim/commit/a7eb442b9c925dc02bd2a30203b16039d0b0a86e))
+
 ## [6.3.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.3.0...v6.3.1) (2025-03-13)
 
 
