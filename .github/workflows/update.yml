@@ -35,6 +35,7 @@ jobs:
           delete-branch: true
           commit-message: "chore(deps): update flake.lock files"
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+          committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           base: main
           title: "chore(deps): update flake.lock files"
           body: "This PR updates the Nix flake.lock files automatically."
