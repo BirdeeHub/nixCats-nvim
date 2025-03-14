@@ -3,10 +3,14 @@ on:
   workflow_dispatch: # allows manual triggering
   schedule:
     - cron: '0 0 * * 0' # runs weekly on Sunday at 00:00
+  push:
+    branches:
+      - main
 
 jobs:
   lockfile:
     runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]' && github.event.head_commit.author.name != 'github-actions[bot]'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,6 +34,7 @@ jobs:
           branch: 'update-flake-lock'
           delete-branch: true
           commit-message: "chore(deps): update flake.lock files"
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           base: main
           title: "chore(deps): update flake.lock files"
           body: "This PR updates the Nix flake.lock files automatically."
