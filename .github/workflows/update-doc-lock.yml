@@ -1,0 +1,16 @@
+name: trigger-update-doc-lock
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: BirdeeHub/nixCats-doc
+          event-type: update-doc-lock
