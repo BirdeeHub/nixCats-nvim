@@ -10,7 +10,7 @@ on:
 jobs:
   lockfile:
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]' && github.event.head_commit.author.name != 'github-actions[bot]'
+    if: github.event.pusher.name != 'github-actions[bot]'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
