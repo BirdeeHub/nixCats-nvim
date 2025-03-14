@@ -711,6 +711,21 @@ These are the defaults:
       # causes sharedLibraries to be added to the END of
       # LD_LIBRARY_PATH instead of the start
 
+      # plugins in nixpkgs sometimes have extra dependencies added to
+      # .runtimeDeps attribute. By default nixCats will append then to the path,
+      # accepts `"suffix"` or `true` to append to the PATH
+      # accepts `"prefix"` to prepend to the PATH
+      # accepts `false` or `null` to not include them.
+      autowrapRuntimeDeps = "suffix";
+
+      # plugins in nixpkgs sometimes have extra lua config added to
+      # .passthru.initLua attribute for compatibility.
+      # By default nixCats will run them before your configuration.
+      # accepts `"prefix"` or `true` to run before your configuration
+      # accepts `"suffix"` to run afterwards
+      # accepts `false` or `null` to not include them.
+      autoconfigure = "prefix";
+
       # whether to group up treesitter grammars into a single directory,
       # or leave them as separate plugins.
       # Defaults to true as it results in
