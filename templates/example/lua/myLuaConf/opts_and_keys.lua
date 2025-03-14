@@ -2,20 +2,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-if os.getenv('WAYLAND_DISPLAY') and vim.fn.exepath('wl-copy') ~= "" then
-  vim.g.clipboard = {
-      name = 'wl-clipboard',
-      copy = {
-          ['+'] = 'wl-copy',
-          ['*'] = 'wl-copy',
-      },
-      paste = {
-          ['+'] = 'wl-paste',
-          ['*'] = 'wl-paste',
-      },
-      cache_enabled = 1,
-  }
-end
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
