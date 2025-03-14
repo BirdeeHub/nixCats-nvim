@@ -1,8 +1,6 @@
 name: update-website
 on:
   workflow_dispatch: # allows manual triggering
-  repository_dispatch: # or triggering from another repo
-    types: [update-nixcats-website]
   push:
     branches: [main]
 
