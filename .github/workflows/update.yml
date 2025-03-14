@@ -10,7 +10,7 @@ on:
 jobs:
   lockfile:
     runs-on: ubuntu-latest
-    if: github.event.pusher.name != 'github-actions[bot]'
+    if: github.ref != 'refs/heads/update-flake-lock' # Prevents loop when bot PR is merged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
