@@ -48,13 +48,10 @@
         };
         nixCats_passthru = {};
 
-        # dependencyOverlays.${system} = [ (final: prev: {}) ];
-        dependencyOverlays = forSystems (system: (
-          /* (import ./overlays inputs) ++ */ [
-            (utils.standardPluginOverlay inputs)
-            # other overlays
-          ]
-        ));
+        dependencyOverlays = [
+          (utils.standardPluginOverlay inputs)
+          # other overlays
+        ];
 
         categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
           # NOTE: for all available fields, see:

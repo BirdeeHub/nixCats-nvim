@@ -20,7 +20,7 @@
   collate_grammars ? true,
   # the function you would have passed to lua.withPackages
   extraLuaPackages ? (_: [ ]),
-  nixCats_passthru ? { },
+  nixCats_packageName,
   neovim-unwrapped,
   autowrapRuntimeDeps ? "suffix",
 
@@ -105,7 +105,7 @@ in
 (pkgs.callPackage ./wrapper.nix { }) (args // {
   wrapperArgsStr = lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
   inherit vimPackDir python3Env luaEnv withNodeJs perlEnv customAliases;
-  inherit (nixCats_passthru) nixCats_packageName;
+  inherit nixCats_packageName;
 } // lib.optionalAttrs withRuby {
   inherit rubyEnv;
 })

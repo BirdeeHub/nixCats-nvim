@@ -9,6 +9,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ### **luaPath** (`path` or `stringWithContext`)
     STORE PATH to your `~/.config/nvim` replacement.
+    e.g. `./.`
 
     ### **pkgsParams** (`AttrSet`)
     set of items for building the pkgs that builds your neovim.
@@ -16,16 +17,18 @@ with builtins; let lib = import ./lib.nix; in rec {
     accepted attributes are:
 
     - `nixpkgs` (`path` | `input` | `channel`)
-    : required. allows path, input, or channel
-    : channel means a resolved pkgs variable
-    : will not grab overlays from pkgs type variable
-    : if passing overlays is desired, put pkgs.overlays into `dependencyOverlays`
+    : required unless using `pkgs`
+    : allows path, or flake input
 
     - `system` (`string`)
-    : required unless nixpkgs is a resolved channel
+    : required unless using `pkgs`
     : or using --impure argument
 
-    - `dependencyOverlays` (`listOf overlays` | `attrsOf (listOf overlays)` | `null`)
+    - `pkgs` (`channel`)
+    : can be passed instead of `nixpkgs` and `system`
+    : the resulting nvim will inherit overlays and other such modifications of the `pkgs` value
+
+    - `dependencyOverlays` (`listOf overlays` | `null`)
     : default = null
 
     - `extra_pkg_config` (`AttrSet`)
@@ -33,9 +36,21 @@ with builtins; let lib = import ./lib.nix; in rec {
     : the attrset passed to:
     : `import nixpkgs { config = extra_pkg_config; inherit system; }`
 
+    - `extra_pkg_params` (`AttrSet`)
+    : default = {}
+    : `import nixpkgs (extra_pkg_params // { inherit system; })`
+
     - `nixCats_passthru` (`AttrSet`)
     : default = {}
     : attrset of extra stuff for finalPackage.passthru
+
+    ```nix
+    { inherit nixpkgs system dependencyOverlays; }
+    ```
+
+    ```nix
+    { inherit pkgs; }
+    ```
 
     ### **categoryDefinitions** (`functionTo` `AttrSet`)
     type: function that returns set of sets of categories of dependencies.
@@ -94,34 +109,33 @@ with builtins; let lib = import ./lib.nix; in rec {
   */
   baseBuilder =
     luaPath:
-    {
-      nixpkgs ? <nixpkgs>
-      , system ? (nixpkgs.system or builtins.system or import ../builder/builder_error.nix)
-      , extra_pkg_config ? {}
-      , dependencyOverlays ? null
-      , nixCats_passthru ? {}
-      , ...
-    }:
+    pkgsParams:
     categoryDefinitions:
     packageDefinitions: name: let
-      # validate channel, regardless of its type
-      # normalize to something that has lib and outPath in it
-      # so that overriders can always use it as expected
-      isPkgs = nixpkgs ? path && nixpkgs ? lib && nixpkgs ? config && nixpkgs ? system;
-      isNixpkgs = nixpkgs ? lib && nixpkgs ? outPath;
-      nixpkgspath = nixpkgs.path or nixpkgs.outPath or nixpkgs;
-      newnixpkgs = if isPkgs then nixpkgs // { outPath = nixpkgspath; }
-        else if isNixpkgs then nixpkgs
-        else {
-          lib = nixpkgs.lib or import "${nixpkgspath}/lib";
-          outPath = nixpkgspath;
-        };
-      builder = import ../builder { nclib = lib; utils = import ./.; };
+      nixpkgspath = pkgsParams.pkgs.path or pkgsParams.nixpkgs.path or pkgsParams.nixpkgs.outPath or pkgsParams.nixpkgs or (if builtins ? system then <nixpkgs> else import ../builder/builder_error.nix);
+      newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
+      ncbuilder = import ../builder { nclib = lib; utils = import ./.; };
+      mkOverride = lib.makeOverridable newlib.overrideDerivation;
     in
-    newnixpkgs.lib.makeOverridable builder {
-      nixpkgs = newnixpkgs;
-      inherit luaPath categoryDefinitions packageDefinitions name
-      system extra_pkg_config dependencyOverlays nixCats_passthru;
+    mkOverride ncbuilder rec {
+      inherit luaPath categoryDefinitions packageDefinitions name;
+      nixCats_passthru = pkgsParams.nixCats_passthru or {};
+      extra_pkg_config = pkgsParams.extra_pkg_config or {};
+      extra_pkg_params = pkgsParams.extra_pkg_params or {};
+      pkgs = pkgsParams.pkgs or null;
+      nixpkgs = if pkgsParams ? "pkgs"
+        then pkgsParams.pkgs // { outPath = nixpkgspath;}
+        else if pkgsParams.nixpkgs ? "lib"
+          then pkgsParams.nixpkgs
+          else { outPath = nixpkgspath; lib = newlib; };
+      system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/builder_error.nix);
+      dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
+        then builtins.trace ''
+          deprecated wrapping of dependencyOverlays list in a set of systems.
+          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+          See :h nixCats.flake.outputs.getOverlays
+          '' pkgsParams.dependencyOverlays.${system}
+        else pkgsParams.dependencyOverlays or [];
     };
 
   /**
@@ -200,7 +214,8 @@ with builtins; let lib = import ./lib.nix; in rec {
       else (outfunc prev.system) final prev);
 
   /**
-    takes all the arguments of the main builder function but as a single set
+    takes all the arguments of the main builder function but as a single set,
+    except it cannot take `system` or `pkgs`, from pkgsParams, only `nixpkgs`.
 
     Instead of name it needs defaultPackageName
 
@@ -225,7 +240,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : can be used to override the namespace of the module options,
     : meaning `[ "programs" "nixCats" ]` would create options like `programs.nixCats.enable = true`.
 
-    - `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    - `dependencyOverlays` (`listOf overlays` or `null`)
     : default = null
 
     - `luaPath` (`path` or `stringWithContext`)
@@ -239,6 +254,10 @@ with builtins; let lib = import ./lib.nix; in rec {
     - `extra_pkg_config` (`attrs`)
     : default = {}
     : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+    - `extra_pkg_params` (`AttrSet`)
+    : default = {}
+    : `import nixpkgs (extra_pkg_params // { inherit system; })`
 
     - `nixpkgs` (`path` or `attrs`)
     : default = null
@@ -264,6 +283,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
+    , extra_pkg_params ? {}
     , ... }:
     (import ./mkModules.nix {
       isHomeManager = false;
@@ -271,11 +291,12 @@ with builtins; let lib = import ./lib.nix; in rec {
       nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config moduleNamespace;
+        packageDefinitions defaultPackageName extra_pkg_config extra_pkg_params moduleNamespace;
     });
 
   /**
-    takes all the arguments of the main builder function but as a single set
+    takes all the arguments of the main builder function but as a single set,
+    except it cannot take `system` or `pkgs`, from pkgsParams, only `nixpkgs`.
 
     Instead of name it needs defaultPackageName
 
@@ -304,7 +325,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     : can be used to override the namespace of the module options,
     : meaning `[ "programs" "nixCats" ]` would create options like `programs.nixCats.enable = true`.
 
-    - `dependencyOverlays` (`listOf overlays` or `attrsOf (listOf overlays)` or `null`)
+    - `dependencyOverlays` (`listOf overlays` or `null`)
     : default = null
 
     - `luaPath` (`path` or `stringWithContext`)
@@ -318,6 +339,10 @@ with builtins; let lib = import ./lib.nix; in rec {
     - `extra_pkg_config` (`attrs`)
     : default = {}
     : the attrset passed to `import nixpkgs { config = extra_pkg_config; inherit system; }`
+
+    - `extra_pkg_params` (`AttrSet`)
+    : default = {}
+    : `import nixpkgs (extra_pkg_params // { inherit system; })`
 
     - `nixpkgs` (`path` or `attrs`)
     : default = null
@@ -343,6 +368,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
     , nixpkgs ? null
     , extra_pkg_config ? {}
+    , extra_pkg_params ? {}
     , ... }:
     (import ./mkModules.nix {
       isHomeManager = true;
@@ -350,7 +376,7 @@ with builtins; let lib = import ./lib.nix; in rec {
       nclib = lib;
       utils = import ./.;
       inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config moduleNamespace;
+        packageDefinitions defaultPackageName extra_pkg_config extra_pkg_params moduleNamespace;
     });
 
   /**
@@ -570,14 +596,14 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  safeOversList = { dependencyOverlays, system ? null }:
-    if isAttrs dependencyOverlays && system == null then
+  safeOversList = { dependencyOverlays, system ? null }: builtins.trace "deprecated because dependencyOverlays is always a list"
+    (if isAttrs dependencyOverlays && system == null then
       throw "dependencyOverlays is a set, but no system was provided"
-    else if isAttrs dependencyOverlays && dependencyOverlays ? system then
+    else if isAttrs dependencyOverlays && dependencyOverlays ? "${system}" then
       dependencyOverlays.${system}
     else if isList dependencyOverlays then
       dependencyOverlays
-    else [];
+    else []);
 
   /**
     makes a default package and then one for each name in `packageDefinitions`
