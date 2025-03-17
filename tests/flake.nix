@@ -16,7 +16,6 @@
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
-    packagename = "testvim";
     stateVersion = "24.05";
     nixCats = (let
       nixosModule = utils.mkNixosModules {};
@@ -31,8 +30,6 @@
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT { inherit inputs utils; };
-
-    package = import ./nvim { inherit inputs utils system packagename; };
 
     pureCallFlake = nixCats: path: let
       bareflake = import "${path}/flake.nix";
@@ -56,22 +53,25 @@
     LazyVim = (pureCallFlake nixCats utils.templates.LazyVim.path).packages.${system}.default;
     flakeless = import ../templates/flakeless { inherit pkgs nixCats; };
 
-    testargs2 = {
+    testargs = {
       inherit inputs utils libT stateVersion;
+    };
+    testargs1 = testargs // {
+      package = import ./nvim {
+        packagename = "testvim";
+        inherit inputs utils system;
+      };
+    };
+    drvtests = pkgs.callPackage ./drv testargs1;
+    hometests = pkgs.callPackage ./home testargs1;
+    nixostests = pkgs.callPackage ./nixos testargs1;
+
+    exampledrvtests = pkgs.callPackage ./exampledrv (testargs // {
       package = exampleconfig;
-    };
-    exampledrvtests = pkgs.callPackage ./exampledrv testargs2;
-    testargs3 = {
-      inherit inputs utils libT stateVersion;
+    });
+    kickstartdrvtests = pkgs.callPackage ./exampledrv (testargs // {
       package = kickstartconfig;
-    };
-    kickstartdrvtests = pkgs.callPackage ./exampledrv testargs3;
-
-    testargs = { inherit package inputs utils libT stateVersion; };
-
-    drvtests = pkgs.callPackage ./drv testargs;
-    hometests = pkgs.callPackage ./home testargs;
-    nixostests = pkgs.callPackage ./nixos testargs;
+    });
   in
   {
     libT = libT;
