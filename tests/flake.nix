@@ -24,8 +24,8 @@
     package = import ./nvim { inherit inputs utils system packagename; };
 
     pureCallFlake = path: let
-    res = (import "${path}/flake.nix").outputs (inputs // {
-      self = { inputs = {}; outputs = res; outPath = path; };
+    res = (import "${path}/flake.nix").outputs (inputs // rec {
+      self = { inputs = inputs // { inherit nixCats self; }; outputs = res; outPath = path; };
       nixCats = (let
         nixosModule = utils.mkNixosModules {};
         homeModule = utils.mkHomeModules {};
