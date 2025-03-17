@@ -1,5 +1,8 @@
-{ # NOTE: dont use pkgs.callPackage on this file
-  # or you will be overriding these with .override instead of the package!
+{ # NOTE: you may call .overrideNixCats (or .override if you don't use callPackage on this)
+  # to construct different packages from
+  # your packageDefinitions from the resulting derivation of this expression!
+  # see :h nixCats.overriding
+  # or build a set of all of them with `utils.mkAllPackages thedrv`
   pkgs ? import <nixpkgs> {}
   , nixCats ? builtins.fetchGit {
     url = "https://github.com/BirdeeHub/nixCats-nvim";

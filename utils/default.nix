@@ -672,7 +672,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   */
   mkAllPackages = package: lib.pipe package.passthru.packageDefinitions [
     attrNames
-    (map (name: lib.nameValuePair name (package.override { inherit name; })))
+    (map (name: lib.nameValuePair name (package.overrideNixCats { inherit name; })))
     listToAttrs
   ];
 
@@ -844,7 +844,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   in
   (final: prev: {
     ${importName} = listToAttrs (map (name:
-        lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+        lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev) system; })
       ) allnames);
   });
 
@@ -871,7 +871,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     allnames = attrNames package.passthru.packageDefinitions;
   in
   (final: prev: listToAttrs (map (name:
-    lib.nameValuePair name (package.override { inherit name; inherit (prev) system; })
+    lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev) system; })
   ) allnames));
 
   /**
@@ -896,7 +896,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   easyNamedOvers = package: let
     mapfunc = map (name:
       lib.nameValuePair name (final: prev: {
-        ${name} = package.override { inherit (prev) system; };
+        ${name} = package.overrideNixCats { inherit (prev) system; };
       }));
   in lib.pipe package.passthru.packageDefinitions [
     attrNames
