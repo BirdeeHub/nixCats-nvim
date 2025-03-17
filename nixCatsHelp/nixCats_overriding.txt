@@ -21,6 +21,14 @@ In the following help, we will override many times. We could combine them all
 together into 1 big override, but it is better to show them separately for
 documentation purposes.
 
+nixCats offers an extra override method to prevent shadowing of `.override`
+variable via things like `callPackage` being called above it.
+
+`package.override` and `package.overrideNixCats` are equivalent in all ways
+other than having different names to prevent shadowing.
+
+For the sake of brevity, we will mostly use `.override` in this documentation.
+
 ---------------------------------------------------------------------------------
                                            *nixCats.overriding.setupVariables*
 Here are some various settings you may recognize that you can override if you
@@ -30,7 +38,7 @@ we chose to inherit them from the main example config.
 If you wanted to build for a different system for example,
 you could change that here.
 >nix
-  pkgWithNewSetupVars = OGpackage.override (prev: {
+  pkgWithNewSetupVars = OGpackage.overrideNixCats (prev: {
     inherit (prev) luaPath;
     inherit (prev) nixpkgs;
     inherit (prev) system;
@@ -61,7 +69,7 @@ it in the same set, or chain overrides like so:
   pkgWithNewSetupVars2 = OGpackage.override (prev: {
     system = "aarch64-linux";
   })
-  regularCats = pkgWithNewSetupVars2.override {
+  regularCats = pkgWithNewSetupVars2.overrideNixCats {
     name = "regularCats";
   };
 <
