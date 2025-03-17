@@ -24,8 +24,13 @@
     package = import ./nvim { inherit inputs utils system packagename; };
 
     pureCallFlake = path: let
-    res = (import "${path}/flake.nix").outputs (inputs // rec {
-      self = { inputs = inputs // { inherit nixCats self; }; outputs = res; outPath = path; };
+    bareflake = import "${path}/flake.nix";
+    res = bareflake.outputs (inputs // rec {
+      self = {
+        outputs = res;
+        outPath = path;
+        inputs = builtins.mapAttrs (n: _: inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}") bareflake.inputs;
+      };
       nixCats = (let
         nixosModule = utils.mkNixosModules {};
         homeModule = utils.mkHomeModules {};
@@ -63,7 +68,6 @@
     libT = libT;
     checks = {
       inherit drvtests hometests nixostests;
-      # NOTE: impure outputs:
       inherit exampledrvtests kickstartdrvtests;
     };
   });
