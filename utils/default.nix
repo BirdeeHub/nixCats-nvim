@@ -560,52 +560,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     mergeOverlays (oldOverlist ++ newOverlist);
 
   /**
-    Simple helper function for `mergeOverlayLists`
-
-    If you know the prior `dependencyOverlays` is a list, you dont need this.
-
-    If `dependencyOverlays` is an attrset, system string is required.
-    If `dependencyOverlays` is a list, system string is ignored.
-    if invalid type or system, returns an empty list
-
-    If you passed in dependencyOverlays as a list to your builder function,
-    it will remain a list.
-
-    ## Arguments
-
-    - `system` (`string` or `null`)
-    : Technically optional if you know `dependencyOverlays` is a list
-    : But the whole function isnt required at that point so, this is effectively required
-
-    - `dependencyOverlays` (`AttrsOfSystemsOf` `listOf` `overlays` | `listOf` `overlays`)
-
-    ## Example
-
-    ```nix
-    dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
-      (utils.mergeOverlayLists # <-- merging 2 lists requires both to be a list
-        # safeOversList checks if dependencyOverlays is a list or a set
-        (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
-        [ # <- and then we add our new list
-          (utils.standardPluginOverlay inputs)
-          # any other flake overlays here.
-        ]
-      )
-    ]);
-    ```
-
-    ---
-  */
-  safeOversList = { dependencyOverlays, system ? null }: builtins.trace "deprecated because dependencyOverlays is always a list"
-    (if isAttrs dependencyOverlays && system == null then
-      throw "dependencyOverlays is a set, but no system was provided"
-    else if isAttrs dependencyOverlays && dependencyOverlays ? "${system}" then
-      dependencyOverlays.${system}
-    else if isList dependencyOverlays then
-      dependencyOverlays
-    else []);
-
-  /**
     makes a default package and then one for each name in `packageDefinitions`
 
     for constructing flake outputs.
@@ -903,5 +857,17 @@ with builtins; let lib = import ./lib.nix; in rec {
     mapfunc
     listToAttrs
   ];
+
+  safeOversList = { dependencyOverlays, system ? null }:
+  builtins.trace ''
+    utils.safeOversList deprecated because dependencyOverlays is now always a list
+  ''
+    (if isAttrs dependencyOverlays && system == null then
+      throw "dependencyOverlays is a set, but no system was provided"
+    else if isAttrs dependencyOverlays && dependencyOverlays ? "${system}" then
+      dependencyOverlays.${system}
+    else if isList dependencyOverlays then
+      dependencyOverlays
+    else []);
 
 }
