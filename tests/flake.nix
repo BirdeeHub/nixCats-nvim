@@ -48,7 +48,7 @@
       });
     in res;
 
-    exampleflake = (pureCallFlake nixCats utils.templates.example.path);
+    exampleflake = pureCallFlake nixCats utils.templates.example.path;
     exampleconfig = exampleflake.packages.${system}.default;
     kickstartconfig = (pureCallFlake nixCats utils.templates.kickstart-nvim.path).packages.${system}.default;
     overriding = (pureCallFlake exampleflake utils.templates.overriding.path).packages.${system}.default;
