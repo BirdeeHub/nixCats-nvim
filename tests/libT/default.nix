@@ -19,7 +19,7 @@
         outputs = res;
         outPath = path;
         inputs = builtins.mapAttrs (n: _:
-            inputs.${n} or { inherit self; }.${n} or builtins.throw "Missing input ${n}"
+            (inputs // { inherit self; }).${n} or builtins.throw "Missing input ${n}"
           ) bareflake.inputs;
       };
     });
