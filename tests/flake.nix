@@ -16,19 +16,6 @@
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
-    pureCallFlake = nixCats: path: let
-      bareflake = import "${path}/flake.nix";
-      res = bareflake.outputs (inputs // rec {
-        self = res // {
-          outputs = res;
-          outPath = path;
-          inputs = builtins.mapAttrs (n: _:
-              inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}"
-            ) bareflake.inputs;
-        };
-        inherit nixCats;
-      });
-    in res;
     nixCats = (let
       nixosModule = utils.mkNixosModules {};
       homeModule = utils.mkHomeModules {};
@@ -42,13 +29,17 @@
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT { inherit inputs utils; };
+    callFlake = libT.pureCallFlakeOverride;
 
-    exampleflake = pureCallFlake nixCats utils.templates.example.path;
+    inputswithbase = inputs // { inherit nixCats; };
+    exampleflake = callFlake utils.templates.example.path inputswithbase;
+    inputswithexample = inputs // { nixCats = exampleflake; };
+
     exampleconfig = exampleflake.packages.${system}.default;
-    kickstartconfig = (pureCallFlake nixCats utils.templates.kickstart-nvim.path).packages.${system}.default;
-    overriding = (pureCallFlake exampleflake utils.templates.overriding.path).packages.${system}.default;
-    overwrite = (pureCallFlake exampleflake utils.templates.overwrite.path).packages.${system}.default;
-    LazyVim = (pureCallFlake nixCats utils.templates.LazyVim.path).packages.${system}.default;
+    kickstartconfig = (callFlake utils.templates.kickstart-nvim.path inputswithbase).packages.${system}.default;
+    overriding = (callFlake utils.templates.overriding.path inputswithexample).packages.${system}.default;
+    overwrite = (callFlake utils.templates.overwrite.path inputswithexample).packages.${system}.default;
+    LazyVim = (callFlake utils.templates.LazyVim.path inputswithbase).packages.${system}.default;
     flakeless = import utils.templates.flakeless.path { inherit pkgs nixCats; };
 
     testargs = {

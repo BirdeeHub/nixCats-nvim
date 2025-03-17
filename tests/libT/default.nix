@@ -12,6 +12,18 @@
   , writeShellScript
   , ...
 }: with builtins; rec {
+  pureCallFlakeOverride = path: inputs: let
+    bareflake = import "${path}/flake.nix";
+    res = bareflake.outputs (inputs // rec {
+      self = res // {
+        outputs = res;
+        outPath = path;
+        inputs = builtins.mapAttrs (n: _:
+            inputs.${n} or { inherit self; }.${n} or builtins.throw "Missing input ${n}"
+          ) bareflake.inputs;
+      };
+    });
+  in res;
   mkHMmodulePkgs = {
     package
     , entrymodule
