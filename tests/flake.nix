@@ -3,7 +3,7 @@
 {
   description = ''
     assuming you are at the top level of the repo,
-    nix flake check --show-trace --impure -Lv ./tests
+    nix flake check --show-trace -Lv ./tests
   '';
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
