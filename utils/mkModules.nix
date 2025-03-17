@@ -12,9 +12,8 @@
   , utils
   , nclib
   , nixpkgs ? null
-  , extra_pkg_config ? {}
   , ...
-}:
+}@inhargs:
 { config, pkgs, lib, ... }: {
 
   imports = [ (import ./mkOpts.nix {
@@ -22,16 +21,22 @@
   }) ];
 
   config = let
-    dependencyOverlaysFunc = { main_options_set, user_options_set ? { addOverlays = []; } }: let
-      overlaylists = [ (utils.mergeOverlayLists main_options_set.addOverlays user_options_set.addOverlays) ];
-    in if builtins.isAttrs oldDependencyOverlays then
-        lib.genAttrs (builtins.attrNames oldDependencyOverlays)
-          (system: pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays.${system} overlaylists)])
-      else if builtins.isList oldDependencyOverlays then
-      pkgs.overlays ++ [(utils.mergeOverlayLists oldDependencyOverlays overlaylists)]
-      else pkgs.overlays ++ overlaylists;
+    dependencyOverlaysFunc = { main_options_set, user_options_set ? {} }:
+      (main_options_set.addOverlays or [])
+        ++ (user_options_set.addOverlays or [])
+        ++ (
+          if builtins.isAttrs oldDependencyOverlays
+          then builtins.trace ''
+            deprecated wrapping of dependencyOverlays list in a set of systems.
+            Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+            See :h nixCats.flake.outputs.getOverlays
+            '' oldDependencyOverlays.${pkgs.system}
+          else if builtins.isList oldDependencyOverlays
+            then oldDependencyOverlays
+            else []
+        );
 
-    mapToPackages = options_set: dependencyOverlays: (let
+    mapToPackages = options_set: depOvers: (let
       getStratWithExisting = enumstr: if enumstr == "merge"
         then utils.deepmergeCats
         else if enumstr == "replace"
@@ -63,23 +68,36 @@
             then keepLuaBuilder else 
             builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option"));
 
-      newNixpkgs = if options_set.nixpkgs_version != null
-        then options_set.nixpkgs_version
-        else if lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config != null
-        then lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config
-        else if nixpkgs != null
-        then nixpkgs
-        else pkgs;
+      newPkgsParams = let
+        pkgsoptions = if options_set.nixpkgs_version != null
+          then options_set.nixpkgs_version
+          else if lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config != null
+          then lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config
+          else nixpkgs;
+        nixpkgspath = if pkgsoptions != null then pkgsoptions else pkgs;
+        extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
+        extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
+        dependencyOverlays = lib.optional (depOvers != []) (utils.mergeOverlays depOvers);
+      in if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
+        then if dependencyOverlays != []
+          then {
+            pkgs = pkgs.appendOverlays dependencyOverlays;
+          } else {
+            inherit pkgs;
+          }
+        else {
+          nixpkgs = nixpkgspath;
+          extra_pkg_config = pkgs.config // extra_pkg_config;
+          inherit (pkgs) system;
+          dependencyOverlays = pkgs.overlays ++ dependencyOverlays;
+          inherit extra_pkg_params;
+        };
 
     in (builtins.listToAttrs (builtins.map (catName: let
-        boxedCat = newLuaBuilder {
-          nixpkgs = newNixpkgs;
-          extra_pkg_config = extra_pkg_config // pkgs.config;
-          inherit (pkgs) system;
-          inherit dependencyOverlays;
-        } newCategoryDefinitions pkgDefs catName;
-      in
-        { name = catName; value = boxedCat; }) options_set.packageNames))
+      in {
+        name = catName;
+        value = newLuaBuilder newPkgsParams newCategoryDefinitions pkgDefs catName;
+      }) options_set.packageNames))
     );
 
     main_options_set = lib.attrByPath moduleNamespace {} config;
@@ -100,7 +118,7 @@
         );
       }
     ) userops;
-    newUserPackageDefinitions = builtins.mapAttrs ( uname: user_options_set: {
+    newUserPackageDefinitions = builtins.mapAttrs (uname: user_options_set: {
         packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (builtins.attrValues newUserPackageOutputs.${uname}.packages);
       }
     ) userops;

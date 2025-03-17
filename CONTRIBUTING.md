@@ -91,10 +91,8 @@ I welcome any help in making this happen.
 
 Run the tests with
 ```sh
-nix flake check --show-trace --impure -Lv ./tests
+nix flake check --show-trace -Lv ./tests
 ```
-
-The `--impure` flag is required to use `builtins.getFlake` on the example templates, but not for the other tests.
 
 I will slowly be adding tests to the tests directory.
 If anyone would like to add some tests, please do!

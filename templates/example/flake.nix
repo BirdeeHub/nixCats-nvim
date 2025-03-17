@@ -73,10 +73,6 @@
     # this allows you to use ${pkgs.system} whenever you want in those sections
     # without fear.
 
-    # sometimes our overlays require a ${system} to access the overlay.
-    # Your dependencyOverlays can either be lists
-    # in a set of ${system}, or simply a list.
-    # the nixCats builder function will accept either.
     # see :help nixCats.flake.outputs.overlays
     dependencyOverlays = /* (import ./overlays inputs) ++ */ [
       # This overlay grabs all the inputs named in the format

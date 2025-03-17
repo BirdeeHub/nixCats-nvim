@@ -23,7 +23,6 @@
   , wrapperArgsStr ? ""
   , nixCats_packageName
   , customAliases ? []
-  , nixCats_passthru ? {}
   , preWrapperShellCode ? ""
   , customRC ? ""
   , luaEnv
@@ -100,8 +99,7 @@ let
     ;
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
-in
-stdenv.mkDerivation {
+in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
 
   meta = neovim-unwrapped.meta // {
@@ -110,8 +108,6 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [ makeWrapper ];
-
-  passthru = nixCats_passthru;
 
   __structuredAttrs = true;
   dontUnpack = true;

@@ -23,9 +23,24 @@
 
     package = import ./nvim { inherit inputs utils system packagename; };
 
-    # NOTE: impure:
-    exampleconfig = (builtins.getFlake (builtins.toString utils.templates.example.path)).packages.${system}.default;
-    kickstartconfig = (builtins.getFlake (builtins.toString utils.templates.kickstart-nvim.path)).packages.${system}.default;
+    pureCallFlake = path: let
+    res = (import "${path}/flake.nix").outputs (inputs // {
+      self = { inputs = {}; outputs = res; outPath = path; };
+      nixCats = (let
+        nixosModule = utils.mkNixosModules {};
+        homeModule = utils.mkHomeModules {};
+      in {
+        outPath = ../.;
+        inherit utils nixosModule homeModule;
+        inherit (utils) templates;
+        nixosModules.default = nixosModule;
+        homeModules.default = homeModule;
+      });
+    });
+    in res;
+
+    exampleconfig = (pureCallFlake utils.templates.example.path).packages.${system}.default;
+    kickstartconfig = (pureCallFlake utils.templates.kickstart-nvim.path).packages.${system}.default;
 
     testargs2 = {
       inherit inputs utils libT stateVersion;

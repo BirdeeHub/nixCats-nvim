@@ -48,24 +48,14 @@
         inherit (prev) extra_pkg_config;
         inherit (prev) nixCats_passthru;
 
-        # and our dependencyOverlays by system.
-        # we didnt add any extra here but this is to demonstrate
-        # that it is the same as any other templates,
-        # we are just using a different function to iterate over systems
-        # to show more possibilities. it outputs to:
-        # dependencyOverlays.${system} = somelistofoverlays;
-        # just like normal.
-        # utils.safeOversList just checks if dependencyOverlays is a list or a set of lists,
-        # and always returns a list
-        dependencyOverlays = forSystems (system: [
+        dependencyOverlays = [
           (utils.mergeOverlays
-            ((utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; }) ++
-            /* (import ./overlays inputs) ++ */[
+            (prev.dependencyOverlays ++ [
               (utils.standardPluginOverlay inputs)
               # any other flake overlays here.
             ])
           )
-        ]);
+        ];
       });
 
       # you can call override many times. We could have also have done this all in 1 call.

@@ -35,13 +35,14 @@ you could change that here.
     inherit (prev) nixpkgs;
     inherit (prev) system;
     inherit (prev) extra_pkg_config;
+    inherit (prev) extra_pkg_params;
     inherit (prev) nixCats_passthru;
+    pkgs = prev.pkgs or null; # <- might not exist
   };
 <
-This is the full list of attributes you may override:
 
-luaPath categoryDefinitions packageDefinitions name
-nixpkgs system extra_pkg_config dependencyOverlays nixCats_passthru;
+The things you may override are any of the arguments to the main builder
+function, grouped into a single set
 
 ---------------------------------------------------------------------------------
                                                      *nixCats.overriding.name*
@@ -66,60 +67,30 @@ it in the same set, or chain overrides like so:
 <
 ---------------------------------------------------------------------------------
                                        *nixCats.overriding.dependencyOverlays*
-Now we will address the overlays. Overlays can be a list or a set,
-so they are slightly tricky.
-In practice, this is mostly just boilerplate you would get from a template so
-it is not too big of a pain.
 
-This is the same as both of the starter templates,
-we are just using a different function to iterate over systems
-to show more possibilities. It outputs to:
->nix
-  dependencyOverlays.${system} = somelistofoverlays;
-<
-and looks like:
+NixCats provides a function to merge lists of overlays together into a single
+overlay. This allows you to combine overlays that might output to the same
+subattribute without them overwriting each other completely.
+
 >nix
   pkgWithNewOverlays = OGpackage.override (prev: {
-    dependencyOverlays = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: [
-      (utils.mergeOverlayLists
-        (utils.safeOversList { inherit system; inherit (prev) dependencyOverlays; })
-        (/* (import ./overlays inputs) ++ */[
+    dependencyOverlays = [
+      (utils.mergeOverlays
+        (prev.dependencyOverlays ++ [
+          # now pkgs.neovimPlugins will contain
+          # the result of both calls to standardPluginOverlay!
           (utils.standardPluginOverlay inputs)
           # any other flake overlays here.
           inputs.neorg-overlay.overlays.default
           inputs.lz-n.overlays.default
-          inputs.codeium.overlays.${system}.default
+          (utils.fixSystemizedOverlay inputs.codeium.overlays
+            (system: inputs.codeium.overlays.${system}.default)
+          )
         ])
       )
-    ]);
+    ];
   });
 <
-`utils.safeOversList` just checks if `dependencyOverlays` is a list or a set of lists,
-and always returns a list
-
-OR
-as just a list, fixing improper overlays via helper function:
->nix
-  pkgWithNewOverlays = OGpackage.override (prev: {
-    dependencyOverlays = [ (utils.mergeOverlayLists
-      (utils.safeOversList { inherit (prev) system dependencyOverlays; })
-      (/* (import ./overlays inputs) ++ */[
-        (utils.standardPluginOverlay inputs)
-        # any other flake overlays here.
-        inputs.neorg-overlay.overlays.default
-        inputs.lz-n.overlays.default
-        # to fix systematized overlay sets
-        (utils.fixSystemizedOverlay inputs.codeium.overlays
-          (system: inputs.codeium.overlays.${system}.default)
-        )
-      ])
-    ) ];
-  });
-<
- If you always choose the list option, it will always be
-a list from then on and thus no need for `utils.safeOversList`,
-but you still will need `utils.mergeOverlayLists` to merge overlays.
-
 ---------------------------------------------------------------------------------
                                       *nixCats.overriding.categoryDefinitions*
 In our `categoryDefinitions`, we most likely also want our new overlays.

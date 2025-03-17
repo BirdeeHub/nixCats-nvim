@@ -160,38 +160,7 @@ That is,
     };
 <
                                            *nixCats.flake.outputs.getOverlays*
-We call flake utils to get system variable for all default systems.
-It simply calls the function with each system value, and maps the resulting
-set from { mySet = {}; } to { mySet.${system} = {}; }
-Many overlays require being accessed via ${system} variable in this manner,
-and thus there is a method for handling it in nixCats.
-
-No overlays SHOULD be exported requiring the ${system} variable to access.
-However, some are (such as codeium, a free ai plugin) and thus, we will wrap this anyway.
 >nix
-  inherit (utils.eachSystem nixpkgs.lib.platforms.all (system: let
-                  /* utils.eachSystem is just flake-utils.lib.eachSystem */
-         /* list of overlays from ./overlays is added to the rest of the list */
-    dependencyOverlays = (import ./overlays inputs) ++ [
-      # This overlay grabs all the inputs named in the format
-      # `plugins-<pluginName>`
-      # Once we add this overlay to our nixpkgs, we are able to
-      # use `pkgs.neovimPlugins`, which is a set of our plugins.
-      (utils.standardPluginOverlay inputs)
-      # add any flake overlays here.
-      inputs.neorg-overlay.overlays.default
-      inputs.lz-n.overlays.default
-      # stuff like this is why this part is done this way.
-      inputs.codeium.overlays.${system}.default
-    ];
-    # these overlays will be wrapped with ${system}
-    # and we will call the same utils.eachSystem function
-    # later on to access them.
-  in { inherit dependencyOverlays; })) dependencyOverlays;
-<
-This will allow us to pass system independent overlays to our module options,
-even when importing overlays from improperly formed flakes.
-
 Managing the system variable in combination with overlays
 can be one of the hardest parts of flake usage.
 This flake resolves our pkgs instance for Neovim itself to help with this,
@@ -207,6 +176,9 @@ They could also just be a list of overlays!
     inputs.neorg-overlay.overlays.default
     inputs.lz-n.overlays.default
 
+    # No overlays SHOULD be exported requiring the ${system} variable to access.
+    # However, some are (such as codeium, a free ai plugin)
+
     # when other people mess up their overlays by wrapping them,
     # you may instead call this function on their overlay.
     # it will check if it has the system in it.
@@ -219,50 +191,28 @@ They could also just be a list of overlays!
 <
 
                                                *nixCats.flake.outputs.overlays*
-The two major things of note in this overlays section.
-Regardless of which above method you choose. >nix
-  (utils.standardPluginOverlay inputs) # return type: a single overlay
-  # and
-  (import ./overlays inputs) # type: List of Overlays
-<
-<1>
--- The first to explain is utils.standardPluginOverlay:
-You do not need to edit it to use it.
-Usage of this overlay is described in:
+`utils.standardPluginOverlay`
+Usage of this function to create an overlay is described in:
 :h |nixCats.flake.inputs|
-along with its friend, utils.sanitizedPluginOverlay
+along with its friend, `utils.sanitizedPluginOverlay`
 
 It takes all the inputs named in the format
 `plugins-somepluginname` and makes them into plugins. 
-If the plugin doesn't have a build step,
-and it wasnt on nixpkgs, then use this method.
 Access them to add them to a category of the builder function 
 with `pkgs.neovimPlugins.somepluginname`
 
-<2>
--- The second is overlays/customBuildsOverlay.nix:
+If the plugin doesn't have a build step,
+and it wasnt on nixpkgs, then use this method.
 
-It is imported via overlays/default.nix above
-
-If you need to interact with one of these overlays, it will be this one.
-You should not need to do it much.
-overlays/default.nix imports this overlay and any others like it.
-see :help |nixCats.flake.nixperts.overlays|
-
-It is used for defining plugins with build steps that 
-were not well handled by nixpkgs.
-It is passed flake inputs, and super is pkgs.
-Define the things within the file. 
-Then, access plugins defined there later 
-with 'pkgs.nixCatsBuilds.somepluginname'
+If the plugin does have a build step and isn't on nixpkgs,
+then you can either make your own overlay from scratch,
+or you can call overrideAttrs on the generated plugin
+to add the required items to it.
+more info at :h |nixCats.flake.inputs|
 
 If you decide you wish to split your customBuildsOverlay up, 
 see :help |nixCats.flake.nixperts.overlays|
-or look at the overlays/default.nix file.
-
-<IMPORTANT> When defining your overlays, they will be
-defined in a SEPARATE LIST named <dependencyOverlays>.
-You will need <dependencyOverlays> later.
+or look at the overlays/default.nix file for advice on how to do that.
 
 ---------------------------------------------------------------------------------------
                                             *nixCats.flake.outputs.categories*
@@ -809,10 +759,16 @@ That argument is the name of the Neovim package to be packaged.
 1. The path to the Lua to include (in the flake, we use the self variable to get
      this path and wrap the Lua when `wrapRc = true`)
 
-2. A set containing:
-  The `dependencyOverlays` set or list,
-  extra_pkg_config, nixpkgs, nixCats_passthru, and system so it can
-  resolve pkgs and pass it where it needs to go.
+2. A set containing parameters for the pkgs to be used:
+  It takes 2 forms. You can either pass it a `nixpkgs` and a `system` and it
+  will resolve the `pkgs` for you and pass it to your `categoryDefinitions` and
+  `packageDefinitions`,
+  or you can pass it a `pkgs` instead to inherit the values and do the same.
+
+  You may also provide a `dependencyOverlays` list to add `overlays` for nvim only,
+  `extra_pkg_config` (maps to the config argument to `import nixpkgs { ... }`),
+  `nixCats_passthru` (extra items to put into passthru in the final drv),
+  and `extra_pkg_params` (contains any fields in `import nixpkgs { ... }` not mentioned).
 
 3. our function that takes an individual package definition
      and returns a set of categoryDefinitions.
@@ -821,65 +777,35 @@ That argument is the name of the Neovim package to be packaged.
 
 It is now a function that takes a name, and returns your chosen Neovim package.
 >nix
-  # It requires the system variable to build a package.
-  utils.eachSystem nixpkgs.lib.platforms.all (system: let
+  packages = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: let
     # create our builder for our exports
-    inherit (utils) baseBuilder;
-    nixCatsBuilder = baseBuilder luaPath {
+    nixCatsBuilder = utils.baseBuilder luaPath {
       inherit nixpkgs system dependencyOverlays extra_pkg_config;
     } categoryDefinitions packageDefinitions;
+  in {
     # it can take a name of a package in packageDefinitions
     # and return the package!
-    defaultPackage = nixCatsBuilder defaultPackageName;
-    # ... rest of the outputs section explained
-    # below in :h nixCats.flake.outputs.exports ...
+    default = nixCatsBuilder defaultPackageName;
+  });
 <
-If you use it wrong, you will most likely get this error message:
-
-  The following arguments are accepted:
 >nix
-  # -------------------------------------------------------- #
-
-  # the path to your ~/.config/nvim replacement within your Nix config.
-  luaPath: # <-- must be a store path
-
-  { # set of items for building the pkgs that builds your Neovim
-
-    , nixpkgs # <-- required
-    , system # <-- required
-
-    # type: (attrsOf listOf overlays) or (listOf overlays) or null
-    , dependencyOverlays ? null 
-
-    # import nixpkgs { config = extra_pkg_config; inherit system; }
-    , extra_pkg_config ? {} # type: attrs
-
-    # any extra stuff for finalPackage.passthru
-    , nixCats_passthru ? {} # type: attrs
-  }:
-
-  # type: function with args { pkgs, settings, categories, name, ... }:
-  # returns: set of sets of categories
-  # see :h nixCats.flake.outputs.categories
-  categoryDefinitions: 
-
-  # type: function with args { pkgs, ... }:
-  # returns: { settings = {}; categories = {}; }
-  packageDefinitions: 
-  # see :h nixCats.flake.outputs.packageDefinitions
-  # see :h nixCats.flake.outputs.settings
-
-  # name of the package to built from packageDefinitions
-  name: 
-
-  # -------------------------------------------------------- #
-<
-  # Note:
-  When using override, all values shown above will
-  be top level attributes of prev, none will be nested.
-  i.e. >nix
-  finalPackage.override (prev: { inherit (prev) dependencyOverlays; })
-<      NOT prev.pkgsargs.dependencyOverlays or something like that
+  packages = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.all (system: let
+    # create our pkgs to pass to builder
+    pkgs = import nixpkgs {
+      inherit system;
+      overlays = dependencyOverlays;
+      config = extra_pkg_config;
+    };
+    # create our builder for our exports
+    nixCatsBuilder = utils.baseBuilder luaPath {
+      /* you can still use dependencyOverlays here and such as well to add */
+      inherit pkgs; # <- but here we are just going to inherit the value.
+    } categoryDefinitions packageDefinitions;
+  in {
+    # it can take a name of a package in packageDefinitions
+    # and return the package!
+    default = nixCatsBuilder defaultPackageName;
+  });
 <
 ---------------------------------------------------------------------------------------
 Flake Exports and Export options               *nixCats.flake.outputs.exports*
@@ -946,6 +872,7 @@ They look something like this:
 
     # we export a NixOS module to allow configuration from configuration.nix
     # allows you to either inherit values from your main flake, or start fresh
+    # It requires the system variable to build a package but not to build a module!
     nixosModules.default = utils.mkNixosModules {
       inherit dependencyOverlays luaPath defaultPackageName
         categoryDefinitions packageDefinitions nixpkgs;

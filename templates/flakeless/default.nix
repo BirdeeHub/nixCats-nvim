@@ -10,16 +10,6 @@
   utils = import nixCats;
   # path to your new .config/nvim
   luaPath = ./.;
-  # the following extra_pkg_config contains any values
-  # which you want to pass to the config set of nixpkgs
-  # import nixpkgs { config = extra_pkg_config; inherit system; }
-  # will not apply to module imports
-  # as that will have your system values
-  extra_pkg_config = {
-    # allowUnfree = true;
-  };
-  # will apply to only nvim
-  dependencyOverlays = /* pkgs.overlays ++ */ [];
 
   # see :help nixCats.flake.outputs.categories
   categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
@@ -122,8 +112,4 @@
   defaultPackageName = "nvim";
 
 # return our package!
-in utils.baseBuilder luaPath {
-  inherit dependencyOverlays extra_pkg_config;
-  inherit (pkgs) system;
-  nixpkgs = pkgs; # <- accepts pkgs, <nixpkgs>, inputs.nixpkgs, or pkgs.path
-} categoryDefinitions packageDefinitions defaultPackageName
+in utils.baseBuilder luaPath { inherit pkgs; } categoryDefinitions packageDefinitions defaultPackageName
