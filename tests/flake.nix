@@ -49,7 +49,7 @@
     overriding = (pureCallFlake exampleflake utils.templates.overriding.path).packages.${system}.default;
     overwrite = (pureCallFlake exampleflake utils.templates.overwrite.path).packages.${system}.default;
     LazyVim = (pureCallFlake nixCats utils.templates.LazyVim.path).packages.${system}.default;
-    flakeless = import ../templates/flakeless { inherit pkgs nixCats; };
+    flakeless = import utils.templates.flakeless.path { inherit pkgs nixCats; };
 
     testargs = {
       stateVersion = "24.05";
