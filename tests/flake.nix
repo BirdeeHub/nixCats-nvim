@@ -16,7 +16,19 @@
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
-    stateVersion = "24.05";
+    pureCallFlake = nixCats: path: let
+      bareflake = import "${path}/flake.nix";
+      res = bareflake.outputs (inputs // rec {
+        self = res // {
+          outputs = res;
+          outPath = path;
+          inputs = builtins.mapAttrs (n: _:
+              inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}"
+            ) bareflake.inputs;
+        };
+        inherit nixCats;
+      });
+    in res;
     nixCats = (let
       nixosModule = utils.mkNixosModules {};
       homeModule = utils.mkHomeModules {};
@@ -31,20 +43,6 @@
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT { inherit inputs utils; };
 
-    pureCallFlake = nixCats: path: let
-      bareflake = import "${path}/flake.nix";
-      res = bareflake.outputs (inputs // rec {
-        self = res // {
-          outputs = res;
-          outPath = path;
-          inputs = builtins.mapAttrs (n: _:
-              inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}"
-            ) bareflake.inputs;
-        };
-        inherit nixCats;
-      });
-    in res;
-
     exampleflake = pureCallFlake nixCats utils.templates.example.path;
     exampleconfig = exampleflake.packages.${system}.default;
     kickstartconfig = (pureCallFlake nixCats utils.templates.kickstart-nvim.path).packages.${system}.default;
@@ -54,7 +52,8 @@
     flakeless = import ../templates/flakeless { inherit pkgs nixCats; };
 
     testargs = {
-      inherit inputs utils libT stateVersion;
+      stateVersion = "24.05";
+      inherit inputs utils libT;
     };
     testargs1 = testargs // {
       package = import ./nvim {
