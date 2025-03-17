@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.5.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.4.0...v6.5.0) (2025-03-17)
+
+
+### Features
+
+* **overrides and pkgs:** see below ([#132](https://github.com/BirdeeHub/nixCats-nvim/issues/132)) ([1bc1e66](https://github.com/BirdeeHub/nixCats-nvim/commit/1bc1e666ac7619b540a6030e1255c12c87218d52))
+
 ## [6.4.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.3.1...v6.4.0) (2025-03-14)
 
 
