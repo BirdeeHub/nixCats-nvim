@@ -24,24 +24,26 @@
     package = import ./nvim { inherit inputs utils system packagename; };
 
     pureCallFlake = path: let
-    bareflake = import "${path}/flake.nix";
-    res = bareflake.outputs (inputs // rec {
-      self = {
-        outputs = res;
-        outPath = path;
-        inputs = builtins.mapAttrs (n: _: inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}") bareflake.inputs;
-      };
-      nixCats = (let
-        nixosModule = utils.mkNixosModules {};
-        homeModule = utils.mkHomeModules {};
-      in {
-        outPath = ../.;
-        inherit utils nixosModule homeModule;
-        inherit (utils) templates;
-        nixosModules.default = nixosModule;
-        homeModules.default = homeModule;
+      bareflake = import "${path}/flake.nix";
+      res = bareflake.outputs (inputs // rec {
+        self = {
+          outputs = res;
+          outPath = path;
+          inputs = builtins.mapAttrs (n: _:
+              inputs.${n} or { inherit nixCats self; }.${n} or builtins.throw "Missing input ${n}"
+            ) bareflake.inputs;
+        };
+        nixCats = (let
+          nixosModule = utils.mkNixosModules {};
+          homeModule = utils.mkHomeModules {};
+        in {
+          outPath = ../.;
+          inherit utils nixosModule homeModule;
+          inherit (utils) templates;
+          nixosModules.default = nixosModule;
+          homeModules.default = homeModule;
+        });
       });
-    });
     in res;
 
     exampleconfig = (pureCallFlake utils.templates.example.path).packages.${system}.default;
