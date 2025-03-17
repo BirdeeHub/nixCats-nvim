@@ -16,7 +16,7 @@
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
     forAllSys = utils.eachSystem nixpkgs.lib.platforms.all;
-    nixCats = (let
+    nixCats = let
       nixosModule = utils.mkNixosModules {};
       homeModule = utils.mkHomeModules {};
     in {
@@ -25,7 +25,7 @@
       inherit (utils) templates;
       nixosModules.default = nixosModule;
       homeModules.default = homeModule;
-    });
+    };
   in forAllSys (system: let
     pkgs = import nixpkgs { inherit system; };
     libT = pkgs.callPackage ./libT { inherit inputs utils; };
