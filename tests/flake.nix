@@ -26,7 +26,7 @@
     pureCallFlake = path: let
       bareflake = import "${path}/flake.nix";
       res = bareflake.outputs (inputs // rec {
-        self = {
+        self = res // {
           outputs = res;
           outPath = path;
           inputs = builtins.mapAttrs (n: _:
