@@ -32,14 +32,14 @@ with builtins; rec {
     || n2l.member lhs || n2l.member rhs
     || ! isAttrs lhs || ! isAttrs rhs;
 
-  recursiveUpdateUntilDRV = recUpUntilWpicker { pred = path: lhs: rhs:
+  recursiveUpdateUntilDRV = pickyRecUpdateUntil { pred = path: lhs: rhs:
     isDerivation lhs || isDerivation rhs || ! isAttrs lhs || ! isAttrs rhs; };
 
-  recUpdateHandleInlineORdrv = recUpUntilWpicker { pred = updateUntilPred; };
+  recUpdateHandleInlineORdrv = pickyRecUpdateUntil { pred = updateUntilPred; };
 
-  recursiveUpdateWithMerge = recUpUntilWpicker {
+  recursiveUpdateWithMerge = pickyRecUpdateUntil {
     pred = updateUntilPred;
-    picker = left: right:
+    pick = path: left: right:
       if isList left && isList right
         then left ++ right
       # category lists can contain mixes of sets and derivations.
@@ -61,9 +61,9 @@ with builtins; rec {
     value:
     { inherit name value; };
 
-  recUpUntilWpicker = {
+  pickyRecUpdateUntil = {
     pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh),
-    picker ? (l: r: r)
+    pick ? (path: l: r: r)
   }: lhs: rhs: let
     f = attrPath:
       zipAttrsWith (n: values:
@@ -71,7 +71,7 @@ with builtins; rec {
         if length values == 1 then
           head values
         else if pred here (elemAt values 1) (head values) then
-          picker (elemAt values 1) (head values)
+          pick here (elemAt values 1) (head values)
         else
           f here values
       );

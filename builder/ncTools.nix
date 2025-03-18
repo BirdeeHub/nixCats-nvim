@@ -89,8 +89,8 @@
     recursiveUpdatePickDeeper = lhs: rhs: let
       isNonDrvSet = v: isAttrs v && !lib.isDerivation v;
       pred = path: lh: rh: ! isNonDrvSet lh || ! isNonDrvSet rh;
-      picker = left: right: if isNonDrvSet left then left else right;
-    in nclib.recUpUntilWpicker { inherit pred picker; } lhs rhs;
+      pick = path: left: right: if isNonDrvSet left then left else right;
+    in nclib.pickyRecUpdateUntil { inherit pred pick; } lhs rhs;
     # get the names of the categories but not the values, to avoid evaluating anything.
     mapfunc = path: mapAttrs (name: value:
       if isAttrs value && ! lib.isDerivation value
@@ -120,8 +120,8 @@
       };
     '';
 
-    recursiveUpdatePickShallower = nclib.recUpUntilWpicker {
-      picker = left: right: if ! isAttrs left then left else right; };
+    recursiveUpdatePickShallower = nclib.pickyRecUpdateUntil {
+      pick = path: left: right: if ! isAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: let
       checkPath = item: if isList item then true
