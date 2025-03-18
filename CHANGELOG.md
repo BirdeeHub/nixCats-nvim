@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.5.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.5.0...v6.5.1) (2025-03-18)
+
+
+### Bug Fixes
+
+* **utils_utils:** various flake output constructors updated, same behavior ([339dc4a](https://github.com/BirdeeHub/nixCats-nvim/commit/339dc4a4d5fd34b9039922b709b301cbf318610a))
+
 ## [6.5.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.4.0...v6.5.0) (2025-03-17)
 
 
