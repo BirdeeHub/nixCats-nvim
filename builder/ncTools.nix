@@ -37,17 +37,18 @@
   # these 2 functions and recFilterCats below are the functions
   # that do the sorting for the nixCats category scheme
   filterAndFlatten = categories: lib.flip lib.pipe [
-    (recFilterCats categories)
+    (recFilterCats true categories) # <- returns [ { path, value } ]
     (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
   ];
 
   filterAndFlattenMapInnerAttrs = categories: twoArgFunc: lib.flip lib.pipe [
-    (recFilterCats categories)
+    (recFilterCats true categories) # <- returns [ { path, value } ]
     (map (v: twoArgFunc (lib.last v.path) v.value))
     (concatMap (v: if isList v then v else if v != null then [v] else []))
   ];
 
-  recFilterCats = categories: let
+  recFilterCats = implicit_defaults: categories: let
+    # destructures attrs recursively
     recAttrsToList = here: lib.flip lib.pipe [
       (lib.mapAttrsToList (n: value: {
         path = here ++ [n];
@@ -58,13 +59,16 @@
         else a ++ [v]
       ) [])
     ];
+    # check paths of included cats only
     catlist = lib.pipe categories [
       (recAttrsToList [])
       (filter (v: v.value == true))
       (map (v: v.path))
     ];
+    # check if each is enabled
     cond = def: any (cat: (lib.take (length cat) def.path) == cat) catlist
-      || (! nclib.ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
+      || (implicit_defaults && ! nclib.ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
+  # destructure category definition and filter based on cond
   in lib.flip lib.pipe [
     (recAttrsToList [])
     (filter cond)
@@ -91,41 +95,56 @@
     errormsg = ''
       # ERROR: incorrect extraCats syntax in categoryDefinitions:
       # USAGE:
+      # see: :help nixCats.flake.outputs.categoryDefinitions.default_values
       extraCats = {
-        target.cat = [ # <- categories must be a list of (sets or list of strings)
+        # if target.cat is enabled, the list of extra cats is active!
+        target.cat = [ # <- must be a list of (sets or list of strings)
+          # list representing attribute path of category to enable.
           [ "to" "enable" ]
+          # or as a set
           {
             cat = [ "other" "toenable" ]; #<- required if providing the set form
-            # enable cat only if all in cond are enabled
-            cond = [
-              [ "other" "category" ] # <- cond must be a list of list of strings
+            # all below conditions, if provided, must be true for the `cat` to be included
+
+            # true if any containing category of the listed cats are enabled
+            when = [ # <- `when` conditions must be a list of list of strings
+              [ "another" "cat" ]
+            ];
+            # true if any containing OR sub category of the listed cats are enabled
+            cond = [ # <- `cond`-itions must be a list of list of strings
+              [ "other" "category" ]
             ];
           }
         ];
       };
     '';
-
+    filterAndFlattenNoDefaults = categories: lib.flip lib.pipe [
+      (recFilterCats false categories) # <- returns [ { path, value } ]
+      (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
+    ];
+    # true if any containing or sub category is enabled
+    condcheck = prev: lib.flip lib.pipe [
+      (atp: if isList atp then atp else throw errormsg)
+      (atp: lib.setAttrByPath atp true)
+      (filterAndFlatten prev)
+      (v: v != [])
+    ];
+    # true if any containing category is enabled
+    whencheck = prev: lib.flip lib.pipe [
+      (atp: if isList atp then atp else throw errormsg)
+      (atp: lib.setAttrByPath atp true)
+      (filterAndFlattenNoDefaults prev)
+      (v: v != [])
+    ];
     recursiveUpdatePickShallower = nclib.pickyRecUpdateUntil {
       pick = path: left: right: if ! nclib.ncIsAttrs left then left else right;
     };
     applyExtraCatsInternal = prev: let
-      checkPath = item: if isList item then true
-        # checks if all in spec.cond are enabled, if so,
-        # it returns true if spec.cat is valid
-        else lib.pipe (item.cond or []) (let
-          # true if enabled by categories
-          condcheck = atpath: lib.pipe atpath [
-            (atp: if isList atp then atp else throw errormsg)
-            (atp: lib.setAttrByPath atp true)
-            (filterAndFlatten prev)
-            (v: v != [])
-          ];
-        in [
-          (map condcheck)
-          (foldl' (acc: v: if acc then v else false) true) # <- defaults to true if no cond specified
-          (enabled: enabled && (if isList (item.cat or null) then true else throw errormsg))
-        ]);
-
+      checkPath = item: if isList item then true else lib.pipe item [
+        (spec: map (condcheck prev) (spec.cond or []) ++ map (whencheck prev) (spec.when or []))
+        (foldl' (acc: v: if acc then v else false) true) # <- defaults to true if no conditions for specs specified
+        (enabled: enabled && (if isList (item.cat or null) then true else throw errormsg))
+      ];
       nextCats = lib.pipe extraCats [
         (filterAndFlatten prev)
         lib.unique
@@ -138,7 +157,7 @@
       # to the newly enabled categories can have an effect.
     in if nextCats == prev then nextCats
       else applyExtraCatsInternal nextCats;
-
+  # if extraCats wasn't empty, start applying!
   in applyExtraCatsInternal categories;
 
 }

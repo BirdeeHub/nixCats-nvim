@@ -49,6 +49,20 @@
           ];
         }
       ];
+      whencat = [
+        {
+          cat = [ "whencat_is_enabled" ];
+          when = [
+            [ "when_top_cat" "is" "enabled" ] # <- (when_top_cat = true)
+          ];
+        }
+        {
+          cat = [ "whencat_this_shouldnt_be_included" ];
+          when = [
+            [ "plz" ] # <- (plz.enable.deepest.subcat = true)
+          ];
+        }
+      ];
     };
   };
   packageDefinitions = {
@@ -61,6 +75,9 @@
         testvars = true;
         autoconf = true;
         autodeps = true;
+        plz.enable.deepest.subcat = true;
+        when_top_cat = true;
+        whencat = true;
       };
       extra = {
         typetests = rec {

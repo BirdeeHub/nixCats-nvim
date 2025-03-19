@@ -501,25 +501,27 @@ If you wish to only enable a value via extraCats if multiple other categories
 are enabled, the categories in extraCats also accept a set form!
 >nix
   extraCats = {
-    target.cat = [ # <- categories must be a list of (sets or list of strings)
-      [ "to" "enable" ] # <- can be a list of strings
-      { # <- or a set!
+    # if target.cat is enabled, the list of extra cats is active!
+    target.cat = [ # <- must be a list of (sets or list of strings)
+      # list representing attribute path of category to enable.
+      [ "to" "enable" ]
+      # or as a set
+      {
         cat = [ "other" "toenable" ]; #<- required if providing the set form
-        # enable cat only if all in cond are enabled
-        cond = [
-          [ "other" "category" ] # <- cond must be a list of list of strings
+        # all below conditions, if provided, must be true for the `cat` to be included
+
+        # true if any containing category of the listed cats are enabled
+        when = [ # <- `when` conditions must be a list of list of strings
+          [ "another" "cat" ]
+        ];
+        # true if any containing OR sub category of the listed cats are enabled
+        cond = [ # <- `cond`-itions must be a list of list of strings
+          [ "other" "category" ]
         ];
       }
     ];
   };
 <
-The set form must contain a list of strings as `cat`, the category to enable.
-It may also contain a `cond` attribute which will contain a list of list of
-strings.
-
-If the category with the set is included,
-it will check that ALL of the categories in `cond` have been enabled,
-and if so, then `cat` will be enabled.
 ---------------------------------------------------------------------------------------
 Package Generation:                           *nixCats.flake.outputs.packageDefinitions*
 
