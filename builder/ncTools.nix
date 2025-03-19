@@ -32,58 +32,40 @@
 
   # returns a flattened list with only those lists 
   # whose name was associated with a true value within the categories set
-  filterAndFlatten = categories: categoryDefs:
-    flattenToList (RecFilterCats categories categoryDefs);
+  filterAndFlatten = categories: lib.flip lib.pipe [
+    (recFilterCats categories)
+    (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
+  ];
 
-  filterAndFlattenMapInnerAttrs = categories: twoArgFunc: categoryDefs:
-    flattenAttrMapLeaves twoArgFunc (RecFilterCats categories categoryDefs);
+  filterAndFlattenMapInnerAttrs = categories: twoArgFunc: lib.flip lib.pipe [
+    (recFilterCats categories)
+    (map (v: twoArgFunc (lib.last v.path) v.value))
+    (concatMap (v: if isList v then v else if v != null then [v] else []))
+  ];
 
-  # Overlays values in place of true values in categories
-  RecFilterCats = categories: categoryDefs: let
-    # remove all things that are not true, or an attribute set that is not also a derivation
-    filterLayer = lib.filterAttrs (name: value:
-        if isBool value
-        then value
-        else if isAttrs value && !lib.isDerivation value
-        then true
-        else false
-      );
-    # overlay value from categoryDefs if the value in categories is true, else recurse
-    mapper = subCats: defAttrs: let
-      mapfunc = name: value: let
-          newDefAttr = getAttr name defAttrs;
-        in
-        if !(isAttrs value && isAttrs newDefAttr) || lib.isDerivation newDefAttr
-        then newDefAttr
-        else mapper value newDefAttr;
-    in lib.pipe subCats [
-      filterLayer
-      (intersectAttrs defAttrs)
-      (mapAttrs mapfunc)
+  recFilterCats = categories: let
+    ncIsAttrs = v: isAttrs v && ! lib.isDerivation v && ! nclib.n2l.member v;
+    recAttrsToList = here: lib.flip lib.pipe [
+      (lib.mapAttrsToList (n: value: {
+        path = here ++ [n];
+        inherit value;
+      }))
+      (foldl' (a: v: if ncIsAttrs v.value
+        then a ++ (recAttrsToList v.path v.value)
+        else a ++ [v]
+      ) [])
     ];
-  in
-  mapper categories categoryDefs;
-
-  flattenToList = attrset: concatMap
-    (v:
-      if isAttrs v && !lib.isDerivation v then flattenToList v
-      else if isList v then v
-      else if v != null then [v] else []
-    ) (attrValues attrset);
-
-  flattenAttrMapLeaves = twoArgFunc: attrset: let
-    mapAttrValues = lib.mapAttrsToList (name: value:
-        if isAttrs value && !lib.isDerivation value
-        then value
-        else (twoArgFunc name value)
-      );
-    flatten = attr: concatMap (v:
-        if isAttrs v && !lib.isDerivation v then flatten v
-        else if isList v then v
-        else if v != null then [v] else []
-      ) (mapAttrValues attr);
-  in
-  flatten attrset;
+    catlist = lib.pipe categories [
+      (recAttrsToList [])
+      (filter (v: v.value == true))
+      (map (v: v.path))
+    ];
+    cond = def: any (cat: (lib.take (length cat) def.path) == cat) catlist
+      || (! ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
+  in lib.flip lib.pipe [
+    (recAttrsToList [])
+    (filter cond)
+  ];
 
   getCatSpace = listOfSections: let
     recursiveUpdatePickDeeper = lhs: rhs: let
