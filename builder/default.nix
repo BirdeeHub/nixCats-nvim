@@ -298,6 +298,15 @@
   };
 
   mkFinal = args: let
+    # separate function to process the spec from making the drv
+    # this function is the entrypoint, and the function that creates the final drv
+    # process_args will return the set that you would pass to mkDerivation
+    # along with passthru and its pkgs separately
+    # Doing it this way allows for using overrideAttrs to change the following args
+    # passthru.{ categoryDefinitions, packageDefinitions, luaPath, nixCats_packageName }
+    # in order to affect the final derivation via the nixCats wrapper via overrideAttrs
+    # This, in combination with how we process pkgsParams, also allows us to not
+    # reimport nixpkgs multiple times while doing this.
     processed = process_args args;
   in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
     oldargs = {

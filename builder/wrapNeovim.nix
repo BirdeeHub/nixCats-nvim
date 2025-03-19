@@ -25,8 +25,6 @@
   autowrapRuntimeDeps ? "suffix",
 
   extraMakeWrapperArgs ? "",
-  # expects a list of sets with plugin and optional
-  # expects { plugin=far-vim; optional = false; }
   start ? [ ],
   opt ? [ ],
   # function to pass to vim-pack-dir that creates nixCats plugin

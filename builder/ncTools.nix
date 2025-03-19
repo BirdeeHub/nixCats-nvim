@@ -3,8 +3,10 @@
 { lib, writeText, nclib, ... }: with builtins; rec {
 # NIX CATS INTERNAL UTILS:
 
+  # ../utils/lib.nix
   inherit nclib;
 
+  # writes the generated lua files for the nixCats plugin
   mkLuaFileWithMeta = filename: table: writeText filename /*lua*/ ''
   return setmetatable(${nclib.n2l.toLua table}, {
     __call = function(self, attrpath)
@@ -32,6 +34,8 @@
 
   # returns a flattened list with only those lists 
   # whose name was associated with a true value within the categories set
+  # these 2 functions and recFilterCats below are the functions
+  # that do the sorting for the nixCats category scheme
   filterAndFlatten = categories: lib.flip lib.pipe [
     (recFilterCats categories)
     (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
@@ -66,6 +70,7 @@
     (filter cond)
   ];
 
+  # populates :NixCats petShop
   getCatSpace = listOfSections: let
     recursiveUpdatePickDeeper = nclib.pickyRecUpdateUntil {
       pick = path: left: right: if nclib.ncIsAttrs left then left else right;
@@ -81,6 +86,7 @@
     (foldl' recursiveUpdatePickDeeper {})
   ];
 
+  # controls extraCats in categoryDefinitions
   applyExtraCats = categories: extraCats: if extraCats == {} then categories else let
     errormsg = ''
       # ERROR: incorrect extraCats syntax in categoryDefinitions:
@@ -100,8 +106,8 @@
     '';
 
     recursiveUpdatePickShallower = nclib.pickyRecUpdateUntil {
-      pick = path: left: right: if ! nclib.ncIsAttrs left then left else right; };
-
+      pick = path: left: right: if ! nclib.ncIsAttrs left then left else right;
+    };
     applyExtraCatsInternal = prev: let
       checkPath = item: if isList item then true
         # checks if all in spec.cond are enabled, if so,

@@ -1,4 +1,5 @@
 with builtins; rec {
+# NIX CATS INTERNAL UTILS:
   mkCatDefType = mkOptionType: pkgType: subtype: let
     pkgdesc = ''function representing the settings and categories for a nvim package'';
     catdesc = ''function returning sets of categories of different types of dependency'';
