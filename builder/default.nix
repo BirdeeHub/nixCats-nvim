@@ -124,12 +124,6 @@
     # its like a flatmap function but with a built in filter for category.
     filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
 
-    # for the env vars section
-    FandF_envVarSet = set: pkgs.lib.pipe set [
-      (filterAndFlattenMapInnerAttrs (name: value: pkgs.lib.escapeShellArgs [ "--set" name value ]))
-      pkgs.lib.unique
-    ];
-
     # shorthand to reduce lispyness
     filterFlattenUnique = s: pkgs.lib.unique (filterAndFlatten s);
 
@@ -194,18 +188,14 @@
     };
 
     customRC = let
-      optLuaPre = let
-        lua = if builtins.isString optionalLuaPreInit
-          then optionalLuaPreInit
-          else builtins.concatStringsSep "\n"
-          (filterFlattenUnique optionalLuaPreInit);
-      in if lua != "" then "dofile([[${pkgs.writeText "optLuaPre.lua" lua}]])" else "";
-      optLuaAdditions = let
-        lua = if builtins.isString optionalLuaAdditions
-          then optionalLuaAdditions
-          else builtins.concatStringsSep "\n"
-          (filterFlattenUnique optionalLuaAdditions);
-      in if lua != "" then "dofile([[${pkgs.writeText "optLuaAdditions.lua" lua}]])" else "";
+      optLuaPre = if builtins.isString optionalLuaPreInit
+        then optionalLuaPreInit
+        else builtins.concatStringsSep "\n"
+        (filterFlattenUnique optionalLuaPreInit);
+      optLuaAdditions = if builtins.isString optionalLuaAdditions
+        then optionalLuaAdditions
+        else builtins.concatStringsSep "\n"
+        (filterFlattenUnique optionalLuaAdditions);
     in /*lua*/''
       ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
       -- optionalLuaPreInit
@@ -228,20 +218,25 @@
     # cat our args
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     extraMakeWrapperArgs = let 
-      preORpostPATH = if settings.suffix-path then "suffix" else "prefix";
-      pathEnv = filterFlattenUnique lspsAndRuntimeDeps;
-      preORpostLD = if settings.suffix-LD then "suffix" else "prefix";
-      linkables = filterFlattenUnique sharedLibraries;
-      envVars = FandF_envVarSet environmentVariables;
+      preORpostPATH = if settings.suffix-path then "--suffix" else "--prefix";
+      userPathEnv = filterFlattenUnique lspsAndRuntimeDeps;
+      preORpostLD = if settings.suffix-LD then "--suffix" else "--prefix";
+      userLinkables = filterFlattenUnique sharedLibraries;
       userWrapperArgs = filterFlattenUnique extraWrapperArgs;
+      userEnvVars = pkgs.lib.pipe environmentVariables [
+        (filterAndFlattenMapInnerAttrs (name: value: [ [ "--set" name value ] ]))
+        pkgs.lib.unique
+        builtins.concatLists
+      ];
     in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
         (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
         "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
-      ] ++ (pkgs.lib.optionals (pathEnv != []) [
-        "--${preORpostPATH}" "PATH" ":" (pkgs.lib.makeBinPath pathEnv)
-      ]) ++ (pkgs.lib.optionals (linkables != []) [
-        "--${preORpostLD}" "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath linkables)
-      ])) + " " + (builtins.concatStringsSep " " (envVars ++ userWrapperArgs));
+      ] ++ pkgs.lib.optionals (userPathEnv != []) [
+        preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
+      ] ++ pkgs.lib.optionals (userLinkables != []) [
+        preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
+      ] ++ pkgs.lib.optionals (userEnvVars != []) userEnvVars
+      ) + " " + builtins.concatStringsSep " " userWrapperArgs;
 
     python3wrapperArgs = pkgs.lib.unique
       (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
@@ -294,12 +289,11 @@
       neovim-unwrapped = myNeovimUnwrapped;
       nixCats_packageName = name;
       inherit pkgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
-      inherit (settings) vimAlias viAlias withRuby withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
+      inherit (settings) vimAlias viAlias withRuby withPython3 withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
       inherit (normalized) start opt;
         /* the function you would have passed to python.withPackages */
       # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
         /* the function you would have passed to python.withPackages */
-      withPython3 = settings.withPython3;
       extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
       extraPython3wrapperArgs = python3wrapperArgs;
         /* the function you would have passed to lua.withPackages */

@@ -37,18 +37,19 @@
   # these 2 functions and recFilterCats below are the functions
   # that do the sorting for the nixCats category scheme
   filterAndFlatten = categories: lib.flip lib.pipe [
-    (recFilterCats true categories) # <- returns [ { path, value } ]
+    (recFilterCats true categories) # <- returns [ { path, value } ... ]
     (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
   ];
 
   filterAndFlattenMapInnerAttrs = categories: twoArgFunc: lib.flip lib.pipe [
-    (recFilterCats true categories) # <- returns [ { path, value } ]
+    (recFilterCats true categories) # <- returns [ { path, value } ... ]
     (map (v: twoArgFunc (lib.last v.path) v.value))
     (concatMap (v: if isList v then v else if v != null then [v] else []))
   ];
 
+  # returns [ { path, value } ... ]
   recFilterCats = implicit_defaults: categories: let
-    # destructures attrs recursively
+    # destructures attrs recursively, returns [ { path, value } ... ]
     recAttrsToList = here: lib.flip lib.pipe [
       (lib.mapAttrsToList (n: value: {
         path = here ++ [n];
@@ -119,7 +120,7 @@
       };
     '';
     filterAndFlattenNoDefaults = categories: lib.flip lib.pipe [
-      (recFilterCats false categories) # <- returns [ { path, value } ]
+      (recFilterCats false categories) # <- returns [ { path, value } ... ]
       (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
     ];
     # true if any containing or sub category is enabled

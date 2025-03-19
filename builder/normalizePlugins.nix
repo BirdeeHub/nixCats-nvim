@@ -74,7 +74,7 @@
   in lib.pipe pluginsWithConfig [
     (builtins.filter (v: ! v.optional))
     (map (st: st.plugin))
-    (st: st ++ findDependenciesRecursively st ++ lib.subtractLists opt (findDependenciesRecursively opt))
+    (st: findDependenciesRecursively st ++ lib.subtractLists opt (findDependenciesRecursively opt))
   ];
 
   passthru_initLua = with builtins; lib.pipe (start ++ opt) [

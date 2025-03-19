@@ -862,7 +862,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
   safeOversList = { dependencyOverlays, system ? null }:
   builtins.trace ''
-    utils.safeOversList deprecated because dependencyOverlays is now always a list
+    nixCats.utils.safeOversList deprecated because dependencyOverlays is now always a list
   ''
     (if isAttrs dependencyOverlays && system == null then
       throw "dependencyOverlays is a set, but no system was provided"
