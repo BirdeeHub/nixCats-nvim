@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.5.1...v6.6.0) (2025-03-19)
+
+
+### Features
+
+* **extraCats:** when field added in addition to cond ([#152](https://github.com/BirdeeHub/nixCats-nvim/issues/152)) ([bb13576](https://github.com/BirdeeHub/nixCats-nvim/commit/bb13576f1c91c0c1178935c6332322248abd86dc))
+
 ## [6.5.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.5.0...v6.5.1) (2025-03-18)
 
 
