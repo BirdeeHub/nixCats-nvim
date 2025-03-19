@@ -131,7 +131,9 @@ with builtins; let lib = import ./lib.nix; in rec {
       system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/builder_error.nix);
       dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
         then builtins.trace ''
-          deprecated wrapping of dependencyOverlays list in a set of systems.
+          # NixCats deprecation warning
+          Do not wrap your dependencyOverlays list in a set of systems.
+          They should just be a list.
           Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
           See :h nixCats.flake.outputs.getOverlays
           '' pkgsParams.dependencyOverlays.${system}

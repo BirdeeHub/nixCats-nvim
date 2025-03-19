@@ -24,7 +24,17 @@
       else args.extra_pkg_params or {};
 
     pkgs = with builtins; (let
-      overlays = if isList (args.dependencyOverlays or null) then args.dependencyOverlays else [];
+      overlays = if isList (args.dependencyOverlays or null)
+        then args.dependencyOverlays
+        else if nclib.ncIsAttrs (args.dependencyOverlays or null)
+        then builtins.trace ''
+          # NixCats deprecation warning
+          Do not wrap your dependencyOverlays list in a set of systems.
+          They should just be a list.
+          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+          See :h nixCats.flake.outputs.getOverlays
+          '' args.dependencyOverlays.${system}
+        else [];
     in if (args.pkgs or null) != null && extra_pkg_config == {} && extra_pkg_params == {} && (args.pkgs.system or null) == system
       then if overlays == [] then args.pkgs else args.pkgs.appendOverlays overlays
       else import (args.pkgs.path or args.nixpkgs.path or args.nixpkgs.outPath or args.nixpkgs) ({

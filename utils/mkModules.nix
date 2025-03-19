@@ -27,7 +27,9 @@
         ++ (
           if builtins.isAttrs oldDependencyOverlays
           then builtins.trace ''
-            deprecated wrapping of dependencyOverlays list in a set of systems.
+            # NixCats deprecation warning
+            Do not wrap your dependencyOverlays list in a set of systems.
+            They should just be a list.
             Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
             See :h nixCats.flake.outputs.getOverlays
             '' oldDependencyOverlays.${pkgs.system}

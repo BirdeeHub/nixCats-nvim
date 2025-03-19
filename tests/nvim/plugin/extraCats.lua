@@ -8,3 +8,8 @@ make_test("extraCats", function()
         assert.truthy(nixCats('bee.bop'))
     end
 end)
+make_test("whencat", function()
+    assert.truthy(nixCats('whencat'))
+    assert.falsy(nixCats('whencat_this_shouldnt_be_included'))
+    assert.truthy(nixCats('whencat_is_enabled'))
+end)

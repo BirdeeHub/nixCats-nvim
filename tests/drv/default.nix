@@ -26,6 +26,7 @@ stdenv.mkDerivation {
         extraCats = true;
         autoconf = true;
         autodeps = true;
+        whencat = true;
       };
     };
   in /*bash*/ ''
