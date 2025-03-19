@@ -473,7 +473,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   mergeDefs = type: definitions:
     args: let
       mergefunc = if type == "replace"
-      then lib.recUpdateHandleInlineORdrv 
+      then lib.pickyRecUpdateUntil {}
       else if type == "merge"
       then lib.recursiveUpdateWithMerge
       else throw ''
@@ -540,7 +540,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   mergeOverlays = overlist: self: super:
     lib.pipe overlist [
       (map (value: value self super))
-      (foldl' lib.recursiveUpdateUntilDRV {})
+      (foldl' (lib.pickyRecUpdateUntil {}) {})
     ];
 
   /**

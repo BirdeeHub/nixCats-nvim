@@ -120,13 +120,13 @@ with builtins; let
       else if isList value then "${luaListPrinter level value}"
       else if inline.member value then let
           res = inline.resolve value;
-        in if isFunction res then res (opts // { _level = level; }) else replacer res
+        in if isFunction (res.__functor or res) then res (opts // { _level = level; }) else replacer res
       else if isPath value then luaEnclose "${value}"
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
-      else if isAttrs value then "${luaTablePrinter level value}"
-      else if isFunction value then addErrorContext ("nixCats.utils.n2l.toLua called on a function with these functionArgs: " + (toJSON (functionArgs value)))
+      else if isFunction (value.__functor or value) then addErrorContext ("nixCats.utils.n2l.toLua called on a function with these functionArgs: " + (toJSON (value.__functionArgs or functionArgs value)))
         (throw "Lua cannot run nix functions. Either call your function first, or make a lua function using `utils.n2l.types.function-safe.mk`.")
+      else if isAttrs value then "${luaTablePrinter level value}"
       else replacer (luaEnclose (toString value));
 
     luaTablePrinter = level: set: pipe set [

@@ -10,7 +10,7 @@ with builtins; rec {
     check = v: isFunction v;
     merge = loc: defs: let
       mergefunc = if subtype == "replace"
-      then recUpdateHandleInlineORdrv 
+      then pickyRecUpdateUntil {}
       else if subtype == "merge"
       then recursiveUpdateWithMerge
       else throw "invalid catDef subtype";
@@ -27,18 +27,11 @@ with builtins; rec {
 
   isDerivation = value: value.type or null == "derivation";
 
-  updateUntilPred = path: lhs: rhs:
-    isDerivation lhs || isDerivation rhs
-    || n2l.member lhs || n2l.member rhs
-    || ! isAttrs lhs || ! isAttrs rhs;
+  ncIsDrv = v: isDerivation v || v.outPath or null != null;
 
-  recursiveUpdateUntilDRV = pickyRecUpdateUntil { pred = path: lhs: rhs:
-    isDerivation lhs || isDerivation rhs || ! isAttrs lhs || ! isAttrs rhs; };
-
-  recUpdateHandleInlineORdrv = pickyRecUpdateUntil { pred = updateUntilPred; };
+  ncIsAttrs = v: isAttrs v && ! ncIsDrv v && ! isFunction (v.__functor or v) && ! n2l.member v;
 
   recursiveUpdateWithMerge = pickyRecUpdateUntil {
-    pred = updateUntilPred;
     pick = path: left: right:
       if isList left && isList right
         then left ++ right
@@ -51,18 +44,12 @@ with builtins; rec {
       else right;
   };
 
-  genAttrs =
-    names:
-    f:
-    listToAttrs (map (n: nameValuePair n (f n)) names);
+  genAttrs = names: f: listToAttrs (map (n: nameValuePair n (f n)) names);
 
-  nameValuePair =
-    name:
-    value:
-    { inherit name value; };
+  nameValuePair = name: value: { inherit name value; };
 
   pickyRecUpdateUntil = {
-    pred ? (path: lh: rh: ! isAttrs lh || ! isAttrs rh),
+    pred ? (path: lh: rh: ! ncIsAttrs lh || ! ncIsAttrs rh),
     pick ? (path: l: r: r)
   }: lhs: rhs: let
     f = attrPath:

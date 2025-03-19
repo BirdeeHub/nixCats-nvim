@@ -44,13 +44,12 @@
   ];
 
   recFilterCats = categories: let
-    ncIsAttrs = v: isAttrs v && ! lib.isDerivation v && ! nclib.n2l.member v;
     recAttrsToList = here: lib.flip lib.pipe [
       (lib.mapAttrsToList (n: value: {
         path = here ++ [n];
         inherit value;
       }))
-      (foldl' (a: v: if ncIsAttrs v.value
+      (foldl' (a: v: if nclib.ncIsAttrs v.value
         then a ++ (recAttrsToList v.path v.value)
         else a ++ [v]
       ) [])
@@ -61,21 +60,19 @@
       (map (v: v.path))
     ];
     cond = def: any (cat: (lib.take (length cat) def.path) == cat) catlist
-      || (! ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
+      || (! nclib.ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
   in lib.flip lib.pipe [
     (recAttrsToList [])
     (filter cond)
   ];
 
   getCatSpace = listOfSections: let
-    recursiveUpdatePickDeeper = lhs: rhs: let
-      isNonDrvSet = v: isAttrs v && !lib.isDerivation v;
-      pred = path: lh: rh: ! isNonDrvSet lh || ! isNonDrvSet rh;
-      pick = path: left: right: if isNonDrvSet left then left else right;
-    in nclib.pickyRecUpdateUntil { inherit pred pick; } lhs rhs;
+    recursiveUpdatePickDeeper = nclib.pickyRecUpdateUntil {
+      pick = path: left: right: if nclib.ncIsAttrs left then left else right;
+    };
     # get the names of the categories but not the values, to avoid evaluating anything.
     mapfunc = path: mapAttrs (name: value:
-      if isAttrs value && ! lib.isDerivation value
+      if nclib.ncIsAttrs value
       then mapfunc (path ++ [ name ]) value
       else path ++ [ name ]);
 
@@ -103,7 +100,7 @@
     '';
 
     recursiveUpdatePickShallower = nclib.pickyRecUpdateUntil {
-      pick = path: left: right: if ! isAttrs left then left else right; };
+      pick = path: left: right: if ! nclib.ncIsAttrs left then left else right; };
 
     applyExtraCatsInternal = prev: let
       checkPath = item: if isList item then true
