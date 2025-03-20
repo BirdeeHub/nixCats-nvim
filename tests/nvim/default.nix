@@ -62,6 +62,12 @@
             [ "plz" ] # <- (plz.enable.deepest.subcat = true)
           ];
         }
+        {
+          cat = [ "cond_works_for_sub_cats" ];
+          cond = [
+            [ "plz" ]
+          ];
+        }
       ];
     };
   };
