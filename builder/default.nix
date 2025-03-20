@@ -235,8 +235,7 @@
         preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
       ] ++ pkgs.lib.optionals (userLinkables != []) [
         preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
-      ] ++ pkgs.lib.optionals (userEnvVars != []) userEnvVars
-      ) + " " + builtins.concatStringsSep " " userWrapperArgs;
+      ] ++ userEnvVars) + " " + builtins.concatStringsSep " " userWrapperArgs;
 
     python3wrapperArgs = pkgs.lib.unique
       (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
