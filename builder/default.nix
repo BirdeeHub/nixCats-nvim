@@ -246,12 +246,14 @@
       (builtins.concatStringsSep " ")
     ];
 
-    preWrapperShellCode = if builtins.isString bashBeforeWrapper
-      then bashBeforeWrapper
-      else builtins.concatStringsSep "\n" ([/*bash*/''
+    preWrapperShellCode = let
+      xtra = /*bash*/''
         NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
         export NVIM_WRAPPER_PATH_NIX
-      ''] ++ (filterFlattenUnique bashBeforeWrapper));
+      '';
+    in if builtins.isString bashBeforeWrapper
+      then xtra + "\n" + bashBeforeWrapper
+      else builtins.concatStringsSep "\n" ([xtra] ++ (filterFlattenUnique bashBeforeWrapper));
 
     # add our propagated build dependencies
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
