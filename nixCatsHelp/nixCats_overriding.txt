@@ -112,7 +112,7 @@ are not a set or a derivation and adding any new values.
     categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: {
       startupPlugins = with pkgs.vimPlugins; {
         newcat = [
-          lz-n
+          lze
         ];
       };
       optionalPlugins = with pkgs.vimPlugins; {
@@ -120,8 +120,8 @@ are not a set or a derivation and adding any new values.
           { plugin = neorg;
             type = "lua";
             config = /*lua*/''
-              -- use our new lz.n to lazy load it!
-              require('lz.n').load({
+              -- use our new lze to lazy load it!
+              require('lze').load({
                 -- use :NixCats pawsible to see the final name for packadd
                 "neorg",
                 ft = "norg",
@@ -218,8 +218,8 @@ within a flake, or a devShell or anywhere else.
 You could have a base configuration, with a bunch of categories disabled by
 default, and enable only the ones you need in project shells if you wanted.
 
-You can have a package based on any of your other packages but with `wrapRc =
-false` for testing Lua without rebuild.
+You can have a package based on any of your other packages,
+but with `wrapRc = false` for testing Lua without rebuild.
 
 The packages themselves also output modules via passthru.
 You can still output modules and overlays from a package built for only a
