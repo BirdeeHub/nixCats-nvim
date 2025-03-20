@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.0...v6.6.1) (2025-03-20)
+
+
+### Bug Fixes
+
+* **nixCats.packageBinPath:** now set regardless of useage of bashBeforeWrapper category section ([0040179](https://github.com/BirdeeHub/nixCats-nvim/commit/0040179e705fcc04c2f858ff815a90f52a9948ca))
+
 ## [6.6.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.5.1...v6.6.0) (2025-03-19)
 
 
