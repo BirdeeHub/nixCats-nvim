@@ -130,7 +130,7 @@ in {
       --replace-fail 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
   ''
   + lib.optionalString (python3Env != null && withPython3) ''
-    makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 ${builtins.concatStringsSep " " extraPython3wrapperArgs}
+    makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 ${extraPython3wrapperArgs}
   ''
   + lib.optionalString (rubyEnv != null) ''
     ln -s ${rubyEnv}/bin/neovim-ruby-host $out/bin/${nixCats_packageName}-ruby

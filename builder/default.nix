@@ -237,10 +237,14 @@
         preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
       ] ++ userEnvVars) + " " + builtins.concatStringsSep " " userWrapperArgs;
 
-    python3wrapperArgs = pkgs.lib.unique
-      (pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
-      ++ (pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"])
-      ++ (filterAndFlatten extraPython3wrapperArgs));
+    python3wrapperArgs = pkgs.lib.pipe extraPython3wrapperArgs [
+      filterAndFlatten
+      (wargs: pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
+        ++ pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"]
+        ++ wargs)
+      pkgs.lib.unique
+      (builtins.concatStringsSep " ")
+    ];
 
     preWrapperShellCode = if builtins.isString bashBeforeWrapper
       then bashBeforeWrapper
