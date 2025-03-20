@@ -108,11 +108,10 @@
           #     vim.opt.packpath:prepend(newCfgDir)
           #     vim.opt.runtimepath:prepend(newCfgDir)
           #     vim.opt.runtimepath:append(newCfgDir .. "/after")
-          #     if vim.fn.filereadable(newCfgDir .. "/init.vim") == 1 then
-          #       vim.cmd.source(newCfgDir .. "/init.vim")
-          #     end
           #     if vim.fn.filereadable(newCfgDir .. "/init.lua") == 1 then
           #       dofile(newCfgDir .. "/init.lua")
+          #     elseif vim.fn.filereadable(newCfgDir .. "/init.vim") == 1 then
+          #       vim.cmd.source(newCfgDir .. "/init.vim")
           #     end
           #   '';
           # };
