@@ -56,7 +56,7 @@
         inherit value;
       }))
       (foldl' (a: v: if nclib.ncIsAttrs v.value
-        then a ++ (recAttrsToList v.path v.value)
+        then a ++ recAttrsToList v.path v.value
         else a ++ [v]
       ) [])
     ];
@@ -67,8 +67,8 @@
       (map (v: v.path))
     ];
     # check if each is enabled
-    cond = def: any (cat: (lib.take (length cat) def.path) == cat) catlist
-      || (implicit_defaults && ! nclib.ncIsAttrs def.value && any (cat: (lib.take (length def.path) cat) == def.path) catlist);
+    cond = def: any (cat: lib.take (length cat) def.path == cat) catlist
+      || implicit_defaults && ! nclib.ncIsAttrs def.value && any (cat: lib.take (length def.path) cat == def.path) catlist;
   # destructure category definition and filter based on cond
   in lib.flip lib.pipe [
     (recAttrsToList [])

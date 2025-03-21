@@ -49,7 +49,7 @@ let
   allPython3Dependencies = ps: lib.pipe (start ++ opt) [
     (map (plugin: (plugin.python3Dependencies or (_: [])) ps))
     lib.flatten
-    (res: (if withPython3 then [ ps.pynvim ] ++ (extraPython3Packages ps) else []) ++ res)
+    (res: (if withPython3 then [ ps.pynvim ] ++ extraPython3Packages ps else []) ++ res)
     lib.unique
   ];
   python3Env = pkgs.python3Packages.python.withPackages allPython3Dependencies;

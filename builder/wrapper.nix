@@ -141,9 +141,9 @@ in {
   + lib.optionalString (perlEnv != null && withPerl) ''
     ln -s ${perlEnv}/bin/perl $out/bin/${nixCats_packageName}-perl
   ''
-  + (builtins.concatStringsSep "\n" (builtins.map (alias: ''
+  + builtins.concatStringsSep "\n" (builtins.map (alias: ''
       ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
-  '') customAliases))
+  '') customAliases)
   +
   (let
     manifestWrapperArgs =

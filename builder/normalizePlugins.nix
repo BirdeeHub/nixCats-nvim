@@ -13,19 +13,19 @@
       else { ${type} = cfg; };
   in {
     config = if ! (p ? plugin) then null
-    else if isAttrs (p.config or null) && checkAttrs p.config
+    else if isAttrs p.config or null && checkAttrs p.config
       then p.config
-    else if isString (p.config or null) && isString (p.type or null)
+    else if isString p.config or null && isString p.type or null
       then typeToSet p.type p.config
-    else if isString (p.config or null)
+    else if isString p.config or null
       then { vim = p.config; }
     else null;
 
-    optional = if isBool (p.optional or null)
+    optional = if isBool p.optional or null
       then p.optional else opt;
-    priority = if isInt (p.priority or null)
+    priority = if isInt p.priority or null
       then p.priority else 150;
-    pre = if isBool (p.pre or null)
+    pre = if isBool p.pre or null
       then p.pre else false;
     plugin = if p ? plugin && p ? name
       then p.plugin // { pname = p.name; }
@@ -41,7 +41,7 @@
   '';
   get_and_sort = plugins: with builtins; lib.pipe plugins [
     (map (v:
-      if isAttrs (v.config or null)
+      if isAttrs v.config or null
       then { inherit (v) priority pre; cfg = setToString v.config; }
       else null
     ))
@@ -57,7 +57,7 @@
     })
   ];
 
-  pluginsWithConfig = (map (parsepluginspec false) startup) ++ (map (parsepluginspec true) optional);
+  pluginsWithConfig = map (parsepluginspec false) startup ++ map (parsepluginspec true) optional;
   user_plugin_configs = get_and_sort pluginsWithConfig;
 
   opt = lib.pipe pluginsWithConfig [
@@ -69,7 +69,7 @@
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
     findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
     transitiveClosure = plugin:
-      [ plugin ] ++ (builtins.concatLists (map transitiveClosure plugin.dependencies or []));
+      [ plugin ] ++ builtins.concatLists (map transitiveClosure plugin.dependencies or []);
 
   in lib.pipe pluginsWithConfig [
     (builtins.filter (v: ! v.optional))
