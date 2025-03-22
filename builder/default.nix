@@ -103,6 +103,9 @@
       inherit categories settings pkgs name mkNvimPlugin;
       extra = extraTableLua;
     }));
+    # categories depends on extraCats
+    categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
+    extraTableLua = thisPackage.extra or {};
     inherit (final_cat_defs_set)
     startupPlugins optionalPlugins lspsAndRuntimeDeps
     propagatedBuildInputs environmentVariables
@@ -110,10 +113,6 @@
     extraLuaPackages optionalLuaAdditions
     extraPython3wrapperArgs sharedLibraries
     optionalLuaPreInit bashBeforeWrapper;
-
-    categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
-    extraTableLua = thisPackage.extra or {};
-    all_cat_names = ncTools.getCatSpace (builtins.attrValues final_cat_defs_set);
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
@@ -159,7 +158,7 @@
 
       cats = ncTools.mkLuaFileWithMeta "cats.lua" categoriesPlus;
       settingsTable = ncTools.mkLuaFileWithMeta "settings.lua" settingsPlus;
-      petShop = ncTools.mkLuaFileWithMeta "petShop.lua" all_cat_names;
+      petShop = ncTools.mkLuaFileWithMeta "petShop.lua" (ncTools.getCatSpace final_cat_defs_set);
       depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
       extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
     in pkgs.stdenv.mkDerivation {
@@ -168,8 +167,7 @@
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
-        cp ${./nixCats.lua} $out/lua/nixCats/init.lua
-        cp ${./nixCatsMeta.lua} $out/lua/nixCats/meta.lua
+        cp -r ${./nixCats}/* $out/lua/nixCats
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua

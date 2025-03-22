@@ -265,7 +265,8 @@ important. So, I showed the general way first.
 `GetNixCat(value)` is equivalent to the `nixCats(value)` command in Lua.
 `GetNixSettings()` is `require('nixCats').settings`
 `GetNixPawsible()` is `require('nixCats').pawsible`
-`GetAllNixCats()` is `require('nixCats').cats`
+`GetNixExtra()` is `require('nixCats').extra`
+`GetNixCats()` is `require('nixCats').cats`
 
 ----------------------------------------------------------------------------------------
 vim:tw=78:ts=8:ft=help:norl:

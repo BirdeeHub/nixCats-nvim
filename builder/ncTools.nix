@@ -76,7 +76,7 @@
   ];
 
   # populates :NixCats petShop
-  getCatSpace = listOfSections: let
+  getCatSpace = let
     recursiveUpdatePickDeeper = nclib.pickyRecUpdateUntil {
       pick = path: left: right: if nclib.ncIsAttrs left then left else right;
     };
@@ -86,7 +86,8 @@
       then mapfunc (path ++ [ name ]) value
       else path ++ [ name ]);
 
-  in lib.pipe listOfSections [
+  in lib.flip lib.pipe [
+    attrValues
     (map (mapfunc []))
     (foldl' recursiveUpdatePickDeeper {})
   ];
