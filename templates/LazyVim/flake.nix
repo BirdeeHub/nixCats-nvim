@@ -234,7 +234,7 @@
       testnvim = { pkgs, mkNvimPlugin, ... }: {
         settings = {
           wrapRc = false;
-          unwrappedCfgPath = utils.mkLuaInline "os.getenv('HOME') .. '/Projects/nixCats-nvim/templates/LazyVim'";
+          unwrappedCfgPath = utils.mkLuaInline "os.getenv('HOME') .. '/some/path/to/your/config'";
         };
         categories = {
           general = true;
