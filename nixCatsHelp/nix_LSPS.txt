@@ -14,6 +14,7 @@ mason, do this.
 The stuff added to servers table is what is passed to lspconfig/mason
 
 >lua
+  local servers = vim.defaulttable()
   if nixCats('neonixdev') then
     -- NOTE: Lazydev will make your Lua LSP stronger for Neovim config
     -- NOTE: we are also using this as an opportunity to show you how to lazy load plugins!
@@ -42,7 +43,6 @@ The stuff added to servers table is what is passed to lspconfig/mason
     -- this must be done by you manually if,
     -- for example, you wanted to lazy load nvim-cmp sources
 
-    local servers = vim.defaulttable()
     servers.lua_ls = {
       settings = {
         Lua = {
