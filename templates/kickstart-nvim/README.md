@@ -42,3 +42,15 @@ builtins.attrValues pkgs.vimPlugins.nvim-treesitter.grammarPlugins
 # or
 pkgs.neovimUtils.grammarToPlugin pkgs.tree-sitter-grammars.somegrammar
 ```
+
+### Disclaimer:
+
+`lazy.nvim` technically works fine on with nix, HOWEVER it will block any other plugin manager, including nix, from installing anything on its own without also making a lazy.nvim plugin spec and making sure the names match.
+
+This is the reason for the lazy.nvim wrapper provided by the luaUtils optional template.
+
+It simply tells lazy about the location of things from nix, and sets a few compatibility options before calling the normal lazy setup function.
+
+If you wish to download something from nix, the name lazy.nvim knows about and the name nix gave it must match. Otherwise, lazy.nvim will download it anyway.
+
+For how to address that, see the main init.lua of this template. and search for `NOTE: nixCats:`
