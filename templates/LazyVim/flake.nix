@@ -104,32 +104,20 @@
           LazyVim
           bufferline-nvim
           lazydev-nvim
-          cmp-buffer
-          cmp-nvim-lsp
-          cmp-path
-          cmp_luasnip
           conform-nvim
-          dashboard-nvim
-          dressing-nvim
           flash-nvim
           friendly-snippets
           gitsigns-nvim
-          indent-blankline-nvim
-          lualine-nvim
-          neo-tree-nvim
-          neoconf-nvim
-          neodev-nvim
+          grug-far-nvim
           noice-nvim
+          lualine-nvim
           nui-nvim
-          nvim-cmp
           nvim-lint
           nvim-lspconfig
-          nvim-notify
-          nvim-spectre
-          nvim-treesitter-context
           nvim-treesitter-textobjects
           nvim-ts-autotag
-          nvim-ts-context-commentstring
+          ts-comments-nvim
+          blink-cmp
           nvim-web-devicons
           persistence-nvim
           plenary-nvim
@@ -153,15 +141,10 @@
           # ))
 
           # sometimes you have to fix some names
-          { plugin = luasnip; name = "LuaSnip"; }
           { plugin = catppuccin-nvim; name = "catppuccin"; }
           { plugin = mini-ai; name = "mini.ai"; }
           { plugin = mini-icons; name = "mini.icons"; }
-          { plugin = mini-bufremove; name = "mini.bufremove"; }
-          { plugin = mini-comment; name = "mini.comment"; }
-          { plugin = mini-indentscope; name = "mini.indentscope"; }
           { plugin = mini-pairs; name = "mini.pairs"; }
-          { plugin = mini-surround; name = "mini.surround"; }
           # you could do this within the lazy spec instead if you wanted
           # and get the new names from `:NixCats pawsible` debug command
         ];
@@ -251,7 +234,7 @@
       testnvim = { pkgs, mkNvimPlugin, ... }: {
         settings = {
           wrapRc = false;
-          unwrappedCfgPath = "/absolute/path/to/config";
+          unwrappedCfgPath = utils.mkLuaInline "os.getenv('HOME') .. '/Projects/nixCats-nvim/templates/LazyVim'";
         };
         categories = {
           general = true;

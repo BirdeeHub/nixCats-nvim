@@ -22,9 +22,6 @@ local lazyOptions = {
 -- argument, the path to lazy.nvim as downloaded by nix, or nil, before the normal arguments.
 require('nixCatsUtils.lazyCat').setup(nixCats.pawsible { 'allPlugins', 'start', 'lazy.nvim' }, {
   { 'LazyVim/LazyVim', import = 'lazyvim.plugins' },
-  -- The following configs are needed for fixing lazyvim on nix
-  -- force enable telescope-fzf-native.nvim
-  { 'nvim-telescope/telescope-fzf-native.nvim', enabled = require('nixCatsUtils').lazyAdd(true, false) },
   -- disable mason.nvim while using nix
   -- precompiled binaries do not agree with nixos, and we can just make nix install this stuff for us.
   { 'williamboman/mason-lspconfig.nvim', enabled = require('nixCatsUtils').lazyAdd(true, false) },
@@ -40,13 +37,15 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible { 'allPlugins', 'start', 
       auto_install = require('nixCatsUtils').lazyAdd(true, false),
     },
   },
-  { 'folke/lazydev.nvim', ft = "lua",
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
     opts = {
       library = {
         -- adds type hints for nixCats global, but LazyDev is just nice in general
-        { path = (nixCats.nixCatsPath or "") .. '/lua', words = { "nixCats" } },
+        { path = (nixCats.nixCatsPath or '') .. '/lua', words = { 'nixCats' } },
       },
-    }
+    },
   },
   -- import/override with your plugins
   { import = 'plugins' },
