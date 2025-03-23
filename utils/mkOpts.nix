@@ -6,7 +6,7 @@
   , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
   , luaPath ? ""
   , packageDefinitions ? {}
-  , nclib
+  , nclib ? import ./lib.nix
   , utils ? import ./.
 }:
 { lib, ... }: let

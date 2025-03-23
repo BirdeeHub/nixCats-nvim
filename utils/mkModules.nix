@@ -9,8 +9,8 @@
   , keepLuaBuilder ? null
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
-  , utils
-  , nclib
+  , utils ? import ./.
+  , nclib ? import ./lib.nix
   , nixpkgs ? null
   , ...
 }@inhargs:
