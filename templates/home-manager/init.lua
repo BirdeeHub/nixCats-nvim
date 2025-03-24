@@ -421,6 +421,7 @@ require('lze').load {
         -- markdown = {'vale',},
         -- javascript = { 'eslint' },
         -- typescript = { 'eslint' },
+        go = nixCats('go') and { 'golangcilint' } or nil,
       }
 
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
@@ -433,9 +434,6 @@ require('lze').load {
   {
     "conform.nvim",
     enabled = nixCats('general') or false,
-    -- cmd = { "" },
-    -- event = "",
-    -- ft = "",
     keys = {
       { "<leader>FF", desc = "[F]ormat [F]ile" },
     },
@@ -447,8 +445,8 @@ require('lze').load {
         formatters_by_ft = {
           -- NOTE: download some formatters in lspsAndRuntimeDeps
           -- and configure them here
-          -- lua = { "stylua" },
-          -- go = { "gofmt", "golint" },
+          lua = nixCats('lua') and { "stylua" } or nil,
+          go = nixCats('go') and { "gofmt", "golint" } or nil,
           -- templ = { "templ" },
           -- Conform will run multiple formatters sequentially
           -- python = { "isort", "black" },
@@ -579,7 +577,7 @@ require('lze').load {
   {
     -- lazydev makes your lsp way better in your config without needing extra lsp configuration.
     "lazydev.nvim",
-    enabled = nixCats('general') or false,
+    enabled = nixCats('lua') or false,
     cmd = { "LazyDev" },
     ft = "lua",
     after = function(_)
@@ -600,7 +598,6 @@ local function lsp_on_attach(_, bufnr)
     if desc then
       desc = 'LSP: ' .. desc
     end
-
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
@@ -678,7 +675,7 @@ require('lze').load {
   {
     -- name of the lsp
     "lua_ls",
-    enabled = nixCats('general') or false,
+    enabled = nixCats('lua') or false,
     -- provide a table containing filetypes,
     -- and then whatever your functions defined in the function type specs expect.
     -- in our case, it just expects the normal lspconfig setup options.
@@ -710,7 +707,7 @@ require('lze').load {
   },
   {
     "nixd",
-    enabled = nixCats('general') or false,
+    enabled = nixCats('nix') or false,
     lsp = {
       filetypes = { 'nix' },
       settings = {
@@ -736,7 +733,7 @@ require('lze').load {
             }
           },
           formatting = {
-            command = { "nixfmt" }
+            command = { "alejandra" }
           },
           diagnostic = {
             suppress = {

@@ -37,9 +37,15 @@ in {
         # this includes LSPs
         lspsAndRuntimeDeps = {
           general = with pkgs; [
-            lua-language-server
-            nixd
             lazygit
+          ];
+          lua = with pkgs; [
+            lua-language-server
+            stylua
+          ];
+          nix = with pkgs; [
+            nixd
+            alejandra
           ];
           go = with pkgs; [
             gopls
@@ -71,6 +77,9 @@ in {
           go = with pkgs.vimPlugins; [
             nvim-dap-go
           ];
+          lua = with pkgs.vimPlugins; [
+            lazydev-nvim
+          ];
           general = with pkgs.vimPlugins; [
             mini-nvim
             nvim-lspconfig
@@ -83,7 +92,6 @@ in {
             which-key-nvim
             nvim-lint
             conform-nvim
-            lazydev-nvim
             nvim-dap
             nvim-dap-ui
             nvim-dap-virtual-text
@@ -140,6 +148,8 @@ in {
           # and a set of categories that you want
           categories = {
             general = true;
+            lua = true;
+            nix = true;
             go = false;
           };
           # anything else to pass and grab in lua with `nixCats.extra`
