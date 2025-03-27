@@ -41,6 +41,7 @@
     overwrite = (callFlake utils.templates.overwrite.path inputswithexample).packages.${system}.default;
     LazyVim = (callFlake utils.templates.LazyVim.path inputswithbase).packages.${system}.default;
     flakeless = import utils.templates.flakeless.path { inherit pkgs nixCats; };
+    simple = import utils.templates.simple.path { inherit pkgs nixCats; };
 
     testargs = {
       stateVersion = "24.05";
@@ -69,7 +70,7 @@
       inherit drvtests hometests nixostests;
       inherit exampledrvtests kickstartdrvtests;
       # sanity template build checks
-      inherit overwrite overriding LazyVim flakeless;
+      inherit overwrite overriding LazyVim flakeless simple;
     };
   });
 }
