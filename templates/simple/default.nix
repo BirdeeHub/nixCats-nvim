@@ -81,11 +81,11 @@
 
 # return our package!
 in utils.baseBuilder luaPath { inherit pkgs; } categoryDefinitions packageDefinitions defaultPackageName
+# NOTE: or to return a set of all of them:
+# `in utils.mkAllPackages (utils.baseBuilder luaPath { inherit pkgs; } categoryDefinitions packageDefinitions defaultPackageName)`
 
-# NOTE: you may call .overrideNixCats
+# NOTE: you may call .overrideNixCats on the resulting package or packages
 # to construct different packages from
 # your packageDefinitions from the resulting derivation of this expression!
 # `finalPackage.overrideNixCats { name = "aDifferentPackage"; }`
 # see :h nixCats.overriding
-# NOTE: or to return a set of all of them:
-# `utils.mkAllPackages finalPackage`
