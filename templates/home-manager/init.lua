@@ -156,6 +156,7 @@ require('lze').load {
         appearance = {
           nerd_font_variant = 'mono'
         },
+        signature = { enabled = true, },
         sources = {
           default = { 'lsp', 'path', 'snippets', 'buffer' },
         },
