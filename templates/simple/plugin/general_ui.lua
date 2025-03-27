@@ -8,21 +8,6 @@ vim.g.startuptime_event_width = 0
 vim.g.startuptime_tries = 10
 vim.g.startuptime_exe_path = nixCats.packageBinPath
 
-require("snacks").setup({
-  picker = {},
-  bigfile = {},
-  image = {},
-  lazygit = {},
-  terminal = {},
-  rename = {},
-  notifier = {},
-  indent = {},
-  gitbrowse = {},
-  scope = {},
-})
-vim.keymap.set("n", "<c-\\>", function() Snacks.terminal.open() end, { desc = 'Snacks Terminal' })
-vim.keymap.set("n", "<leader>_", function() Snacks.lazygit.open() end, { desc = 'Snacks LazyGit' })
-
 require('mini.pairs').setup()
 require('mini.icons').setup()
 require('mini.ai').setup()
@@ -88,6 +73,8 @@ require('which-key').add {
   { "<leader>r_", hidden = true },
   { "<leader>s", group = "[s]earch" },
   { "<leader>s_", hidden = true },
+  { "<leader>f", group = "[f]ind" },
+  { "<leader>f_", hidden = true },
   { "<leader>t", group = "[t]oggles" },
   { "<leader>t_", hidden = true },
   { "<leader>w", group = "[w]orkspace" },
