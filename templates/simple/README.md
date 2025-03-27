@@ -1,6 +1,6 @@
 # Simple
 
-This is approximately as minimal of a configuration as possible without missing major functionality,
+This is approximately the most minimal configuration that can be called a fully-featured configuration,
 and is split up into multiple files for easy reading.
 
 Just like the [`flakeless`](../flakeless) template it is a nix expression that returns a derivation containing
