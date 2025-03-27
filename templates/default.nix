@@ -99,6 +99,22 @@
       when your config file is not loaded via Nix.
     '';
   };
+  simple = {
+    path = ./simple;
+    description = ''
+      This is approximately as minimal of a configuration as possible without missing major functionality,
+      and is split up into multiple files for easy reading.
+
+      Just like the `flakeless` template, it is a nix expression that returns a derivation containing
+      neovim plus your configuration that can be installed like any other package.
+
+      This configuration does not make much use of the category system. Everything is in 1 single `general` category.
+
+      It also does not lazily load its plugins.
+
+      If you are new to nvim and lua and maybe even nix, and everything else is too confusing, this may help!
+    '';
+  };
   overriding = {
     path = ./overriding;
     description = ''
