@@ -7,10 +7,11 @@ end
 -- like a nix attribute set without explicitly creating each internal table.
 local servers = vim.defaulttable()
 
+-- most don't need much configuration
 -- servers.gopls = {}
 -- servers.html = {}
 
-servers.lua_ls.filetypes = { 'lua' }
+-- but you can provide some if you want to!
 servers.lua_ls.settings.Lua = {
   formatters = {
     ignoreComments = true,
@@ -68,7 +69,6 @@ lspconfig.util.default_config = vim.tbl_extend(
     on_attach = function(_, bufnr)
       -- we create a function that lets us more easily define mappings specific
       -- for LSP related items. It sets the mode, buffer and description for us each time.
-
       local nmap = function(keys, func, desc)
         if desc then
           desc = 'LSP: ' .. desc
@@ -78,15 +78,12 @@ lspconfig.util.default_config = vim.tbl_extend(
 
       nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
       nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
       nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-
+      nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
       nmap('gr', function() Snacks.picker.lsp_references() end, '[G]oto [R]eferences')
       nmap('gI', function() Snacks.picker.lsp_implementations() end, '[G]oto [I]mplementation')
       nmap('<leader>ds', function() Snacks.picker.lsp_symbols() end, '[D]ocument [S]ymbols')
       nmap('<leader>ws', function() Snacks.picker.lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
-
-      nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
 
       -- See `:help K` for why this keymap
       nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
