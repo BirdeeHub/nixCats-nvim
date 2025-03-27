@@ -1,3 +1,6 @@
+if not nixCats('general') then
+  return
+end
 require("snacks").setup({
   picker = {},
   bigfile = {},
