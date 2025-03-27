@@ -23,7 +23,7 @@ You could make it into a flake too!
         pkgs = import nixpkgs { inherit system; overlays = []; config = {}; };
     in nixCats.utils.mkAllWithDefault (import ./. (inputs // { inherit pkgs; })));
     homeModule = self.packages.x86_64-linux.default.homeModule; # <- it will get the system from the importing configuration
-    nixosModule = self.packages.x86_64-linux.default.nixosModule; # <- it will get the system from the importing configuration
+    nixosModule = self.packages.x86_64-linux.default.nixosModule; # <- module namespace defaults to defaultPackageName.{ enable, packageNames, etc... }
   };
 }
 ```
