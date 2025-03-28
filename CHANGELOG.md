@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.1...v6.6.2) (2025-03-28)
+
+
+### Bug Fixes
+
+* **autoPluginOverlay:** autoPluginOverlay no longer entirely overrides old autoPluginOverlay ([40c942b](https://github.com/BirdeeHub/nixCats-nvim/commit/40c942b51f59686a32ad17f15f8aa52b222aea53))
+
 ## [6.6.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.0...v6.6.1) (2025-03-20)
 
 
