@@ -526,8 +526,9 @@ with builtins; let lib = import ./lib.nix; in rec {
     two overlays output a set of the same name when importing from other nixCats.
     Merges everything into 1 overlay
 
-    If you have 2 overlays both outputting a set like pkgs.neovimPlugins,
-    The second will replace the first.
+    If you have 2 overlays both outputting a set like pkgs.someSet
+    (other than when using the standardPluginOverlay),
+    The second will replace the first if the overlay does not explicitly update into prev.
 
     This will merge the results instead.
 
