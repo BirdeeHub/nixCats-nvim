@@ -12,6 +12,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-appimage.url = "github:ralismark/nix-appimage";
+    visual-whitespace = {
+      url = "github:mcauley-penney/visual-whitespace.nvim";
+      flake = false;
+    };
+    plugins-hlargs = {
+      url = "github:m-demare/hlargs.nvim";
+      flake = false;
+    };
   };
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;

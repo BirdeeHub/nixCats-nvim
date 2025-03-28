@@ -48,13 +48,9 @@
         inherit (prev) extra_pkg_config;
         inherit (prev) nixCats_passthru;
 
-        dependencyOverlays = [
-          (utils.mergeOverlays
-            (prev.dependencyOverlays ++ [
-              (utils.standardPluginOverlay inputs)
-              # any other flake overlays here.
-            ])
-          )
+        dependencyOverlays = prev.dependencyOverlays ++ [
+          (utils.standardPluginOverlay inputs)
+          # any other flake overlays here.
         ];
       });
 

@@ -9,6 +9,9 @@
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
     startupPlugins = {
+      overlaytest = [
+        pkgs.neovimPlugins.hlargs
+      ];
       autoconf = [
         ((pkgs.runCommandNoCC "autoconftest" {} ''mkdir -p $out'').overrideAttrs (prev: {
           passthru = prev.passthru or {} // {
@@ -78,6 +81,7 @@
         withPython3 = true;
       };
       categories = {
+        overlaytest = true;
         testvars = true;
         autoconf = true;
         autodeps = true;

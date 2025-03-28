@@ -21,24 +21,21 @@
   }) ];
 
   config = let
-    dependencyOverlaysFunc = { main_options_set, user_options_set ? {} }:
-      (main_options_set.addOverlays or [])
-        ++ (user_options_set.addOverlays or [])
-        ++ (
-          if builtins.isAttrs oldDependencyOverlays
-          then builtins.trace ''
-            # NixCats deprecation warning
-            Do not wrap your dependencyOverlays list in a set of systems.
-            They should just be a list.
-            Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-            See :h nixCats.flake.outputs.getOverlays
-            '' oldDependencyOverlays.${pkgs.system}
-          else if builtins.isList oldDependencyOverlays
-            then oldDependencyOverlays
-            else []
-        );
+    dependencyOverlaysFunc = { main_options_set, user_options_set ? {} }: (
+      if builtins.isAttrs oldDependencyOverlays
+      then builtins.trace ''
+        # NixCats deprecation warning
+        Do not wrap your dependencyOverlays list in a set of systems.
+        They should just be a list.
+        Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+        See :h nixCats.flake.outputs.getOverlays
+        '' oldDependencyOverlays.${pkgs.system}
+      else if builtins.isList oldDependencyOverlays
+        then oldDependencyOverlays
+        else []
+    ) ++ (main_options_set.addOverlays or []) ++ (user_options_set.addOverlays or []);
 
-    mapToPackages = options_set: depOvers: (let
+    mapToPackages = options_set: dependencyOverlays: (let
       getStratWithExisting = enumstr: if enumstr == "merge"
         then utils.deepmergeCats
         else if enumstr == "replace"
@@ -79,7 +76,6 @@
         nixpkgspath = if pkgsoptions != null then pkgsoptions else pkgs;
         extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
         extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
-        dependencyOverlays = lib.optional (depOvers != []) (utils.mergeOverlays depOvers);
       in if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
         then if dependencyOverlays != []
           then {

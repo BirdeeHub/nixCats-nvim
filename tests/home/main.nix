@@ -21,12 +21,23 @@ in {
 # nixCats module:
 (lib.setAttrByPath moduleNamespace {
   enable = true;
+  addOverlays = [
+    (utils.standardPluginOverlay { plugins-visual-whitespace = inputs.visual-whitespace; })
+  ];
+  categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: {
+    startupPlugins = {
+      overlaytest = [
+        pkgs.neovimPlugins.visual-whitespace
+      ];
+    };
+  };
   # packageNames = [ packagename ];
   packageDefinitions.replace = {
     ${packagename} = { pkgs, ... }: {
       settings = {
       };
       categories = {
+        overlaytest = true;
         fi = true;
         foe = true;
         cowboy = true;

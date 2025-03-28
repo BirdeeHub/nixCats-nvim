@@ -26,12 +26,12 @@
     };
   in
   {
-    neovimPlugins = builtins.listToAttrs (map
+    neovimPlugins = (super.neovimPlugins or {}) // (builtins.listToAttrs (map
       (plugin: {
         name = plugName plugin;
         value = buildPlug plugin;
       })
-      plugins);
+      plugins));
   });
   # same as standardPluginOverlay except if you give it `plugins-foo.bar`
   # you can `pkgs.neovimPlugins.foo-bar` and still `packadd foo.bar`
@@ -56,11 +56,11 @@
     };
   in
   {
-    neovimPlugins = builtins.listToAttrs (map
+    neovimPlugins = (super.neovimPlugins or {}) // (builtins.listToAttrs (map
       (plugin: {
         name = plugAttrName plugin;
         value = buildPlug plugin;
       })
-      plugins);
+      plugins));
   });
 }

@@ -106,11 +106,29 @@
         "type": "github"
       }
     },
+    "plugins-hlargs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1742742261,
+        "narHash": "sha256-PRwiKgEHBC+FT+axH3Vwbl5612cRMQ+oZKBA7uNdhis=",
+        "owner": "m-demare",
+        "repo": "hlargs.nvim",
+        "rev": "063fa2ba05f5eee5a1ab3da76ecb19770b7725cf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "m-demare",
+        "repo": "hlargs.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "nix-appimage": "nix-appimage",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "plugins-hlargs": "plugins-hlargs",
+        "visual-whitespace": "visual-whitespace"
       }
     },
     "systems": {
@@ -125,6 +143,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "visual-whitespace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1740960721,
+        "narHash": "sha256-jdOyXsi7TQP8bqn9dZUaX4L/RolKSRJjsPN/udDAizw=",
+        "owner": "mcauley-penney",
+        "repo": "visual-whitespace.nvim",
+        "rev": "11b340715aa5e0ed730520741591de3f2ab1f28f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mcauley-penney",
+        "repo": "visual-whitespace.nvim",
         "type": "github"
       }
     }

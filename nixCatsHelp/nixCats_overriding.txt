@@ -78,23 +78,18 @@ it in the same set, or chain overrides like so:
 
 NixCats provides a function to merge lists of overlays together into a single
 overlay. This allows you to combine overlays that might output to the same
-subattribute without them overwriting each other completely.
+subattribute without them overwriting each other completely, `utils.mergeOverlays`
+but hopefully it will not be needed!
 
 >nix
   pkgWithNewOverlays = OGpackage.override (prev: {
-    dependencyOverlays = [
-      (utils.mergeOverlays
-        (prev.dependencyOverlays ++ [
-          # now pkgs.neovimPlugins will contain
-          # the result of both calls to standardPluginOverlay!
-          (utils.standardPluginOverlay inputs)
-          # any other flake overlays here.
-          inputs.neorg-overlay.overlays.default
-          inputs.lz-n.overlays.default
-          (utils.fixSystemizedOverlay inputs.codeium.overlays
-            (system: inputs.codeium.overlays.${system}.default)
-          )
-        ])
+    dependencyOverlays = prev.dependencyOverlays ++ [
+      (utils.standardPluginOverlay inputs)
+      # any other flake overlays here.
+      inputs.neorg-overlay.overlays.default
+      inputs.lz-n.overlays.default
+      (utils.fixSystemizedOverlay inputs.codeium.overlays
+        (system: inputs.codeium.overlays.${system}.default)
       )
     ];
   });
