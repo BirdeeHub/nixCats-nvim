@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.2...v6.6.3) (2025-03-28)
+
+
+### Bug Fixes
+
+* **mkPlugin:** mkPlugin = name: src: added (because mkNvimPlugin = src: name: is backwards) ([a91d721](https://github.com/BirdeeHub/nixCats-nvim/commit/a91d721747fcdf502bbaad53bc9b0c1ecc61d660))
+
 ## [6.6.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.1...v6.6.2) (2025-03-28)
 
 
