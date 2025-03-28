@@ -24,7 +24,7 @@ in {
   addOverlays = [
     (utils.standardPluginOverlay { plugins-visual-whitespace = inputs.visual-whitespace; })
   ];
-  categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: {
+  categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkPlugin, ... }@packageDef: {
     startupPlugins = {
       overlaytest = [
         pkgs.neovimPlugins.visual-whitespace

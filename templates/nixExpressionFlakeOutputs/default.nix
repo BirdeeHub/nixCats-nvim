@@ -46,7 +46,7 @@
     # )
   ];
 
-  categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
 
     lspsAndRuntimeDeps = {
       general = with pkgs; [

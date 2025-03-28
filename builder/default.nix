@@ -43,16 +43,17 @@
           overlays = (args.pkgs.overlays or []) ++ overlays;
         } // (args.extra_pkg_params or {})));
 
-    mkNvimPlugin = src: pname:
+    mkPlugin = pname: src:
       pkgs.vimUtils.buildVimPlugin {
         inherit pname src;
         doCheck = false;
         version = builtins.toString (src.lastModifiedDate or "master");
       };
+    mkNvimPlugin = pkgs.lib.flip mkPlugin;
 
     ncTools = pkgs.callPackage ./ncTools.nix { inherit nclib; };
 
-    thisPackage = packageDefinitions.${name} { inherit pkgs mkNvimPlugin; };
+    thisPackage = packageDefinitions.${name} { inherit pkgs mkPlugin mkNvimPlugin; };
     settings = {
       wrapRc = true;
       viAlias = false;
@@ -100,7 +101,7 @@
       extraCats = {};
     } // (categoryDefinitions {
       # categories depends on extraCats
-      inherit categories settings pkgs name mkNvimPlugin;
+      inherit categories settings pkgs name mkPlugin mkNvimPlugin;
       extra = extraTableLua;
     }));
     # categories depends on extraCats
@@ -132,7 +133,7 @@
     combineCatsOfFuncs = section:
       x: pkgs.lib.pipe section [
         filterAndFlatten
-        (map (value: value x))
+        (map (value: if pkgs.lib.isFunction value then value x else value))
         pkgs.lib.flatten
         pkgs.lib.unique
       ];

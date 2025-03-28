@@ -25,7 +25,7 @@ in {
       # the .replace vs .merge options are for modules based on existing configurations,
       # they refer to how multiple categoryDefinitions get merged together by the module.
       # for useage of this section, refer to :h nixCats.flake.outputs.categories
-      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
         lspsAndRuntimeDeps = {
           general = [];
         };
@@ -106,7 +106,7 @@ in {
       # users.REPLACE_ME = {
       #   enable = true;
       #   packageNames = [ "REPLACE_MEs_VIM" ];
-      #   categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {});
+      #   categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {});
       #   packageDefinitions.replace = {
       #     REPLACE_MEs_VIM = {pkgs, ...}: {
       #       settings = {};

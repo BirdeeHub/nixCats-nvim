@@ -57,7 +57,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     Called with the contents of the current package definition as arguments
 
     ```nix
-    { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+    { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
       lspsAndRuntimeDeps = {
         general = with pkgs; [ ];
       };
@@ -78,7 +78,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ```nix
     {
-      nvim = { pkgs, mkNvimPlugin, ... }: {
+      nvim = { pkgs, mkPlugin, ... }: {
         settings = {};
         categories = {
           general = true;

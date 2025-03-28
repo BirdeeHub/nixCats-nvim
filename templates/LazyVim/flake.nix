@@ -64,7 +64,7 @@
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
-    categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+    categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
       # to define and use a new category, simply add a new list to a set here, 
       # and later, you will include categoryname = true; in the set you
       # provide when you build the package using this builder function.
@@ -210,7 +210,7 @@
     packageDefinitions = {
       # These are the names of your packages
       # you can include as many as you wish.
-      nvim = { pkgs, mkNvimPlugin, ... }: {
+      nvim = { pkgs, mkPlugin, ... }: {
         # they contain a settings set defined above
         # see :help nixCats.flake.outputs.settings
         settings = {
@@ -231,7 +231,7 @@
       # an extra test package with normal lua reload for fast edits
       # nix doesnt provide the config in this package, allowing you free reign to edit it.
       # then you can swap back to the normal pure package when done.
-      testnvim = { pkgs, mkNvimPlugin, ... }: {
+      testnvim = { pkgs, mkPlugin, ... }: {
         settings = {
           wrapRc = false;
           unwrappedCfgPath = utils.mkLuaInline "os.getenv('HOME') .. '/some/path/to/your/config'";

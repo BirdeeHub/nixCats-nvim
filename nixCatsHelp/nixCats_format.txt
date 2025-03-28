@@ -221,15 +221,19 @@ The builder will call it with that argument, you may use it.
 This allows categoryDefinitions to access their packages categories and settings,
 which allows categoryDefinitions to be much more dynamic.
 
-It also gets `mkNvimPlugin = src: name:` as an argument. mkNvimPlugin takes a src, either flake input
-or fetched drv, and then a name, and it returns a nvim plugin that can be further
-overriden via overrideAttrs if desired.
+It also gets `mkPlugin = name: src:` as an argument. `mkPlugin` takes a name,
+and then a src which is any flake input or fetched drv,
+and it returns a nvim plugin that can be further overriden via overrideAttrs if desired.
 There is an overlay to do this automatically from flake inputs, mentioned
 above. But sometimes it can be advantageous to do one of them individually.
 
+It also recieves a `mkNvimPlugin = src: name:` which does the same thing, but
+with the arguments the wrong way around.
+It is still present for backwards compatibility.
+
 These are the things you can return:
 >nix
-  categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, mkNvimPlugin, ... }@packageDef: {
 <
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSPs or

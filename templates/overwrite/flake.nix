@@ -53,7 +53,7 @@
           # other overlays
         ];
 
-        categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+        categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
           # NOTE: for all available fields, see:
           # :help nixCats.flake.outputs.categories
           startupPlugins = with pkgs.vimPlugins; {

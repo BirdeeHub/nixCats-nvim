@@ -48,7 +48,7 @@ type: function that returns set of sets of categories of dependencies.
 Called with the contents of the current package definition as arguments
 
 ```nix
-{ pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+{ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
   lspsAndRuntimeDeps = {
     general = with pkgs; [ ];
   };
@@ -69,7 +69,7 @@ Among other info, things declared in settings, categories, and extra will be ava
 
 ```nix
 {
-  nvim = { pkgs, mkNvimPlugin, ... }: {
+  nvim = { pkgs, mkPlugin, ... }: {
     settings = {};
     categories = {
       general = true;

@@ -104,7 +104,7 @@ replacing whenever it reaches 2 conflicting items that
 are not a set or a derivation and adding any new values.
 >nix
   pkgWithExtraCats = pkgWithNewOverlays.override (prev: {
-    categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: {
+    categoryDefinitions = utils.mergeCatDefs prev.categoryDefinitions ({ pkgs, settings, categories, name, extra, mkPlugin, ... }@packageDef: {
       startupPlugins = with pkgs.vimPlugins; {
         newcat = [
           lze

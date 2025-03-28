@@ -11,7 +11,7 @@
   luaPath = ./.;
 
   # see :help nixCats.flake.outputs.categories
-  categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
     lspsAndRuntimeDeps = {
       general = with pkgs; [
         lazygit
@@ -59,7 +59,7 @@
     # These are the names of your packages
     # you can include as many as you wish.
     # each of these sets are also written into the nixCats plugin for querying within lua.
-    nvim = {pkgs , mkNvimPlugin, ... }: {
+    nvim = {pkgs , mkPlugin, ... }: {
       settings = {
         # see :help nixCats.flake.outputs.settings
         # IMPORTANT:

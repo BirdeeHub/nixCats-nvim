@@ -81,7 +81,7 @@
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
-    categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+    categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
       # to define and use a new category, simply add a new list to a set here, 
       # and later, you will include categoryname = true; in the set you
       # provide when you build the package using this builder function.

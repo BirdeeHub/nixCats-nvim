@@ -15,7 +15,7 @@
   luaPath = ./.;
 
   # see :help nixCats.flake.outputs.categories
-  categoryDefinitions = { pkgs, settings, categories, extra, name, mkNvimPlugin, ... }@packageDef: {
+  categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {
     # to define and use a new category, simply add a new list to a set here, 
     # and later, you will include categoryname = true; in the set you
     # provide when you build the package using this builder function.
@@ -89,7 +89,7 @@
   packageDefinitions = {
     # These are the names of your packages
     # you can include as many as you wish.
-    nvim = {pkgs , mkNvimPlugin, ... }: {
+    nvim = {pkgs , mkPlugin, ... }: {
       # they contain a settings set defined above
       # see :help nixCats.flake.outputs.settings
       settings = {

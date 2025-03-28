@@ -340,7 +340,7 @@ in {
                 see :help nixCats.flake.outputs.exports for more info on the merge strategy options
               '';
               example = ''
-                categoryDefinitions.replace = { pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: { }
+                categoryDefinitions.replace = { pkgs, settings, categories, name, extra, mkPlugin, ... }@packageDef: { }
               '';
             };
             merge = mkOption {
@@ -352,7 +352,7 @@ in {
                 see :help nixCats.flake.outputs.exports for more info on the merge strategy options
               '';
               example = ''
-                categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkNvimPlugin, ... }@packageDef: { }
+                categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkPlugin, ... }@packageDef: { }
               '';
             };
           };
