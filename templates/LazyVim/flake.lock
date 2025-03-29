@@ -2,11 +2,11 @@
   "nodes": {
     "nixCats": {
       "locked": {
-        "lastModified": 1743131527,
-        "narHash": "sha256-J8p99gvec/F1SOzHIGkq7kRs7TnZcVA3KJ7bYf9Ahd4=",
+        "lastModified": 1743207292,
+        "narHash": "sha256-Hf23aM/FRGCvT/oNyPUZ2kw9j2ptpkBo3UzdO2kORXs=",
         "owner": "BirdeeHub",
         "repo": "nixCats-nvim",
-        "rev": "c331e73658ad93281dbf800c6dc5a1c9f4e479c8",
+        "rev": "7cf13e3215570450a432cf32a5ae7dd82a4f63e1",
         "type": "github"
       },
       "original": {
@@ -17,11 +17,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1743014863,
-        "narHash": "sha256-jAIUqsiN2r3hCuHji80U7NNEafpIMBXiwKlSrjWMlpg=",
+        "lastModified": 1743076231,
+        "narHash": "sha256-yQugdVfi316qUfqzN8JMaA2vixl+45GxNm4oUfXlbgw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "bd3bac8bfb542dbde7ffffb6987a1a1f9d41699f",
+        "rev": "6c5963357f3c1c840201eda129a99d455074db04",
         "type": "github"
       },
       "original": {
