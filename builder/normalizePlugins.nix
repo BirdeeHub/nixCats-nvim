@@ -64,17 +64,23 @@
     (builtins.filter (v: v.optional))
     (map (v: v.plugin))
   ];
-  start = let
+  start = with builtins; let
     # gets plugin.dependencies from
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/overrides.nix
     findDependenciesRecursively = plugins: lib.concatMap transitiveClosure plugins;
     transitiveClosure = plugin:
-      [ plugin ] ++ builtins.concatLists (map transitiveClosure plugin.dependencies or []);
+      [ plugin ] ++ concatLists (map transitiveClosure plugin.dependencies or []);
+    subtractByName = tosub: filter (v: all (x: lib.getName v != lib.getName x) tosub);
 
-  in lib.pipe pluginsWithConfig [
-    (builtins.filter (v: ! v.optional))
-    (map (st: st.plugin))
-    (st: findDependenciesRecursively st ++ lib.subtractLists opt (findDependenciesRecursively opt))
+    st1 = lib.pipe pluginsWithConfig [
+      (filter (v: ! v.optional))
+      (map (st: st.plugin))
+    ];
+
+  in lib.pipe st1 [
+    (st: findDependenciesRecursively st ++ findDependenciesRecursively opt)
+    (subtractByName (opt ++ st1))
+    (st: st1 ++ st)
   ];
 
   passthru_initLua = with builtins; lib.pipe (start ++ opt) [
