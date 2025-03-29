@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.3...v6.6.4) (2025-03-29)
+
+
+### Bug Fixes
+
+* **nixpkgs_deps:** dependencies declared by nixpkgs plugins can no longer override user provided ones with the same name ([738915d](https://github.com/BirdeeHub/nixCats-nvim/commit/738915d5933fe16236fca89ec1bf77967b4a8932))
+
 ## [6.6.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.2...v6.6.3) (2025-03-28)
 
 
