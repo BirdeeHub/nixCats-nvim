@@ -57,21 +57,37 @@ let
             "vim.g.${prog}_host_prog='${placeholder "out"}/bin/${nixCats_packageName}-${prog}'"
           else
             "vim.g.loaded_${prog}_provider=0";
-
-      hostProviderLua = lib.mapAttrsToList genProviderCommand hostprog_check_table;
     in
-      lib.concatStringsSep ";" hostProviderLua;
+      lib.mapAttrsToList genProviderCommand hostprog_check_table;
 
     providerLuaRc = generateProviderRc {
       inherit withPython3 withNodeJs withPerl;
       withRuby = rubyEnv != null;
     };
 
+    concat_lua_args = lib.flip lib.pipe [
+      (builtins.concatStringsSep ";")
+      (res: ''--cmd "lua '' + res + ''"'')
+    ];
+
+  in [
+    # vim accepts a limited number of commands so we join them all
+    "--add-flags" (concat_lua_args (providerLuaRc ++ [
+      ''vim.opt.packpath:prepend([[${vimPackDir}]])''
+      ''vim.opt.runtimepath:prepend([[${vimPackDir}]])''
+      ''vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]''
+      ''vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]''
+    ]))
+  ];
+
+  # If configure != {}, we can't generate the rplugin.vim file with e.g
+  # NVIM_SYSTEM_RPLUGIN_MANIFEST *and* NVIM_RPLUGIN_MANIFEST env vars set in
+  # the wrapper. That's why only when configure != {} (tested both here and
+  # when postBuild is evaluated), we call makeWrapper once to generate a
+  # wrapper with most arguments we need, excluding those that cause problems to
+  # generate rplugin.vim, but still required for the final wrapper.
+  finalMakeWrapperArgs = let
     setupLua = writeText "setup.lua" /*lua*/''
-      vim.opt.packpath:prepend([[${vimPackDir}]])
-      vim.opt.runtimepath:prepend([[${vimPackDir}]])
-      vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]
-      vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]
       local configdir = vim.fn.stdpath('config')
       vim.opt.packpath:remove(configdir)
       vim.opt.runtimepath:remove(configdir)
@@ -81,22 +97,12 @@ let
       vim.opt.runtimepath:prepend(configdir)
       vim.opt.runtimepath:append(configdir .. "/after")
     '';
-  in [
-    # vim accepts a limited number of commands so we join them all
-    "--add-flags" ''--cmd "lua ${providerLuaRc}; dofile([[${setupLua}]])"''
-  ];
-
-  # If configure != {}, we can't generate the rplugin.vim file with e.g
-  # NVIM_SYSTEM_RPLUGIN_MANIFEST *and* NVIM_RPLUGIN_MANIFEST env vars set in
-  # the wrapper. That's why only when configure != {} (tested both here and
-  # when postBuild is evaluated), we call makeWrapper once to generate a
-  # wrapper with most arguments we need, excluding those that cause problems to
-  # generate rplugin.vim, but still required for the final wrapper.
-  finalMakeWrapperArgs =
+  in
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
     ++ [ "--add-flags" ''-u ${writeText "init.lua" customRC}'' ]
     ++ generatedWrapperArgs
+    ++ [ "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"'' ]
     ;
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
