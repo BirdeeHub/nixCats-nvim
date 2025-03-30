@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.6...v6.6.7) (2025-03-30)
+
+
+### Bug Fixes
+
+* **builder:** prevent UpdateRemotePlugins from running user config during build ([4d33792](https://github.com/BirdeeHub/nixCats-nvim/commit/4d33792c3163609f4617a19615a4b7431bdbf08e))
+
 ## [6.6.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.5...v6.6.6) (2025-03-30)
 
 
