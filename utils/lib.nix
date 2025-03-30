@@ -34,14 +34,16 @@ with builtins; rec {
 
   recursiveUpdateWithMerge = pickyRecUpdateUntil {
     pick = path: left: right:
-      if isList left && isList right
+      # if either are nested further, update
+      if ncIsAttrs left || ncIsAttrs right then
+        right
+      else if isList left && isList right
         then left ++ right
-      # category lists can contain mixes of sets and derivations.
-      # But they are both attrsets according to typeOf, so we dont need a check for that.
-      else if isList left && all (lv: typeOf lv == typeOf right) left then
+      else if isList left then
         left ++ [ right ]
-      else if isList right && all (rv: typeOf rv == typeOf left) right then
+      else if isList right then
         [ left ] ++ right
+      # if neither are lists, update
       else right;
   };
 

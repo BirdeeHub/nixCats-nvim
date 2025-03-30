@@ -51,8 +51,8 @@
   recFilterCats = implicit_defaults: categories: let
     # destructures attrs recursively, returns [ { path, value } ... ]
     recAttrsToList = here: lib.flip lib.pipe [
-      (lib.mapAttrsToList (n: value: {
-        path = here ++ [n];
+      (lib.mapAttrsToList (name: value: {
+        path = here ++ [name];
         inherit value;
       }))
       (foldl' (a: v: if nclib.ncIsAttrs v.value
@@ -68,7 +68,7 @@
     ];
     # check if each is enabled
     cond = def: any (cat: lib.take (length cat) def.path == cat) catlist
-      || implicit_defaults && ! nclib.ncIsAttrs def.value && any (cat: lib.take (length def.path) cat == def.path) catlist;
+      || implicit_defaults && any (cat: lib.take (length def.path) cat == def.path) catlist;
   # destructure category definition and filter based on cond
   in lib.flip lib.pipe [
     (recAttrsToList [])
