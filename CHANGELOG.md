@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.8](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.7...v6.6.8) (2025-03-30)
+
+
+### Bug Fixes
+
+* **sensible_defaults:** suffix-path and suffix-LD now default to true ([06d616e](https://github.com/BirdeeHub/nixCats-nvim/commit/06d616e09bffef8bb0efae9dbd92d9984988489b))
+
 ## [6.6.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.6...v6.6.7) (2025-03-30)
 
 
