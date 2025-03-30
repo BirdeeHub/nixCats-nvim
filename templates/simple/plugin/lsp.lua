@@ -3,8 +3,6 @@ if not nixCats('general') then
 end
 -- NOTE: lsp setup via lspconfig
 
--- vim.defaulttable() will allow us to set values in the `servers` table
--- like a nix attribute set without explicitly creating each internal table.
 local servers = {}
 
 -- most don't need much configuration
