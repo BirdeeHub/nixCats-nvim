@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.4...v6.6.5) (2025-03-30)
+
+
+### Bug Fixes
+
+* **builder:** nvim nightly changed its desktop file, we change how we fix desktop file ([3d337bd](https://github.com/BirdeeHub/nixCats-nvim/commit/3d337bdf2e060cec4a29bbbbc86d9ecbe4051be1))
+
 ## [6.6.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.3...v6.6.4) (2025-03-29)
 
 
