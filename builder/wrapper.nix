@@ -126,9 +126,9 @@ in {
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
       --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
       --replace-fail 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
-      --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'\
-      --replace-fail 'Exec=nvim %F' "Exec=${nixCats_packageName} %F"
-  ''
+      --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'
+    sed -i '/^Exec=nvim/c\Exec=${nixCats_packageName} "%F"' $out/share/applications/${nixCats_packageName}.desktop
+    ''
   + lib.optionalString (python3Env != null && withPython3) ''
     makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 ${extraPython3wrapperArgs}
   ''
