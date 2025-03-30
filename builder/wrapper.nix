@@ -70,14 +70,14 @@ let
       (res: ''--cmd "lua '' + res + ''"'')
     ];
 
-  in [
+  in extra: [
     # vim accepts a limited number of commands so we join them all
     "--add-flags" (concat_lua_args (providerLuaRc ++ [
       ''vim.opt.packpath:prepend([[${vimPackDir}]])''
       ''vim.opt.runtimepath:prepend([[${vimPackDir}]])''
       ''vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]''
       ''vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]''
-    ]))
+    ] ++ extra))
   ];
 
   # If configure != {}, we can't generate the rplugin.vim file with e.g
@@ -101,9 +101,7 @@ let
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
     ++ [ "--add-flags" ''-u ${writeText "init.lua" customRC}'' ]
-    ++ generatedWrapperArgs
-    ++ [ "--add-flags" ''--cmd "lua dofile([[${setupLua}]])"'' ]
-    ;
+    ++ generatedWrapperArgs [ "dofile([[${setupLua}]])" ];
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 in {
@@ -154,7 +152,7 @@ in {
   +
   (let
     manifestWrapperArgs =
-      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generatedWrapperArgs;
+      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generatedWrapperArgs [];
   in /* bash */ ''
     echo "Generating remote plugin manifest"
     export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim
