@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.5...v6.6.6) (2025-03-30)
+
+
+### Bug Fixes
+
+* **builder:** desktop file fix would be different on mac ([48d48e6](https://github.com/BirdeeHub/nixCats-nvim/commit/48d48e6f4830e8c0d8a285890da349e8edbc89d2))
+
 ## [6.6.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.4...v6.6.5) (2025-03-30)
 
 
