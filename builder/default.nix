@@ -27,7 +27,7 @@
       overlays = if isList (args.dependencyOverlays or null)
         then args.dependencyOverlays
         else if nclib.ncIsAttrs (args.dependencyOverlays or null)
-        then builtins.trace ''
+        then builtins.warn ''
           # NixCats deprecation warning
           Do not wrap your dependencyOverlays list in a set of systems.
           They should just be a list.
@@ -168,13 +168,13 @@
         source $stdenv/setup
         mkdir -p $out/lua/nixCats
         mkdir -p $out/doc
+        cp -r ${../nixCatsHelp}/* $out/doc/
         cp -r ${./nixCats}/* $out/lua/nixCats
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
         cp ${petShop} $out/lua/nixCats/petShop.lua
         cp ${extraItems} $out/lua/nixCats/extra.lua
-        cp -r ${../nixCatsHelp}/* $out/doc/
       '';
     };
 
