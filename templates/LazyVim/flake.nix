@@ -214,6 +214,8 @@
         # they contain a settings set defined above
         # see :help nixCats.flake.outputs.settings
         settings = {
+          suffix-path = true;
+          suffix-LD = true;
           wrapRc = true;
           # IMPORTANT:
           # your alias may not conflict with your other packages.
@@ -233,6 +235,8 @@
       # then you can swap back to the normal pure package when done.
       testnvim = { pkgs, mkPlugin, ... }: {
         settings = {
+          suffix-path = true;
+          suffix-LD = true;
           wrapRc = false;
           unwrappedCfgPath = utils.mkLuaInline "os.getenv('HOME') .. '/some/path/to/your/config'";
         };

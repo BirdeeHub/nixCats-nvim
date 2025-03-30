@@ -61,6 +61,8 @@
     # each of these sets are also written into the nixCats plugin for querying within lua.
     nvim = {pkgs , mkPlugin, ... }: {
       settings = {
+        suffix-path = true;
+        suffix-LD = true;
         # see :help nixCats.flake.outputs.settings
         # IMPORTANT:
         # your aliases may not conflict with other packages.

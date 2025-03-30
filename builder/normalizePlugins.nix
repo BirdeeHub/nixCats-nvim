@@ -1,6 +1,7 @@
 {
   startup ? [],
   optional ? [],
+  autoPluginDeps ? true,
   lib,
   n2l,
 }: let
@@ -77,11 +78,11 @@
       (map (st: st.plugin))
     ];
 
-  in lib.pipe st1 [
+  in if autoPluginDeps then lib.pipe st1 [
     (st: findDependenciesRecursively st ++ findDependenciesRecursively opt)
     (subtractByName (opt ++ st1))
     (st: st1 ++ st)
-  ];
+  ] else st1;
 
   passthru_initLua = with builtins; lib.pipe (start ++ opt) [
     (map (v: v.passthru.initLua or null))

@@ -68,11 +68,12 @@
       unwrappedCfgPath = null;
       autowrapRuntimeDeps = "suffix";
       autoconfigure = "prefix";
+      autoPluginDeps = true;
       aliases = null;
       nvimSRC = null;
       neovim-unwrapped = null;
-      suffix-path = false;
-      suffix-LD = false;
+      suffix-path = true;
+      suffix-LD = true;
       disablePythonSafePath = false;
       disablePythonPath = true; # <- you almost certainly want this set to true
       collate_grammars = true;
@@ -183,6 +184,7 @@
     normalized = pkgs.callPackage ./normalizePlugins.nix {
       startup = filterAndFlatten startupPlugins;
       optional = filterAndFlatten optionalPlugins;
+      inherit (settings) autoPluginDeps;
       inherit (utils) n2l;
     };
 
@@ -216,25 +218,27 @@
 
     # cat our args
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-    extraMakeWrapperArgs = let 
+    makeWrapperArgs = let
       preORpostPATH = if settings.suffix-path then "--suffix" else "--prefix";
       userPathEnv = filterFlattenUnique lspsAndRuntimeDeps;
       preORpostLD = if settings.suffix-LD then "--suffix" else "--prefix";
       userLinkables = filterFlattenUnique sharedLibraries;
-      userWrapperArgs = filterFlattenUnique extraWrapperArgs;
       userEnvVars = pkgs.lib.pipe environmentVariables [
         (filterAndFlattenMapInnerAttrs (name: value: [ [ "--set" name value ] ]))
         pkgs.lib.unique
         builtins.concatLists
       ];
-    in pkgs.lib.escapeShellArgs (pkgs.lib.optionals 
-        (settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim") [
+    in pkgs.lib.optionals (
+        settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim"
+      ) [
         "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
       ] ++ pkgs.lib.optionals (userPathEnv != []) [
         preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
       ] ++ pkgs.lib.optionals (userLinkables != []) [
         preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
-      ] ++ userEnvVars) + " " + builtins.concatStringsSep " " userWrapperArgs;
+      ] ++ userEnvVars;
+
+    extraMakeWrapperArgs = builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
 
     python3wrapperArgs = pkgs.lib.pipe extraPython3wrapperArgs [
       filterAndFlatten
@@ -292,7 +296,7 @@
     drvargs = import ./wrapNeovim.nix {
       neovim-unwrapped = myNeovimUnwrapped;
       nixCats_packageName = name;
-      inherit pkgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
+      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
       inherit (settings) vimAlias viAlias withRuby withPython3 withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
       inherit (normalized) start opt;
         /* the function you would have passed to python.withPackages */

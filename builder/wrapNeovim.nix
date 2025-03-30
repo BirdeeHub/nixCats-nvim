@@ -24,6 +24,7 @@
   neovim-unwrapped,
   autowrapRuntimeDeps ? "suffix",
 
+  makeWrapperArgs ? [],
   extraMakeWrapperArgs ? "",
   start ? [ ],
   opt ? [ ],
@@ -60,7 +61,7 @@ let
   # We start with the executable itself NOTE we call this variable "initial"
   # because if configure != {} we need to call makeWrapper twice, in order to
   # avoid double wrapping, see comment near finalMakeWrapperArgs
-  makeWrapperArgs =
+  mkWrapperArgs =
     let
       autowrapped = lib.pipe (start ++ opt) [
         (builtins.foldl' (acc: v: acc ++ v.runtimeDeps or []) [])
@@ -78,13 +79,13 @@ let
       "--inherit-argv0"
     ] ++ lib.optionals withRuby [
       "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}"
-    ] ++ lib.optionals (binPath != "") [
-      "--suffix" "PATH" ":" binPath
-    ] ++ lib.optionals (autowrapRuntimeDeps == "prefix") [
-      "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
     ] ++ lib.optionals (luaEnv != null) [
       "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
       "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
+    ] ++ lib.optionals (autowrapRuntimeDeps == "prefix") [
+      "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
+    ] ++ makeWrapperArgs ++ lib.optionals (binPath != "") [
+      "--suffix" "PATH" ":" binPath
     ];
 
   vimPackDir = pkgs.callPackage ./vim-pack-dir.nix {
@@ -101,7 +102,7 @@ let
   );
 in
 (pkgs.callPackage ./wrapper.nix { }) (args // {
-  wrapperArgsStr = lib.escapeShellArgs makeWrapperArgs + " " + extraMakeWrapperArgs;
+  wrapperArgsStr = lib.escapeShellArgs mkWrapperArgs + " " + extraMakeWrapperArgs;
   inherit vimPackDir python3Env luaEnv withNodeJs perlEnv customAliases;
   inherit nixCats_packageName;
 } // lib.optionalAttrs withRuby {

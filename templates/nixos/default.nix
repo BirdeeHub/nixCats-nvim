@@ -87,6 +87,8 @@ in {
           # they contain a settings set defined above
           # see :help nixCats.flake.outputs.settings
           settings = {
+            suffix-path = true;
+            suffix-LD = true;
             wrapRc = true;
             # unwrappedCfgPath = "/path/to/config";
             # IMPORTANT:

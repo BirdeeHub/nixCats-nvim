@@ -344,6 +344,8 @@
         # these also recieve our pkgs variable
         # see :help nixCats.flake.outputs.packageDefinitions
         settings = {
+          suffix-path = true;
+          suffix-LD = true;
           # The name of the package, and the default launch name,
           # and the name of the .desktop file, is `nixCats`,
           # or, whatever you named the package definition in the packageDefinitions set.
@@ -392,6 +394,8 @@
       };
       regularCats = { pkgs, ... }@misc: {
         settings = {
+          suffix-path = true;
+          suffix-LD = true;
           # IMPURE PACKAGE: normal config reload
           # include same categories as main config,
           # will load from vim.fn.stdpath('config')

@@ -105,6 +105,8 @@
           };
           configNotIncluded = { pkgs, ... }: {
             settings = {
+              suffix-path = true;
+              suffix-LD = true;
               # NOTE: see :help nixCats.flake.outputs.settings
               # This one wont bundle config.
               # it will look in ~/.config/nvim by default

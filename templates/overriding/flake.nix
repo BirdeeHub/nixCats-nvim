@@ -125,6 +125,8 @@
           # which was in the original packageDefinitions set.
           newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
             settings = {
+              suffix-path = true;
+              suffix-LD = true;
               # these ones override the old ones
               aliases = [ "nvi" ];
             };
