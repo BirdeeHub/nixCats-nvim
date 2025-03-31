@@ -100,7 +100,6 @@ let
   in
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-    ++ [ "--add-flags" ''-u ${writeText "init.lua" customRC}'' ]
     ++ generatedWrapperArgs [ "dofile([[${setupLua}]])" ];
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
@@ -185,7 +184,8 @@ in {
     echo "propagated dependency cpath for plugins: $LUA_CPATH"
     makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
-        --prefix LUA_CPATH ';' "$LUA_CPATH"
+        --prefix LUA_CPATH ';' "$LUA_CPATH" \
+        --set VIMINIT 'lua dofile([[${writeText "init.lua" customRC}]])'
 
     # add wrapper path to an environment variable
     # so that configuration may easily reference the path of the wrapper
