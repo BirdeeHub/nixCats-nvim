@@ -109,7 +109,7 @@ Useage:
 optionalLuaPreInit = {
   catname = [ #<- a list
     { # <- of sets
-      priority = 0;
+      priority = 0; # default priority is 150
       config = "vim.loader.enable()";
     }
     "vim.g.mycustomval = 5" #<- or strings
