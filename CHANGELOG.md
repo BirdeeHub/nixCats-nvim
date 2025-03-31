@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.7.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.8...v6.7.0) (2025-03-31)
+
+
+### Features
+
+* **optionalLuaCats:** values within categories of optionalLuaPreInit and optionalLuaAdditions can now specify priority ([a2293ed](https://github.com/BirdeeHub/nixCats-nvim/commit/a2293ed392c7013f8f567481434131e3b6c675f6))
+
 ## [6.6.8](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.7...v6.6.8) (2025-03-30)
 
 
