@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.8.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.7.0...v6.8.0) (2025-03-31)
+
+
+### Features
+
+* **vim.o.exrc:** support vim.o.exrc despite wrapping the config with -u ([cc2360f](https://github.com/BirdeeHub/nixCats-nvim/commit/cc2360fa34ce982786363424744273bb255ef2bf))
+
+
+### Bug Fixes
+
+* **vim.o.exrc:** support vim.o.exrc despite wrapping the config ([1d40e7f](https://github.com/BirdeeHub/nixCats-nvim/commit/1d40e7fed19e7b3e46465bf2a7a5941773739c7a))
+
 ## [6.7.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.6.8...v6.7.0) (2025-03-31)
 
 
