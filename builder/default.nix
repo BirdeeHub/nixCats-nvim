@@ -11,16 +11,16 @@
   , ...
   }@args:
     assert with builtins; !(isFunction categoryDefinitions && isAttrs packageDefinitions && isString name && isAttrs (args.nixCats_passthru or {})
-      && (isPath luaPath || (isString luaPath && hasContext luaPath) || luaPath.outPath or null != null)) -> import ./builder_error.nix;
+      && (isPath luaPath || (isString luaPath && hasContext luaPath) || luaPath.outPath or null != null)) -> (import ./errors.nix).main;
   let
     system = let
-      val = args.system or args.pkgs.system or args.nixpkgs.system or builtins.system or (import ./builder_error.nix);
-    in if builtins.isString val then val else import ./builder_error.nix;
+      val = args.system or args.pkgs.system or args.nixpkgs.system or builtins.system or (import ./errors.nix).main;
+    in if builtins.isString val then val else (import ./errors.nix).main;
     extra_pkg_config = if ! (builtins.isAttrs args.extra_pkg_config or {})
-      then import ./builder_error.nix
+      then (import ./errors.nix).main
       else args.extra_pkg_config or {};
     extra_pkg_params = if ! (builtins.isAttrs args.extra_pkg_params or {})
-      then import ./builder_error.nix
+      then (import ./errors.nix).main
       else args.extra_pkg_params or {};
 
     pkgs = with builtins; (let
@@ -189,18 +189,21 @@
     };
 
     customRC = let
-      optLuaPre = if builtins.isString optionalLuaPreInit
-        then optionalLuaPreInit
-        else builtins.concatStringsSep "\n"
-        (filterFlattenUnique optionalLuaPreInit);
-      optLuaAdditions = if builtins.isString optionalLuaAdditions
-        then optionalLuaAdditions
-        else builtins.concatStringsSep "\n"
-        (filterFlattenUnique optionalLuaAdditions);
+      processExtraLua = with builtins; field: section: if isString section then section else pkgs.lib.pipe section [
+        filterFlattenUnique
+        (map (x: if isString x then { config = x; priority = 150; } else x // { priority = x.priority or 150; }))
+        (sort (a: b: a.priority < b.priority))
+        (map (v: v.config or ((import ./errors.nix).optLua field)))
+        (concatStringsSep "\n")
+      ];
+      optLua = {
+        pre = processExtraLua "optionalLuaPreInit" optionalLuaPreInit;
+        post = processExtraLua "optionalLuaAdditions" optionalLuaAdditions;
+      };
     in /*lua*/''
       ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
       -- optionalLuaPreInit
-      ${optLuaPre}
+      ${optLua.pre}
       -- lua from nix with pre = true
       ${normalized.preInlineConfigs}
       -- run the init.lua (or init.vim)
@@ -212,7 +215,7 @@
       -- all other lua from nix plugin specs
       ${normalized.inlineConfigs}
       -- optionalLuaAdditions
-      ${optLuaAdditions}
+      ${optLua.post}
       ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
     '';
 

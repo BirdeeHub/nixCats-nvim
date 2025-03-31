@@ -286,16 +286,20 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   USING THIS OPTION WILL CAUSE NVIM TO BUILD FROM SOURCE.
 
 <optionalLuaPreInit>
-  a flexible set of categories, each containing a Lua string
-  that will be ran before sourcing your init.lua
-  Yes it can access nixCats.
+  a flexible set of categories, each containing a list of lua strings,
+  or a LIST of sets containing a priority and a string of the format:
+  `catname = [ "require('athing')" { config = "require('something')"; priority = 150; } ];`
+  (150 is default priority)
+  These will be ran before sourcing your init.lua
   It is not the recommended way to create Lua for this flake,
   but it may be useful in editing flake imports 
   of other already configured setups following the nixCats format.
 <optionalLuaAdditions>
-  a flexible set of categories, each containing a Lua string
-  that will be ran after sourcing your init.lua
-  Yes it can access nixCats.
+  a flexible set of categories, each containing a list of lua strings,
+  or a LIST of sets containing a priority and a string of the format:
+  `catname = [ "require('athing')" { config = "require('something')"; priority = 150; } ];`
+  (150 is default priority)
+  These will be ran after sourcing your init.lua
   It is not the recommended way to create Lua for this flake,
   but it may be useful in editing flake imports 
   of other already configured setups following the nixCats format.

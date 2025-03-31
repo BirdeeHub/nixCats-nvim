@@ -1,6 +1,7 @@
-# Copyright (c) 2023 BirdeeHub 
-# Licensed under the MIT license 
-builtins.throw ''
+# Copyright (c) 2023 BirdeeHub
+# Licensed under the MIT license
+{
+main = builtins.throw ''
 Error calling main nixCats builder function `utils.baseBuilder`
 
 # -------------------------------------------------------- #
@@ -97,4 +98,51 @@ i.e. `finalPackage.override (prev: { inherit (prev) dependencyOverlays; })`
 NOT `prev.pkgsParams.dependencyOverlays` or something like that
 
 ---
-''
+'';
+
+optLua = name: builtins.throw ''
+Invalid syntax in ${name}:
+Both optionalLuaPreInit or optionalLuaAdditions have the same syntax,
+one runs before the ''${luaPath}/init.lua, the other after:
+
+Useage:
+optionalLuaPreInit = {
+  catname = [ #<- a list
+    { # <- of sets
+      priority = 0;
+      config = "vim.loader.enable()";
+    }
+    "vim.g.mycustomval = 5" #<- or strings
+  ];
+}
+Both also accept a plain string at the cost of merging not being effective with such a value
+optionalLuaAdditions = "print('init.lua has finished running')";
+'';
+
+extraCats = builtins.throw ''
+# ERROR: incorrect extraCats syntax in categoryDefinitions:
+# USAGE:
+# see: :help nixCats.flake.outputs.categoryDefinitions.default_values
+extraCats = {
+  # if target.cat is enabled, the list of extra cats is active!
+  target.cat = [ # <- must be a list of (sets or list of strings)
+    # list representing attribute path of category to enable.
+    [ "to" "enable" ]
+    # or as a set
+    {
+      cat = [ "other" "toenable" ]; #<- required if providing the set form
+      # all below conditions, if provided, must be true for the `cat` to be included
+
+      # true if any containing category of the listed cats are enabled
+      when = [ # <- `when` conditions must be a list of list of strings
+        [ "another" "cat" ]
+      ];
+      # true if any containing OR sub category of the listed cats are enabled
+      cond = [ # <- `cond`-itions must be a list of list of strings
+        [ "other" "category" ]
+      ];
+    }
+  ];
+};
+'';
+}

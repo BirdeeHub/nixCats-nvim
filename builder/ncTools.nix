@@ -94,46 +94,20 @@
 
   # controls extraCats in categoryDefinitions
   applyExtraCats = categories: extraCats: if extraCats == {} then categories else let
-    errormsg = ''
-      # ERROR: incorrect extraCats syntax in categoryDefinitions:
-      # USAGE:
-      # see: :help nixCats.flake.outputs.categoryDefinitions.default_values
-      extraCats = {
-        # if target.cat is enabled, the list of extra cats is active!
-        target.cat = [ # <- must be a list of (sets or list of strings)
-          # list representing attribute path of category to enable.
-          [ "to" "enable" ]
-          # or as a set
-          {
-            cat = [ "other" "toenable" ]; #<- required if providing the set form
-            # all below conditions, if provided, must be true for the `cat` to be included
-
-            # true if any containing category of the listed cats are enabled
-            when = [ # <- `when` conditions must be a list of list of strings
-              [ "another" "cat" ]
-            ];
-            # true if any containing OR sub category of the listed cats are enabled
-            cond = [ # <- `cond`-itions must be a list of list of strings
-              [ "other" "category" ]
-            ];
-          }
-        ];
-      };
-    '';
     filterAndFlattenNoDefaults = categories: lib.flip lib.pipe [
       (recFilterCats false categories) # <- returns [ { path, value } ... ]
       (concatMap (v: if isList v.value then v.value else if v.value != null then [v.value] else []))
     ];
     # true if any containing or sub category is enabled
     condcheck = prev: lib.flip lib.pipe [
-      (atp: if isList atp then atp else throw errormsg)
+      (atp: if isList atp then atp else (import ./errors.nix).extraCats)
       (atp: lib.setAttrByPath atp true)
       (filterAndFlatten prev)
       (v: v != [])
     ];
     # true if any containing category is enabled
     whencheck = prev: lib.flip lib.pipe [
-      (atp: if isList atp then atp else throw errormsg)
+      (atp: if isList atp then atp else (import ./errors.nix).extraCats)
       (atp: lib.setAttrByPath atp true)
       (filterAndFlattenNoDefaults prev)
       (v: v != [])
@@ -145,7 +119,7 @@
       checkPath = item: if isList item then true else lib.pipe item [
         (spec: map (condcheck prev) (spec.cond or []) ++ map (whencheck prev) (spec.when or []))
         (foldl' (acc: v: if acc then v else false) true) # <- defaults to true if no conditions for specs specified
-        (enabled: enabled && (if isList (item.cat or null) then true else throw errormsg))
+        (enabled: enabled && (if isList (item.cat or null) then true else (import ./errors.nix).extraCats))
       ];
       nextCats = lib.pipe extraCats [
         (filterAndFlatten prev)

@@ -112,7 +112,11 @@ with builtins; let lib = import ./lib.nix; in rec {
     pkgsParams:
     categoryDefinitions:
     packageDefinitions: name: let
-      nixpkgspath = pkgsParams.pkgs.path or pkgsParams.nixpkgs.path or pkgsParams.nixpkgs.outPath or pkgsParams.nixpkgs or (if builtins ? system then <nixpkgs> else import ../builder/builder_error.nix);
+      nixpkgspath = pkgsParams.pkgs.path
+        or pkgsParams.nixpkgs.path
+        or pkgsParams.nixpkgs.outPath
+        or pkgsParams.nixpkgs
+        or (if builtins ? system then <nixpkgs> else (import ../builder/errors.nix).main);
       newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
       ncbuilder = import ../builder { nclib = lib; utils = import ./.; };
       mkOverride = lib.makeOverridable newlib.overrideDerivation;
@@ -128,7 +132,7 @@ with builtins; let lib = import ./lib.nix; in rec {
         else if pkgsParams.nixpkgs ? "lib"
           then pkgsParams.nixpkgs
           else { outPath = nixpkgspath; lib = newlib; };
-      system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/builder_error.nix);
+      system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/errors.nix).main;
       dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
         then builtins.warn ''
           # NixCats deprecation warning
