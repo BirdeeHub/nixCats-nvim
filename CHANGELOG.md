@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.8.0...v6.9.0) (2025-03-31)
+
+
+### Features
+
+* **wrapRc:** allowed toggling of wrapRc at runtime via setting a custom env var ([85ab39e](https://github.com/BirdeeHub/nixCats-nvim/commit/85ab39ecd0f3b8cf95cd1f4e136ee579eae367ca))
+
 ## [6.8.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.7.0...v6.8.0) (2025-03-31)
 
 
