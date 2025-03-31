@@ -54,7 +54,7 @@ let
         # nixCats modified to start with packagename instead of nvim to avoid collisions with multiple neovims
         genProviderCommand = prog: withProg:
           if withProg then
-            "vim.g.${prog}_host_prog='${placeholder "out"}/bin/${nixCats_packageName}-${prog}'"
+            "vim.g.${prog}_host_prog=[[${placeholder "out"}/bin/${nixCats_packageName}-${prog}]]"
           else
             "vim.g.loaded_${prog}_provider=0";
     in
@@ -73,10 +73,14 @@ let
   in extra: [
     # vim accepts a limited number of commands so we join them all
     "--add-flags" (concat_lua_args (providerLuaRc ++ [
-      ''vim.opt.packpath:prepend([[${vimPackDir}]])''
-      ''vim.opt.runtimepath:prepend([[${vimPackDir}]])''
-      ''vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]''
-      ''vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]''
+      "vim.opt.packpath:prepend([[${vimPackDir}]])"
+      "vim.opt.runtimepath:prepend([[${vimPackDir}]])"
+      "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]"
+      "vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"
+      "local configdir = vim.fn.stdpath([[config]])"
+      "vim.opt.packpath:remove(configdir)"
+      "vim.opt.runtimepath:remove(configdir)"
+      "vim.opt.runtimepath:remove(configdir .. [[/after]])"
     ] ++ extra))
   ];
 
@@ -86,21 +90,15 @@ let
   # when postBuild is evaluated), we call makeWrapper once to generate a
   # wrapper with most arguments we need, excluding those that cause problems to
   # generate rplugin.vim, but still required for the final wrapper.
-  finalMakeWrapperArgs = let
-    setupLua = writeText "setup.lua" /*lua*/''
-      local configdir = vim.fn.stdpath('config')
-      vim.opt.packpath:remove(configdir)
-      vim.opt.runtimepath:remove(configdir)
-      vim.opt.runtimepath:remove(configdir .. "/after")
-      configdir = require('nixCats').configDir
-      vim.opt.packpath:prepend(configdir)
-      vim.opt.runtimepath:prepend(configdir)
-      vim.opt.runtimepath:append(configdir .. "/after")
-    '';
-  in
+  finalMakeWrapperArgs =
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-    ++ generatedWrapperArgs [ "dofile([[${setupLua}]])" ];
+    ++ generatedWrapperArgs [
+      "configdir = require([[nixCats]]).configDir"
+      "vim.opt.packpath:prepend(configdir)"
+      "vim.opt.runtimepath:prepend(configdir)"
+      "vim.opt.runtimepath:append(configdir .. [[/after]])"
+    ];
 
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 in {
