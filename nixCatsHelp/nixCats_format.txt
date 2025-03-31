@@ -633,6 +633,11 @@ These are the defaults:
       # it is not for being ran from anywhere via nix run, because the config
       # was not wrapped with the program.
       wrapRc = true;
+      # wrapRc may also be set as a string.
+      # That string will become an environment variable
+      # which you are able to set to unwrap the config.
+      # and unset to wrap it again, at runtime.
+      # requires 1 extra syscall to achieve.
 
       # What should the name of the folder within standard directories
       # i.e. .config, .local/share, .local/state, .cache, etc... be?

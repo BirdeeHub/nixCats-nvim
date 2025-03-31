@@ -143,17 +143,31 @@
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = allPluginDeps: let
-      nixCats_config_location = if settings.wrapRc == true then luaPath
-        else if settings.unwrappedCfgPath == null
-          then utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
+      nixCats_config_location = if builtins.isString settings.wrapRc
+        then utils.n2l.types.inline-unsafe.mk {
+            body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc}) and "${luaPath}" or '' + (
+              if settings.unwrappedCfgPath == null
+              then "vim.fn.stdpath('config')"
+              else utils.n2l.uglyLua settings.unwrappedCfgPath
+            );
+          }
+        else if settings.wrapRc == true then
+          luaPath
+        else if settings.unwrappedCfgPath == null then
+          utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
         else settings.unwrappedCfgPath;
 
+      finalwraprc = if builtins.isString settings.wrapRc
+        then utils.n2l.types.inline-unsafe.mk { body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc})''; }
+        else settings.wrapRc;
+
       categoriesPlus = categories // {
-        nixCats_wrapRc = settings.wrapRc;
+        nixCats_wrapRc = finalwraprc;
         nixCats_packageName = name;
         inherit nixCats_config_location;
       };
       settingsPlus = settings // {
+        wrapRc = finalwraprc;
         nixCats_packageName = name;
         inherit nixCats_config_location;
       };
