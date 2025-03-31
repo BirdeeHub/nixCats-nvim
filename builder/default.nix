@@ -214,6 +214,16 @@
       end
       -- all other lua from nix plugin specs
       ${normalized.inlineConfigs}
+      -- since we use -u we must manually respect vim.o.exrc
+      if vim.o.exrc then
+        if vim.fn.filereadable(".nvim.lua") == 1 then
+          dofile(".nvim.lua")
+        elseif vim.fn.filereadable(".nvimrc") == 1 then
+          vim.cmd.source(".nvimrc")
+        elseif vim.fn.filereadable(".exrc") == 1 then
+          vim.cmd.source(".exrc")
+        end
+      end
       -- optionalLuaAdditions
       ${optLua.post}
       ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
