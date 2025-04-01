@@ -102,19 +102,11 @@ let
   preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
-
+  dontUnpack = true;
   meta = neovim-unwrapped.meta // {
     mainProgram = "${nixCats_packageName}";
     maintainers = neovim-unwrapped.meta.maintainers ++ (if lib.maintainers ? birdee then [ lib.maintainers.birdee ] else []);
   };
-
-  nativeBuildInputs = [ makeWrapper ];
-
-  __structuredAttrs = true;
-  dontUnpack = true;
-  preferLocalBuild = true;
-
-  # nixCats: modified to start with packagename instead of nvim to avoid collisions with multiple neovims
   buildPhase = /*bash*/ ''
     runHook preBuild
     mkdir -p $out/bin

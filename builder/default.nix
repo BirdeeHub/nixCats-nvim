@@ -326,31 +326,32 @@
     };
   };
 
-  mkFinal = args: let
-    # separate function to process the spec from making the drv
-    # this function is the entrypoint, and the function that creates the final drv
-    # process_args will return the set that you would pass to mkDerivation
-    # along with passthru and its pkgs separately
-    # Doing it this way allows for using overrideAttrs to change the following args
-    # passthru.{ categoryDefinitions, packageDefinitions, luaPath, nixCats_packageName }
-    # in order to affect the final derivation via the nixCats wrapper via overrideAttrs
-    # This, in combination with how we process pkgsParams, also allows us to not
-    # reimport nixpkgs multiple times while doing this.
-    processed = process_args args;
-  in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
-    oldargs = {
-      inherit (finalAttrs.passthru) categoryDefinitions packageDefinitions luaPath;
-      name = finalAttrs.passthru.nixCats_packageName;
-      inherit (processed) pkgs;
-    };
-    final_processed = process_args oldargs;
-  in {
-    inherit (final_processed.drvargs) name meta nativeBuildInputs buildPhase __structuredAttrs dontUnpack preferLocalBuild;
-    passthru = processed.pass // {
-      inherit (final_processed.pass) moduleNamespace homeModule nixosModule keepLuaBuilder;
-      dependencyOverlays = builtins.seq final_processed.pass.dependencyOverlays processed.pass.dependencyOverlays;
-      extra_pkg_config = builtins.seq final_processed.pass.extra_pkg_config processed.pass.extra_pkg_config;
-      extra_pkg_params = builtins.seq final_processed.pass.extra_pkg_params processed.pass.extra_pkg_params;
-    };
-  });
-in mkFinal
+in args: let
+  # separate function to process the spec from making the drv
+  # this function is the entrypoint, and the function that creates the final drv
+  # process_args will return the set that you would pass to mkDerivation
+  # along with passthru and its pkgs separately
+  # Doing it this way allows for using overrideAttrs to change the following args
+  # passthru.{ categoryDefinitions, packageDefinitions, luaPath, nixCats_packageName }
+  # in order to affect the final derivation via the nixCats wrapper via overrideAttrs
+  # This, in combination with how we process pkgsParams, also allows us to not
+  # reimport nixpkgs multiple times while doing this.
+  processed = process_args args;
+in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
+  oldargs = {
+    inherit (finalAttrs.passthru) categoryDefinitions packageDefinitions luaPath;
+    name = finalAttrs.passthru.nixCats_packageName;
+    inherit (processed) pkgs;
+  };
+  final_processed = process_args oldargs;
+in {
+  inherit (final_processed.drvargs) name meta buildPhase dontUnpack; # <- generated args
+  nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
+  preferLocalBuild = true; # <- set here plain so that it is overrideable
+  passthru = processed.pass // {
+    inherit (final_processed.pass) moduleNamespace homeModule nixosModule keepLuaBuilder; # <- generated passthru
+    dependencyOverlays = builtins.seq final_processed.pass.dependencyOverlays processed.pass.dependencyOverlays;
+    extra_pkg_config = builtins.seq final_processed.pass.extra_pkg_config processed.pass.extra_pkg_config;
+    extra_pkg_params = builtins.seq final_processed.pass.extra_pkg_params processed.pass.extra_pkg_params;
+  };
+})
