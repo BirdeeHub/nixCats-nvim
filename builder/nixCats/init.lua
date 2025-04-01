@@ -25,10 +25,10 @@ local meta_tbl_get = {
     end
 }
 M.cats = setmetatable(@nixCatsCats@, meta_tbl_get)
-M.pawsible = setmetatable(@nixCatsPawsible@, meta_tbl_get)
 M.settings = setmetatable(@nixCatsSettings@, meta_tbl_get)
-M.petShop = setmetatable(@nixCatsPetShop@, meta_tbl_get)
 M.extra = setmetatable(@nixCatsExtra@, meta_tbl_get)
+M.pawsible = setmetatable(@nixCatsPawsible@, meta_tbl_get)
+M.petShop = setmetatable(@nixCatsPetShop@, meta_tbl_get)
 M.configDir = M.settings.nixCats_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
