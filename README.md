@@ -35,7 +35,7 @@ for the Lua-natic's Neovim config on Nix
 
 - **Or build it your way!**
   Configurable as a flake, a derivation, or a module,
-  or even entirely via calling the override function on an existing nixCats based package.
+  or even entirely via calling the override function on an existing nixCats based package. <br>
   It can then be imported and reconfigured without duplication and exported again. And again. and again.
 
 - **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
