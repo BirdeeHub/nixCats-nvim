@@ -25,7 +25,6 @@
   , nixCats_packageName
   , customAliases ? []
   , preWrapperShellCode ? ""
-  , customRC ? ""
   , luaEnv
   , extraPython3wrapperArgs ? []
   # lets you append stuff to the derivation name so that you can search for it in the store easier
@@ -183,7 +182,7 @@ in {
     makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
         --prefix LUA_CPATH ';' "$LUA_CPATH" \
-        --set VIMINIT 'lua dofile([[${writeText "init.lua" customRC}]])'
+        --set VIMINIT 'lua require([[nixCats.init_main]])'
 
     # add wrapper path to an environment variable
     # so that configuration may easily reference the path of the wrapper

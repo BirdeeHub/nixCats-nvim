@@ -7,7 +7,6 @@
   vimAlias ? false,
   viAlias ? false,
   aliases ? null,
-  customRC ? "",
   preWrapperShellCode ? "",
   extraPython3wrapperArgs ? [ ],
   withPython3 ? true,

@@ -177,6 +177,36 @@
       petShop = ncTools.mkLuaFileWithMeta "petShop.lua" (ncTools.getCatSpace final_cat_defs_set);
       depsTable = ncTools.mkLuaFileWithMeta "pawsible.lua" allPluginDeps;
       extraItems = ncTools.mkLuaFileWithMeta "extra.lua" extraTableLua;
+      init_main = pkgs.writeText "init_main.lua" (let
+        processExtraLua = with builtins; field: section: if isString section then section else pkgs.lib.pipe section [
+          filterFlattenUnique
+          (map (x: if isString x then { config = x; priority = 150; } else x // { priority = x.priority or 150; }))
+          (sort (a: b: a.priority < b.priority))
+          (map (v: v.config or ((import ./errors.nix).optLua field)))
+          (concatStringsSep "\n")
+        ];
+        optLua = {
+          pre = processExtraLua "optionalLuaPreInit" optionalLuaPreInit;
+          post = processExtraLua "optionalLuaAdditions" optionalLuaAdditions;
+        };
+      in /*lua*/''
+        ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
+        -- optionalLuaPreInit
+        ${optLua.pre}
+        -- lua from nix with pre = true
+        ${normalized.preInlineConfigs}
+        -- run the init.lua (or init.vim)
+        if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
+          dofile(require('nixCats').configDir .. "/init.lua")
+        elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
+          vim.cmd.source(require('nixCats').configDir .. "/init.vim")
+        end
+        -- all other lua from nix plugin specs
+        ${normalized.inlineConfigs}
+        -- optionalLuaAdditions
+        ${optLua.post}
+        ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
+      '');
     in pkgs.stdenv.mkDerivation {
       name = "nixCats";
       builder = pkgs.writeText "builder.sh" /*bash*/ ''
@@ -185,6 +215,7 @@
         mkdir -p $out/doc
         cp -r ${../nixCatsHelp}/* $out/doc/
         cp -r ${./nixCats}/* $out/lua/nixCats
+        cp ${init_main} $out/lua/nixCats/init_main.lua
         cp ${cats} $out/lua/nixCats/cats.lua
         cp ${settingsTable} $out/lua/nixCats/settings.lua
         cp ${depsTable} $out/lua/nixCats/pawsible.lua
@@ -201,37 +232,6 @@
       inherit (settings) autoPluginDeps;
       inherit (utils) n2l;
     };
-
-    customRC = let
-      processExtraLua = with builtins; field: section: if isString section then section else pkgs.lib.pipe section [
-        filterFlattenUnique
-        (map (x: if isString x then { config = x; priority = 150; } else x // { priority = x.priority or 150; }))
-        (sort (a: b: a.priority < b.priority))
-        (map (v: v.config or ((import ./errors.nix).optLua field)))
-        (concatStringsSep "\n")
-      ];
-      optLua = {
-        pre = processExtraLua "optionalLuaPreInit" optionalLuaPreInit;
-        post = processExtraLua "optionalLuaAdditions" optionalLuaAdditions;
-      };
-    in /*lua*/''
-      ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
-      -- optionalLuaPreInit
-      ${optLua.pre}
-      -- lua from nix with pre = true
-      ${normalized.preInlineConfigs}
-      -- run the init.lua (or init.vim)
-      if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
-        dofile(require('nixCats').configDir .. "/init.lua")
-      elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
-        vim.cmd.source(require('nixCats').configDir .. "/init.vim")
-      end
-      -- all other lua from nix plugin specs
-      ${normalized.inlineConfigs}
-      -- optionalLuaAdditions
-      ${optLua.post}
-      ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
-    '';
 
     # cat our args
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
@@ -313,7 +313,7 @@
     drvargs = import ./wrapNeovim.nix {
       neovim-unwrapped = myNeovimUnwrapped;
       nixCats_packageName = name;
-      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode customRC;
+      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode;
       inherit (settings) vimAlias viAlias withRuby withPython3 withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
       inherit (normalized) start opt;
         /* the function you would have passed to python.withPackages */
