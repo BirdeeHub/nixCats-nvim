@@ -27,7 +27,9 @@ for the Lua-natic's Neovim config on Nix
   `wrapRc = "UNWRAP_IT"`
   
 - **No need for Lua in Nix strings.**
-  define arbitrary categories of dependencies in Nix, and interact with them transparently from Lua.
+  define arbitrary categories of dependencies in Nix,
+  and pass arbitrary nix values, and have all the info
+  be effortlessly made available in your configuration!
   
 - **Integrates with NixOS or Home Manager,**
 
