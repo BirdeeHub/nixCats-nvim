@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.2...v6.9.3) (2025-04-01)
+
+
+### Bug Fixes
+
+* **lix:** lix doesnt have builtins.warn ([32c97d9](https://github.com/BirdeeHub/nixCats-nvim/commit/32c97d95bd5ccb86ebd977b4987e127e0fb498a2))
+
 ## [6.9.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.1...v6.9.2) (2025-04-01)
 
 
