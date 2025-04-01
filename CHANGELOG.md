@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.1...v6.9.2) (2025-04-01)
+
+
+### Performance Improvements
+
+* **nixCats_plugin:** entire plugin inlined (minor performance benefits) ([d8ea184](https://github.com/BirdeeHub/nixCats-nvim/commit/d8ea18412e66e35e7214ac838833110128802a59))
+
 ## [6.9.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.0...v6.9.1) (2025-04-01)
 
 
