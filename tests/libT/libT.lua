@@ -4,7 +4,7 @@ if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
     local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return v and k or nil end):filter(function(v) return v ~= nil end):totable()
-    local is_nightly = os.getenv([[IS_NIGHTLY_NVIM]]) == "true"
+    local is_nightly = os.getenv([[IS_NIGHTLY_NVIM]])
     local nvim_version = vim.version()
     local version_str = string.format("%d.%d.%d", nvim_version.major, nvim_version.minor, nvim_version.patch)
 

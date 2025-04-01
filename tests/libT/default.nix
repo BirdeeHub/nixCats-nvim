@@ -160,8 +160,10 @@
       ${fvim}/bin/${runnable_name} "$@"
     '');
   in writeShellScript "runtests-${packagename}-${runnable_name}" ''
-    ${runtests false finaltestvim} "$@"
+    unset IS_NIGHTLY_NVIM
+    ${runtests false finaltestvim}
+  '' + (if runnable_is_nvim then "\n
     export IS_NIGHTLY_NVIM=true
-    ${runtests true (finaltestvim.overrideNixCats (prev: { dependencyOverlays = prev.dependencyOverlays or [] ++ [ inputs.neovim-nightly-overlay.overlays.default ]; }))} "$@"
-  '';
+    ${runtests true (finaltestvim.overrideNixCats (prev: { dependencyOverlays = prev.dependencyOverlays or [] ++ [ inputs.neovim-nightly-overlay.overlays.default ]; }))}
+  " else "");
 }
