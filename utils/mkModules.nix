@@ -23,7 +23,7 @@
   config = let
     dependencyOverlaysFunc = { main_options_set, user_options_set ? {} }: (
       if builtins.isAttrs oldDependencyOverlays
-      then builtins.warn ''
+      then nclib.warnfn ''
         # NixCats deprecation warning
         Do not wrap your dependencyOverlays list in a set of systems.
         They should just be a list.

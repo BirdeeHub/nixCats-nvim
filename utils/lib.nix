@@ -22,6 +22,9 @@ with builtins; rec {
     ];
   };
 
+  # lix compat. see: https://github.com/BirdeeHub/nixCats-nvim/issues/193
+  warnfn = if (builtins ? warn) then builtins.warn else builtins.trace;
+
   n2l = import ./n2l.nix;
 
   pipe = builtins.foldl' (x: f: f x);

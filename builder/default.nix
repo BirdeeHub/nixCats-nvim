@@ -27,7 +27,7 @@
       overlays = if isList (args.dependencyOverlays or null)
         then args.dependencyOverlays
         else if nclib.ncIsAttrs (args.dependencyOverlays or null)
-        then builtins.warn ''
+        then nclib.warnfn ''
           # NixCats deprecation warning
           Do not wrap your dependencyOverlays list in a set of systems.
           They should just be a list.

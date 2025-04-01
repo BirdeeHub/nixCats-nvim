@@ -134,7 +134,7 @@ with builtins; let lib = import ./lib.nix; in rec {
           else { outPath = nixpkgspath; lib = newlib; };
       system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/errors.nix).main;
       dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
-        then builtins.warn ''
+        then lib.warnfn ''
           # NixCats deprecation warning
           Do not wrap your dependencyOverlays list in a set of systems.
           They should just be a list.
@@ -866,7 +866,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   ];
 
   safeOversList = { dependencyOverlays, system ? null }:
-  builtins.warn ''
+  lib.warnfn ''
     nixCats.utils.safeOversList deprecated because dependencyOverlays is now always a list
   ''
     (if isAttrs dependencyOverlays && system == null then
