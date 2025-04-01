@@ -4,9 +4,19 @@ if nixCats('nixCats_test_lib_deps') then
     ---@type table<string, true|string>
     local states = {}
     local toRun = vim.iter(nixCats("nixCats_test_names")):map(function(k, v) return v and k or nil end):filter(function(v) return v ~= nil end):totable()
+    local is_nightly = os.getenv([[IS_NIGHTLY_NVIM]]) == "true"
+    local nvim_version = vim.version()
+    local version_str = string.format("%d.%d.%d", nvim_version.major, nvim_version.minor, nvim_version.patch)
 
     local function finalize(fstates)
         local colors = require('ansicolors')
+        if is_nightly then
+            io.stdout:write(colors("%{cyan}Running tests for nightly package: " .. nixCats.settings("nixCats_packageName") .. "%{reset}\n"))
+            io.stdout:write(colors("%{cyan} nvim version: " .. version_str .. "%{reset}\n"))
+        else
+            io.stdout:write(colors("%{magenta}Running tests for package: " .. nixCats.settings("nixCats_packageName") .. "%{reset}\n"))
+            io.stdout:write(colors("%{magenta} nvim version: " .. version_str .. "%{reset}\n"))
+        end
         for k, v in pairs(fstates) do
             if v == true then
                 io.stdout:write(colors("%{green}PASS:%{reset} " .. k .. "\n"))

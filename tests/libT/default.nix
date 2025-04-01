@@ -129,7 +129,6 @@
       });
       packageDefinitions = prev.packageDefinitions // {
         ${packagename} = utils.mergeCatDefs prev.packageDefinitions.${packagename} ({ pkgs, ... }: {
-          settings = {};
           categories = {
             nixCats_test_lib_deps = true;
             killAfter = true;
@@ -146,18 +145,23 @@
       end
       require('libT')
     '';
-  in writeShellScript "runtests-${packagename}-${runnable_name}" (/*bash*/''
-    HOME="$(mktemp -d)"
-    TEST_TEMP="$(mktemp -d)"
-    mkdir -p "$TEST_TEMP" "$HOME"
-    cd "$TEST_TEMP"
-    [ ! -f "${finaltestvim}/bin/${runnable_name}" ] && \
-      echo "${finaltestvim}/bin/${runnable_name} does not exist!" && exit 1
-    ${preRunBash}
-  '' + (if runnable_is_nvim then ''
-    "${finaltestvim}/bin/${runnable_name}" --headless \
-      --cmd "lua vim.g.nix_test_out = [[$out]]; vim.g.nix_test_src = [[$src]]; vim.g.nix_test_temp = [[$TEST_TEMP]]; dofile('${luaPre}')" "$@"
-  '' else ''
-    ${finaltestvim}/bin/${runnable_name} "$@"
-  ''));
+    runtests = nightly: fvim: /*bash*/''
+      HOME="$(mktemp -d)"
+      TEST_TEMP="$(mktemp -d)"
+      mkdir -p "$TEST_TEMP" "$HOME"
+      cd "$TEST_TEMP"
+      [ ! -f "${fvim}/bin/${runnable_name}" ] && \
+        echo "${fvim}/bin/${runnable_name} does not exist!" && exit 1
+      ${preRunBash}
+    '' + (if runnable_is_nvim then ''
+      "${fvim}/bin/${runnable_name}" --headless \
+        --cmd "lua vim.g.nix_test_out = [[$out]]; vim.g.nix_test_src = [[$src]]; vim.g.nix_test_temp = [[$TEST_TEMP]]; dofile('${luaPre}')" "$@"
+    '' else ''
+      ${fvim}/bin/${runnable_name} "$@"
+    '');
+  in writeShellScript "runtests-${packagename}-${runnable_name}" ''
+    ${runtests false finaltestvim} "$@"
+    export IS_NIGHTLY_NVIM=true
+    ${runtests true (finaltestvim.overrideNixCats (prev: { dependencyOverlays = prev.dependencyOverlays or [] ++ [ inputs.neovim-nightly-overlay.overlays.default ]; }))} "$@"
+  '';
 }
