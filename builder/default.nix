@@ -139,6 +139,13 @@
         pkgs.lib.unique
       ];
 
+    normalized = pkgs.callPackage ./normalizePlugins.nix {
+      startup = filterAndFlatten startupPlugins;
+      optional = filterAndFlatten optionalPlugins;
+      inherit (settings) autoPluginDeps;
+      inherit (utils) n2l;
+    };
+
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
@@ -224,15 +231,6 @@
       '';
     };
 
-    buildInputs = filterFlattenUnique propagatedBuildInputs;
-
-    normalized = pkgs.callPackage ./normalizePlugins.nix {
-      startup = filterAndFlatten startupPlugins;
-      optional = filterAndFlatten optionalPlugins;
-      inherit (settings) autoPluginDeps;
-      inherit (utils) n2l;
-    };
-
     # cat our args
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
     makeWrapperArgs = let
@@ -276,6 +274,7 @@
       else builtins.concatStringsSep "\n" ([xtra] ++ (filterFlattenUnique bashBeforeWrapper));
 
     # add our propagated build dependencies
+    buildInputs = filterFlattenUnique propagatedBuildInputs;
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
