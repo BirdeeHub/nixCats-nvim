@@ -28,8 +28,6 @@ error("Cannot import a meta module")
 ---@field vimPackDir string
 ---The path to the nixCats plugin
 ---@field nixCatsPath string
----internal: this creates the nixCats global commands
----@field addGlobals fun()
 ---See :h nixCats
 ---This function will return the nearest parent category value, unless the nearest
 ---parent is a table, in which case that means a different subcategory

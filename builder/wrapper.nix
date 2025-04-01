@@ -173,7 +173,7 @@ in {
     makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
         --prefix LUA_CPATH ';' "$LUA_CPATH" \
-        --set VIMINIT 'lua require([[nixCats.init_main]])'
+        --set VIMINIT 'lua require([[nixCats]]).init_main()'
 
     # add wrapper path to an environment variable
     # so that configuration may easily reference the path of the wrapper
