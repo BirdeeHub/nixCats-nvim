@@ -5,7 +5,6 @@
 { stdenv
 , pkgs
 , lib
-, makeWrapper
 , writeText
 , nodePackages
 , python3
