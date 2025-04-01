@@ -211,8 +211,7 @@
         ${normalized.inlineConfigs}
         -- optionalLuaAdditions
         ${optLua.post}
-        ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}
-      '';
+        ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}'';
 
       inlined = pkgs.substituteAll {
         src = ./nixCats/init.lua;
