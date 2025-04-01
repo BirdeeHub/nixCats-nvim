@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.0...v6.9.1) (2025-04-01)
+
+
+### Bug Fixes
+
+* **overrideAttrs:** nativeBuildInputs and prefersLocalBuild ([227bc60](https://github.com/BirdeeHub/nixCats-nvim/commit/227bc60dcca3bd243effa7bbeb4c27c28c8122f8))
+
 ## [6.9.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.8.0...v6.9.0) (2025-03-31)
 
 
