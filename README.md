@@ -16,26 +16,30 @@ for the Lua-natic's Neovim config on Nix
   Configure all downloads from a single Nix file.
 
 - **Multiple Neovim executables.**
-  Easily output multiple configured packages that are variations of your main config.
+  Using a powerful but effectively optional category system,
+  easily output multiple configured packages that are variations of your main config.
+  The name is short for 'Nix Categories'!
 
 - **Best of both worlds.**
   Use the Nix Store for full reproducibility and `nix run`,
   or switch to live reloading with `wrapRc = false`.
-  Or make one package for each.
+  Or set a variable to use to toggle on the fly!
+  `wrapRc = "UNWRAP_IT"`
   
 - **No need for Lua in Nix strings.**
-  The name is short for 'Nix Categories':
   define arbitrary categories of dependencies in Nix, and interact with them transparently from Lua.
   
 - **Integrates with NixOS or Home Manager,**
-  but buildable separately.
 
-- **Build it your way.**
+- **Or build it your way!**
   Configurable as a flake, a derivation, or a module,
   or even entirely via calling the override function on an existing nixCats based package.
   It can then be imported and reconfigured without duplication and exported again. And again. and again.
 
 - **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
+
+- **Try out an example!**
+  `nix run github:BirdeeHub/nixCats-nvim?dir=templates/example`
 
 ## Table of Contents
 
