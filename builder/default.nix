@@ -213,21 +213,18 @@
         ${optLua.post}
         ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}'';
 
-      inlined = pkgs.substituteAll {
+    in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
+      src = pkgs.substituteAll {
         src = ./nixCats/init.lua;
         inherit nixCatsSettings nixCatsCats nixCatsPetShop nixCatsPawsible nixCatsExtra nixCatsInitMain;
       };
-    in pkgs.stdenv.mkDerivation {
-      name = "nixCats";
-      builder = pkgs.writeText "builder.sh" /*bash*/ ''
-        source $stdenv/setup
-        mkdir -p $out/lua/nixCats
-        mkdir -p $out/doc
-        cp -r ${../nixCatsHelp}/* $out/doc/
-        cp ${./nixCats/meta.lua} $out/lua/nixCats/meta.lua
-        cp ${inlined} $out/lua/nixCats/init.lua
-      '';
-    };
+    } ''
+      mkdir -p $out/doc
+      cp -r ${../nixCatsHelp}/* $out/doc/
+      mkdir -p $out/lua/nixCats
+      cp ${./nixCats/meta.lua} $out/lua/nixCats/meta.lua
+      cp $src $out/lua/nixCats/init.lua
+    '';
 
     # cat our args
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
