@@ -526,47 +526,6 @@ with builtins; let lib = import ./lib.nix; in rec {
     mergeDefs "merge" [ oldCats newCats ];
 
   /**
-    recursiveUpdate each overlay output to avoid issues where
-    two overlays output a set of the same name when importing from other nixCats.
-    Merges everything into 1 overlay
-
-    If you have 2 overlays both outputting a set like pkgs.someSet
-    (other than when using the standardPluginOverlay),
-    The second will replace the first if the overlay does not explicitly update into prev.
-
-    This will merge the results instead.
-
-    Returns a SINGLE overlay
-
-    ## Arguments
-
-    - `overlist` (`listOf` `overlays`)
-
-    ---
-  */
-  mergeOverlays = overlist: self: super:
-    lib.pipe overlist [
-      (map (value: value self super))
-      (foldl' (lib.pickyRecUpdateUntil {}) {})
-    ];
-
-  /**
-    equivalent to `utils.mergeOverlays (oldOverlist ++ newOverlist)`
-
-    returns a SINGLE overlay
-
-    ## Arguments
-
-    - `oldOverlist` (`listOf` `overlays`)
-
-    - `newOverlist` (`listOf` `overlays`)
-
-    ---
-  */
-  mergeOverlayLists = oldOverlist: newOverlist:
-    mergeOverlays (oldOverlist ++ newOverlist);
-
-  /**
     makes a default package and then one for each name in `packageDefinitions`
 
     for constructing flake outputs.
@@ -864,6 +823,18 @@ with builtins; let lib = import ./lib.nix; in rec {
     mapfunc
     listToAttrs
   ];
+
+  mergeOverlays = overlist: self: super: lib.warnfn ''
+    nixCats: utils.mergeOverlays AND utils.mergeOverlayLists are being deprecated!
+    They are bad practice due to merging overlays in parallel rather than in sequence,
+    and should NEVER be required. They are not required for anything in nixCats.
+  '' (lib.pipe overlist [
+      (map (value: value self super))
+      (foldl' (lib.pickyRecUpdateUntil {}) {})
+    ]);
+
+  mergeOverlayLists = oldOverlist: newOverlist:
+    mergeOverlays (oldOverlist ++ newOverlist);
 
   safeOversList = { dependencyOverlays, system ? null }:
   lib.warnfn ''

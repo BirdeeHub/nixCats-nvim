@@ -114,7 +114,7 @@ in {
         };
 
         # categories of the function you would have passed to withPackages
-        extraPython3Packages = {
+        python3.libraries = {
           # test = [ (_:[]) ];
         };
 
@@ -132,7 +132,7 @@ in {
       packageDefinitions.replace = {
         # These are the names of your packages
         # you can include as many as you wish.
-        myHomeModuleNvim = {pkgs , ... }: {
+        myHomeModuleNvim = {pkgs, name, ... }: {
           # they contain a settings set defined above
           # see :help nixCats.flake.outputs.settings
           settings = {
@@ -144,6 +144,8 @@ in {
             # your alias may not conflict with your other packages.
             aliases = [ "vim" "homeVim" ];
             # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
+            hosts.python3.enable = true;
+            hosts.node.enable = true;
           };
           # and a set of categories that you want
           # (and other information to pass to lua)

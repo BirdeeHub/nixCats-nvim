@@ -297,7 +297,7 @@
       # in your lua config via
       # vim.g.python3_host_prog
       # or run from nvim terminal via :!<packagename>-python3
-      extraPython3Packages = {
+      python3.libraries = {
         test = (_:[]);
       };
       # populates $LUA_PATH and $LUA_CPATH
@@ -340,7 +340,7 @@
     packageDefinitions = {
       # the name here is the name of the package
       # and also the default command name for it.
-      nixCats = { pkgs, ... }@misc: {
+      nixCats = { pkgs, name, ... }@misc: {
         # these also recieve our pkgs variable
         # see :help nixCats.flake.outputs.packageDefinitions
         settings = {
@@ -358,6 +358,8 @@
           wrapRc = true;
           configDirName = "nixCats-nvim";
           # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
+          hosts.python3.enable = true;
+          hosts.node.enable = true;
         };
         # enable the categories you want from categoryDefinitions
         categories = {

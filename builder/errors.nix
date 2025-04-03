@@ -1,6 +1,7 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
 {
+# lix compat. see: https://github.com/BirdeeHub/nixCats-nvim/issues/193
 main = builtins.throw ''
 Error calling main nixCats builder function `utils.baseBuilder`
 
@@ -143,6 +144,121 @@ extraCats = {
       ];
     }
   ];
+};
+'';
+
+catsOfFn = name: builtins.throw ''
+Error: Invalid syntax in categoryDefinitions.
+${name}.libraries category section does not accept functions!
+'';
+
+wrapArgs = name: builtins.throw ''
+Error: Invalid syntax in categoryDefinitions.
+${if name != "wrapperArgs" then name + "." else ""}wrapperArgs categories must be
+either a list of lists of strings, or a list of only strings.
+lib.escapeShellArgs will be called on the resulting list of arguments
+If you don't know what these are, check this link out:
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+'';
+
+envVar = name: let
+  sname = if name == "environmentVariables" then name else "${name}.envVars";
+in builtins.throw ''
+Error: Invalid syntax in categoryDefinitions.
+Useage for ${sname} category section is:
+${sname} = {
+  test = {
+    CATTESTVARDEFAULT = "It worked!";
+  };
+  moretests = {
+    subtest1 = {
+      CATTESTVAR = "hehehe";
+    };
+    subtest2 = {
+      CATTESTVAR3 = "Hello World!";
+    };
+  };
+};
+'';
+
+hosts = name: val: type: builtins.throw ''
+Error: Invalid syntax in nixCats settings hosts.${name}.${val}
+hosts.${name}.${val} must be a ${type}
+categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+  ${name} = {
+    wrapperArgs = {};
+    libraries = {};
+    envVars = {};
+    extraWrapperArgs = {};
+  };
+}
+hosts = {
+  ${name} = {
+    enable = true; # <- default false
+
+    # REQUIRED:
+    # path can be { value = pkgs.python3; args = [ "extra" "wrapper" "args" ]; nvimArgs = [ "for" "nvim" "itself" ]; }
+    # or a string, or a function that returns either type.
+    # If not a function, the ${name}.libraries categoryDefinitions section is ignored
+    path = depfn: (${name}.withPackages depfn).interpreter;
+
+    # REQUIRED:
+    # the vim.g variable to set to the path of the host.
+    global = "${name}_host_prog"; # <- the default value
+
+    # grabs the named attribute from all included plugins, valid only if path is a function,
+    # included dependencies are returned by the
+    # function your path function recieves in addition to items from ${name}.libraries
+    pluginAttr = "${name}Dependencies"; # <- defaults to null
+
+    # If explicitely disabled, will set this vim.g variable to 0
+    # This is for disabling healthchecks for a provider.
+    # Variable only set if host.${name}.enable = false
+    # can be set to null to prevent it from being set regardless of enable value
+    disabled = "loaded_${name}_provider"; # <- the default value
+  };
+};
+'';
+
+hostPath = name: builtins.throw ''
+nixCats: hosts.${name}.path is required to use hosts.${name}
+hosts.${name}.path may be:
+- a string or path to executable
+- a set with
+  {
+    value = string or path to executable;
+    args = [ "wrapper" "args" "for" "host" ];
+    nvimArgs = [ "wrapper" "args" "for" "neovim" ];
+  }
+- a function that recieves a function that returns a list of dependencies which returns either of the above.
+
+If `path` is a function, a ${name}.libraries section in categoryDefinitions
+is created in addition to the normal ${name}.wrapperArgs, ${name}.extraWrapperArgs, ${name}.envVars sections.
+
+The function that gets passed to `path` recieves either null, or a different value, and returns a list of packages from
+${name}.libraries.
+
+If you pass it null, the ${name}.libraries categoryDefinitions section
+accepts only lists, and if you pass it a value, the section may contain functions as well
+in the style of lua.withPackages, where the functions are called with the value passed.
+
+# examples:
+hosts.perl.path = depfn: "''${perl.withPackages (p: depfn p ++ [ p.NeovimExt p.Appcpanminus ])}/bin/perl";
+
+hosts.python.path = depfn: {
+  value = (python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
+  args = [ "--unset" "PYTHONPATH" ];
+};
+
+hosts.ruby.path = let
+  rubyEnv = pkgs.bundlerEnv {
+    name = "neovim-ruby-env";
+    postBuild = "ln -sf ''${pkgs.ruby}/bin/* $out/bin";
+    gemdir = ./your/gem/dir;
+  };
+in {
+  value = "''${rubyEnv}/bin/neovim-ruby-host";
+  nvimArgs = [ "--set" "GEM_HOME" "''${rubyEnv}/''${rubyEnv.ruby.gemPath}" "--suffix" "PATH" ":" "''${rubyEnv}/bin" ];
 };
 '';
 }

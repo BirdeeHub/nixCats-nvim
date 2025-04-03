@@ -123,7 +123,7 @@
           # we merge the new definitions into
           # the prev.packageDefinitions.nixCats package 
           # which was in the original packageDefinitions set.
-          newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
+          newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, name, ... }: {
             settings = {
               suffix-path = true;
               suffix-LD = true;
@@ -139,7 +139,7 @@
             };
           });
           # this is the package we are going to build into an appimage
-          appCats = utils.mergeCatDefs prev.packageDefinitions.nixCats ({pkgs , ... }: {
+          appCats = utils.mergeCatDefs prev.packageDefinitions.nixCats ({pkgs, name, ... }: {
             categories = {
               # include our new category
               # with the extra dependencies needed for the appimage version.

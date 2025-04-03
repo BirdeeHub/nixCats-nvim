@@ -70,7 +70,7 @@ in {
         # in your lua config via
         # vim.g.python3_host_prog
         # or run from nvim terminal via :!<packagename>-python3
-        extraPython3Packages = {
+        python3.libraries = {
           test = (_:[]);
         };
         # populates $LUA_PATH and $LUA_CPATH
@@ -83,7 +83,7 @@ in {
       packageDefinitions.replace = {
         # These are the names of your packages
         # you can include as many as you wish.
-        myNixModuleNvim = {pkgs , ... }: {
+        myNixModuleNvim = {pkgs, name, ... }: {
           # they contain a settings set defined above
           # see :help nixCats.flake.outputs.settings
           settings = {
@@ -110,7 +110,7 @@ in {
       #   packageNames = [ "REPLACE_MEs_VIM" ];
       #   categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name, mkPlugin, ... }@packageDef: {});
       #   packageDefinitions.replace = {
-      #     REPLACE_MEs_VIM = {pkgs, ...}: {
+      #     REPLACE_MEs_VIM = {pkgs, name, ...}: {
       #       settings = {};
       #       categories = {};
       #     };

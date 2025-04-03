@@ -53,17 +53,10 @@
 
     ncTools = import ./ncTools.nix { inherit (pkgs) lib; inherit nclib; };
 
-    thisPackage = packageDefinitions.${name} { inherit pkgs mkPlugin mkNvimPlugin; };
-    settings = {
+    thisPackage = packageDefinitions.${name} { inherit name pkgs mkPlugin mkNvimPlugin; };
+    initial_settings = {
       wrapRc = true;
-      viAlias = false;
-      vimAlias = false;
-      withNodeJs = false;
-      withRuby = true;
-      gem_path = null;
-      withPerl = false;
       extraName = "";
-      withPython3 = true;
       configDirName = "nvim";
       unwrappedCfgPath = null;
       autowrapRuntimeDeps = "suffix";
@@ -74,13 +67,12 @@
       neovim-unwrapped = null;
       suffix-path = true;
       suffix-LD = true;
-      disablePythonSafePath = false;
-      disablePythonPath = true; # <- you almost certainly want this set to true
       collate_grammars = true;
       moduleNamespace = [ name ];
+      hosts = {};
     } // (thisPackage.settings or {});
 
-    final_cat_defs_set = ({
+    base_sections = {
       startupPlugins = {};
       optionalPlugins = {};
       lspsAndRuntimeDeps = {};
@@ -88,9 +80,7 @@
       propagatedBuildInputs = {};
       environmentVariables = {};
       extraWrapperArgs = {};
-      /* the function you would have passed to python.withPackages */
-      extraPython3Packages = {};
-      extraPython3wrapperArgs = {};
+      wrapperArgs = {};
     # same thing except for lua.withPackages
       extraLuaPackages = {};
     # only for use when importing flake in a flake 
@@ -100,50 +90,65 @@
       bashBeforeWrapper = {};
       # set of lists of lists of strings of other categories to enable
       extraCats = {};
-    } // (categoryDefinitions {
-      # categories depends on extraCats
-      inherit categories settings pkgs name mkPlugin mkNvimPlugin;
-      extra = extraTableLua;
-    }));
+    };
+    final_cat_defs_set = (base_sections // (let
+      catdef = categoryDefinitions {
+        # categories depends on extraCats
+        inherit categories pkgs name mkPlugin mkNvimPlugin;
+        settings = initial_settings;
+        extra = extraTableLua;
+      };
+    catdef_with_deprecations = catdef
+      // (pkgs.lib.optionalAttrs (catdef ? extraPython3Packages) (nclib.warnfn ''
+        nixCats categoryDefinitions extraPython3Packages section deprecated for python3.libraries
+      '' { python3.libraries = catdef.extraPython3Packages; }))
+      // (pkgs.lib.optionalAttrs (catdef ? extraPython3wrapperArgs) (nclib.warnfn ''
+        nixCats categoryDefinitions extraPython3wrapperArgs section deprecated for python3.extraWrapperArgs
+      '' { python3.extraWrapperArgs = catdef.extraPython3wrapperArgs; }));
+    in catdef_with_deprecations));
     # categories depends on extraCats
     categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
     extraTableLua = thisPackage.extra or {};
     inherit (final_cat_defs_set)
     startupPlugins optionalPlugins lspsAndRuntimeDeps
-    propagatedBuildInputs environmentVariables
-    extraWrapperArgs extraPython3Packages
-    extraLuaPackages optionalLuaAdditions
-    extraPython3wrapperArgs sharedLibraries
-    optionalLuaPreInit bashBeforeWrapper;
+    propagatedBuildInputs environmentVariables sharedLibraries
+    extraWrapperArgs extraLuaPackages optionalLuaAdditions
+    optionalLuaPreInit bashBeforeWrapper wrapperArgs;
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
     filterAndFlatten = ncTools.filterAndFlatten categories;
-    # This one filters and flattens like above but for attrs of attrs 
-    # and then maps name and value
-    # into a list based on the function we provide it.
-    # its like a flatmap function but with a built in filter for category.
-    filterAndFlattenMapInnerAttrs = ncTools.filterAndFlattenMapInnerAttrs categories;
 
     # shorthand to reduce lispyness
     filterFlattenUnique = s: pkgs.lib.unique (filterAndFlatten s);
 
-    # extraPythonPackages and the like require FUNCTIONS that return lists.
-    # so we make a function that returns a function that returns lists.
-    # this is used for the fields in the wrapper where the default value is (_: [])
-    combineCatsOfFuncs = section:
-      x: pkgs.lib.pipe section [
-        filterAndFlatten
-        (map (value: if pkgs.lib.isFunction value then value x else value))
-        pkgs.lib.flatten
-        pkgs.lib.unique
-      ];
+    # the following 3 take an initial section name argument for error messages
+
+    # returns a function that returns a list
+    combineCatsOfFuncs = ncTools.combineCatsOfFuncs categories;
+
+    # returns a list of wrapper args
+    filterAndFlattenEnvVars = ncTools.filterAndFlattenEnvVars categories;
+
+    # returns a list of wrapper args
+    filterAndFlattenWrapArgs = ncTools.filterAndFlattenWrapArgs categories;
 
     normalized = ncTools.normalizePlugins {
       startup = filterAndFlatten startupPlugins;
       optional = filterAndFlatten optionalPlugins;
-      inherit (settings) autoPluginDeps;
+      inherit (initial_settings) autoPluginDeps;
     };
+
+    host_builder = pkgs.callPackage ./hosts.nix {
+      plugins = normalized.start ++ normalized.opt;
+      invalidHostNames = builtins.attrNames base_sections;
+      nixCats_packageName = name;
+      inherit nclib initial_settings final_cat_defs_set;
+      inherit combineCatsOfFuncs filterAndFlattenEnvVars filterAndFlattenWrapArgs filterFlattenUnique;
+    };
+
+    # replace the path functions with lua before trying to write a nix function to a lua file
+    settings = host_builder.final_settings;
 
     # see :help nixCats
     # this function gets passed all the way into the wrapper so that we can also add
@@ -233,11 +238,7 @@
       userPathEnv = filterFlattenUnique lspsAndRuntimeDeps;
       preORpostLD = if settings.suffix-LD then "--suffix" else "--prefix";
       userLinkables = filterFlattenUnique sharedLibraries;
-      userEnvVars = pkgs.lib.pipe environmentVariables [
-        (filterAndFlattenMapInnerAttrs (name: value: [ [ "--set" name value ] ]))
-        pkgs.lib.unique
-        builtins.concatLists
-      ];
+      userEnvVars = filterAndFlattenEnvVars "environmentVariables" environmentVariables;
     in pkgs.lib.optionals (
         settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim"
       ) [
@@ -248,35 +249,21 @@
         preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
       ] ++ userEnvVars;
 
-    extraMakeWrapperArgs = builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
+    extraMakeWrapperArgs = pkgs.lib.escapeShellArgs (filterAndFlattenWrapArgs "wrapperArgs" wrapperArgs)
+      + " " + builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
 
-    python3wrapperArgs = pkgs.lib.pipe extraPython3wrapperArgs [
-      filterAndFlatten
-      (wargs: pkgs.lib.optionals settings.disablePythonPath ["--unset PYTHONPATH"]
-        ++ pkgs.lib.optionals settings.disablePythonSafePath ["--unset PYTHONSAFEPATH"]
-        ++ wargs)
-      pkgs.lib.unique
-      (builtins.concatStringsSep " ")
-    ];
-
-    preWrapperShellCode = let
-      xtra = /*bash*/''
-        NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
-        export NVIM_WRAPPER_PATH_NIX
-      '';
-    in if builtins.isString bashBeforeWrapper
-      then xtra + "\n" + bashBeforeWrapper
-      else builtins.concatStringsSep "\n" ([xtra] ++ (filterFlattenUnique bashBeforeWrapper));
-
-    # add our propagated build dependencies
+    # add our propagated build dependencies (not adviseable as then you miss the cache)
+    # can also be done by overriding nvim itself via settings.neovim-unwrapped
+    # as such, more sections that do this will not be added.
     buildInputs = filterFlattenUnique propagatedBuildInputs;
     baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
     myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
       src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
       propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
     }) else baseNvimUnwrapped;
-
-    nc_passthru = (args.nixCats_passthru or {}) // {
+  in {
+    inherit pkgs;
+    pass = (args.nixCats_passthru or {}) // {
       keepLuaBuilder = utils.baseBuilder luaPath; # why is this still a thing?
       nixCats_packageName = name;
       inherit categoryDefinitions packageDefinitions luaPath utils extra_pkg_config extra_pkg_params;
@@ -301,22 +288,31 @@
         inherit (settings) moduleNamespace;
       };
     };
-  in {
-    pass = nc_passthru;
-    inherit pkgs;
     drvargs = import ./wrapNeovim.nix {
       neovim-unwrapped = myNeovimUnwrapped;
       nixCats_packageName = name;
-      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats ncTools preWrapperShellCode;
-      inherit (settings) vimAlias viAlias withRuby withPython3 withPerl extraName withNodeJs aliases gem_path collate_grammars autowrapRuntimeDeps;
+      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats nclib;
+      inherit (settings) extraName aliases collate_grammars autowrapRuntimeDeps;
+      inherit (host_builder) host_phase nvim_host_args nvim_host_vars;
       inherit (normalized) start opt;
-        /* the function you would have passed to python.withPackages */
-      # extraPythonPackages = combineCatsOfFuncs extraPythonPackages;
-        /* the function you would have passed to python.withPackages */
-      extraPython3Packages = combineCatsOfFuncs extraPython3Packages;
-      extraPython3wrapperArgs = python3wrapperArgs;
         /* the function you would have passed to lua.withPackages */
-      extraLuaPackages = combineCatsOfFuncs extraLuaPackages;
+      extraLuaPackages = combineCatsOfFuncs "lua" extraLuaPackages;
+      bashBeforeWrapper = if builtins.isString bashBeforeWrapper
+        then [bashBeforeWrapper] else filterFlattenUnique bashBeforeWrapper;
+      customAliases = let
+        viAlias = if settings ? viAlias then nclib.warnfn ''
+          nixCats: settings.viAlias is being deprecated
+          use aliases = [ "vi" ]; instead.
+        '' settings.viAlias else false;
+        vimAlias = if settings ? vimAlias then nclib.warnfn ''
+          nixCats: settings.vimAlias is being deprecated
+          use aliases = [ "vim" ]; instead.
+        '' settings.vimAlias else false;
+      in pkgs.lib.unique (
+        pkgs.lib.optional viAlias "vi"
+        ++ pkgs.lib.optional vimAlias "vim"
+        ++ pkgs.lib.optionals (builtins.isList settings.aliases) settings.aliases
+      );
     };
   };
 

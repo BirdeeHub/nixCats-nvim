@@ -76,11 +76,10 @@ it in the same set, or chain overrides like so:
 ---------------------------------------------------------------------------------
                                        *nixCats.overriding.dependencyOverlays*
 
-NixCats provides a function to merge lists of overlays together into a single
-overlay. This allows you to combine overlays that might output to the same
-subattribute without them overwriting each other completely, `utils.mergeOverlays`
-but hopefully it will not be needed!
-
+And now we are going to make another package with more overlays!
+We will override it again in the next section.
+You could do all of these in the same override call of course,
+but this fits within documentation better.
 >nix
   pkgWithNewOverlays = OGpackage.override (prev: {
     dependencyOverlays = prev.dependencyOverlays ++ [
@@ -186,7 +185,7 @@ And we included our `newcat` category alongside the old ones!
       # we merge the new definitions into
       # the prev.packageDefinitions.nixCats package 
       # which was in the original packageDefinitions set.
-      newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, ... }: {
+      newvim = utils.mergeCatDefs prev.packageDefinitions.nixCats ({ pkgs, name, ... }: {
         settings = {
           # these ones override the old ones
           aliases = [ "nvi" ];

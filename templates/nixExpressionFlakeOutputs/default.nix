@@ -91,7 +91,7 @@
     # in your lua config via
     # vim.g.python3_host_prog
     # or run from nvim terminal via :!<packagename>-python3
-    extraPython3Packages = {
+    python3.libraries = {
       test = (_:[]);
     };
     # populates $LUA_PATH and $LUA_CPATH
@@ -102,7 +102,7 @@
   };
 
   packageDefinitions = {
-    nixCats = {pkgs , ... }: {
+    nixCats = {pkgs, name, ... }: {
       # they contain a settings set defined above
       # see :help nixCats.flake.outputs.settings
       settings = {
