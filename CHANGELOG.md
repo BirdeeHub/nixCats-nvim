@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.2...v7.0.3) (2025-04-03)
+
+
+### Bug Fixes
+
+* **collate_grammars:** fix regression when value is false ([843a0ee](https://github.com/BirdeeHub/nixCats-nvim/commit/843a0ee71389923cc30e4c31a7ec8fcdc130e209))
+
 ## [7.0.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.1...v7.0.2) (2025-04-03)
 
 
