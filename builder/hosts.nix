@@ -104,7 +104,6 @@
   get_dependencies = attrname: lib.pipe plugins [
     (map (v: v.${attrname} or []))
     builtins.concatLists
-    lib.flatten
   ];
 
   mkHost = with builtins; name: host_set:
@@ -142,7 +141,7 @@
     nvim_host_var = "vim.g[ ${nclib.n2l.uglyLua globalname} ]";
     disabled = lib.optional (host_settings.enable or null == false && isString (host_settings.disabled or null))
       "vim.g[ ${nclib.n2l.uglyLua disabledname} ]=0";
-    host_settings = builtins.removeAttrs host_settings ["path"] // {
+    host_settings = removeAttrs host_settings ["path"] // {
       global = globalname;
       disabled = disabledname;
     } // (lib.optionalAttrs (host_settings.enable or false) {

@@ -335,9 +335,10 @@ in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
   };
   final_processed = process_args oldargs;
 in {
-  inherit (final_processed.drvargs) name meta buildPhase dontUnpack; # <- generated args
+  inherit (final_processed.drvargs) name meta buildPhase; # <- generated args
   nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
   preferLocalBuild = true; # <- set here plain so that it is overrideable
+  dontUnpack = true;
   passthru = processed.pass // {
     inherit (final_processed.pass) moduleNamespace homeModule nixosModule keepLuaBuilder; # <- generated passthru
     dependencyOverlays = builtins.seq final_processed.pass.dependencyOverlays processed.pass.dependencyOverlays;
