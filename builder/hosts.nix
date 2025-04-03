@@ -153,7 +153,7 @@
   combineHosts = acc: host: acc // {
     final_settings = acc.final_settings // {
       hosts = (acc.final_settings.hosts or {}) // {
-        ${host.name} = (acc.final_settings.hosts.${host.name} or {}) // host.host_settings;
+        ${host.name} = builtins.removeAttrs (acc.final_settings.hosts.${host.name} or {}) ["path"] // host.host_settings;
       };
     };
   } // (if host.enable then {
