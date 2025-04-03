@@ -852,6 +852,39 @@ You can bundle and wrap anything this way!
     };
   };
 <
+Defaults:
+>nix
+  defaults = {
+    python3 = {
+      path = depfn: {
+        value = (pkgs.python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
+        args = [ "--unset" "PYTHONPATH" ];
+      };
+      pluginAttr = "python3Dependencies";
+    };
+    node = {
+      path = {
+        value = "${pkgs.neovim-node-client or pkgs.nodePackages.neovim}/bin/neovim-node-host";
+        nvimArgs = [ "--suffix" "PATH" ":" "${pkgs.nodejs}/bin" ];
+      };
+    };
+    perl = {
+      path = depfn: "${pkgs.perl.withPackages (p: depfn p ++ [ p.NeovimExt p.Appcpanminus ])}/bin/perl";
+    };
+    ruby = {
+      path = let
+        rubyEnv = pkgs.bundlerEnv {
+          name = "neovim-ruby-env";
+          postBuild = "ln -sf ${pkgs.ruby}/bin/* $out/bin";
+          gemdir = "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
+        };
+      in {
+        value = "${rubyEnv}/bin/neovim-ruby-host";
+        nvimArgs = [ "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}" "--suffix" "PATH" ":" "${rubyEnv}/bin" ];
+      };
+    };
+  };
+<
 --------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 
