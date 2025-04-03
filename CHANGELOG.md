@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.10.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.3...v6.10.0) (2025-04-03)
+
+
+### Features
+
+* **providers:** hosting program update, now can bundle anything with nvim ([#197](https://github.com/BirdeeHub/nixCats-nvim/issues/197)) ([2aa1b64](https://github.com/BirdeeHub/nixCats-nvim/commit/2aa1b646de7af1f17ce0a7eb2f7bf6ca1cfb0cc4))
+
 ## [6.9.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.2...v6.9.3) (2025-04-01)
 
 
