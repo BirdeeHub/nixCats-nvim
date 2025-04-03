@@ -1,6 +1,6 @@
 { nclib
 , nixCats_packageName
-, initial_settings
+, initial_settings # <- post removal of deprecations, this should be renamed to settings
 , final_cat_defs_set
 , plugins
 , invalidHostNames
@@ -19,6 +19,7 @@
 , ...
 }: let
 
+  # post removal of deprecations, this should be removed
   settings = with builtins; let
     deprecated = {
       withNodeJs = "node";
@@ -100,6 +101,40 @@
       };
     };
   };
+/*
+  # post removal of deprecations, this will be the new defaults table
+  defaults = {
+    python3 = {
+      path = depfn: {
+        value = (python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
+        args = [ "--unset" "PYTHONPATH" ];
+      };
+      pluginAttr = "python3Dependencies";
+    };
+    node = {
+      path = {
+        value = "${pkgs.neovim-node-client or nodePackages.neovim}/bin/neovim-node-host";
+        nvimArgs = [ "--suffix" "PATH" ":" "${pkgs.nodejs}/bin" ];
+      };
+    };
+    perl = {
+      path = depfn: "${perl.withPackages (p: depfn p ++ [ p.NeovimExt p.Appcpanminus ])}/bin/perl";
+    };
+    ruby = {
+      path = let
+        rubyEnv = bundlerEnv {
+          name = "neovim-ruby-env";
+          postBuild = "ln -sf ${ruby}/bin/* $out/bin";
+          gemdir = "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
+        };
+      in {
+        value = "${rubyEnv}/bin/neovim-ruby-host";
+        nvimArgs = [ "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}" "--suffix" "PATH" ":" "${rubyEnv}/bin" ];
+      };
+    };
+  };
+*/
+# the rest doesnt need to change
 
   get_dependencies = attrname: lib.pipe plugins [
     (map (v: v.${attrname} or []))
