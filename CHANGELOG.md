@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.1...v7.0.2) (2025-04-03)
+
+
+### Bug Fixes
+
+* **hosts:** explicit disable not disabling healthchecks ([3957745](https://github.com/BirdeeHub/nixCats-nvim/commit/395774590f186a6ac8b996631ece9aa0e1164d10))
+
 ## [7.0.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.0...v7.0.1) (2025-04-03)
 
 
