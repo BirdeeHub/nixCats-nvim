@@ -368,11 +368,11 @@
     "visual-whitespace": {
       "flake": false,
       "locked": {
-        "lastModified": 1743627560,
-        "narHash": "sha256-P+JtQflODHda0B/ZSVCEvcuIwj5Z6D2S78ieNLlMWLc=",
+        "lastModified": 1743693405,
+        "narHash": "sha256-Nom2zCF0Bm73YXFVTRgIRG9S25LtCfJSMlZoJlAOyEg=",
         "owner": "mcauley-penney",
         "repo": "visual-whitespace.nvim",
-        "rev": "7336006c47ab3675bcac1bf5f2ae26c10c62805a",
+        "rev": "97bb1320f259be56a08b3b33ef335f5865ebf17e",
         "type": "github"
       },
       "original": {
