@@ -163,12 +163,6 @@
     nvim_host_args = acc.nvim_host_args ++ host.nvim_host_args;
     # generateProviderRc
     nvim_host_vars = acc.nvim_host_vars ++ [ "${host.nvim_host_var}=[[${placeholder "out"}/bin/${nixCats_packageName}-${host.name}]]" ];
-    # user provided settings from packageDefinitions but with hosts.<names>.path replaced with the var.
-    final_settings = acc.final_settings // {
-      hosts = (acc.final_settings.hosts or {}) // {
-        ${host.name} = (acc.final_settings.hosts.${host.name} or {}) // host.host_settings;
-      };
-    };
   } else {
     nvim_host_vars = acc.nvim_host_vars ++ host.disabled;
   });
