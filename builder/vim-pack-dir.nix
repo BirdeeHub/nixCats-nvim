@@ -42,7 +42,7 @@
   let
     # lazy.nvim wrapper uses this value to add the parsers back.
     ts_grammar_path = if collate_grammars then ts_grammar_plugin_combined else
-      nclib.nclib.n2l.types.inline-unsafe.mk {
+      nclib.n2l.types.inline-unsafe.mk {
         body = "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] .. [[/pack/${grammarPackName}/start/*]]";
       };
 
