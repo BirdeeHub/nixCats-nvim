@@ -844,7 +844,10 @@ You can bundle and wrap anything this way!
             # Will create a `packagename-neovide` in your path that launches the
             # package named `packagename` in this case.
             enable = true;
-            path = { value = "${pkgs.neovide}/bin/neovide"; args = [ "--add-flags" "--neovim-bin ${name}" ]; };
+            path = {
+              value = "${pkgs.neovide}/bin/neovide";
+              args = [ "--add-flags" "--neovim-bin ${name}" ];
+            };
           };
         };
       };
@@ -880,7 +883,10 @@ Defaults:
         };
       in {
         value = "${rubyEnv}/bin/neovim-ruby-host";
-        nvimArgs = [ "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}" "--suffix" "PATH" ":" "${rubyEnv}/bin" ];
+        nvimArgs = [
+          "--set" "GEM_HOME" "${rubyEnv}/${rubyEnv.ruby.gemPath}"
+          "--suffix" "PATH" ":" "${rubyEnv}/bin"
+        ];
       };
     };
   };
