@@ -776,7 +776,7 @@ The things defined within it will wrap only that host.
       # libraries categories no longer accept functions
       libraries = {
         somecatname = [
-          (p: p.pytest)
+          (p: [p.pytest])
         ];
       };
     };
