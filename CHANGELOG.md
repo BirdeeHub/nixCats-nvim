@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.0...v7.0.1) (2025-04-03)
+
+
+### Bug Fixes
+
+* **hosts:** path not always properly removed ([72560e4](https://github.com/BirdeeHub/nixCats-nvim/commit/72560e46f0a48ed7de4d9bf1c0261d1cc203b634))
+
 ## [6.10.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v6.9.3...v6.10.0) (2025-04-03)
 
 
