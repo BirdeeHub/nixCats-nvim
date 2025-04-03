@@ -142,7 +142,7 @@
     enable = host_settings.enable or false;
     nvim_host_args = pathRes.nvimArgs or [];
     nvim_host_var = "vim.g[ ${nclib.n2l.uglyLua globalname} ]";
-    disabled = lib.optional (host_settings.enable or null == false && isString (host_settings.disabled or null))
+    disabled = lib.optional (host_settings.enable or null == false && isString disabledname)
       "vim.g[ ${nclib.n2l.uglyLua disabledname} ]=0";
     host_settings = removeAttrs host_settings ["path"] // {
       global = globalname;
