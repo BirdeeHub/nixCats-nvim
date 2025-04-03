@@ -269,17 +269,6 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   These functions are the same thing that you would pass to lua.withPackages.
   Is used to populate $LUA_PATH and $LUA_CPATH
 
-<extraPython3Packages> 
-  a flexible set of categories, each containing FUNCTIONS
-  that return lists of Python packages.
-  These functions are the same thing that you would pass to python.withPackages.
-  You may get the path to this Python environment in your Lua config via
-  vim.g.python3_host_prog
-  or run from nvim terminal via :!<packagename>-python3
-
-<extraPython3wrapperArgs>
-  the same as extraWrapperArgs but for bundled python3 executable
-
 <propagatedBuildInputs> 
   a flexible set of categories, each containing internal BUILD dependencies.
   Will not be available to the PATH unless in a devShell.
@@ -558,7 +547,7 @@ as well as the general startupPlugins category.
 an example package definition:
 >nix
   packageDefinitions = {
-    nixCats = { pkgs, ... }: {
+    nixCats = { pkgs, name, ... }: {
       setting = {
         wrapRc = true;
         # nvimSRC = inputs.neovim;
@@ -610,126 +599,101 @@ Settings                                       *nixCats.flake.outputs.settings*
 
 These are the defaults:
 >nix
-    default_settings = {
-      # YOU ARE IN CHARGE OF MAKING SURE THESE ALIASES DO NOT COLLIDE WITH
-      # ANYTHING ELSE
-      # [ "takes" "a" "list" "of" "strings" "and" "makes" "an" "alias" "for" "each" ];
-      aliases = null;
-      viAlias = false;
-      vimAlias = false;
+  default_settings = {
+    # YOU ARE IN CHARGE OF MAKING SURE THESE ALIASES DO NOT COLLIDE WITH
+    # ANYTHING ELSE
+    # [ "takes" "a" "list" "of" "strings" "and" "makes" "an" "alias" "for" "each" ];
+    aliases = null;
 
-      # so that you can see it in the store
-      extraName = "";
+    # so that you can see it in the store
+    extraName = "";
 
-      withRuby = true;
-      withPython3 = true;
-      withNodeJs = false;
-      withPerl = false;
+    # see :help nixCats.flake.outputs.settings.hosts (the next section)
+    hosts = {};
 
-      # do you want to package the Lua from this flake in the store?
-      # or would you rather it just read it in your .config/<configDirName>?
-      # nixCats and this help will work either way.
-      # packages with wrapRc = false are for quick changes to Lua.
-      # it is not for being ran from anywhere via nix run, because the config
-      # was not wrapped with the program.
-      wrapRc = true;
-      # wrapRc may also be set as a string.
-      # That string will become an environment variable
-      # which you are able to set to unwrap the config.
-      # and unset to wrap it again, at runtime.
-      # requires 1 extra syscall to achieve.
+    # do you want to package the Lua from this flake in the store?
+    # or would you rather it just read it in your .config/<configDirName>?
+    # nixCats and this help will work either way.
+    # packages with wrapRc = false are for quick changes to Lua.
+    # it is not for being ran from anywhere via nix run, because the config
+    # was not wrapped with the program.
+    wrapRc = true;
+    # wrapRc may also be set as a string.
+    # That string will become an environment variable
+    # which you are able to set to unwrap the config.
+    # and unset to wrap it again, at runtime.
+    # requires 1 extra syscall to achieve.
 
-      # What should the name of the folder within standard directories
-      # i.e. .config, .local/share, .local/state, .cache, etc... be?
-      # This option is very useful when you want 
-      # to clone an unwrapped config straight to the .config dir.
-      # It is also helpful to prevent other nvim packages sharing data folders.
-      # see :help `$NVIM_APPNAME`
-      configDirName = "nvim";
+    # What should the name of the folder within standard directories
+    # i.e. .config, .local/share, .local/state, .cache, etc... be?
+    # This option is very useful when you want 
+    # to clone an unwrapped config straight to the .config dir.
+    # It is also helpful to prevent other nvim packages sharing data folders.
+    # see :help `$NVIM_APPNAME`
+    configDirName = "nvim";
 
-      # Only active when wrapRc = false, this option allows you to specify
-      # an absolute path to the unwrapped config directory.
-      # This is not a Nix path. This is the unwrapped config directory.
-      # This means you are going to need to make
-      # sure that it points the right place on the current machine.
-      unwrappedCfgPath = null;
-      # Will not change anything other than config directory, configDirName
-      # is still needed for .local/share or .cache and the like
+    # Only active when wrapRc = false, this option allows you to specify
+    # an absolute path to the unwrapped config directory.
+    # This is not a Nix path. This is the unwrapped config directory.
+    # This means you are going to need to make
+    # sure that it points the right place on the current machine.
+    unwrappedCfgPath = null;
+    # Will not change anything other than config directory, configDirName
+    # is still needed for .local/share or .cache and the like
 
-      # use this to pin a specific Neovim version.
-      # This one will specify the base Neovim derivation to use.
-      neovim-unwrapped = null;
-      # This one will just override the src value of the Neovim in nixpkgs
-      # import it in flake inputs with flake = false,
-      # It will also obviously cause Neovim to build from source.
-      nvimSRC = null;
+    # use this to pin a specific Neovim version.
+    # This one will specify the base Neovim derivation to use.
+    neovim-unwrapped = null;
+    # This one will just override the src value of the Neovim in nixpkgs
+    # import it in flake inputs with flake = false,
+    # It will also obviously cause Neovim to build from source.
+    nvimSRC = null;
 
-      # These 2 options allow you to choose whether the items from nixCats
-      # override your global environment, or the other way around.
-      # true will allow them to inherit, false will cause it to override.
-      suffix-path = true;
-      # ^ causes lspsAndDeps to be added to the END of
-      # PATH instead of the start
-      suffix-LD = true;
-      # ^ causes sharedLibraries to be added to the END of
-      # LD_LIBRARY_PATH instead of the start
+    # These 2 options allow you to choose whether the items from nixCats
+    # override your global environment, or the other way around.
+    # true will allow them to inherit, false will cause it to override.
+    suffix-path = true;
+    # ^ causes lspsAndDeps to be added to the END of
+    # PATH instead of the start
+    suffix-LD = true;
+    # ^ causes sharedLibraries to be added to the END of
+    # LD_LIBRARY_PATH instead of the start
 
-      # plugins in nixpkgs sometimes have extra dependencies added to
-      # .runtimeDeps attribute. By default nixCats will append then to the path,
-      # accepts `"suffix"` or `true` to append to the PATH
-      # accepts `"prefix"` to prepend to the PATH
-      # accepts `false` or `null` to not include them.
-      autowrapRuntimeDeps = "suffix";
+    # plugins in nixpkgs sometimes have extra dependencies added to
+    # .runtimeDeps attribute. By default nixCats will append then to the path,
+    # accepts `"suffix"` or `true` to append to the PATH
+    # accepts `"prefix"` to prepend to the PATH
+    # accepts `false` or `null` to not include them.
+    autowrapRuntimeDeps = "suffix";
 
-      # plugins in nixpkgs sometimes have extra lua config added to
-      # .passthru.initLua attribute for compatibility.
-      # By default nixCats will run them before your configuration.
-      # accepts `"prefix"` or `true` to run before your configuration
-      # accepts `"suffix"` to run afterwards
-      # accepts `false` or `null` to not include them.
-      autoconfigure = "prefix";
+    # plugins in nixpkgs sometimes have extra lua config added to
+    # .passthru.initLua attribute for compatibility.
+    # By default nixCats will run them before your configuration.
+    # accepts `"prefix"` or `true` to run before your configuration
+    # accepts `"suffix"` to run afterwards
+    # accepts `false` or `null` to not include them.
+    autoconfigure = "prefix";
 
-      # whether to group up treesitter grammars into a single directory,
-      # or leave them as separate plugins.
-      # Defaults to true as it results in
-      # a significant startup time performance boost
-      # Works only on grammars that have been passed through
-      # pkgs.neovimUtils.grammarToPlugin
-      # or pkgs.vimPlugins.nvim-treesitter.withPlugins
-      collate_grammars = true;
+    # whether to group up treesitter grammars into a single directory,
+    # or leave them as separate plugins.
+    # Defaults to true as it results in
+    # a significant startup time performance boost
+    # Works only on grammars that have been passed through
+    # pkgs.neovimUtils.grammarToPlugin
+    # or pkgs.vimPlugins.nvim-treesitter.withPlugins
+    collate_grammars = true;
 
-      # unsets PYTHONSAFEPATH variable.
-      # Can cause issues with reproducibility,
-      # can fix some stuff
-      disablePythonSafePath = false;
+    # plugins in nixpkgs sometimes have extra plugin dependencies added to
+    # .dependencies attribute. By default nixCats will add them.
+    # If for some reason you want to avoid that, set this to false.
+    autoPluginDeps = true;
 
-      # plugins in nixpkgs sometimes have extra plugin dependencies added to
-      # .dependencies attribute. By default nixCats will add them.
-      # If for some reason you want to avoid that, set this to false.
-      autoPluginDeps = true;
-
-      # optional, specify custom store path gemdir
-      # must contain a gemset.nix like one generated by bundix
-      # must contain the Neovim gem
-      # for further info, see
-      # https://github.com/NixOS/nixpkgs/tree/74ad6cb1d2b14edb4ad1fffc0791e94910c61453/pkgs/applications/editors/neovim/ruby_provider
-      # https://github.com/BirdeeHub/neovim_ruby_updater
-      gem_path = null;
-      # If you are using neovim-unwrapped from nixpkgs itself,
-      # there is a good chance your Neovim
-      # will not be able to find it regardless of settings.
-      # thus withRuby and gem_path options may not work
-      # It works great using https://github.com/nix-community/neovim-nightly-overlay
-      # so this seems to be an upstream issue, as all the expected variables
-      # are still being set correctly.
-
-      # each package outputs a module via passthru.
-      # this will set the namespace for the module options
-      # by default will be at config.${packagename}
-      moduleNamespace = [ <packagename> ];
-    };
+    # each package outputs a module via passthru.
+    # this will set the namespace for the module options
+    # by default will be at config.${packagename}
+    moduleNamespace = [ <packagename> ];
+  };
 <
-
 QUICK TIP: wrapRc
 
 The `wrapRc` option is very useful for testing Lua changes.
@@ -764,6 +728,130 @@ Neovim experience, only rebuilding when you install new packages.
 When you are satisfied, simply rebuild and go back to using the main package,
 as it was the same except for the single option!
 
+--------------------------------------------------------------------------------------
+Remote Host Providers:                   *nixCats.flake.outputs.settings.hosts*
+
+You can bundle anything with nixCats as a host/provider!
+Each "host" defined in the hosts set will
+create a new section in categoryDefinitions,
+and a global variable of your choosing will be set to the path of the host.
+
+Each defined host will also be added to your path as `${nvimname}-${hostname}`
+
+So if your package was named `mynvim`,
+enabling the `python3` host will add `mynvim-python3` to your path.
+
+There are some with builtin defaults.
+For those, unless you wish to redefine them, you only need to enable them.
+`hosts.python3.enable = true`
+`hosts.node.enable = true`
+`hosts.ruby.enable = true`
+`hosts.perl.enable = true`
+
+Lets use `python3`, as an example of a host definition.
+
+It will create a section in categoryDefinitions called `python3` you can use.
+The things defined within it will wrap only that host.
+>nix
+  categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    python3 = {
+      wrapperArgs = {
+        somecatname = [
+          [ "--unset" "PYTHONSAFEPATH" ]
+        ];
+      };
+      extraWrapperArgs = { # <- the same as wrapperArgs but unescaped
+        somecatname = [
+          "--prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.vulkan-loader ]}"
+        ];
+      };
+      envVars = {
+        somecatname = {
+          MY_VAR = "somevalue";
+        };
+      };
+      # only defined if settings.hosts.python3.path is a function
+      # If function passed to the settings.hosts.python3.path function
+      # is called with null as an argument,
+      # libraries categories no longer accept functions
+      libraries = {
+        somecatname = [
+          (p: p.pytest)
+        ];
+      };
+    };
+  }
+<
+The definition for the `python3` host would look like this when fully spelled out:
+>nix
+  packageDefinitions = {
+    somename = {pkgs, name, ...}: {
+      settings = {
+        hosts = {
+          python3 = {
+            enable = true; # <- not set by default
+
+            # REQUIRED:
+            # path can be a string,
+            # or a set:
+            # { value = pkgs.python3; args = [ "extra" "wrapper" "args" ]; nvimArgs = [ "for" "nvim" "itself" ]; }
+            # or a function that returns either type.
+            # If not a function, the ${name}.libraries categoryDefinitions section is ignored
+            path = depfn: {
+              value = (pkgs.python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
+              args = [ "--unset" "PYTHONPATH" ];
+            };
+            # depfn returns the result of filtering the
+            # python3.libraries section by categories
+
+            # the vim.g variable to set to the path of the host.
+            global = "python3_host_prog";
+            # accepts only a string.
+            # the default value is "${name}_host_prog"
+            # and can be omitted if that is the desired value
+
+            # grabs the named attribute from all included plugins, valid only if path is a function,
+            # included dependencies are returned by the
+            # function your path function recieves in addition to items from ${name}.libraries
+            pluginAttr = "python3Dependencies";
+            # accepts a string, or null.
+            # defaults to null
+            # and can be omitted if that is the desired value
+
+            # If explicitely disabled, will set this vim.g variable to 0
+            # This is for disabling healthchecks for a provider.
+            # Variable only set if host.${name}.enable = false
+            # can be set to null to prevent it from being set regardless of enable value
+            disabled = "loaded_python3_provider"; # <- the default value
+            # accepts a string, or null.
+            # the default value is "loaded_${name}_provider"
+            # and can be omitted if that is the desired value
+          };
+        };
+      };
+    };
+  };
+<
+You can bundle and wrap anything this way!
+>nix
+  packageDefinitions = {
+    packagename = { pkgs, name, mkPlugin, ... }: {
+      categories = {
+      };
+      settings = {
+        hosts = {
+          neovide = {
+            # Will create a `packagename-neovide` in your path that launches the
+            # package named `packagename` in this case.
+            enable = true;
+            path = { value = "${pkgs.neovide}/bin/neovide"; args = [ "--add-flags" "--neovim-bin ${name}" ]; };
+          };
+        };
+      };
+      extra = {};
+    };
+  };
+<
 --------------------------------------------------------------------------------------
 Neovim Builder Creation:                        *nixCats.flake.outputs.builder*
 

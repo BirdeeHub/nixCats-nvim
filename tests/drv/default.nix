@@ -27,6 +27,7 @@ stdenv.mkDerivation {
         autoconf = true;
         autodeps = true;
         whencat = true;
+        environment_variables = true;
       };
     };
   in /*bash*/ ''

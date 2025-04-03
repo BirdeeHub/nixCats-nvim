@@ -4,11 +4,6 @@
 # the directions inside the comment blocks.
 # it is done this way for convenience but you could do it another way.
 
-# When importing these overlays from one nixCats into another using its otherOverlays,
-# you should use the utils.mergeOverlays function to combine them.
-# This will allow you not to worry about other nixCats overlay
-# imports from having import naming conflicts with your own.
-
 /*
 This file imports overlays defined in the following format.
 Plugins will still only be downloaded if included in a category.

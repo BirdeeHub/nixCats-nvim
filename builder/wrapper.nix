@@ -3,74 +3,32 @@
 # Derived from:
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix
 { stdenv
-, pkgs
 , lib
 , writeText
-, nodePackages
-, python3
 , gnused
 }:
 {
   neovim-unwrapped
-  , withPython2 ? false
-  , withPython3 ? true
-  , python3Env ? python3
-  , withNodeJs ? false
-  , withPerl ? false
-  , perlEnv ? null
-  , rubyEnv ? null
+  , nvim_host_vars ? []
+  , host_phase ? ""
   , vimPackDir
   , wrapperArgsStr ? ""
   , nixCats_packageName
   , customAliases ? []
   , preWrapperShellCode ? ""
   , luaEnv
-  , extraPython3wrapperArgs ? []
   # lets you append stuff to the derivation name so that you can search for it in the store easier
   , extraName ? ""
   , ...
-}:
-assert withPython2 -> throw "Python2 support has been removed from the neovim wrapper, please remove withPython2 and python2Env.";
-let
-  generatedWrapperArgs = let
-    generateProviderRc = {
-        withPython3 ? true
-      , withNodeJs ? false
-      , withRuby ? true
-      # perl is problematic https://github.com/NixOS/nixpkgs/issues/132368
-      , withPerl ? false
-      , ...
-      }: let
-        hostprog_check_table = {
-          node = withNodeJs;
-          python = false;
-          python3 = withPython3;
-          ruby = withRuby;
-          perl = withPerl;
-        };
-
-        # nixCats modified to start with packagename instead of nvim to avoid collisions with multiple neovims
-        genProviderCommand = prog: withProg:
-          if withProg then
-            "vim.g.${prog}_host_prog=[[${placeholder "out"}/bin/${nixCats_packageName}-${prog}]]"
-          else
-            "vim.g.loaded_${prog}_provider=0";
-    in
-      lib.mapAttrsToList genProviderCommand hostprog_check_table;
-
-    providerLuaRc = generateProviderRc {
-      inherit withPython3 withNodeJs withPerl;
-      withRuby = rubyEnv != null;
-    };
-
+}: let
+  generateCmdArg = extra: let
     concat_lua_args = lib.flip lib.pipe [
       (builtins.concatStringsSep ";")
       (res: ''--cmd "lua '' + res + ''"'')
     ];
-
-  in extra: [
+  in [
     # vim accepts a limited number of commands so we join them all
-    "--add-flags" (concat_lua_args (providerLuaRc ++ [
+    "--add-flags" (concat_lua_args (nvim_host_vars ++ [
       "vim.opt.packpath:prepend([[${vimPackDir}]])"
       "vim.opt.runtimepath:prepend([[${vimPackDir}]])"
       "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]"
@@ -91,7 +49,7 @@ let
   finalMakeWrapperArgs =
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-    ++ generatedWrapperArgs [
+    ++ generateCmdArg [
       "configdir = require([[nixCats]]).configDir"
       "vim.opt.packpath:prepend(configdir)"
       "vim.opt.runtimepath:prepend(configdir)"
@@ -121,25 +79,13 @@ in {
       --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'
     ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${nixCats_packageName} "%F"' $out/share/applications/${nixCats_packageName}.desktop
     ''
-  + lib.optionalString (python3Env != null && withPython3) ''
-    makeWrapper ${python3Env.interpreter} $out/bin/${nixCats_packageName}-python3 ${extraPython3wrapperArgs}
-  ''
-  + lib.optionalString (rubyEnv != null) ''
-    ln -s ${rubyEnv}/bin/neovim-ruby-host $out/bin/${nixCats_packageName}-ruby
-  ''
-  + lib.optionalString withNodeJs ''
-    ln -s ${pkgs.neovim-node-client or nodePackages.neovim}/bin/neovim-node-host $out/bin/${nixCats_packageName}-node
-  ''
-  + lib.optionalString (perlEnv != null && withPerl) ''
-    ln -s ${perlEnv}/bin/perl $out/bin/${nixCats_packageName}-perl
-  ''
   + builtins.concatStringsSep "\n" (builtins.map (alias: ''
-      ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
+    ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
   '') customAliases)
-  +
-  (let
+  + "\n" + host_phase + "\n"
+  + (let
     manifestWrapperArgs =
-      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generatedWrapperArgs [];
+      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generateCmdArg [];
   in /* bash */ ''
     echo "Generating remote plugin manifest"
     export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim

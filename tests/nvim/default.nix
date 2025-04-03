@@ -77,8 +77,8 @@
   packageDefinitions = {
     ${packagename} = { pkgs, ... }: {
       settings = {
-        withNodeJs = true;
-        withPython3 = true;
+        hosts.node.enable = true;
+        hosts.python3.enable = true;
       };
       categories = {
         overlaytest = true;

@@ -59,7 +59,7 @@
     # These are the names of your packages
     # you can include as many as you wish.
     # each of these sets are also written into the nixCats plugin for querying within lua.
-    nvim = {pkgs , mkPlugin, ... }: {
+    nvim = {pkgs, name, mkPlugin, ... }: {
       settings = {
         suffix-path = true;
         suffix-LD = true;
@@ -67,6 +67,8 @@
         # IMPORTANT:
         # your aliases may not conflict with other packages.
         # aliases = [ "vim" ];
+        hosts.python3.enable = true;
+        hosts.node.enable = true;
       };
       # and a set of categories that you want
       # All categories you wish to include must be marked true

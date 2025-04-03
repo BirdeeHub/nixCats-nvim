@@ -49,6 +49,36 @@
     (filter cond)
   ];
 
+  combineCatsOfFuncs = categories: secname: section:
+    x: lib.pipe section [
+      (filterAndFlatten categories)
+      (map (value:
+        if x == null && lib.isFunction value then (import ./errors.nix).catsOfFn secname
+        else if lib.isFunction value then value x else value
+      ))
+      lib.flatten
+      lib.unique
+    ];
+
+  filterAndFlattenEnvVars = categories: secname:
+    lib.flip lib.pipe [
+      (filterAndFlattenMapInnerAttrs categories (name: value:
+        if lib.isFunction value || isList value
+        then (import ./errors.nix).envVar secname
+        else [ [ "--set" name value ] ]
+      ))
+      lib.unique
+      concatLists
+    ];
+
+  filterAndFlattenWrapArgs = categories: secname: let
+    errormsg = (import ./errors.nix).wrapArgs secname;
+    checker = _: value: if isList value && (all (v: isList v) value || all (v: isString v) value) then value else errormsg;
+  in lib.flip lib.pipe [
+      (filterAndFlattenMapInnerAttrs categories checker)
+      lib.flatten
+    ];
+
   normalizePlugins = {
     startup ? [],
     optional ? [],

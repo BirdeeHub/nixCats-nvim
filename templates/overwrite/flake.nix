@@ -68,7 +68,7 @@
           sharedLibraries = with pkgs; {
             general = [ ];
           };
-          extraPython3Packages = {
+          python3.libraries = {
             general = (_:[]);
           };
           extraLuaPackages = {
@@ -83,7 +83,7 @@
 
         # see :help nixCats.flake.outputs.packageDefinitions
         packageDefinitions = {
-          ${defaultPackageName} = { pkgs, ... }: {
+          ${defaultPackageName} = { pkgs, name, ... }: {
             settings = {
               # NOTE: see :help nixCats.flake.outputs.settings
               aliases = [ "vi" "vim" ];
@@ -103,7 +103,7 @@
               # are also made available via the nixCats plugin
             };
           };
-          configNotIncluded = { pkgs, ... }: {
+          configNotIncluded = { pkgs, name, ... }: {
             settings = {
               suffix-path = true;
               suffix-LD = true;
