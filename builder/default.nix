@@ -51,7 +51,7 @@
       };
     mkNvimPlugin = pkgs.lib.flip mkPlugin;
 
-    ncTools = import ./ncTools.nix { inherit (pkgs) lib; inherit nclib; };
+    sorting = import ./sorting.nix { inherit (pkgs) lib; inherit nclib; };
 
     thisPackage = packageDefinitions.${name} { inherit name pkgs mkPlugin mkNvimPlugin; };
     initial_settings = {
@@ -107,7 +107,7 @@
       '' { python3.extraWrapperArgs = catdef.extraPython3wrapperArgs; }));
     in catdef_with_deprecations));
     # categories depends on extraCats
-    categories = ncTools.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
+    categories = sorting.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
     extraTableLua = thisPackage.extra or {};
     inherit (final_cat_defs_set)
     startupPlugins optionalPlugins lspsAndRuntimeDeps
@@ -117,7 +117,7 @@
 
     # this is what allows for dynamic packaging in flake.nix
     # It includes categories marked as true, then flattens to a single list
-    filterAndFlatten = ncTools.filterAndFlatten categories;
+    filterAndFlatten = sorting.filterAndFlatten categories;
 
     # shorthand to reduce lispyness
     filterFlattenUnique = s: pkgs.lib.unique (filterAndFlatten s);
@@ -125,18 +125,20 @@
     # the following 3 take an initial section name argument for error messages
 
     # returns a function that returns a list
-    combineCatsOfFuncs = ncTools.combineCatsOfFuncs categories;
+    combineCatsOfFuncs = sorting.combineCatsOfFuncs categories;
 
     # returns a list of wrapper args
-    filterAndFlattenEnvVars = ncTools.filterAndFlattenEnvVars categories;
+    filterAndFlattenEnvVars = sorting.filterAndFlattenEnvVars categories;
 
     # returns a list of wrapper args
-    filterAndFlattenWrapArgs = ncTools.filterAndFlattenWrapArgs categories;
+    filterAndFlattenWrapArgs = sorting.filterAndFlattenWrapArgs categories;
 
-    normalized = ncTools.normalizePlugins {
+    normalized = import ./normalizePlugins.nix {
       startup = filterAndFlatten startupPlugins;
       optional = filterAndFlatten optionalPlugins;
       inherit (initial_settings) autoPluginDeps;
+      inherit (pkgs) lib;
+      inherit nclib;
     };
 
     host_builder = pkgs.callPackage ./hosts.nix {
@@ -185,7 +187,7 @@
 
       nixCatsCats = utils.n2l.toLua categoriesPlus;
       nixCatsSettings = utils.n2l.toLua settingsPlus;
-      nixCatsPetShop = utils.n2l.toLua (ncTools.getCatSpace final_cat_defs_set);
+      nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace final_cat_defs_set);
       nixCatsPawsible = utils.n2l.toLua allPluginDeps;
       nixCatsExtra = utils.n2l.toLua extraTableLua;
       nixCatsInitMain = let
