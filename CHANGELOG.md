@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.3...v7.0.4) (2025-04-04)
+
+
+### Bug Fixes
+
+* **hosts:** path.args was not applied without also using extraWrapperArgs ([2be5129](https://github.com/BirdeeHub/nixCats-nvim/commit/2be5129c0cbec3ed0477029091d6f036d52578a3))
+
 ## [7.0.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.2...v7.0.3) (2025-04-03)
 
 
