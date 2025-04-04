@@ -3,6 +3,12 @@
 # derived from:
 # https://github.com/NixOS/nixpkgs/blob/8564cb1517f118e1e90b8bc9ba052678f1aa4603/pkgs/applications/editors/neovim/utils.nix#L26-L122
 {
+  preORpostPATH ? "--suffix",
+  userPathEnv ? [],
+  preORpostLD ? "--suffix",
+  userLinkables ? [],
+  userEnvVars ? [],
+  configDirName ? null,
   extraName ? "",
   customAliases ? [],
   bashBeforeWrapper ? [],
@@ -30,24 +36,29 @@ let
 
   luaEnv = neovim-unwrapped.lua.withPackages extraLuaPackages;
 
-  mkWrapperArgs =
-    let
-      autowrapped = lib.pipe (start ++ opt) [
-        (builtins.foldl' (acc: v: acc ++ v.runtimeDeps or []) [])
-        lib.unique
-      ];
-    in
-    [
-      "--inherit-argv0"
-    ] ++ nvim_host_args ++ [
-      "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
-      "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
-    ] ++ lib.optionals (autowrapRuntimeDeps == "prefix" && autowrapped != []) [
-      "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
-    ] ++ makeWrapperArgs ++
-    lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != []) [
-      "--suffix" "PATH" ":" (lib.makeBinPath autowrapped)
+  # cat our args
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+  mkWrapperArgs = let
+    autowrapped = lib.pipe (start ++ opt) [
+      (builtins.foldl' (acc: v: acc ++ v.runtimeDeps or []) [])
+      lib.unique
     ];
+  in [
+    "--inherit-argv0"
+  ] ++ nvim_host_args ++ [
+    "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
+    "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
+  ] ++ lib.optionals (autowrapRuntimeDeps == "prefix" && autowrapped != []) [
+    "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
+  ] ++ pkgs.lib.optionals (configDirName != null && configDirName != "" || configDirName != "nvim") [
+    "--set" "NVIM_APPNAME" configDirName
+  ] ++ pkgs.lib.optionals (userPathEnv != []) [
+    preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
+  ] ++ pkgs.lib.optionals (userLinkables != []) [
+    preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
+  ] ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != []) [
+    "--suffix" "PATH" ":" (lib.makeBinPath autowrapped)
+  ] ++ userEnvVars ++ makeWrapperArgs;
 
   vimPackDir = pkgs.callPackage ./vim-pack-dir.nix {
     inherit collate_grammars nixCats nclib;
@@ -55,16 +66,13 @@ let
     opt = lib.unique opt;
   };
 
-  preWrapperShellCode = let
-    xtra = /*bash*/''
-      NVIM_WRAPPER_PATH_NIX="$(${pkgs.coreutils}/bin/readlink -f "$0")"
-      export NVIM_WRAPPER_PATH_NIX
-    '';
-  in builtins.concatStringsSep "\n" ([xtra] ++ bashBeforeWrapper);
-
 in
 (pkgs.callPackage ./wrapper.nix { }) {
   wrapperArgsStr = lib.escapeShellArgs mkWrapperArgs + " " + extraMakeWrapperArgs;
   inherit vimPackDir luaEnv customAliases neovim-unwrapped
-    nixCats_packageName host_phase nvim_host_vars preWrapperShellCode extraName;
+    nixCats_packageName host_phase nvim_host_vars extraName;
+    bashBeforeWrapper = builtins.concatStringsSep "\n" ([
+      "NVIM_WRAPPER_PATH_NIX='${placeholder "out"}/bin/${nixCats_packageName}'"
+      "export NVIM_WRAPPER_PATH_NIX"
+    ] ++ bashBeforeWrapper);
 }

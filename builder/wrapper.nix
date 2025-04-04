@@ -4,7 +4,6 @@
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix
 { stdenv
 , lib
-, writeText
 , gnused
 }:
 {
@@ -15,7 +14,7 @@
   , wrapperArgsStr ? ""
   , nixCats_packageName
   , customAliases ? []
-  , preWrapperShellCode ? ""
+  , bashBeforeWrapper ? ""
   , luaEnv
   # lets you append stuff to the derivation name so that you can search for it in the store easier
   , extraName ? ""
@@ -47,7 +46,7 @@
   # wrapper with most arguments we need, excluding those that cause problems to
   # generate rplugin.vim, but still required for the final wrapper.
   finalMakeWrapperArgs =
-    [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
+    [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/temp-nvim-wrapper" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
     ++ generateCmdArg [
       "configdir = require([[nixCats]]).configDir"
@@ -56,13 +55,13 @@
       "vim.opt.runtimepath:append(configdir .. [[/after]])"
     ];
 
-  preWrapperShellFile = writeText "preNixCatsWrapperShellCode" preWrapperShellCode;
 in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
   meta = neovim-unwrapped.meta // {
-    mainProgram = "${nixCats_packageName}";
+    mainProgram = nixCats_packageName;
     maintainers = neovim-unwrapped.meta.maintainers ++ (if lib.maintainers ? birdee then [ lib.maintainers.birdee ] else []);
   };
+  inherit bashBeforeWrapper;
   buildPhase = /*bash*/ ''
     runHook preBuild
     mkdir -p $out/bin
@@ -123,15 +122,19 @@ in {
     # add wrapper path to an environment variable
     # so that configuration may easily reference the path of the wrapper
     # for things like vim-startuptime
-    export BASHCACHE=$(mktemp)
     # Grab the shebang
-    head -1 ${placeholder "out"}/bin/${nixCats_packageName} > $BASHCACHE
+    head -1 ${placeholder "out"}/bin/temp-nvim-wrapper > ${placeholder "out"}/bin/${nixCats_packageName}
     # add the code to set the environment variable
-    cat ${preWrapperShellFile} >> $BASHCACHE
+    if [ -e "$bashBeforeWrapperPath" ]; then
+      cat "$bashBeforeWrapperPath" >> ${placeholder "out"}/bin/${nixCats_packageName}
+    else
+      echo "$bashBeforeWrapper" >> ${placeholder "out"}/bin/${nixCats_packageName}
+    fi
+    echo >> ${placeholder "out"}/bin/${nixCats_packageName}
     # add the rest of the file back
-    tail -n +2 ${placeholder "out"}/bin/${nixCats_packageName} >> $BASHCACHE
-    cat $BASHCACHE > ${placeholder "out"}/bin/${nixCats_packageName}
-    rm $BASHCACHE
+    tail -n +2 ${placeholder "out"}/bin/temp-nvim-wrapper >> ${placeholder "out"}/bin/${nixCats_packageName}
+    rm ${placeholder "out"}/bin/temp-nvim-wrapper
+    chmod +x ${placeholder "out"}/bin/${nixCats_packageName}
     runHook postBuild
   '';
 }

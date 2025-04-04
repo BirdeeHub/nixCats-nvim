@@ -232,37 +232,6 @@
       cp ${./nixCats/meta.lua} $out/lua/nixCats/meta.lua
       cp $src $out/lua/nixCats/init.lua
     '';
-
-    # cat our args
-    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-    makeWrapperArgs = let
-      preORpostPATH = if settings.suffix-path then "--suffix" else "--prefix";
-      userPathEnv = filterFlattenUnique lspsAndRuntimeDeps;
-      preORpostLD = if settings.suffix-LD then "--suffix" else "--prefix";
-      userLinkables = filterFlattenUnique sharedLibraries;
-      userEnvVars = filterAndFlattenEnvVars "environmentVariables" environmentVariables;
-    in pkgs.lib.optionals (
-        settings.configDirName != null && settings.configDirName != "" || settings.configDirName != "nvim"
-      ) [
-        "--set" "NVIM_APPNAME" settings.configDirName # this sets the name of the folder to look for nvim stuff in
-      ] ++ pkgs.lib.optionals (userPathEnv != []) [
-        preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
-      ] ++ pkgs.lib.optionals (userLinkables != []) [
-        preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
-      ] ++ userEnvVars;
-
-    extraMakeWrapperArgs = pkgs.lib.escapeShellArgs (filterAndFlattenWrapArgs "wrapperArgs" wrapperArgs)
-      + " " + builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
-
-    # add our propagated build dependencies (not adviseable as then you miss the cache)
-    # can also be done by overriding nvim itself via settings.neovim-unwrapped
-    # as such, more sections that do this will not be added.
-    buildInputs = filterFlattenUnique propagatedBuildInputs;
-    baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
-    myNeovimUnwrapped = if settings.nvimSRC != null || buildInputs != [] then baseNvimUnwrapped.overrideAttrs (prev: {
-      src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
-      propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
-    }) else baseNvimUnwrapped;
   in {
     inherit pkgs;
     pass = (args.nixCats_passthru or {}) // {
@@ -291,16 +260,33 @@
       };
     };
     drvargs = import ./wrapNeovim.nix {
-      neovim-unwrapped = myNeovimUnwrapped;
       nixCats_packageName = name;
-      inherit pkgs makeWrapperArgs extraMakeWrapperArgs nixCats nclib;
-      inherit (settings) extraName aliases collate_grammars autowrapRuntimeDeps;
+      inherit pkgs nixCats nclib;
+      inherit (settings) extraName aliases collate_grammars autowrapRuntimeDeps configDirName;
       inherit (host_builder) host_phase nvim_host_args nvim_host_vars;
       inherit (normalized) start opt;
-        /* the function you would have passed to lua.withPackages */
-      extraLuaPackages = combineCatsOfFuncs "lua" extraLuaPackages;
+      preORpostPATH = if settings.suffix-path then "--suffix" else "--prefix";
+      userPathEnv = filterFlattenUnique lspsAndRuntimeDeps;
+      preORpostLD = if settings.suffix-LD then "--suffix" else "--prefix";
+      userLinkables = filterFlattenUnique sharedLibraries;
+      userEnvVars = filterAndFlattenEnvVars "environmentVariables" environmentVariables;
+      makeWrapperArgs = filterAndFlattenWrapArgs "wrapperArgs" wrapperArgs;
       bashBeforeWrapper = if builtins.isString bashBeforeWrapper
         then [bashBeforeWrapper] else filterFlattenUnique bashBeforeWrapper;
+      extraMakeWrapperArgs = builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
+      # the function you would have passed to lua.withPackages
+      extraLuaPackages = combineCatsOfFuncs "lua" extraLuaPackages;
+      # add our propagated build dependencies (not adviseable as then you miss the cache)
+      # can also be done by overriding nvim itself via settings.neovim-unwrapped
+      # as such, more sections that do this will not be added.
+      neovim-unwrapped = let
+        buildInputs = filterFlattenUnique propagatedBuildInputs;
+        baseNvimUnwrapped = if settings.neovim-unwrapped == null then pkgs.neovim-unwrapped else settings.neovim-unwrapped;
+      in if settings.nvimSRC == null && buildInputs == [] then baseNvimUnwrapped
+        else baseNvimUnwrapped.overrideAttrs (prev: {
+        src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
+        propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
+      });
       customAliases = let
         viAlias = if settings ? viAlias then nclib.warnfn ''
           nixCats: settings.viAlias is being deprecated
@@ -337,7 +323,8 @@ in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
   };
   final_processed = process_args oldargs;
 in {
-  inherit (final_processed.drvargs) name meta buildPhase; # <- generated args
+  inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper; # <- generated args
+  passAsFile = [ "bashBeforeWrapper" ];
   nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
   preferLocalBuild = true; # <- set here plain so that it is overrideable
   dontUnpack = true;

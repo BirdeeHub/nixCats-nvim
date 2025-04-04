@@ -89,6 +89,7 @@
 
   in lib.flip lib.pipe [
     attrValues
+    (filter (v: nclib.ncIsAttrs v))
     (map (mapfunc []))
     (foldl' recursiveUpdatePickDeeper {})
   ];
