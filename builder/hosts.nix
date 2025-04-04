@@ -27,41 +27,42 @@
       withRuby = "ruby";
       withPerl = "perl";
     };
-    deprecate = old: name: value: nclib.warnfn ''
+    deprecate = old: name: nclib.warnfn ''
       nixCats setting ${old} is deprecated in favor of "hosts.${name}.enable"
       see: [:help nixCats.flake.outputs.settings.hosts](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.settings.hosts)
-    '' value;
-  in initial_settings // (foldl' (acc: n:
-      acc // (lib.optionalAttrs (isString (deprecated.${n} or null)) {
-        hosts = acc.hosts // { ${deprecated.${n}}.enable = deprecate n deprecated.${n} initial_settings.${n}; };
-      })
-    ) { hosts = initial_settings.hosts; } (attrNames initial_settings));
+    '';
+  in foldl' (acc: n: lib.recursiveUpdate acc (lib.optionalAttrs (isString (deprecated.${n} or null)) (
+      lib.setAttrByPath [ "hosts" deprecated.${n} "enable" ] (deprecate n deprecated.${n} initial_settings.${n})
+    ))) initial_settings (attrNames initial_settings);
 
   # the post deprecation version is in the help for hosts
   # :h nixCats.flake.outputs.settings.hosts
   defaults = {
-    python3 = {
+    python3 = let
+      maybeWarn = if ! settings ? disablePythonPath && ! settings ? disablePythonSafePath
+        then (v: v) else nclib.warnfn (lib.optionalString (! settings.disablePythonPath or true) ''
+          nixCats: settings.disablePythonPath is deprecated.
+          to override the default value of true, (removing it)
+          redefine the python3 host path to:
+          hosts.python3.path = depfn: (python3.withPackages (p: depfn p ++ [p.pynvim]));
+          in order to prevent it from providing
+          [ "--unset" "PYTHONPATH" ] wrapper arguments by default
+
+        '' + lib.optionalString (settings.disablePythonSafePath or false) ''
+
+          nixCats: settings.disablePythonSafePath is deprecated.
+          in categoryDefinitions, define the following instead
+          python3.wrapperArgs = {
+            yourcatname = [
+              [ "--unset" "PYTHONSAFEPATH" ]
+            ];
+          }
+        '');
+    in {
       path = depfn: {
         value = (python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
-        args = let
-          res = lib.optionals (settings.disablePythonPath or true) [ "--unset" "PYTHONPATH" ]
-          ++ lib.optionals (settings.disablePythonSafePath or false) [ "--unset" "PYTHONSAFEPATH" ];
-          in if settings ? disablePythonPath || settings ? disablePythonSafePath then nclib.warnfn (lib.optionalString (!(settings.disablePythonPath or true)) ''
-            nixCats: settings.disablePythonPath is deprecated.
-            to override the default value of true, (removing it)
-            redefine the python3 host path to:
-            hosts.python3.path = depfn: (python3.withPackages (p: depfn p ++ [p.pynvim]));
-            in order to prevent it from providing
-            [ "--unset" "PYTHONPATH" ] wrapper arguments by default
-          '' + lib.optionalString (settings.disablePythonSafePath or false) ''
-            nixCats: settings.disablePythonSafePath is deprecated.
-            in categoryDefinitions, define the following instead
-            python3.wrapperArgs = {
-              yourcatname = [
-                [ "--unset" "PYTHONSAFEPATH" ]
-              ];
-            }
-          '') res else res;
+        args = maybeWarn (lib.optionals (settings.disablePythonPath or true) [ "--unset" "PYTHONPATH" ]
+          ++ lib.optionals (settings.disablePythonSafePath or false) [ "--unset" "PYTHONSAFEPATH" ]);
       };
       pluginAttr = "python3Dependencies";
     };
@@ -110,14 +111,13 @@
     '';
   let
     host_settings = (defaults.${name} or {}) // host_set;
-    get_dependencies = attrname: builtins.concatLists (map (v: v.${attrname} or []) plugins);
+    get_dependencies = attrname: concatLists (map (v: v.${attrname} or []) plugins);
     libraryFunc = x: let
       OGfn = combineCatsOfFuncs name (final_cat_defs_set.${name}.libraries or {});
     in OGfn x ++ lib.optionals (isString (host_settings.pluginAttr or null)) (get_dependencies host_settings.pluginAttr);
     pathRes = if lib.isFunction host_settings.path
       then host_settings.path libraryFunc
       else host_settings.path or ((import ./errors.nix).hostPath name);
-    path = pathRes.value or pathRes;
     extraWrapperArgs = filterFlattenUnique (final_cat_defs_set.${name}.extraWrapperArgs or {});
     wrapperArgsPre = filterAndFlattenWrapArgs name (final_cat_defs_set.${name}.wrapperArgs or {});
     envArgs = filterAndFlattenEnvVars name (final_cat_defs_set.${name}.envVars or {});
@@ -133,8 +133,8 @@
   {
     inherit name;
     cmd = if extraWrapperArgs == [] && wrapperArgs == []
-      then "ln -s ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name}"
-      else "makeWrapper ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name} ${wrapperArgsStr}";
+      then "ln -s ${pathRes.value or pathRes} ${placeholder "out"}/bin/${nixCats_packageName}-${name}"
+      else "makeWrapper ${pathRes.value or pathRes} ${placeholder "out"}/bin/${nixCats_packageName}-${name} ${wrapperArgsStr}";
     enable = host_settings.enable or false;
     nvim_host_args = pathRes.nvimArgs or [];
     nvim_host_var = "vim.g[ ${nclib.n2l.uglyLua globalname} ]";
@@ -167,8 +167,7 @@
 
 in with builtins;
 lib.pipe (settings.hosts or {}) [
-  (mapAttrs mkHost)
-  attrValues
+  (lib.mapAttrsToList mkHost)
   (foldl' combineHosts {
     host_phase = "";
     nvim_host_args = [];
