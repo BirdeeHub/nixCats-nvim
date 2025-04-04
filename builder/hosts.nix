@@ -126,7 +126,6 @@
     wrapperArgsPre = filterAndFlattenWrapArgs name (final_cat_defs_set.${name}.wrapperArgs or {});
     envArgs = filterAndFlattenEnvVars name (final_cat_defs_set.${name}.envVars or {});
     wrapperArgs = wrapperArgsPre ++ (pathRes.args or []) ++ envArgs;
-    towrap = extraWrapperArgs != [] && wrapperArgs != [];
     wrapperArgsStr = concatStringsSep " " ([ (lib.escapeShellArgs wrapperArgs) ] ++ extraWrapperArgs);
     globalname = host_settings.global or "${name}_host_prog";
     disabledname = host_settings.disabled or "loaded_${name}_provider";
@@ -137,8 +136,9 @@
     assert (isString (host_settings.disabled or "") || (host_settings.disabled or null) == null) || (import ./errors.nix).hosts name "disabled" "string or null";
   {
     inherit name;
-    cmd = if towrap then "makeWrapper ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name} ${wrapperArgsStr}"
-      else "ln -s ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name}";
+    cmd = if extraWrapperArgs == [] && wrapperArgs == []
+      then "ln -s ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name}"
+      else "makeWrapper ${path} ${placeholder "out"}/bin/${nixCats_packageName}-${name} ${wrapperArgsStr}";
     enable = host_settings.enable or false;
     nvim_host_args = pathRes.nvimArgs or [];
     nvim_host_var = "vim.g[ ${nclib.n2l.uglyLua globalname} ]";
