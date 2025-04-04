@@ -104,17 +104,13 @@
     };
   };
 
-  get_dependencies = attrname: lib.pipe plugins [
-    (map (v: v.${attrname} or []))
-    builtins.concatLists
-  ];
-
   mkHost = with builtins; name: host_set:
     assert (elem name invalidHostNames) -> throw ''
       nixCats: hosts must not share a name with an already existing categoryDefinitions section
     '';
   let
     host_settings = (defaults.${name} or {}) // host_set;
+    get_dependencies = attrname: builtins.concatLists (map (v: v.${attrname} or []) plugins);
     libraryFunc = x: let
       OGfn = combineCatsOfFuncs name (final_cat_defs_set.${name}.libraries or {});
     in OGfn x ++ lib.optionals (isString (host_settings.pluginAttr or null)) (get_dependencies host_settings.pluginAttr);
