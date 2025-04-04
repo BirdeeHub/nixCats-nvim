@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.5...v7.0.6) (2025-04-04)
+
+
+### Bug Fixes
+
+* **bashb4:** bashBeforeWrapper section didnt allow use of ${placeholder "out"} ([f4c53a9](https://github.com/BirdeeHub/nixCats-nvim/commit/f4c53a9f3c14b0a86845e13f5dfb6c747ae14ef8))
+
 ## [7.0.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.4...v7.0.5) (2025-04-04)
 
 
