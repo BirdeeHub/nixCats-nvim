@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.4...v7.0.5) (2025-04-04)
+
+
+### Bug Fixes
+
+* **VIMINIT:** -u didnt let us, but actually, we can support  itself too ([f0f081d](https://github.com/BirdeeHub/nixCats-nvim/commit/f0f081d84f574f6c3d7c511099cdc7d06dde4766))
+
 ## [7.0.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.3...v7.0.4) (2025-04-04)
 
 
