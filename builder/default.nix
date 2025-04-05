@@ -187,7 +187,10 @@
 
       nixCatsCats = utils.n2l.toLua categoriesPlus;
       nixCatsSettings = utils.n2l.toLua settingsPlus;
-      nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace final_cat_defs_set);
+      nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace {
+        inherit categories final_cat_defs_set;
+        sections = pkgs.lib.mapAttrsToList (n: _: [ n ]) base_sections ++ host_builder.new_sections;
+      });
       nixCatsPawsible = utils.n2l.toLua allPluginDeps;
       nixCatsExtra = utils.n2l.toLua extraTableLua;
       nixCatsInitMain = let

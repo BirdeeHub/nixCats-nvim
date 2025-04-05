@@ -18,19 +18,20 @@
     (concatMap (v: if isList v then v else if v != null then [v] else []))
   ];
 
+  # destructures attrs recursively, returns [ { path, value } ... ]
+  recAttrsToList = here: lib.flip lib.pipe [
+    (lib.mapAttrsToList (name: value: {
+      path = here ++ [name];
+      inherit value;
+    }))
+    (foldl' (a: v: if nclib.ncIsAttrs v.value
+      then a ++ recAttrsToList v.path v.value
+      else a ++ [v]
+    ) [])
+  ];
+
   # returns [ { path, value } ... ]
   recFilterCats = implicit_defaults: categories: let
-    # destructures attrs recursively, returns [ { path, value } ... ]
-    recAttrsToList = here: lib.flip lib.pipe [
-      (lib.mapAttrsToList (name: value: {
-        path = here ++ [name];
-        inherit value;
-      }))
-      (foldl' (a: v: if nclib.ncIsAttrs v.value
-        then a ++ recAttrsToList v.path v.value
-        else a ++ [v]
-      ) [])
-    ];
     # check paths of included cats only
     catlist = lib.pipe categories [
       (recAttrsToList [])
@@ -77,21 +78,33 @@
     ];
 
   # populates :NixCats petShop
-  getCatSpace = let
-    recursiveUpdatePickDeeper = nclib.pickyRecUpdateUntil {
-      pick = path: left: right: if nclib.ncIsAttrs left then left else right;
-    };
-    # get the names of the categories but not the values, to avoid evaluating anything.
-    mapfunc = path: mapAttrs (name: value:
-      if nclib.ncIsAttrs value
-      then mapfunc (path ++ [ name ]) value
-      else path ++ [ name ]);
-
-  in lib.flip lib.pipe [
-    attrValues
-    (filter nclib.ncIsAttrs)
-    (map (mapfunc []))
-    (foldl' recursiveUpdatePickDeeper {})
+  getCatSpace = { categories, sections, final_cat_defs_set }: let
+    toScan = lib.pipe sections [
+      (map (sec: { inherit sec; val = lib.attrByPath sec null final_cat_defs_set; }))
+      (filter (v: nclib.ncIsAttrs v.val))
+    ];
+    allenabled = map (v: {
+      inherit (v) sec;
+      val = lib.pipe v.val [
+        (recFilterCats true categories)
+        (map (val: val.path))
+      ];
+    }) toScan;
+  in lib.pipe toScan [
+    (map (v: { inherit (v) sec; has = lib.pipe v.val [
+      (recAttrsToList [])
+      (map (val: val.path))
+    ]; }))
+    (map (v: v // {
+      enabled = (lib.findFirst (val: v.sec == val.sec) (throw "This error will never be returned") allenabled).val;
+    }))
+    (map (v: { inherit (v) sec; val = lib.pipe v.has [
+      (map (val: lib.setAttrByPath val (elem val v.enabled)))
+      (foldl' lib.recursiveUpdate {})
+    ]; }))
+    (filter (v: v.val != {}))
+    (map (v: lib.setAttrByPath v.sec v.val))
+    (foldl' lib.recursiveUpdate {})
   ];
 
   # controls extraCats in categoryDefinitions

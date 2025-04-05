@@ -173,5 +173,12 @@ lib.pipe (settings.hosts or {}) [
     nvim_host_args = [];
     nvim_host_vars = [];
     final_settings = settings;
+    new_sections = pkgs.lib.pipe (settings.hosts or {} // defaults) [
+      (mapAttrs (n: v: if nclib.ncIsAttrs v && v ? path then lib.isFunction v.path else null))
+      (lib.filterAttrs (n: v: v != null))
+      (mapAttrs (n: v: ["envVars" "wrapperArgs" "extraWrapperArgs"] ++ lib.optional v "libraries"))
+      (lib.mapAttrsToList (n: value: map (v: [ n v ]) value))
+      concatLists
+    ];
   })
 ]
