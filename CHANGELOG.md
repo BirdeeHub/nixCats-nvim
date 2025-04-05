@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.0.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.6...v7.0.7) (2025-04-05)
+
+
+### Performance Improvements
+
+* **nixCats:** lua/nixCats/init.lua to lua/nixCats.lua for earlier search path position ([d595a68](https://github.com/BirdeeHub/nixCats-nvim/commit/d595a687101a011018ca854e2098ef5968d8154b))
+
 ## [7.0.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.5...v7.0.6) (2025-04-04)
 
 
