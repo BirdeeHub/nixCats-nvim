@@ -222,15 +222,15 @@
 
     in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
       src = pkgs.substituteAll {
-        src = ./nixCats/init.lua;
+        src = ./nixCats.lua;
         inherit nixCatsSettings nixCatsCats nixCatsPetShop nixCatsPawsible nixCatsExtra nixCatsInitMain;
       };
     } ''
       mkdir -p $out/doc
       cp -r ${../nixCatsHelp}/* $out/doc/
       mkdir -p $out/lua/nixCats
-      cp ${./nixCats/meta.lua} $out/lua/nixCats/meta.lua
-      cp $src $out/lua/nixCats/init.lua
+      cp -r ${./nixCats}/* $out/lua/nixCats
+      cp $src $out/lua/nixCats.lua
     '';
   in {
     inherit pkgs;
