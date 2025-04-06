@@ -212,10 +212,10 @@
         -- lua from nix with pre = true
         ${normalized.preInlineConfigs}
         -- run the init.lua (or init.vim)
-        if vim.fn.filereadable(require('nixCats').configDir .. "/init.lua") == 1 then
-          dofile(require('nixCats').configDir .. "/init.lua")
-        elseif vim.fn.filereadable(require('nixCats').configDir .. "/init.vim") == 1 then
-          vim.cmd.source(require('nixCats').configDir .. "/init.vim")
+        if vim.fn.filereadable(nixCats.configDir .. "/init.lua") == 1 then
+          dofile(nixCats.configDir .. "/init.lua")
+        elseif vim.fn.filereadable(nixCats.configDir .. "/init.vim") == 1 then
+          vim.cmd.source(nixCats.configDir .. "/init.vim")
         end
         -- all other lua from nix plugin specs
         ${normalized.inlineConfigs}
