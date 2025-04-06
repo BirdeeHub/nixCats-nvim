@@ -1,7 +1,13 @@
 -- Copyright (c) 2023 BirdeeHub
 -- Licensed under the MIT license
+-- NOTE: first to prevent use of local fields in code injected from nix
+local function init_main()
+@nixCatsInitMain@
+end
 ---@type nixCats.main
 local M = {}
+---@diagnostic disable-next-line: inject-field
+M.init_main = init_main
 local meta_tbl_get = {
     __call = function(self, attrpath)
       local strtable = {}
@@ -35,11 +41,6 @@ M.configDir = M.settings.nixCats_config_location
 M.nixCatsPath = require('nixCats.saveTheCats')
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
 M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
-
----@diagnostic disable-next-line: inject-field
-M.init_main = function()
-@nixCatsInitMain@
-end
 
 function M.get(category)
     local strtable = {}
