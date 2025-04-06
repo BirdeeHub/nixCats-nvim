@@ -73,14 +73,14 @@ in {
     mkdir -p $out/share/applications
     substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
       --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
-      --replace-fail 'TryExec=nvim' 'TryExec=${nixCats_packageName}'\
+      --replace-fail 'TryExec=nvim' 'TryExec=${placeholder "out"}/bin/${nixCats_packageName}'\
       --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'
-    ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${nixCats_packageName} "%F"' $out/share/applications/${nixCats_packageName}.desktop
+    ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${placeholder "out"}/bin/${nixCats_packageName} "%F"' $out/share/applications/${nixCats_packageName}.desktop
     ''
-  + builtins.concatStringsSep "\n" (builtins.map (alias: ''
-    ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}
-  '') customAliases)
-  + "\n" + host_phase + "\n"
+  + builtins.concatStringsSep "\n" (builtins.map (alias:
+    "ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}"
+  ) customAliases)
+  + host_phase + "\n"
   + (let
     manifestWrapperArgs =
       [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generateCmdArg [];

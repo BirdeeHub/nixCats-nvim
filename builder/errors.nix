@@ -1,7 +1,6 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
 {
-# lix compat. see: https://github.com/BirdeeHub/nixCats-nvim/issues/193
 main = builtins.throw ''
 Error calling main nixCats builder function `utils.baseBuilder`
 

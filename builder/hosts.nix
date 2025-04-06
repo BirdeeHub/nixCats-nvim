@@ -14,6 +14,7 @@
 , python3
 , perl
 , ruby
+, nodejs
 , nodePackages
 , bundlerEnv
 , ...
@@ -69,7 +70,7 @@
     node = {
       path = {
         value = "${pkgs.neovim-node-client or nodePackages.neovim}/bin/neovim-node-host";
-        nvimArgs = [ "--suffix" "PATH" ":" "${pkgs.nodejs}/bin" ];
+        nvimArgs = [ "--suffix" "PATH" ":" "${nodejs}/bin" ];
       };
     };
     perl = {
@@ -173,7 +174,9 @@ lib.pipe (settings.hosts or {}) [
     nvim_host_args = [];
     nvim_host_vars = [];
     final_settings = settings;
-    new_sections = pkgs.lib.pipe (settings.hosts or {} // defaults) [
+  })
+  (v: v // {
+    new_sections = lib.pipe (lib.recursiveUpdate defaults (settings.hosts or {})) [
       (mapAttrs (n: v: if nclib.ncIsAttrs v && v ? path then lib.isFunction v.path else null))
       (lib.filterAttrs (n: v: v != null))
       (mapAttrs (n: v: ["envVars" "wrapperArgs" "extraWrapperArgs"] ++ lib.optional v "libraries"))
