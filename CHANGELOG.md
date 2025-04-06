@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.7...v7.1.0) (2025-04-06)
+
+
+### Features
+
+* **petShop:** `:NixCats petShop` debug command now actually shows useful info! ([822eacc](https://github.com/BirdeeHub/nixCats-nvim/commit/822eacc693d1363ef74b26a13f252fece473a498))
+
 ## [7.0.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.6...v7.0.7) (2025-04-05)
 
 
