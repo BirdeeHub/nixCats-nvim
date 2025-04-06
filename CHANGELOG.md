@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.0...v7.1.1) (2025-04-06)
+
+
+### Bug Fixes
+
+* **petShop:** minor issue with petShop display when redefining default hosts ([a6194f9](https://github.com/BirdeeHub/nixCats-nvim/commit/a6194f9cc2104443ee82694dfac93c698397419b))
+
 ## [7.1.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.0.7...v7.1.0) (2025-04-06)
 
 
