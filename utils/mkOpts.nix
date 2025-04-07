@@ -116,12 +116,6 @@ in {
       };
     };
 
-    packages = mkOption {
-      default = null;
-      type = with types; nullOr (attrsOf (catDef "replace"));
-      visible = false;
-    };
-
     packageDefinitions = {
       existing = mkOption {
         default = "replace";
@@ -355,12 +349,6 @@ in {
                 categoryDefinitions.merge = { pkgs, settings, categories, name, extra, mkPlugin, ... }@packageDef: { }
               '';
             };
-          };
-
-          packages = mkOption {
-            default = null;
-            type = with types; nullOr (attrsOf (catDef "replace"));
-            visible = false;
           };
 
           packageDefinitions = {
