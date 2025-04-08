@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.1...v7.1.2) (2025-04-08)
+
+
+### Performance Improvements
+
+* **init:** all rtp searches removed from init sequence ([85626fc](https://github.com/BirdeeHub/nixCats-nvim/commit/85626fc1338d5f7205955c048f0f24a360a5655a))
+
 ## [7.1.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.0...v7.1.1) (2025-04-06)
 
 
