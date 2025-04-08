@@ -235,12 +235,6 @@ These are the things you can return:
 >nix
   categoryDefinitions = { pkgs, settings, categories, extra, name, mkPlugin, mkNvimPlugin, ... }@packageDef: {
 <
-<lspsAndRuntimeDeps>
-  a flexible set of categories, each containing LSPs or
-  other internal runtime dependencies such as ctags or debuggers
-  these are available to the PATH while within the Neovim program.
-  this includes the Neovim terminal.
-
 <startupPlugins>
   a flexible set of categories, each containing startup plugins.
   Startup plugins are loaded and can be required. 
@@ -250,6 +244,12 @@ These are the things you can return:
   Optional plugins need to be added with packadd before being required.
   Use :NixCats pawsible to see the names to use for packadd
 
+<lspsAndRuntimeDeps>
+  a flexible set of categories, each containing LSPs or
+  other internal runtime dependencies such as ctags or debuggers
+  these are available to the PATH while within the Neovim program.
+  this includes the Neovim terminal.
+
 <sharedLibraries>
   a flexible set of categories, each containing a derivation for
   a runtime shared library. Will be prepended to the LD_LIBRARY_PATH variable.
@@ -258,21 +258,34 @@ These are the things you can return:
   a flexible set of categories, each containing an ATTRIBUTE SET of 
   EnvironmentVariableName = "EnvironmentVariableValue";
 
-<extraWrapperArgs>
-  a flexible set of categories, each containing extra wrapper arguments.
-  If you don't know what that is, see here:
-github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+<wrapperArgs>
+  a flexible set of categories, each containing escaped lists of wrapper arguments. >nix
+    wrapperArgs = {
+      yourCategory = [
+        [ "--set" "MYVAR" "test value" ]
+      ];
+      another = [
+        "--suffix"
+        "PATH"
+        "${pkgs.lib.makeBinPath [ pkgs.something ]}" # <- lspsAndRuntimeDeps does this
+      ];
+    };
+<  If you don't know what that is, see here:
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
 
+<extraWrapperArgs>
+  a flexible set of categories, each containing unescaped wrapper arguments. >nix
+    extraWrapperArgs = {
+      yourCategory = [
+        "--set MYVAR 'test value'"
+      ];
+    };
+<
 <extraLuaPackages>
   a flexible set of categories, each containing FUNCTIONS 
   that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
   Is used to populate $LUA_PATH and $LUA_CPATH
-
-<propagatedBuildInputs> 
-  a flexible set of categories, each containing internal BUILD dependencies.
-  Will not be available to the PATH unless in a devShell.
-  USING THIS OPTION WILL CAUSE NVIM TO BUILD FROM SOURCE.
 
 <optionalLuaPreInit>
   a flexible set of categories, each containing a list of lua strings,
@@ -283,6 +296,7 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   It is not the recommended way to create Lua for this flake,
   but it may be useful in editing flake imports 
   of other already configured setups following the nixCats format.
+
 <optionalLuaAdditions>
   a flexible set of categories, each containing a list of lua strings,
   or a LIST of sets containing a priority and a string of the format:
@@ -292,11 +306,13 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   It is not the recommended way to create Lua for this flake,
   but it may be useful in editing flake imports 
   of other already configured setups following the nixCats format.
+
 <bashBeforeWrapper>
   a flexible set of categories, each containing arbitrary Bash code
   to run before the wrapper starts within the wrapper's Bash environment.
-  CAUTION: only use this if you know what you are doing and why you need
-  to do it. Whenever possible, use extraWrapperArgs instead.
+  # WARNING: only use this if you know what you are doing and why you need
+  to do it. Whenever possible, use `wrapperArgs` or `extraWrapperArgs` instead.
+
 <extraCats>
   a flexible set of categories, each containing a list of attribute paths,
   specified as lists of strings. Thus each category would contain a list of
@@ -308,6 +324,11 @@ github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper
   # WARNING: use of categories argument in this set will cause infinite recursion
   # The categories argument of this function is the FINAL value.
   # You may use it in any of the other sets.
+
+<propagatedBuildInputs> 
+  a flexible set of categories, each containing internal BUILD dependencies.
+  Will not be available to the PATH unless in a devShell.
+  # WARNING: USING THIS SECTION WILL CAUSE NVIM TO BUILD FROM SOURCE.
 }
 
 In essence, the contents of each set listed here are filtered
