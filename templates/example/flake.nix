@@ -292,6 +292,7 @@
 
       # lists of the functions you would have passed to
       # python.withPackages or lua.withPackages
+      # do not forget to set `hosts.python3.enable` in package settings
 
       # get the path to this python environment
       # in your lua config via
