@@ -11,6 +11,7 @@
   , nvim_host_vars ? []
   , host_phase ? ""
   , vimPackDir
+  , nixCatsPath
   , wrapperArgsStr ? ""
   , nixCats_packageName
   , customAliases ? []
@@ -30,6 +31,7 @@
     "--add-flags" (concat_lua_args (nvim_host_vars ++ [
       "vim.opt.packpath:prepend([[${vimPackDir}]])"
       "vim.opt.runtimepath:prepend([[${vimPackDir}]])"
+      "vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsPath}]]"
       "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]"
       "vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"
       "local configdir = vim.fn.stdpath([[config]])"
@@ -49,6 +51,7 @@
     [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/temp-nvim-wrapper" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
     ++ generateCmdArg [
+      "package.loaded.nixCats = dofile([[${nixCatsPath}/lua/nixCats.lua]])"
       "configdir = require([[nixCats]]).configDir"
       "vim.opt.packpath:prepend(configdir)"
       "vim.opt.runtimepath:prepend(configdir)"

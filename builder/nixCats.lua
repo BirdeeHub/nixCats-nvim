@@ -38,7 +38,7 @@ M.petShop = setmetatable(@nixCatsPetShop@, meta_tbl_get)
 M.configDir = M.settings.nixCats_config_location
 -- NOTE: nixCats is inside of these and thus they could not be written into nixCats
 -- due to infinite recursion, so they are variables instead.
-M.nixCatsPath = require('nixCats.saveTheCats')
+M.nixCatsPath = vim.g[ [[nixCats-special-rtp-entry-nixCats]] ]
 M.vimPackDir = vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ]
 M.packageBinPath = os.getenv('NVIM_WRAPPER_PATH_NIX') or vim.v.progpath
 

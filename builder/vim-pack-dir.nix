@@ -65,7 +65,10 @@
     });
     nixCatsFinal = nixCats fullDeps;
   in # add fully called nixCats plugin along with another to save its path.
-  [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
+  {
+    plugins = [ nixCatsFinal (nixCatsDir nixCatsFinal) ];
+    nixCatsPath = nixCatsFinal;
+  };
 
   # filter out all the grammars so we can group them up
   start = grammarMatcher false startup;
@@ -86,19 +89,21 @@
     ts_grammar_plugin_combined;
   };
 
-  packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (start ++ resolvedCats);
+  packdirStart = vimFarm "pack/${packageName}/start" "packdir-start" (start ++ resolvedCats.plugins);
 
   packdirOpt = vimFarm "pack/${packageName}/opt" "packdir-opt" opt;
 
-in
-buildEnv {
-  name = "vim-pack-dir";
-  paths = [ packdirStart packdirOpt packdirGrammar ];
-  # gather all propagated build inputs from packDir
-  postBuild = ''
-    mkdir $out/nix-support
-    for i in $(find -L $out -name propagated-build-inputs ); do
-      cat "$i" >> $out/nix-support/propagated-build-inputs
-    done
-  '';
+in {
+  inherit (resolvedCats) nixCatsPath;
+  vimPackDir = buildEnv {
+    name = "vim-pack-dir";
+    paths = [ packdirStart packdirOpt packdirGrammar ];
+    # gather all propagated build inputs from packDir
+    postBuild = ''
+      mkdir $out/nix-support
+      for i in $(find -L $out -name propagated-build-inputs ); do
+        cat "$i" >> $out/nix-support/propagated-build-inputs
+      done
+    '';
+  };
 }

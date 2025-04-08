@@ -60,7 +60,7 @@ let
     "--suffix" "PATH" ":" (lib.makeBinPath autowrapped)
   ] ++ userEnvVars ++ makeWrapperArgs;
 
-  vimPackDir = pkgs.callPackage ./vim-pack-dir.nix {
+  vimPack = pkgs.callPackage ./vim-pack-dir.nix {
     inherit collate_grammars nixCats nclib;
     startup = lib.unique start;
     opt = lib.unique opt;
@@ -69,7 +69,8 @@ let
 in
 (pkgs.callPackage ./wrapper.nix { }) {
   wrapperArgsStr = lib.escapeShellArgs mkWrapperArgs + " " + extraMakeWrapperArgs;
-  inherit vimPackDir luaEnv customAliases neovim-unwrapped
+  inherit (vimPack) nixCatsPath vimPackDir;
+  inherit luaEnv customAliases neovim-unwrapped
     nixCats_packageName host_phase nvim_host_vars extraName;
     bashBeforeWrapper = builtins.concatStringsSep "\n" ([
       "NVIM_WRAPPER_PATH_NIX='${placeholder "out"}/bin/${nixCats_packageName}'"
