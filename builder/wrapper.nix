@@ -121,7 +121,9 @@ in {
     addprebash() {
       [ -e "$bashBeforeWrapperPath" ] && cat "$bashBeforeWrapperPath" || echo "$bashBeforeWrapper"
     }
-    makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} --run "$(addprebash)" ${wrapperArgsStr} \
+    makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} \
+        --run "$(addprebash)" \
+        ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
         --prefix LUA_CPATH ';' "$LUA_CPATH" \
         --set-default VIMINIT 'lua nixCats.init_main()'
