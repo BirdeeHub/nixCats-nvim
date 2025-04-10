@@ -48,8 +48,9 @@
   # wrapper with most arguments we need, excluding those that cause problems to
   # generate rplugin.vim, but still required for the final wrapper.
   finalMakeWrapperArgs =
-    [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/temp-nvim-wrapper" ]
+    [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
+    ++ [ "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ generateCmdArg [
       "package.loaded.nixCats = dofile([[${nixCatsPath}/lua/nixCats.lua]])"
       "configdir = require([[nixCats]]).configDir"
@@ -117,27 +118,14 @@ in {
     _addToLuaPath "${vimPackDir}" || true
     echo "propagated dependency path for plugins: $LUA_PATH"
     echo "propagated dependency cpath for plugins: $LUA_CPATH"
-    makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} ${wrapperArgsStr} \
+    addprebash() {
+      [ -e "$bashBeforeWrapperPath" ] && cat "$bashBeforeWrapperPath" || echo "$bashBeforeWrapper"
+    }
+    makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} --run "$(addprebash)" ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
         --prefix LUA_CPATH ';' "$LUA_CPATH" \
         --set-default VIMINIT 'lua nixCats.init_main()'
 
-    # add wrapper path to an environment variable
-    # so that configuration may easily reference the path of the wrapper
-    # for things like vim-startuptime
-    # Grab the shebang
-    head -1 ${placeholder "out"}/bin/temp-nvim-wrapper > '${placeholder "out"}/bin/${nixCats_packageName}'
-    # add the code to set the environment variable
-    if [ -e "$bashBeforeWrapperPath" ]; then
-      cat "$bashBeforeWrapperPath" >> '${placeholder "out"}/bin/${nixCats_packageName}'
-    else
-      echo "$bashBeforeWrapper" >> '${placeholder "out"}/bin/${nixCats_packageName}'
-    fi
-    echo >> '${placeholder "out"}/bin/${nixCats_packageName}'
-    # add the rest of the file back
-    tail -n +2 ${placeholder "out"}/bin/temp-nvim-wrapper >> '${placeholder "out"}/bin/${nixCats_packageName}'
-    rm ${placeholder "out"}/bin/temp-nvim-wrapper
-    chmod +x '${placeholder "out"}/bin/${nixCats_packageName}'
     runHook postBuild
   '';
 }

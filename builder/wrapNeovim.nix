@@ -72,8 +72,5 @@ in
   inherit (vimPack) nixCatsPath vimPackDir;
   inherit luaEnv customAliases neovim-unwrapped
     nixCats_packageName host_phase nvim_host_vars extraName;
-    bashBeforeWrapper = builtins.concatStringsSep "\n" ([
-      "NVIM_WRAPPER_PATH_NIX='${placeholder "out"}/bin/${nixCats_packageName}'"
-      "export NVIM_WRAPPER_PATH_NIX"
-    ] ++ bashBeforeWrapper);
+    bashBeforeWrapper = builtins.concatStringsSep "\n" bashBeforeWrapper;
 }
