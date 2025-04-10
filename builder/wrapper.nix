@@ -74,16 +74,16 @@ in {
   ''
   + lib.optionalString stdenv.isLinux ''
     mkdir -p $out/share/applications
-    substitute ${neovim-unwrapped}/share/applications/nvim.desktop $out/share/applications/${nixCats_packageName}.desktop \
+    substitute ${neovim-unwrapped}/share/applications/nvim.desktop '${placeholder "out"}/share/applications/${nixCats_packageName}.desktop' \
       --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
       --replace-fail 'TryExec=nvim' 'TryExec=${placeholder "out"}/bin/${nixCats_packageName}'\
       --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'
-    ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${placeholder "out"}/bin/${nixCats_packageName} "%F"' $out/share/applications/${nixCats_packageName}.desktop
+    ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${placeholder "out"}/bin/${nixCats_packageName} "%F"' '${placeholder "out"}/share/applications/${nixCats_packageName}.desktop'
     ''
-  + builtins.concatStringsSep "\n" (builtins.map (alias:
-    "ln -s $out/bin/${nixCats_packageName} $out/bin/${alias}"
-  ) customAliases)
-  + host_phase + "\n"
+  + ''
+    ${lib.concatMapStringsSep "\n" (alias: "ln -s '${placeholder "out"}/bin/${nixCats_packageName}' '${placeholder "out"}/bin/${alias}'") customAliases}
+    ${host_phase}
+    ''
   + (let
     manifestWrapperArgs =
       [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper" ] ++ generateCmdArg [];
@@ -126,18 +126,18 @@ in {
     # so that configuration may easily reference the path of the wrapper
     # for things like vim-startuptime
     # Grab the shebang
-    head -1 ${placeholder "out"}/bin/temp-nvim-wrapper > ${placeholder "out"}/bin/${nixCats_packageName}
+    head -1 ${placeholder "out"}/bin/temp-nvim-wrapper > '${placeholder "out"}/bin/${nixCats_packageName}'
     # add the code to set the environment variable
     if [ -e "$bashBeforeWrapperPath" ]; then
-      cat "$bashBeforeWrapperPath" >> ${placeholder "out"}/bin/${nixCats_packageName}
+      cat "$bashBeforeWrapperPath" >> '${placeholder "out"}/bin/${nixCats_packageName}'
     else
-      echo "$bashBeforeWrapper" >> ${placeholder "out"}/bin/${nixCats_packageName}
+      echo "$bashBeforeWrapper" >> '${placeholder "out"}/bin/${nixCats_packageName}'
     fi
-    echo >> ${placeholder "out"}/bin/${nixCats_packageName}
+    echo >> '${placeholder "out"}/bin/${nixCats_packageName}'
     # add the rest of the file back
-    tail -n +2 ${placeholder "out"}/bin/temp-nvim-wrapper >> ${placeholder "out"}/bin/${nixCats_packageName}
+    tail -n +2 ${placeholder "out"}/bin/temp-nvim-wrapper >> '${placeholder "out"}/bin/${nixCats_packageName}'
     rm ${placeholder "out"}/bin/temp-nvim-wrapper
-    chmod +x ${placeholder "out"}/bin/${nixCats_packageName}
+    chmod +x '${placeholder "out"}/bin/${nixCats_packageName}'
     runHook postBuild
   '';
 }
