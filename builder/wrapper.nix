@@ -52,7 +52,7 @@
     ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
     ++ [ "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}" ]
     ++ generateCmdArg [
-      "package.preload.nixCats = dofile([[${nixCatsPath}/lua/nixCats.lua]])"
+      "package.preload.nixCats = function() return dofile([[${nixCatsPath}/lua/nixCats.lua]]) end"
       "configdir = require([[nixCats]]).configDir"
       "vim.opt.packpath:prepend(configdir)"
       "vim.opt.runtimepath:prepend(configdir)"
