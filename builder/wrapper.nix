@@ -40,25 +40,6 @@
       "vim.opt.runtimepath:remove(configdir .. [[/after]])"
     ] ++ extra))
   ];
-
-  # If configure != {}, we can't generate the rplugin.vim file with e.g
-  # NVIM_SYSTEM_RPLUGIN_MANIFEST *and* NVIM_RPLUGIN_MANIFEST env vars set in
-  # the wrapper. That's why only when configure != {} (tested both here and
-  # when postBuild is evaluated), we call makeWrapper once to generate a
-  # wrapper with most arguments we need, excluding those that cause problems to
-  # generate rplugin.vim, but still required for the final wrapper.
-  finalMakeWrapperArgs =
-    [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
-    ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
-    ++ [ "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}" ]
-    ++ generateCmdArg [
-      "package.preload.nixCats = function() return dofile([[${nixCatsPath}/lua/nixCats.lua]]) end"
-      "configdir = require([[nixCats]]).configDir"
-      "vim.opt.packpath:prepend(configdir)"
-      "vim.opt.runtimepath:prepend(configdir)"
-      "vim.opt.runtimepath:append(configdir .. [[/after]])"
-    ];
-
 in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
   meta = neovim-unwrapped.meta // {
@@ -107,10 +88,23 @@ in {
       echo -e "\nGenerating rplugin.vim failed!"
       exit 1
     fi
-    rm "${placeholder "out"}/bin/nvim-wrapper"
-    touch $out/rplugin.vim
+    rm '${placeholder "out"}/bin/nvim-wrapper'
+    touch '${placeholder "out"}/rplugin.vim'
   '')
-  + /* bash */ ''
+  + (let
+    finalMakeWrapperArgs =
+      [ "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}" ]
+      ++ [ "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim" ]
+      ++ [ "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}" ]
+      ++ generateCmdArg [
+        "package.preload.nixCats = function() return dofile([[${nixCatsPath}/lua/nixCats.lua]]) end"
+        "configdir = require([[nixCats]]).configDir"
+        "vim.opt.packpath:prepend(configdir)"
+        "vim.opt.runtimepath:prepend(configdir)"
+        "vim.opt.runtimepath:append(configdir .. [[/after]])"
+      ];
+    finalArgStr = lib.escapeShellArgs finalMakeWrapperArgs + lib.optionalString (bashBeforeWrapper != "") " --run \"$(addprebash)\"";
+  in /* bash */ ''
     # see:
     # https://github.com/NixOS/nixpkgs/issues/318925
     echo "Looking for lua dependencies..."
@@ -121,13 +115,11 @@ in {
     addprebash() {
       [ -e "$bashBeforeWrapperPath" ] && cat "$bashBeforeWrapperPath" || echo "$bashBeforeWrapper"
     }
-    makeWrapper ${lib.escapeShellArgs finalMakeWrapperArgs} \
-        --run "$(addprebash)" \
-        ${wrapperArgsStr} \
+    makeWrapper ${finalArgStr} ${wrapperArgsStr} \
         --prefix LUA_PATH ';' "$LUA_PATH" \
         --prefix LUA_CPATH ';' "$LUA_CPATH" \
         --set-default VIMINIT 'lua nixCats.init_main()'
 
     runHook postBuild
-  '';
+  '');
 }
