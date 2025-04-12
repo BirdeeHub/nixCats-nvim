@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.2...v7.2.0) (2025-04-12)
+
+
+### Features
+
+* **wrapArgs:** added spec form for setting priority if desired ([6c2fc3d](https://github.com/BirdeeHub/nixCats-nvim/commit/6c2fc3df598fae20cfca9ab1891a37e999c935a9))
+
 ## [7.1.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.1...v7.1.2) (2025-04-08)
 
 
