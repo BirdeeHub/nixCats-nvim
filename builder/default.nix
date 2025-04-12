@@ -122,7 +122,7 @@
     # shorthand to reduce lispyness
     filterFlattenUnique = s: pkgs.lib.unique (filterAndFlatten s);
 
-    # the following 3 take an initial section name argument for error messages
+    # the following 4 take an initial section name argument for error messages
 
     # returns a function that returns a list
     combineCatsOfFuncs = sorting.combineCatsOfFuncs categories;
@@ -132,6 +132,9 @@
 
     # returns a list of wrapper args
     filterAndFlattenWrapArgs = sorting.filterAndFlattenWrapArgs categories;
+
+    # returns a string of unescaped wrapper args
+    filterAndFlattenXtraWrapArgs = sorting.filterAndFlattenXtraWrapArgs categories;
 
     normalized = import ./normalizePlugins.nix {
       startup = filterAndFlatten startupPlugins;
@@ -146,7 +149,7 @@
       invalidHostNames = builtins.attrNames base_sections;
       nixCats_packageName = name;
       inherit nclib initial_settings final_cat_defs_set;
-      inherit combineCatsOfFuncs filterAndFlattenEnvVars filterAndFlattenWrapArgs filterFlattenUnique;
+      inherit combineCatsOfFuncs filterAndFlattenEnvVars filterAndFlattenWrapArgs filterAndFlattenXtraWrapArgs;
     };
 
     # replace the path functions with lua before trying to write a nix function to a lua file
@@ -275,8 +278,8 @@
       userEnvVars = filterAndFlattenEnvVars "environmentVariables" environmentVariables;
       makeWrapperArgs = filterAndFlattenWrapArgs "wrapperArgs" wrapperArgs;
       bashBeforeWrapper = if builtins.isString bashBeforeWrapper
-        then [bashBeforeWrapper] else filterFlattenUnique bashBeforeWrapper;
-      extraMakeWrapperArgs = builtins.concatStringsSep " " (filterFlattenUnique extraWrapperArgs);
+        then [bashBeforeWrapper] else filterAndFlattenXtraWrapArgs "bashBeforeWrapper" bashBeforeWrapper;
+      extraMakeWrapperArgs = filterAndFlattenXtraWrapArgs "extraWrapperArgs" extraWrapperArgs;
       # the function you would have passed to lua.withPackages
       extraLuaPackages = combineCatsOfFuncs "lua" extraLuaPackages;
       # add our propagated build dependencies (not adviseable as then you miss the cache)

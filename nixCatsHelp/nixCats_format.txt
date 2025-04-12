@@ -237,32 +237,68 @@ These are the things you can return:
 <
 <startupPlugins>
   a flexible set of categories, each containing startup plugins.
-  Startup plugins are loaded and can be required. 
+  Startup plugins are loaded and can be required.
+  In addition, this can also recieve a superset of the home manager syntax for
+  plugins. see :help |nixCats.flake.outputs.categoryDefinitions.schemas| below
+  for info
 
 <optionalPlugins>
   a flexible set of categories, each containing optional plugins.
   Optional plugins need to be added with packadd before being required.
   Use :NixCats pawsible to see the names to use for packadd
+  In addition, this can also recieve a superset of the home manager syntax for
+  plugins. see :help |nixCats.flake.outputs.categoryDefinitions.schemas| below
+  for info
 
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSPs or
   other internal runtime dependencies such as ctags or debuggers
   these are available to the PATH while within the Neovim program.
-  this includes the Neovim terminal.
-
+  this includes the Neovim terminal. >nix
+  lspsAndRuntimeDeps = {
+    # some categories of stuff.
+    general = with pkgs; [
+      universal-ctags
+      ripgrep
+      fd
+    ];
+    go = with pkgs; [
+      gopls
+      gotools
+      go-tools
+      gccgo
+    ];
+  };
+<  
 <sharedLibraries>
   a flexible set of categories, each containing a derivation for
-  a runtime shared library. Will be prepended to the LD_LIBRARY_PATH variable.
-
+  a runtime shared library. Will be prepended to the LD_LIBRARY_PATH variable. >nix
+  sharedLibraries = {
+    general = {
+      myGitStuff = with pkgs; [ #<- yes you can nest stuff
+        libgit2
+      ];
+    };
+  };
+<
 <environmentVariables>
   a flexible set of categories, each containing an ATTRIBUTE SET of 
-  EnvironmentVariableName = "EnvironmentVariableValue";
-
+  EnvironmentVariableName = "EnvironmentVariableValue"; >nix
+  environmentVariables = {
+    general = {
+      CATTESTVARDEFAULT = "It worked!";
+    };
+  };
+<  
 <wrapperArgs>
   a flexible set of categories, each containing escaped lists of wrapper arguments. >nix
     wrapperArgs = {
       yourCategory = [
         [ "--set" "MYVAR" "test value" ]
+        {
+          value = [ "--set" "MYVAR2" "test value 2" ];
+          priority = 150; # <- the default priority
+        }
       ];
       another = [
         "--suffix"
@@ -278,6 +314,10 @@ https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make
     extraWrapperArgs = {
       yourCategory = [
         "--set MYVAR 'test value'"
+        {
+          value = "--set MYVAR2 'test value 2'";
+          priority = 150; # <- the default priority
+        }
       ];
     };
 <
@@ -285,8 +325,11 @@ https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make
   a flexible set of categories, each containing FUNCTIONS 
   that return lists of extra Lua packages.
   These functions are the same thing that you would pass to lua.withPackages.
-  Is used to populate $LUA_PATH and $LUA_CPATH
-
+  Is used to populate $LUA_PATH and $LUA_CPATH >nix
+    extraLuaPackages = {
+      general = [ (lp: [ lp.magick ]) ];
+    };
+<
 <optionalLuaPreInit>
   a flexible set of categories, each containing a list of lua strings,
   or a LIST of sets containing a priority and a string of the format:
@@ -312,6 +355,7 @@ https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make
   to run before the wrapper starts within the wrapper's Bash environment.
   # WARNING: only use this if you know what you are doing and why you need
   to do it. Whenever possible, use `wrapperArgs` or `extraWrapperArgs` instead.
+  This section works the same as `extraWrapperArgs` but for bash.
 
 <extraCats>
   a flexible set of categories, each containing a list of attribute paths,

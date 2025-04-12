@@ -154,10 +154,24 @@ ${name}.libraries category section does not accept functions!
 wrapArgs = name: builtins.throw ''
 Error: Invalid syntax in categoryDefinitions.
 ${if name != "wrapperArgs" then name + "." else ""}wrapperArgs categories must be
-either a list of lists of strings, or a list of only strings.
+either a list of:
+  (lists of strings like [ "--set" "MYVAR" "test value" ])
+  or (sets with { value = [ "--set" "MYVAR" "test value" ]; priority = 150; })
+or they may be a list of only strings.
 lib.escapeShellArgs will be called on the resulting list of arguments
 If you don't know what these are, check this link out:
 https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+'';
+
+xtraWrapArgs = name: builtins.throw ''
+Error: Invalid syntax in categoryDefinitions.
+${if name != "extraWrapperArgs" && name != "bashBeforeWrapper" then name + ".extraWrapperArgs" else name} categories must be
+a list of strings, or sets with { value = "${if name != "bashBeforeWrapper" then "--set MYVAR 'test value'" else "some bash code"}"; priority = 150; }
+THESE VALUES WILL BE PASSED UNESCAPED
+${if name != "bashBeforeWrapper" then ''
+If you don't know what these are, check this link out:
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+'' else ""}
 '';
 
 envVar = name: let

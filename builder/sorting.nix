@@ -70,12 +70,22 @@
     ];
 
   filterAndFlattenWrapArgs = categories: secname: let
-    errormsg = (import ./errors.nix).wrapArgs secname;
-    checker = _: value: if isList value && (all (v: isList v) value || all (v: isString v) value) then value else errormsg;
+    checker = _: value: if isList value && (all (v: isList (v.value or v)) value || all (v: isString v) value)
+      then value else (import ./errors.nix).wrapArgs secname;
   in lib.flip lib.pipe [
       (filterAndFlattenMapInnerAttrs categories checker)
       lib.flatten
+      (sort (a: b: a.priority or 150 < b.priority or 150))
+      (map (v: v.value or v))
+      concatLists
     ];
+
+  # also sorts bashBeforeWrapper
+  filterAndFlattenXtraWrapArgs = categories: secname: lib.flip lib.pipe [
+    (filterAndFlatten categories)
+    (sort (a: b: a.priority or 150 < b.priority or 150))
+    (map (v: if nclib.ncIsAttrs v then v.value or ((import ./errors.nix).xtraWrapArgs secname) else v))
+  ];
 
   # populates :NixCats petShop
   getCatSpace = { categories, sections, final_cat_defs_set }: let
