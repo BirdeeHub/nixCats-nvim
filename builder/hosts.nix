@@ -7,7 +7,7 @@
 , combineCatsOfFuncs
 , filterAndFlattenEnvVars
 , filterAndFlattenWrapArgs
-, filterFlattenUnique
+, filterAndFlattenXtraWrapArgs
 # from callPackage
 , pkgs
 , lib
@@ -119,7 +119,7 @@
     pathRes = if lib.isFunction host_settings.path
       then host_settings.path libraryFunc
       else host_settings.path or ((import ./errors.nix).hostPath name);
-    extraWrapperArgs = filterFlattenUnique (final_cat_defs_set.${name}.extraWrapperArgs or {});
+    extraWrapperArgs = filterAndFlattenXtraWrapArgs name (final_cat_defs_set.${name}.extraWrapperArgs or {});
     wrapperArgsPre = filterAndFlattenWrapArgs name (final_cat_defs_set.${name}.wrapperArgs or {});
     envArgs = filterAndFlattenEnvVars name (final_cat_defs_set.${name}.envVars or {});
     wrapperArgs = wrapperArgsPre ++ (pathRes.args or []) ++ envArgs;

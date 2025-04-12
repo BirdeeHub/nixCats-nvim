@@ -22,7 +22,7 @@
   nvim_host_vars ? [],
   host_phase ? "",
   makeWrapperArgs ? [],
-  extraMakeWrapperArgs ? "",
+  extraMakeWrapperArgs ? [],
   start ? [ ],
   opt ? [ ],
   # function to pass to vim-pack-dir that creates nixCats plugin
@@ -68,7 +68,7 @@ let
 
 in
 (pkgs.callPackage ./wrapper.nix { }) {
-  wrapperArgsStr = lib.escapeShellArgs mkWrapperArgs + " " + extraMakeWrapperArgs;
+  wrapperArgsStr = builtins.concatStringsSep " " ([ (lib.escapeShellArgs mkWrapperArgs) ] ++ extraMakeWrapperArgs);
   inherit (vimPack) nixCatsPath vimPackDir;
   inherit luaEnv customAliases neovim-unwrapped
     nixCats_packageName host_phase nvim_host_vars extraName;
