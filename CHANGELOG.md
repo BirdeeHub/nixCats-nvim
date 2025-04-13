@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.0...v7.2.1) (2025-04-13)
+
+
+### Bug Fixes
+
+* **host_deps:** grabbing host deps from plugins properly accepts function items ([624c018](https://github.com/BirdeeHub/nixCats-nvim/commit/624c01824b9c246ea3a05bbdc0ba9c04f7447dbc))
+
 ## [7.2.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.1.2...v7.2.0) (2025-04-12)
 
 
