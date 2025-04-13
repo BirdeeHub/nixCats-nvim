@@ -149,6 +149,12 @@ extraCats = {
 catsOfFn = name: builtins.throw ''
 Error: Invalid syntax in categoryDefinitions.
 ${name}.libraries category section does not accept functions!
+${name} host has passed null to the dependency function provided to its path field!
+'';
+
+hostDeps = name: field: builtins.throw ''
+Error: ${name} host does not allow plugin.${field} definition to accept functions!
+${name} host has passed null to the dependency function provided to its path field!
 '';
 
 wrapArgs = name: builtins.throw ''
