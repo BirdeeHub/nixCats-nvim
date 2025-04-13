@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.1...v7.2.2) (2025-04-13)
+
+
+### Bug Fixes
+
+* **host_deps:** pluginAttr error messages now properly match that of its associated libraries category section ([5cbda76](https://github.com/BirdeeHub/nixCats-nvim/commit/5cbda76bf285ef9da3b7d45a857e7ec364555207))
+
 ## [7.2.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.0...v7.2.1) (2025-04-13)
 
 
