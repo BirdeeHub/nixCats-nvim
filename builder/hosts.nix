@@ -112,10 +112,10 @@
     '';
   let
     host_settings = (defaults.${name} or {}) // host_set;
-    get_dependencies = attrname: concatLists (map (v: v.${attrname} or []) plugins);
+    get_dependencies = x: attrname: concatLists (map (v: if lib.isFunction (v.${attrname} or null) then v.${attrname} x else v.${attrname} or []) plugins);
     libraryFunc = x: let
       OGfn = combineCatsOfFuncs name (final_cat_defs_set.${name}.libraries or {});
-    in OGfn x ++ lib.optionals (isString (host_settings.pluginAttr or null)) (get_dependencies host_settings.pluginAttr);
+    in OGfn x ++ lib.optionals (isString (host_settings.pluginAttr or null)) (get_dependencies x host_settings.pluginAttr);
     pathRes = if lib.isFunction host_settings.path
       then host_settings.path libraryFunc
       else host_settings.path or ((import ./errors.nix).hostPath name);

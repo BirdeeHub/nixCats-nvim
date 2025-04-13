@@ -9,6 +9,9 @@
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
     startupPlugins = {
+      hostdeps = [
+        pkgs.vimPlugins.vim-beancount
+      ];
       overlaytest = [
         pkgs.neovimPlugins.hlargs
       ];
@@ -81,6 +84,7 @@
         hosts.python3.enable = true;
       };
       categories = {
+        hostdeps = true;
         overlaytest = true;
         testvars = true;
         autoconf = true;
