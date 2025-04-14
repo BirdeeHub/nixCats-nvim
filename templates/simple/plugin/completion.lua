@@ -12,5 +12,16 @@ require("blink.cmp").setup({
   signature = { enabled = true, },
   sources = {
     default = { 'lsp', 'path', 'snippets', 'buffer' },
+    providers = {
+      path = {
+        score_offset = 50,
+      },
+      lsp = {
+        score_offset = 40,
+      },
+      snippets = {
+        score_offset = 40,
+      },
+    },
   },
 })

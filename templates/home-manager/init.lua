@@ -658,25 +658,16 @@ local function lsp_on_attach(_, bufnr)
 
 end
 
-local function get_lsp_capabilities(server_name)
-  -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-  -- if you make a package without it, make sure to check if it exists with nixCats!
-  local capabilities = {}
-  if nixCats('general') then
-    capabilities = require('blink.cmp').get_lsp_capabilities(capabilities, true)
-  else
-    capabilities = vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), capabilities)
-  end
-  return capabilities
-end
-
 -- NOTE: Register a handler from lzextras. This one makes it so that
 -- you can set up lsps within lze specs,
--- and trigger lspconfig setup only on the correct filetypes
+-- and trigger vim.lsp.enable and the rtp config collection only on the correct filetypes
 -- it adds the lsp field used below
 -- (and must be registered before any load calls that use it!)
 require('lze').register_handlers(require('lzextras').lsp)
-
+-- also replace the fallback filetype list retrieval function with a slightly faster one
+require('lze').h.lsp.set_ft_fallback(function(name)
+  return dofile(nixCats.pawsible({ "allPlugins", "opt", "nvim-lspconfig" }) .. "/lsp/" .. name .. ".lua").filetypes or {}
+end)
 require('lze').load {
   {
     "nvim-lspconfig",
@@ -687,13 +678,13 @@ require('lze').load {
     -- define a function to run over all type(plugin.lsp) == table
     -- when their filetype trigger loads them
     lsp = function(plugin)
-      -- in this case, just extend some default arguments with the ones provided in the lsp table
-      require('lspconfig')[plugin.name].setup(vim.tbl_extend("force",{
-        -- provide our capabilities and our on_attach function by default
-        capabilities = get_lsp_capabilities(plugin.name),
+      vim.lsp.config(plugin.name, plugin.lsp or {})
+      vim.lsp.enable(plugin.name)
+    end,
+    before = function(_)
+      vim.lsp.config('*', {
         on_attach = lsp_on_attach,
-        -- and add the config from each spec to the defaults here and call lspconfig with it
-      }, plugin.lsp or {}))
+      })
     end,
   },
   {
@@ -726,8 +717,10 @@ require('lze').load {
   {
     "gopls",
     enabled = nixCats("go") or false,
-    -- if you don't provide the filetypes it asks lspconfig for them
-    lsp = {},
+    -- if you don't provide the filetypes it asks lspconfig for them using the function we set above
+    lsp = {
+      -- filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    },
   },
   {
     "nixd",
