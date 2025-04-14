@@ -3,10 +3,14 @@ on:
   workflow_dispatch: # allows manual triggering
   schedule:
     - cron: '0 0 * * 0' # runs weekly on Sunday at 00:00
+  push:
+    branches:
+      - main
 
 jobs:
   lockfile:
     runs-on: ubuntu-latest
+    if: startsWith(github.event.head_commit.message, 'chore') && contains(github.event.head_commit.message, 'release')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
