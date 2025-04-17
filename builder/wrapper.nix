@@ -71,12 +71,12 @@ in {
   + (let
     manifestWrapperStr = lib.escapeShellArgs [
       "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper"
-      "--add-flags" "--cmd source${placeholder "out"}/setup.lua"
+      "--add-flags" "--cmd source${placeholder "out"}/${nixCats_packageName}-setup.lua"
     ];
   in /* bash */ ''
     echo "Generating remote plugin manifest"
     export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim
-    { [ -e "$manifestLuaPath" ] && cat "$manifestLuaPath" || echo "$manifestLua"; } > '${placeholder "out"}/setup.lua'
+    { [ -e "$manifestLuaPath" ] && cat "$manifestLuaPath" || echo "$manifestLua"; } > '${placeholder "out"}/${nixCats_packageName}-setup.lua'
     makeWrapper ${manifestWrapperStr} ${wrapperArgsStr}
     # some plugins expect $HOME to exist or they throw at startup
     export HOME="$(mktemp -d)"
@@ -101,7 +101,7 @@ in {
       "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}"
       "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim"
       "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}"
-      "--add-flags" "--cmd source${placeholder "out"}/setup.lua" ]
+      "--add-flags" "--cmd source${placeholder "out"}/${nixCats_packageName}-setup.lua" ]
       + lib.optionalString (bashBeforeWrapper != "") " --run \"$(addprebash)\"";
   in /* bash */ ''
     # see:
@@ -111,7 +111,7 @@ in {
     _addToLuaPath "${vimPackDir}" || true
     echo "propagated dependency path for plugins: $LUA_PATH"
     echo "propagated dependency cpath for plugins: $LUA_CPATH"
-    { [ -e "$setupLuaPath" ] && cat "$setupLuaPath" || echo "$setupLua"; } > '${placeholder "out"}/setup.lua'
+    { [ -e "$setupLuaPath" ] && cat "$setupLuaPath" || echo "$setupLua"; } > '${placeholder "out"}/${nixCats_packageName}-setup.lua'
     addprebash() {
       [ -e "$bashBeforeWrapperPath" ] && cat "$bashBeforeWrapperPath" || echo "$bashBeforeWrapper"
     }
