@@ -329,8 +329,8 @@ in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
   };
   final_processed = process_args oldargs;
 in {
-  inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper; # <- generated args
-  passAsFile = [ "bashBeforeWrapper" ];
+  inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper setupLua manifestLua; # <- generated args
+  passAsFile = [ "bashBeforeWrapper" "setupLua" "manifestLua" ];
   nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
   preferLocalBuild = true; # <- set here plain so that it is overrideable
   dontUnpack = true;
