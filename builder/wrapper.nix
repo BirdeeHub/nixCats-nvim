@@ -95,11 +95,12 @@ in {
     fi
     rm '${placeholder "out"}/bin/nvim-wrapper'
     touch '${placeholder "out"}/rplugin.vim'
+    mv '${placeholder "out"}/rplugin.vim' '${placeholder "out"}/${nixCats_packageName}-rplugin.vim'
   '')
   + (let
     finalArgStr = lib.escapeShellArgs [
       "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}"
-      "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/rplugin.vim"
+      "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/${nixCats_packageName}-rplugin.vim"
       "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}"
       "--add-flags" "--cmd source${placeholder "out"}/${nixCats_packageName}-setup.lua" ]
       + lib.optionalString (bashBeforeWrapper != "") " --run \"$(addprebash)\"";
