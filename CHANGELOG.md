@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.2...v7.2.3) (2025-04-17)
+
+
+### Bug Fixes
+
+* **tmux-resurrect:** https://github.com/BirdeeHub/nixCats-nvim/issues/244 ([9021ee6](https://github.com/BirdeeHub/nixCats-nvim/commit/9021ee6f85892588511135512b10e5d9f2cb9e9d))
+
 ## [7.2.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.1...v7.2.2) (2025-04-13)
 
 
