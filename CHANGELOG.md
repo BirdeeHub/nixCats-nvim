@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.3...v7.2.4) (2025-04-17)
+
+
+### Bug Fixes
+
+* **home-manager:** fix multi install regression from latest fix ([0787a77](https://github.com/BirdeeHub/nixCats-nvim/commit/0787a77b0d375733ec5213e224258a8b675e658a))
+
 ## [7.2.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.2...v7.2.3) (2025-04-17)
 
 
