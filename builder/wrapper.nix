@@ -22,11 +22,11 @@
   , ...
 }: let
   luaSetupLines = nvim_host_vars ++ [
-    "vim.opt.packpath:prepend([[${vimPackDir}]])"
-    "vim.opt.runtimepath:prepend([[${vimPackDir}]])"
-    "vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = [[${nixCatsPath}]]"
-    "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = [[${vimPackDir}]]"
-    "vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = [[${luaEnv}]]"
+    "vim.opt.packpath:prepend('${vimPackDir}')"
+    "vim.opt.runtimepath:prepend('${vimPackDir}')"
+    "vim.g[ [[nixCats-special-rtp-entry-nixCats]] ] = '${nixCatsPath}'"
+    "vim.g[ [[nixCats-special-rtp-entry-vimPackDir]] ] = '${vimPackDir}'"
+    "vim.g[ [[nixCats-special-rtp-entry-nvimLuaEnv]] ] = '${luaEnv}'"
     "local configdir = vim.fn.stdpath([[config]])"
     "vim.opt.packpath:remove(configdir)"
     "vim.opt.runtimepath:remove(configdir)"
@@ -43,7 +43,7 @@ in {
   setupLua = builtins.concatStringsSep "\n" ([
     "if nixCats then return end" # <- safety to prevent possible weirdness from --cmd being called twice by tmux-resurrect or similar
   ] ++ luaSetupLines ++ [
-    "package.preload.nixCats = function() return dofile([[${nixCatsPath}/lua/nixCats.lua]]) end"
+    "package.preload.nixCats = function() return dofile('${nixCatsPath}/lua/nixCats.lua') end"
     "configdir = require([[nixCats]]).configDir"
     "vim.opt.packpath:prepend(configdir)"
     "vim.opt.runtimepath:prepend(configdir)"
@@ -58,25 +58,25 @@ in {
   ''
   + lib.optionalString stdenv.isLinux ''
     mkdir -p $out/share/applications
-    substitute ${neovim-unwrapped}/share/applications/nvim.desktop '${placeholder "out"}/share/applications/${nixCats_packageName}.desktop' \
-      --replace-fail 'Name=Neovim' 'Name=${nixCats_packageName}'\
-      --replace-fail 'TryExec=nvim' 'TryExec=${placeholder "out"}/bin/${nixCats_packageName}'\
-      --replace-fail 'Icon=nvim' 'Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png'
-    ${gnused}/bin/sed -i '/^Exec=nvim/c\Exec=${placeholder "out"}/bin/${nixCats_packageName} "%F"' '${placeholder "out"}/share/applications/${nixCats_packageName}.desktop'
+    substitute ${lib.escapeShellArgs [ "${neovim-unwrapped}/share/applications/nvim.desktop" "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop"
+      "--replace-fail" "Name=Neovim" "Name=${nixCats_packageName}"
+      "--replace-fail" "TryExec=nvim" "TryExec=${placeholder "out"}/bin/${nixCats_packageName}"
+      "--replace-fail" "Icon=nvim" "Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png" ]}
+    ${gnused}/bin/sed -i ${lib.escapeShellArgs [ "/^Exec=nvim/c\Exec=${placeholder "out"}/bin/${nixCats_packageName} \"%F\"" "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop" ]}
     ''
   + ''
-    ${lib.concatMapStringsSep "\n" (alias: "ln -s '${placeholder "out"}/bin/${nixCats_packageName}' '${placeholder "out"}/bin/${alias}'") customAliases}
+    ${lib.concatMapStringsSep "\n" (alias: "ln -s ${lib.escapeShellArgs [ "${placeholder "out"}/bin/${nixCats_packageName}" "${placeholder "out"}/bin/${alias}" ]}") customAliases}
     ${host_phase}
     ''
   + (let
     manifestWrapperStr = lib.escapeShellArgs [
       "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/nvim-wrapper"
-      "--add-flags" "--cmd source${placeholder "out"}/${nixCats_packageName}-setup.lua"
+      "--add-flags" "--cmd ${lib.escapeShellArg "source${placeholder "out"}/${nixCats_packageName}-setup.lua"}"
     ];
   in /* bash */ ''
     echo "Generating remote plugin manifest"
     export NVIM_RPLUGIN_MANIFEST=$out/rplugin.vim
-    { [ -e "$manifestLuaPath" ] && cat "$manifestLuaPath" || echo "$manifestLua"; } > '${placeholder "out"}/${nixCats_packageName}-setup.lua'
+    { [ -e "$manifestLuaPath" ] && cat "$manifestLuaPath" || echo "$manifestLua"; } > ${lib.escapeShellArg "${placeholder "out"}/${nixCats_packageName}-setup.lua"}
     makeWrapper ${manifestWrapperStr} ${wrapperArgsStr}
     # some plugins expect $HOME to exist or they throw at startup
     export HOME="$(mktemp -d)"
@@ -95,24 +95,24 @@ in {
     fi
     rm '${placeholder "out"}/bin/nvim-wrapper'
     touch '${placeholder "out"}/rplugin.vim'
-    mv '${placeholder "out"}/rplugin.vim' '${placeholder "out"}/${nixCats_packageName}-rplugin.vim'
+    mv '${placeholder "out"}/rplugin.vim' ${lib.escapeShellArg "${placeholder "out"}/${nixCats_packageName}-rplugin.vim"}
   '')
   + (let
     finalArgStr = lib.escapeShellArgs [
       "${neovim-unwrapped}/bin/nvim" "${placeholder "out"}/bin/${nixCats_packageName}"
       "--set" "NVIM_SYSTEM_RPLUGIN_MANIFEST" "${placeholder "out"}/${nixCats_packageName}-rplugin.vim"
       "--set" "NVIM_WRAPPER_PATH_NIX" "${placeholder "out"}/bin/${nixCats_packageName}"
-      "--add-flags" "--cmd source${placeholder "out"}/${nixCats_packageName}-setup.lua" ]
+      "--add-flags" "--cmd ${lib.escapeShellArg "source${placeholder "out"}/${nixCats_packageName}-setup.lua"}" ]
       + lib.optionalString (bashBeforeWrapper != "") " --run \"$(addprebash)\"";
   in /* bash */ ''
     # see:
     # https://github.com/NixOS/nixpkgs/issues/318925
     echo "Looking for lua dependencies..."
     source ${neovim-unwrapped.lua}/nix-support/utils.sh || true
-    _addToLuaPath "${vimPackDir}" || true
+    _addToLuaPath '${vimPackDir}' || true
     echo "propagated dependency path for plugins: $LUA_PATH"
     echo "propagated dependency cpath for plugins: $LUA_CPATH"
-    { [ -e "$setupLuaPath" ] && cat "$setupLuaPath" || echo "$setupLua"; } > '${placeholder "out"}/${nixCats_packageName}-setup.lua'
+    { [ -e "$setupLuaPath" ] && cat "$setupLuaPath" || echo "$setupLua"; } > ${lib.escapeShellArg "${placeholder "out"}/${nixCats_packageName}-setup.lua"}
     addprebash() {
       [ -e "$bashBeforeWrapperPath" ] && cat "$bashBeforeWrapperPath" || echo "$bashBeforeWrapper"
     }

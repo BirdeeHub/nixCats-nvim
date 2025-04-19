@@ -137,8 +137,8 @@
   {
     inherit name;
     cmd = if extraWrapperArgs == [] && wrapperArgs == []
-      then "ln -s ${pathRes.value or pathRes} ${placeholder "out"}/bin/${nixCats_packageName}-${name}"
-      else "makeWrapper ${pathRes.value or pathRes} ${placeholder "out"}/bin/${nixCats_packageName}-${name} ${wrapperArgsStr}";
+      then "ln -s ${lib.escapeShellArgs [ (pathRes.value or pathRes) "${placeholder "out"}/bin/${nixCats_packageName}-${name}" ]}"
+      else "makeWrapper ${lib.escapeShellArgs [ (pathRes.value or pathRes) "${placeholder "out"}/bin/${nixCats_packageName}-${name}" ]} ${wrapperArgsStr}";
     enable = host_settings.enable or false;
     nvim_host_args = pathRes.nvimArgs or [];
     nvim_host_var = "vim.g[ ${nclib.n2l.uglyLua globalname} ]";
@@ -164,7 +164,7 @@
     # wrapper args for nvim from hosts
     nvim_host_args = acc.nvim_host_args ++ host.nvim_host_args;
     # generateProviderRc
-    nvim_host_vars = acc.nvim_host_vars ++ [ "${host.nvim_host_var}=[[${placeholder "out"}/bin/${nixCats_packageName}-${host.name}]]" ];
+    nvim_host_vars = acc.nvim_host_vars ++ [ "${host.nvim_host_var}=${nclib.n2l.uglyLua "${placeholder "out"}/bin/${nixCats_packageName}-${host.name}"}" ];
   } else {
     nvim_host_vars = acc.nvim_host_vars ++ host.disabled;
   });

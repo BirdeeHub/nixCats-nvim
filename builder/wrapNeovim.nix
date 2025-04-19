@@ -69,8 +69,8 @@ let
 in
 (pkgs.callPackage ./wrapper.nix { }) {
   wrapperArgsStr = builtins.concatStringsSep " " ([ (lib.escapeShellArgs mkWrapperArgs) ] ++ extraMakeWrapperArgs);
+  bashBeforeWrapper = builtins.concatStringsSep "\n" bashBeforeWrapper;
   inherit (vimPack) nixCatsPath vimPackDir;
   inherit luaEnv customAliases neovim-unwrapped
     nixCats_packageName host_phase nvim_host_vars extraName;
-    bashBeforeWrapper = builtins.concatStringsSep "\n" bashBeforeWrapper;
 }
