@@ -28,7 +28,9 @@
         snacks-nvim
         onedark-nvim
         vim-sleuth
-        mini-nvim
+        mini-ai
+        mini-icons
+        mini-pairs
         nvim-lspconfig
         vim-startuptime
         blink-cmp
@@ -67,8 +69,10 @@
         # IMPORTANT:
         # your aliases may not conflict with other packages.
         # aliases = [ "vim" ];
-        hosts.python3.enable = true;
-        hosts.node.enable = true;
+        hosts.python3.enable = false;
+        hosts.node.enable = false;
+        hosts.ruby.enable = false;
+        hosts.perl.enable = false;
       };
       # and a set of categories that you want
       # All categories you wish to include must be marked true

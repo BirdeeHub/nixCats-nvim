@@ -107,7 +107,7 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 -- NOTE: nixCats: we asked nix if we have it instead of setting it here.
 -- because nix is more likely to know if we have a nerd font or not.
-vim.g.have_nerd_font = nixCats("have_nerd_font")
+vim.g.have_nerd_font = nixCats 'have_nerd_font'
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -220,13 +220,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
-
 -- NOTE: nixCats: You might want to move the lazy-lock.json file
 local function getlockfilepath()
-  if require('nixCatsUtils').isNixCats and type(nixCats.settings.unwrappedCfgPath) == "string" then
-    return nixCats.settings.unwrappedCfgPath .. "/lazy-lock.json"
+  if require('nixCatsUtils').isNixCats and type(nixCats.settings.unwrappedCfgPath) == 'string' then
+    return nixCats.settings.unwrappedCfgPath .. '/lazy-lock.json'
   else
-    return vim.fn.stdpath("config") .. "/lazy-lock.json"
+    return vim.fn.stdpath 'config' .. '/lazy-lock.json'
   end
 end
 local lazyOptions = {
@@ -265,8 +264,7 @@ local lazyOptions = {
 -- NOTE: Here is where you install your plugins.
 -- NOTE: nixCats: this the lazy wrapper. Use it like require('lazy').setup() but with an extra
 -- argument, the path to lazy.nvim as downloaded by nix, or nil, before the normal arguments.
-require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "lazy.nvim" }),
-{
+require('nixCatsUtils.lazyCat').setup(nixCats.pawsible { 'allPlugins', 'start', 'lazy.nvim' }, {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -282,7 +280,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
   -- "gc" to comment visual regions/lines
   -- NOTE: nixCats: nix downloads it with a different file name.
   -- tell lazy about that.
-  { 'numToStr/Comment.nvim', name = "comment.nvim", opts = {} },
+  { 'numToStr/Comment.nvim', name = 'comment.nvim', opts = {} },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -366,7 +364,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         -- This is only run then, not every time Neovim starts up.
         -- NOTE: nixCats: use lazyAdd to only run build steps if nix wasnt involved.
         -- because nix already did this.
-        build = require('nixCatsUtils').lazyAdd('make'),
+        build = require('nixCatsUtils').lazyAdd 'make',
 
         -- `cond` is a condition used to determine whether this plugin should be
         -- installed and loaded.
@@ -492,13 +490,15 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/lazydev.nvim', ft = "lua",
+      {
+        'folke/lazydev.nvim',
+        ft = 'lua',
         opts = {
           library = {
             -- adds type hints for nixCats global
-            { path = (nixCats.nixCatsPath or "") .. '/lua', words = { "nixCats" } },
+            { path = (nixCats.nixCatsPath or '') .. '/lua', words = { 'nixCats' } },
           },
-        }
+        },
       },
       -- kickstart.nvim was still on neodev. lazydev is the new version of neodev
     },
@@ -632,6 +632,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      vim.lsp.config('*', { capabilities = capabilities })
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -644,18 +645,18 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       -- NOTE: nixCats: there is help in nixCats for lsps at `:h nixCats.LSPs` and also `:h nixCats.luaUtils`
       local servers = {}
-        -- servers.clangd = {},
-        -- servers.gopls = {},
-        -- servers.pyright = {},
-        -- servers.rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- servers.tsserver = {},
-        --
+      -- servers.clangd = {},
+      -- servers.gopls = {},
+      -- servers.pyright = {},
+      -- servers.rust_analyzer = {},
+      -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
+      --
+      -- Some languages (like typescript) have entire language plugins that can be useful:
+      --    https://github.com/pmizio/typescript-tools.nvim
+      --
+      -- But for many setups, the LSP (`tsserver`) will work just fine
+      -- servers.tsserver = {},
+      --
 
       -- NOTE: nixCats: nixd is not available on mason.
       -- Feel free to check the nixd docs for more configuration options:
@@ -677,7 +678,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
             },
             -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
             diagnostics = {
-              globals = { "nixCats" },
+              globals = { 'nixCats' },
               disable = { 'missing-fields' },
             },
           },
@@ -688,17 +689,13 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
       -- You could MAKE it work, using lspsAndRuntimeDeps and sharedLibraries in nixCats
       -- but don't... its not worth it. Just add the lsp to lspsAndRuntimeDeps.
       if require('nixCatsUtils').isNixCats then
-        for server_name,_ in pairs(servers) do
-          require('lspconfig')[server_name].setup({
-            capabilities = capabilities,
-            settings = (servers[server_name] or {}).settings,
-            filetypes = (servers[server_name] or {}).filetypes,
-            cmd = (servers[server_name] or {}).cmd,
-            root_pattern = (servers[server_name] or {}).root_pattern,
-          })
+        -- set up the servers to be loaded on the appropriate filetypes!
+        for server_name, cfg in pairs(servers) do
+          vim.lsp.config(server_name, cfg)
+          vim.lsp.enable(server_name)
         end
       else
-        -- NOTE: nixCats: and if no nix, do it the normal way
+        -- NOTE: nixCats: and if no nix, use mason
 
         -- Ensure the servers and tools above are installed
         --  To check the current status of installed tools and/or manually install
@@ -719,12 +716,8 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
         require('mason-lspconfig').setup {
           handlers = {
             function(server_name)
-              local server = servers[server_name] or {}
-              -- This handles overriding only values explicitly passed
-              -- by the server configuration above. Useful when disabling
-              -- certain features of an LSP (for example, turning off formatting for tsserver)
-              server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-              require('lspconfig')[server_name].setup(server)
+              vim.lsp.config(server_name, servers[server_name] or {})
+              vim.lsp.enable(server_name)
             end,
           },
         }
@@ -943,11 +936,11 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    build = require('nixCatsUtils').lazyAdd(':TSUpdate'),
+    build = require('nixCatsUtils').lazyAdd ':TSUpdate',
     opts = {
       -- NOTE: nixCats: use lazyAdd to only set these 2 options if nix wasnt involved.
       -- because nix already ensured they were installed.
-      ensure_installed = require('nixCatsUtils').lazyAdd({ 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' }),
+      ensure_installed = require('nixCatsUtils').lazyAdd { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
       auto_install = require('nixCatsUtils').lazyAdd(true, false),
 
       highlight = {

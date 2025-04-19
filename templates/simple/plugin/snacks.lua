@@ -5,6 +5,7 @@ require("snacks").setup({
   picker = {},
   bigfile = {},
   image = {},
+  explorer = { replace_netrw = true, },
   lazygit = {},
   terminal = {},
   rename = {},
@@ -17,6 +18,7 @@ vim.keymap.set("n", "<c-\\>", function() Snacks.terminal.open() end, { desc = 'S
 vim.keymap.set("n", "<leader>_", function() Snacks.lazygit.open() end, { desc = 'Snacks LazyGit' })
 vim.keymap.set('n', "<leader>sf", function() Snacks.picker.smart() end, { desc = "Smart Find Files" })
 vim.keymap.set('n', "<leader><leader>s", function() Snacks.picker.buffers() end, { desc = "Search Buffers" })
+vim.keymap.set("n", "-", function() Snacks.explorer.open() end, { desc = 'Snacks file explorer' })
 -- find
 vim.keymap.set('n', "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" })
 vim.keymap.set('n', "<leader>fg", function() Snacks.picker.git_files() end, { desc = "Find Git Files" })
