@@ -98,14 +98,14 @@
         settings = initial_settings;
         extra = extraTableLua;
       };
-    catdef_with_deprecations = catdef
+    in catdef
       // (pkgs.lib.optionalAttrs (catdef ? extraPython3Packages) (nclib.warnfn ''
         nixCats categoryDefinitions extraPython3Packages section deprecated for python3.libraries
       '' { python3.libraries = catdef.extraPython3Packages; }))
       // (pkgs.lib.optionalAttrs (catdef ? extraPython3wrapperArgs) (nclib.warnfn ''
         nixCats categoryDefinitions extraPython3wrapperArgs section deprecated for python3.extraWrapperArgs
-      '' { python3.extraWrapperArgs = catdef.extraPython3wrapperArgs; }));
-    in catdef_with_deprecations));
+      '' { python3.extraWrapperArgs = catdef.extraPython3wrapperArgs; })))
+    );
     # categories depends on extraCats
     categories = sorting.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
     extraTableLua = thisPackage.extra or {};
