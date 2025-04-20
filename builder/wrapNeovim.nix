@@ -54,18 +54,21 @@ let
     ];
   in [
     "--inherit-argv0"
-  ] ++ nvim_host_args ++ [
     "--prefix" "LUA_PATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv)
     "--prefix" "LUA_CPATH" ";" (neovim-unwrapped.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv)
-  ] ++ lib.optionals (autowrapRuntimeDeps == "prefix" && autowrapped != []) [
-    "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
   ] ++ pkgs.lib.optionals (configDirName != null && configDirName != "" || configDirName != "nvim") [
     "--set" "NVIM_APPNAME" configDirName
-  ] ++ normSpecs preORpostPATH "PATH" pkgs.lib.makeBinPath userPathEnv
+  ] ++ userEnvVars ++ nvim_host_args
+  # auto included prefixes first so user prefixes win
+  ++ lib.optionals (autowrapRuntimeDeps == "prefix" && autowrapped != [])
+    [ "--prefix" "PATH" ":" (lib.makeBinPath autowrapped) ]
+  # user provided deps
+  ++ normSpecs preORpostPATH "PATH" pkgs.lib.makeBinPath userPathEnv
   ++ normSpecs preORpostLD "LD_LIBRARY_PATH" pkgs.lib.makeLibraryPath userLinkables
-  ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != []) [
-    "--suffix" "PATH" ":" (lib.makeBinPath autowrapped)
-  ] ++ userEnvVars ++ makeWrapperArgs;
+  # auto included suffixes last so user prefixes win
+  ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != [])
+    [ "--suffix" "PATH" ":" (lib.makeBinPath autowrapped) ]
+  ++ makeWrapperArgs;
 
   vimPack = pkgs.callPackage ./vim-pack-dir.nix {
     inherit collate_grammars nixCats nclib;
