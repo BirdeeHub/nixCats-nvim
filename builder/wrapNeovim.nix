@@ -65,7 +65,7 @@ let
   # user provided deps
   ++ normSpecs preORpostPATH "PATH" lib.makeBinPath userPathEnv
   ++ normSpecs preORpostLD "LD_LIBRARY_PATH" lib.makeLibraryPath userLinkables
-  # auto included suffixes last so user prefixes win
+  # auto included suffixes last so user suffixes win
   ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != [])
     [ "--suffix" "PATH" ":" (lib.makeBinPath autowrapped) ]
   ++ makeWrapperArgs;
