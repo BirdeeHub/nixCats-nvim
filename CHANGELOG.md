@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.4...v7.2.5) (2025-04-20)
+
+
+### Bug Fixes
+
+* **templates:** converting templates to new lsp scheme for 0.11 ([#252](https://github.com/BirdeeHub/nixCats-nvim/issues/252)) ([6cb25b1](https://github.com/BirdeeHub/nixCats-nvim/commit/6cb25b1c003283332bf1a62cd2bb938f9e2cd9f8))
+
 ## [7.2.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.3...v7.2.4) (2025-04-17)
 
 
