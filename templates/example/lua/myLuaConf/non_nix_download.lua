@@ -49,18 +49,11 @@ require('nixCatsUtils.catPacker').setup({
   { 'folke/lazydev.nvim', opt = true, },
 
   -- completion
-  { 'onsails/lspkind.nvim', opt = true, },
   { 'L3MON4D3/LuaSnip', opt = true, as = "luasnip", },
-  { 'saadparwaiz1/cmp_luasnip', opt = true, },
-  { 'hrsh7th/cmp-nvim-lsp', opt = true, },
-  { 'hrsh7th/cmp-nvim-lua', opt = true, },
-  { 'hrsh7th/cmp-nvim-lsp-signature-help', opt = true, },
-  { 'hrsh7th/cmp-path', opt = true, },
-  { 'rafamadriz/friendly-snippets', opt = true, },
-  { 'hrsh7th/cmp-buffer', opt = true, },
   { 'hrsh7th/cmp-cmdline', opt = true, },
-  { 'dmitmel/cmp-cmdline-history', opt = true, },
-  { 'hrsh7th/nvim-cmp', opt = true, },
+  { 'Saghen/blink.cmp', opt = true, },
+  { 'Saghen/blink.compat', opt = true, },
+  { 'xzbdmw/colorful-menu.nvim', opt = true, },
 
   -- lint and format
   { 'mfussenegger/nvim-lint', opt = true, },

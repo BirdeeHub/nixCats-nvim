@@ -5,13 +5,14 @@ MASON AND LSPCONFIG                                             *nixCats.LSPs*
 This is a method you may use to make sure mason only tries to download stuff
 when you did not install Neovim via nixCats
 
+When not using nix you will of course be responsible for downloading mason
+using something else.
+
 It functions the same as what kickstart.nvim does for its mason setup.
 However, when loaded via Nix,
-it skips mason and passes them straight to nvim-lspconfig
+it skips mason and enables them with default configs provided by nvim-lspconfig.
 
-When installing via paq-nvim, install mason via paq-nvim. Then wherever you set up
-mason, do this.
-The stuff added to servers table is what is passed to lspconfig/mason
+The following assumes that you have nvim-lspconfig loaded as a startup plugin
 
 >lua
   local servers = {}
@@ -132,62 +133,7 @@ The stuff added to servers table is what is passed to lspconfig/mason
   -- servers.html = { filetypes = { 'html', 'twig', 'hbs'} }
 
 
-  -- If you were to comment out this autocommand
-  -- and instead pass the on attach function directly to
-  -- nvim-lspconfig, it would do the same thing.
-  vim.api.nvim_create_autocmd('LspAttach', {
-    group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
-    callback = function(event)
-      require('myLuaConf.LSPs.caps-on_attach').on_attach(vim.lsp.get_client_by_id(event.data.client_id), event.buf)
-    end
-  })
-  if require('nixCatsUtils').isNixCats then
-    for server_name, cfg in pairs(servers) do
-      require('lspconfig')[server_name].setup({
-        capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
-        -- this line is interchangeable with the above LspAttach autocommand
-        -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-        settings = (cfg or {}).settings,
-        filetypes = (cfg or {}).filetypes,
-        cmd = (cfg or {}).cmd,
-        root_pattern = (cfg or {}).root_pattern,
-      })
-    end
-
-  else
-    require('mason').setup()
-    local mason_lspconfig = require 'mason-lspconfig'
-    mason_lspconfig.setup {
-      ensure_installed = vim.tbl_keys(servers),
-    }
-    mason_lspconfig.setup_handlers {
-      function(server_name)
-        require('lspconfig')[server_name].setup {
-          capabilities = require('myLuaConf.LSPs.caps-on_attach').get_capabilities(server_name),
-          -- this line is interchangeable with the above LspAttach autocommand
-          -- on_attach = require('myLuaConf.LSPs.caps-on_attach').on_attach,
-          settings = (servers[server_name] or {}).settings,
-          filetypes = (servers[server_name] or {}).filetypes,
-        }
-      end,
-    }
-  end
-<
----------------------------------------------------------------------------------
-                                                 *nixCats.LSPs.caps-on_attach*
-
-The above snippet mentions another file at the end.
-
-caps-on_attach.lua or 'myLuaConf.LSPs.caps-on_attach'
-
-It is simply a file containing the function we want to run on LSP attach, and a
-function to return our completion capabilities object.
-
-It looks like this:
-
->lua
-  local M = {}
-  function M.on_attach(_, bufnr)
+  local function on_attach(_, bufnr)
     -- we create a function that lets us more easily define mappings specific
     -- for LSP related items. It sets the mode, buffer and description for us each time.
 
@@ -227,21 +173,42 @@ It looks like this:
     end, { desc = 'Format current buffer with LSP' })
 
   end
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
+    callback = function(event)
+      on_attach(vim.lsp.get_client_by_id(event.data.client_id), event.buf)
+    end
+  })
 
-  function M.get_capabilities(server_name)
-    -- you may wish to know which server you're using to set different capabilities
-    -- if server_name is omitted, it will be nil
-
-    -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-    -- if you make a package without it, make sure to check if it exists with nixCats!
+  -- if nixCats('nvim-cmp') then
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-    capabilities.textDocument.completion.completionItem.snippetSupport = true
-    return capabilities
+    vim.lsp.config('*', { capabilities = capabilities })
+  -- end
+
+  -- Check if we used nix, only run mason if we did not
+  if require('nixCatsUtils').isNixCats then
+    for server_name, cfg in pairs(servers) do
+      -- This gets provided a default configuration by nvim-lspconfig
+      -- and then ours gets tbl_deep_extend'ed into it
+      vim.lsp.config(server_name, cfg)
+      vim.lsp.enable(server_name)
+    end
+
+  else
+    require('mason').setup()
+    local mason_lspconfig = require 'mason-lspconfig'
+    mason_lspconfig.setup {
+      ensure_installed = vim.tbl_keys(servers),
+    }
+    mason_lspconfig.setup_handlers {
+      function(server_name)
+        local server = servers[server_name] or {}
+        vim.lsp.config(server_name, server)
+        vim.lsp.enable(server_name)
+      end,
+    }
   end
-  return M
 <
-
-
 =================================================================================
 vim:tw=78:ts=8:ft=help:norl:
