@@ -2,6 +2,11 @@ local catUtils = require('nixCatsUtils')
 if (catUtils.isNixCats and nixCats('lspDebugMode')) then
   vim.lsp.set_log_level("debug")
 end
+
+-- NOTE: This file uses lzextras.lsp handler https://github.com/BirdeeHub/lzextras?tab=readme-ov-file#lsp-handler
+-- This is a slightly more performant fallback function
+-- for when you don't provide a filetype to trigger on yourself.
+-- nixCats gives us the paths, which is faster than searching the rtp!
 local old_ft_fallback = require('lze').h.lsp.get_ft_fallback()
 require('lze').h.lsp.set_ft_fallback(function(name)
   local lspcfg = nixCats.pawsible({ "allPlugins", "opt", "nvim-lspconfig" }) or nixCats.pawsible({ "allPlugins", "start", "nvim-lspconfig" })
@@ -15,13 +20,13 @@ require('lze').h.lsp.set_ft_fallback(function(name)
     return old_ft_fallback(name)
   end
 end)
--- file uses lzextras.lsp handler
 require('lze').load {
   {
     "nvim-lspconfig",
     for_cat = "general.core",
     on_require = { "lspconfig" },
-    -- define a function to run over all type(plugin.lsp) == table
+    -- NOTE: define a function for lsp,
+    -- and it will run for all specs with type(plugin.lsp) == table
     -- when their filetype trigger loads them
     lsp = function(plugin)
       vim.lsp.config(plugin.name, plugin.lsp or {})
@@ -116,6 +121,7 @@ require('lze').load {
     "nixd",
     enabled = catUtils.isNixCats and (nixCats('nix') or nixCats('neonixdev')) or false,
     lsp = {
+      filetypes = { "nix" },
       settings = {
         nixd = {
           -- nixd requires some configuration.
