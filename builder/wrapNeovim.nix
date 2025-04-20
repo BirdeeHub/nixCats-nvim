@@ -34,6 +34,15 @@
 let
   inherit (pkgs) lib;
 
+  normSpecs = control: var: maker: lib.flip lib.pipe [
+    (lib.partition (p: p.value or null != null && ((p.pre or false == true && control == "--suffix") || (p.pre or true == false && control == "--prefix"))))
+    ({ right ? [], wrong ? []}: {
+      pre = map (p: p.value or p) (if control == "--suffix" then right else wrong);
+      post = map (p: p.value or p) (if control == "--prefix" then right else wrong);
+    })
+    ({ pre ? [], post ? [] }: lib.optionals (pre != []) [ "--prefix" var ":" (maker pre) ] ++ lib.optionals (post != []) [ "--suffix" var ":" (maker post) ])
+  ];
+
   luaEnv = neovim-unwrapped.lua.withPackages extraLuaPackages;
 
   # cat our args
@@ -52,11 +61,9 @@ let
     "--prefix" "PATH" ":" (lib.makeBinPath autowrapped)
   ] ++ pkgs.lib.optionals (configDirName != null && configDirName != "" || configDirName != "nvim") [
     "--set" "NVIM_APPNAME" configDirName
-  ] ++ pkgs.lib.optionals (userPathEnv != []) [
-    preORpostPATH "PATH" ":" (pkgs.lib.makeBinPath userPathEnv)
-  ] ++ pkgs.lib.optionals (userLinkables != []) [
-    preORpostLD "LD_LIBRARY_PATH" ":" (pkgs.lib.makeLibraryPath userLinkables)
-  ] ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != []) [
+  ] ++ normSpecs preORpostPATH "PATH" pkgs.lib.makeBinPath userPathEnv
+  ++ normSpecs preORpostLD "LD_LIBRARY_PATH" pkgs.lib.makeLibraryPath userLinkables
+  ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != []) [
     "--suffix" "PATH" ":" (lib.makeBinPath autowrapped)
   ] ++ userEnvVars ++ makeWrapperArgs;
 

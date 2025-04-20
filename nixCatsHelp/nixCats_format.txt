@@ -252,9 +252,9 @@ These are the things you can return:
 
 <lspsAndRuntimeDeps>
   a flexible set of categories, each containing LSPs or
-  other internal runtime dependencies such as ctags or debuggers
-  these are available to the PATH while within the Neovim program.
-  this includes the Neovim terminal. >nix
+  other internal runtime dependencies such as ctags or debuggers.
+  These are appended to the PATH (by default) while within
+  the Neovim program, including the Neovim terminal. >nix
   lspsAndRuntimeDeps = {
     # some categories of stuff.
     general = with pkgs; [
@@ -263,7 +263,7 @@ These are the things you can return:
       fd
     ];
     go = with pkgs; [
-      gopls
+      { pre = true; value = gopls; }
       gotools
       go-tools
       gccgo
@@ -272,11 +272,15 @@ These are the things you can return:
 <  
 <sharedLibraries>
   a flexible set of categories, each containing a derivation for
-  a runtime shared library. Will be prepended to the LD_LIBRARY_PATH variable. >nix
+  a runtime shared library. Will be appended to the LD_LIBRARY_PATH variable. >nix
   sharedLibraries = {
     general = {
       myGitStuff = with pkgs; [ #<- yes you can nest stuff
         libgit2
+        # by default, these are suffixed unless pre = true;
+        # however, you can change that default in settings,
+        # making default prefix, and pre = false to suffix
+        { value = libpng; pre = true; }
       ];
     };
   };

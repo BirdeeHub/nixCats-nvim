@@ -28,6 +28,7 @@ stdenv.mkDerivation {
         autodeps = true;
         whencat = true;
         environment_variables = true;
+        test_suffix_and_prefix = true;
       };
     };
   in /*bash*/ ''

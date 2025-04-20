@@ -8,6 +8,18 @@
     (utils.standardPluginOverlay inputs)
   ];
   categoryDefinitions = { pkgs, settings, categories, name, ... }@packageDef: {
+    lspsAndRuntimeDeps = {
+      suffix_and_prefix_path = [
+        { value = pkgs.writeShellScriptBin "my_test_program" ''
+          echo "I should be overridden by the other my_test_program"
+          echo "so if I cause an error, that failed"
+          exit 1
+        ''; pre = false; }
+        { value = pkgs.writeShellScriptBin "my_test_program" ""; pre = true; }
+        { value = pkgs.fd; }
+        pkgs.ripgrep
+      ];
+    };
     startupPlugins = {
       hostdeps = [
         pkgs.vimPlugins.vim-beancount
@@ -84,6 +96,7 @@
         hosts.python3.enable = true;
       };
       categories = {
+        suffix_and_prefix_path = true;
         hostdeps = true;
         overlaytest = true;
         testvars = true;
