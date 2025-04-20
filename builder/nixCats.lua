@@ -81,10 +81,6 @@ function M.addGlobals()
     })
 
     vim.cmd([[
-        function! GetAllNixCats()
-            echoerr("GetAllNixCats() is deprecated. Use GetNixCats() instead")
-            return v:lua.require('nixCats.cats')
-        endfunction
         function! GetNixCat(value)
             return luaeval('require("nixCats").get("' . a:value . '")')
         endfunction
@@ -124,11 +120,11 @@ function M.addGlobals()
             endif
         endfunction
     ]])
-    package.preload['nixCats.cats'] = M.cats
-    package.preload['nixCats.pawsible'] = M.pawsible
-    package.preload['nixCats.settings'] = M.settings
-    package.preload['nixCats.petShop'] = M.petShop
-    package.preload['nixCats.extra'] = M.extra
+    package.preload['nixCats.cats'] = function() return M.cats end
+    package.preload['nixCats.pawsible'] = function() return M.pawsible end
+    package.preload['nixCats.settings'] = function() return M.settings end
+    package.preload['nixCats.petShop'] = function() return M.petShop end
+    package.preload['nixCats.extra'] = function() return M.extra end
 end
 
 M.addGlobals()
