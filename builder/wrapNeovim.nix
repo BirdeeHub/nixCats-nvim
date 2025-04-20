@@ -63,8 +63,8 @@ let
   ++ lib.optionals (autowrapRuntimeDeps == "prefix" && autowrapped != [])
     [ "--prefix" "PATH" ":" (lib.makeBinPath autowrapped) ]
   # user provided deps
-  ++ normSpecs preORpostPATH "PATH" pkgs.lib.makeBinPath userPathEnv
-  ++ normSpecs preORpostLD "LD_LIBRARY_PATH" pkgs.lib.makeLibraryPath userLinkables
+  ++ normSpecs preORpostPATH "PATH" lib.makeBinPath userPathEnv
+  ++ normSpecs preORpostLD "LD_LIBRARY_PATH" lib.makeLibraryPath userLinkables
   # auto included suffixes last so user prefixes win
   ++ lib.optionals ((autowrapRuntimeDeps == "suffix" || autowrapRuntimeDeps == true) && autowrapped != [])
     [ "--suffix" "PATH" ":" (lib.makeBinPath autowrapped) ]
