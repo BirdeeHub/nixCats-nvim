@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.5...v7.2.6) (2025-04-20)
+
+
+### Bug Fixes
+
+* **lsps_and_libs:** minor feature, can specify prefix or suffix individually ([c11f477](https://github.com/BirdeeHub/nixCats-nvim/commit/c11f47779c2873eb9e14476680b298074f035b43))
+
 ## [7.2.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.4...v7.2.5) (2025-04-20)
 
 
