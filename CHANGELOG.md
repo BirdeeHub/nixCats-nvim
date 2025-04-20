@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.6...v7.2.7) (2025-04-20)
+
+
+### Bug Fixes
+
+* **lua_plugin:** incorrect use of package.preload on some rarely used values ([53940b5](https://github.com/BirdeeHub/nixCats-nvim/commit/53940b5f42a9e1a14db3f4cf895a741dbc47945f))
+
 ## [7.2.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.5...v7.2.6) (2025-04-20)
 
 
