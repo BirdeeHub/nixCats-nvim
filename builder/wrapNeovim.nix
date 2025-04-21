@@ -37,8 +37,8 @@ let
   normSpecs = control: var: maker: lib.flip lib.pipe [
     (lib.partition (p: p.value or null != null && ((p.pre or false == true && control == "--suffix") || (p.pre or true == false && control == "--prefix"))))
     ({ right ? [], wrong ? []}: {
-      pre = map (p: p.value or p) (if control == "--suffix" then right else wrong);
-      post = map (p: p.value or p) (if control == "--prefix" then right else wrong);
+      pre = map (p: if nclib.ncIsAttrs p then p.value or p else p) (if control == "--suffix" then right else wrong);
+      post = map (p: if nclib.ncIsAttrs p then p.value or p else p) (if control == "--prefix" then right else wrong);
     })
     ({ pre ? [], post ? [] }: lib.optionals (pre != []) [ "--prefix" var ":" (maker pre) ] ++ lib.optionals (post != []) [ "--suffix" var ":" (maker post) ])
   ];
