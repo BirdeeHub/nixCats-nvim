@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.8](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.7...v7.2.8) (2025-04-21)
+
+
+### Bug Fixes
+
+* **spec_deps:** fixed a bug where drv.passthru.value would seem like a spec ([cc46310](https://github.com/BirdeeHub/nixCats-nvim/commit/cc46310c6351bc5078b469b48cd6827109059934))
+
 ## [7.2.7](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.6...v7.2.7) (2025-04-20)
 
 
