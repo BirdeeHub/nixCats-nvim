@@ -35,7 +35,9 @@ let
   inherit (pkgs) lib;
 
   normSpecs = control: var: maker: lib.flip lib.pipe [
-    (lib.partition (p: p.value or null != null && ((p.pre or false == true && control == "--suffix") || (p.pre or true == false && control == "--prefix"))))
+    (lib.partition (p: nclib.ncIsAttrs p && p ? value && (
+      (p.pre or false == true && control == "--suffix") || (p.pre or true == false && control == "--prefix")))
+    )
     ({ right ? [], wrong ? []}: {
       pre = map (p: if nclib.ncIsAttrs p then p.value or p else p) (if control == "--suffix" then right else wrong);
       post = map (p: if nclib.ncIsAttrs p then p.value or p else p) (if control == "--prefix" then right else wrong);
