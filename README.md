@@ -41,7 +41,7 @@ for the Lua-natic's Neovim config on Nix
 - **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
 
 - **Try out an example!**
-  `nix run github:BirdeeHub/nixCats-nvim?dir=templates/example`
+  `nix run 'github:BirdeeHub/nixCats-nvim?dir=templates/example'`
 
 ## Table of Contents
 
