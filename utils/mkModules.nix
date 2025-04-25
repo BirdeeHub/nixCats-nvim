@@ -91,8 +91,7 @@
           inherit extra_pkg_params;
         };
 
-    in (builtins.listToAttrs (builtins.map (catName: let
-      in {
+    in (builtins.listToAttrs (builtins.map (catName: {
         name = catName;
         value = newLuaBuilder newPkgsParams newCategoryDefinitions pkgDefs catName;
       }) options_set.packageNames))
@@ -100,7 +99,7 @@
 
     main_options_set = lib.attrByPath moduleNamespace {} config;
     mappedPackageAttrs = mapToPackages main_options_set (dependencyOverlaysFunc { inherit main_options_set;});
-    mappedPackages = builtins.attrValues mappedPackageAttrs;
+    mappedPackages = builtins.attrValues (lib.attrByPath (moduleNamespace ++ [ "out" "packages" ]) {} config);
 
   in
   (if isHomeManager then (lib.setAttrByPath (moduleNamespace ++ [ "out" ]) {
@@ -116,8 +115,10 @@
         );
       }
     ) userops;
-    newUserPackageDefinitions = builtins.mapAttrs (uname: user_options_set: {
-        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (builtins.attrValues newUserPackageOutputs.${uname}.packages);
+    newUserPackageDefinitions = builtins.mapAttrs (uname: user_options_set: let
+      usrpkgs = builtins.attrValues (lib.attrByPath (moduleNamespace ++ [ "out" "users" uname "packages" ]) {} config);
+    in {
+        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) usrpkgs;
       }
     ) userops;
   in (lib.setAttrByPath (moduleNamespace ++ [ "out" ]) {
