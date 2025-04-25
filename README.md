@@ -175,6 +175,9 @@ and thus not be findable by either Nix or Neovim.
 See Nix documentation on how to use the command line commands further at:
 [the Nix command reference manual](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix)
 
+Zsh users may occasionally run into globbing issues running nix flake commands.
+[See this note for more info](https://nixcats.org/nixCats_templates.html#note-for-zsh-users)
+
 Also, familiarize yourself with the [flake schema](https://nixos.wiki/wiki/Flakes)
 
 This knowledge will be useful when installing flake based nixCats configurations into your main configuration.
