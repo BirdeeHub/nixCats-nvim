@@ -310,34 +310,66 @@
     };
   };
 
-in args: let
-  # separate function to process the spec from making the drv
-  # this function is the entrypoint, and the function that creates the final drv
-  # process_args will return the set that you would pass to mkDerivation
-  # along with passthru and its pkgs separately
-  # Doing it this way allows for using overrideAttrs to change the following args
-  # passthru.{ categoryDefinitions, packageDefinitions, luaPath, nixCats_packageName }
-  # in order to affect the final derivation via the nixCats wrapper via overrideAttrs
-  # This, in combination with how we process pkgsParams, also allows us to not
-  # reimport nixpkgs multiple times while doing this.
-  processed = process_args args;
-in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
-  oldargs = {
-    inherit (finalAttrs.passthru) categoryDefinitions packageDefinitions luaPath;
-    name = finalAttrs.passthru.nixCats_packageName;
-    inherit (processed) pkgs;
-  };
-  final_processed = process_args oldargs;
-in {
-  inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper setupLua manifestLua; # <- generated args
-  passAsFile = [ "bashBeforeWrapper" "setupLua" "manifestLua" ];
-  nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
-  preferLocalBuild = true; # <- set here plain so that it is overrideable
-  dontUnpack = true;
-  passthru = processed.pass // {
-    inherit (final_processed.pass) moduleNamespace homeModule nixosModule keepLuaBuilder; # <- generated passthru
-    dependencyOverlays = builtins.seq final_processed.pass.dependencyOverlays processed.pass.dependencyOverlays;
-    extra_pkg_config = builtins.seq final_processed.pass.extra_pkg_config processed.pass.extra_pkg_config;
-    extra_pkg_params = builtins.seq final_processed.pass.extra_pkg_params processed.pass.extra_pkg_params;
-  };
-})
+  main_builder = args: let
+    # separate function to process the spec from making the drv
+    # this function is the entrypoint, and the function that creates the final drv
+    # process_args will return the set that you would pass to mkDerivation
+    # along with passthru and its pkgs separately
+    # Doing it this way allows for using overrideAttrs to change the following args
+    # passthru.{ categoryDefinitions, packageDefinitions, luaPath, nixCats_packageName }
+    # in order to affect the final derivation via the nixCats wrapper via overrideAttrs
+    # This, in combination with how we process pkgsParams, also allows us to not
+    # reimport nixpkgs multiple times while doing this.
+    processed = process_args args;
+  in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
+    oldargs = {
+      inherit (finalAttrs.passthru) categoryDefinitions packageDefinitions luaPath;
+      name = finalAttrs.passthru.nixCats_packageName;
+      inherit (processed) pkgs;
+    };
+    final_processed = process_args oldargs;
+  in {
+    inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper setupLua manifestLua; # <- generated args
+    passAsFile = [ "bashBeforeWrapper" "setupLua" "manifestLua" ];
+    nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
+    preferLocalBuild = true; # <- set here plain so that it is overrideable
+    dontUnpack = true;
+    passthru = processed.pass // {
+      inherit (final_processed.pass) moduleNamespace homeModule nixosModule keepLuaBuilder; # <- generated passthru
+      dependencyOverlays = builtins.seq final_processed.pass.dependencyOverlays processed.pass.dependencyOverlays;
+      extra_pkg_config = builtins.seq final_processed.pass.extra_pkg_config processed.pass.extra_pkg_config;
+      extra_pkg_params = builtins.seq final_processed.pass.extra_pkg_params processed.pass.extra_pkg_params;
+    };
+  });
+
+in luaPath: pkgsParams: categoryDefinitions: packageDefinitions: name: let
+  nixpkgspath = pkgsParams.pkgs.path
+    or pkgsParams.nixpkgs.path
+    or pkgsParams.nixpkgs.outPath
+    or pkgsParams.nixpkgs
+    or (if builtins ? system then <nixpkgs> else (import ./errors.nix).main);
+  newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
+  mkOverride = nclib.makeOverridable newlib.overrideDerivation;
+  system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/errors.nix).main;
+in
+mkOverride main_builder {
+  inherit system luaPath categoryDefinitions packageDefinitions name;
+  nixCats_passthru = pkgsParams.nixCats_passthru or {};
+  extra_pkg_config = pkgsParams.extra_pkg_config or {};
+  extra_pkg_params = pkgsParams.extra_pkg_params or {};
+  pkgs = pkgsParams.pkgs or null;
+  nixpkgs = if pkgsParams ? "pkgs" && pkgsParams.pkgs != null
+    then pkgsParams.pkgs // { outPath = nixpkgspath;}
+    else if pkgsParams.nixpkgs ? "lib"
+      then pkgsParams.nixpkgs
+      else { outPath = nixpkgspath; lib = newlib; };
+  dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
+    then nclib.warnfn ''
+      # NixCats deprecation warning
+      Do not wrap your dependencyOverlays list in a set of systems.
+      They should just be a list.
+      Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+      See :h nixCats.flake.outputs.getOverlays
+      '' pkgsParams.dependencyOverlays.${system}
+    else pkgsParams.dependencyOverlays or [];
+}

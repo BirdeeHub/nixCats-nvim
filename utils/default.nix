@@ -107,42 +107,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  baseBuilder =
-    luaPath:
-    pkgsParams:
-    categoryDefinitions:
-    packageDefinitions: name: let
-      nixpkgspath = pkgsParams.pkgs.path
-        or pkgsParams.nixpkgs.path
-        or pkgsParams.nixpkgs.outPath
-        or pkgsParams.nixpkgs
-        or (if builtins ? system then <nixpkgs> else (import ../builder/errors.nix).main);
-      newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
-      ncbuilder = import ../builder { nclib = lib; utils = import ./.; };
-      mkOverride = lib.makeOverridable newlib.overrideDerivation;
-    in
-    mkOverride ncbuilder rec {
-      inherit luaPath categoryDefinitions packageDefinitions name;
-      nixCats_passthru = pkgsParams.nixCats_passthru or {};
-      extra_pkg_config = pkgsParams.extra_pkg_config or {};
-      extra_pkg_params = pkgsParams.extra_pkg_params or {};
-      pkgs = pkgsParams.pkgs or null;
-      nixpkgs = if pkgsParams ? "pkgs"
-        then pkgsParams.pkgs // { outPath = nixpkgspath;}
-        else if pkgsParams.nixpkgs ? "lib"
-          then pkgsParams.nixpkgs
-          else { outPath = nixpkgspath; lib = newlib; };
-      system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/errors.nix).main;
-      dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
-        then lib.warnfn ''
-          # NixCats deprecation warning
-          Do not wrap your dependencyOverlays list in a set of systems.
-          They should just be a list.
-          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-          See :h nixCats.flake.outputs.getOverlays
-          '' pkgsParams.dependencyOverlays.${system}
-        else pkgsParams.dependencyOverlays or [];
-    };
+  baseBuilder = import ../builder { nclib = lib; utils = import ./.; };
 
   /**
     a set of templates to get you started. See [the template list](https://nixcats.org/nixCats_templates.html).
