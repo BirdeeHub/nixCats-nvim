@@ -350,7 +350,7 @@ in luaPath: pkgsParams: categoryDefinitions: packageDefinitions: name: let
     or (if builtins ? system then <nixpkgs> else (import ./errors.nix).main);
   newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
   mkOverride = nclib.makeOverridable newlib.overrideDerivation;
-  system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ../builder/errors.nix).main;
+  system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ./errors.nix).main;
 in
 mkOverride main_builder {
   inherit system luaPath categoryDefinitions packageDefinitions name;
