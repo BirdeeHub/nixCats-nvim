@@ -22,114 +22,96 @@
   }) ];
 
   config = let
-    dependencyOverlaysFunc = { main_options_set, user_options_set ? {} }: (
-      if builtins.isAttrs oldDependencyOverlays
-      then nclib.warnfn ''
-        # NixCats deprecation warning
-        Do not wrap your dependencyOverlays list in a set of systems.
-        They should just be a list.
-        Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-        See :h nixCats.flake.outputs.getOverlays
-        '' oldDependencyOverlays.${pkgs.system}
-      else if builtins.isList oldDependencyOverlays
-        then oldDependencyOverlays
-        else []
-    ) ++ (main_options_set.addOverlays or []) ++ (user_options_set.addOverlays or []);
+    def_merger = strat: old: new:
+      if old != null && new != null
+        then if strat == "merge" || strat == "replace"
+        then utils.mergeDefs strat [ old new ]
+        else new
+      else if new != null then new else if old != null then old else (_:{});
 
-    mapToPackages = options_set: dependencyOverlays: (let
-      getStratWithExisting = enumstr: if enumstr == "merge"
-        then utils.deepmergeCats
-        else if enumstr == "replace"
-        then utils.mergeCatDefs
-        else (_: r: r);
+    pkg_def_merger = strat: old: new:
+      (if builtins.isAttrs old then old else {})
+      // (builtins.mapAttrs (n: v: def_merger strat (old.${n} or null) v) (if builtins.isAttrs new then new else {}));
 
-      newCategoryDefinitions = let
-        combineModDeps = replacements: merges: utils.deepmergeCats (
-          if replacements != null then replacements else (_:{})
-        ) (if merges != null then merges else (_:{}));
-        stratWithExisting = getStratWithExisting options_set.categoryDefinitions.existing;
-        moduleCatDefs = combineModDeps options_set.categoryDefinitions.replace options_set.categoryDefinitions.merge;
-      in stratWithExisting categoryDefinitions moduleCatDefs;
-
-      pkgDefs = let
-        pkgmerger = strat: old: new: let
-          oldAttrs = if builtins.isAttrs old then old else {};
-          newAttrs = if builtins.isAttrs new then new else {};
-          merged = builtins.mapAttrs (n: v: if oldAttrs ? ${n} then strat oldAttrs.${n} v else v) newAttrs;
-        in
-        oldAttrs // merged;
-        stratWithExisting = getStratWithExisting options_set.packageDefinitions.existing;
-        modulePkgDefs = pkgmerger utils.deepmergeCats options_set.packageDefinitions.replace options_set.packageDefinitions.merge;
-      in pkgmerger stratWithExisting packageDefinitions modulePkgDefs;
-
+    mapToPackages = main_options_set: options_set: let
       newLuaBuilder = if options_set.luaPath != ""
-        then utils.baseBuilder options_set.luaPath
-        else if luaPath != "" && luaPath != null
-        then utils.baseBuilder luaPath
+          then utils.baseBuilder options_set.luaPath
+        else if luaPath != ""
+          then utils.baseBuilder luaPath
         else if keepLuaBuilder != null
-        then keepLuaBuilder
-        else builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option";
+          then keepLuaBuilder
+        else builtins.throw "no luaPath supplied to mkModules or luaPath module option";
 
-      newPkgsParams = let
-        pkgsoptions = if options_set.nixpkgs_version != null
-          then options_set.nixpkgs_version
-          else if lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config != null
-          then lib.attrByPath (moduleNamespace ++ [ "nixpkgs_version" ]) null config
-          else nixpkgs;
-        nixpkgspath = if pkgsoptions != null then pkgsoptions else pkgs;
-        extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
-        extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
-      in if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
+      catDefs = lib.pipe options_set.categoryDefinitions.merge [
+        (def_merger "merge" options_set.categoryDefinitions.replace)
+        (def_merger options_set.categoryDefinitions.existing categoryDefinitions)
+      ];
+
+      pkgDefs = lib.pipe options_set.packageDefinitions.merge [
+        (pkg_def_merger "merge" options_set.packageDefinitions.replace)
+        (pkg_def_merger options_set.packageDefinitions.existing packageDefinitions)
+      ];
+
+      pkgsoptions = if options_set.nixpkgs_version or null != null
+        then options_set.nixpkgs_version
+        else if main_options_set.nixpkgs_version or null != null
+        then main_options_set.nixpkgs_version
+        else nixpkgs;
+
+      dependencyOverlays = (if builtins.isAttrs oldDependencyOverlays
+        then nclib.warnfn ''
+          # NixCats deprecation warning
+          Do not wrap your dependencyOverlays list in a set of systems.
+          They should just be a list.
+          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
+          See :h nixCats.flake.outputs.getOverlays
+          '' oldDependencyOverlays.${pkgs.system}
+        else if builtins.isList oldDependencyOverlays
+          then oldDependencyOverlays
+          else []) ++ (main_options_set.addOverlays or []) ++ (options_set.addOverlays or []);
+
+      extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
+      extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
+
+      newPkgsParams = if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
         then if dependencyOverlays != []
-          then {
-            pkgs = pkgs.appendOverlays dependencyOverlays;
-          } else {
-            inherit pkgs;
-          }
+          then { pkgs = pkgs.appendOverlays dependencyOverlays; }
+          else { inherit pkgs; }
         else {
-          nixpkgs = nixpkgspath;
-          extra_pkg_config = pkgs.config // extra_pkg_config;
+          nixpkgs = if pkgsoptions != null then pkgsoptions else pkgs;
+          pkgs = if pkgsoptions == null then pkgs else null;
+          dependencyOverlays = (if pkgsoptions != null then pkgs.overlays else []) ++ dependencyOverlays;
           inherit (pkgs) system;
-          dependencyOverlays = pkgs.overlays ++ dependencyOverlays;
           inherit extra_pkg_params;
+          extra_pkg_config = (if pkgsoptions != null then pkgs.config else {}) // extra_pkg_config;
         };
 
-    in (builtins.listToAttrs (builtins.map (catName: {
-        name = catName;
-        value = newLuaBuilder newPkgsParams newCategoryDefinitions pkgDefs catName;
-      }) options_set.packageNames))
-    );
+    in lib.pipe options_set.packageNames [
+      (builtins.map (name: { inherit name; value = newLuaBuilder newPkgsParams catDefs pkgDefs name; }))
+      builtins.listToAttrs
+    ];
 
     main_options_set = lib.attrByPath moduleNamespace {} config;
-    mappedPackageAttrs = mapToPackages main_options_set (dependencyOverlaysFunc { inherit main_options_set;});
+    mappedPackageAttrs = mapToPackages {} main_options_set;
     mappedPackages = builtins.attrValues (lib.attrByPath (moduleNamespace ++ [ "out" "packages" ]) {} config);
-
   in
-  (if isHomeManager then (lib.setAttrByPath (moduleNamespace ++ [ "out" ]) {
-      packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
-    }) // {
-    home.packages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
-  } else (let
+  if isHomeManager
+  then (lib.setAttrByPath (moduleNamespace ++ [ "out" ]) { packages = lib.mkIf main_options_set.enable mappedPackageAttrs; })
+    // { home.packages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages; }
+  else (let
     userops = lib.attrByPath (moduleNamespace ++ [ "users" ]) {} config;
-    newUserPackageOutputs = builtins.mapAttrs ( uname: user_options_set: {
-        packages = lib.mkIf user_options_set.enable (mapToPackages
-          user_options_set
-          (dependencyOverlaysFunc { inherit main_options_set user_options_set; })
-        );
-      }
-    ) userops;
-    newUserPackageDefinitions = builtins.mapAttrs (uname: user_options_set: let
-      usrpkgs = builtins.attrValues (lib.attrByPath (moduleNamespace ++ [ "out" "users" uname "packages" ]) {} config);
-    in {
-        packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) usrpkgs;
-      }
-    ) userops;
   in (lib.setAttrByPath (moduleNamespace ++ [ "out" ]) {
-      users = newUserPackageOutputs;
+      users = builtins.mapAttrs (_: user_options_set: {
+        packages = lib.mkIf user_options_set.enable (mapToPackages main_options_set user_options_set);
+      }) userops;
       packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
-    }) // {
-    users.users = newUserPackageDefinitions;
+  }) // {
+    users.users = builtins.mapAttrs (uname: user_options_set: {
+      packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (lib.pipe config [
+        (lib.attrByPath (moduleNamespace ++ [ "out" "users" uname "packages" ]) {})
+        builtins.attrValues
+      ]);
+    }) userops;
     environment.systemPackages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
-  }));
-
+  });
 }
