@@ -172,63 +172,53 @@
         else if settings.unwrappedCfgPath == null then
           utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
         else settings.unwrappedCfgPath;
-
       finalwraprc = if builtins.isString settings.wrapRc
         then utils.n2l.types.inline-unsafe.mk { body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc})''; }
         else settings.wrapRc;
-
-      categoriesPlus = categories // {
+      extraValues = {
         nixCats_wrapRc = finalwraprc;
         nixCats_packageName = name;
         inherit nixCats_config_location;
       };
-      settingsPlus = settings // {
-        wrapRc = finalwraprc;
-        nixCats_packageName = name;
-        inherit nixCats_config_location;
-      };
-
-      nixCatsCats = utils.n2l.toLua categoriesPlus;
-      nixCatsSettings = utils.n2l.toLua settingsPlus;
-      nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace {
-        inherit categories final_cat_defs_set;
-        sections = pkgs.lib.mapAttrsToList (n: _: [ n ]) base_sections ++ host_builder.new_sections;
-      });
-      nixCatsPawsible = utils.n2l.toLua allPluginDeps;
-      nixCatsExtra = utils.n2l.toLua extraTableLua;
-      nixCatsInitMain = let
-        processExtraLua = with builtins; field: section: if isString section then section else pkgs.lib.pipe section [
-          filterFlattenUnique
-          (map (x: if isString x then { config = x; priority = 150; } else x // { priority = x.priority or 150; }))
-          (sort (a: b: a.priority < b.priority))
-          (map (v: v.config or ((import ./errors.nix).optLua field)))
-          (concatStringsSep "\n")
-        ];
-        optLua = {
-          pre = processExtraLua "optionalLuaPreInit" optionalLuaPreInit;
-          post = processExtraLua "optionalLuaAdditions" optionalLuaAdditions;
-        };
-      in /*lua*/''
-        ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
-        -- optionalLuaPreInit
-        ${optLua.pre}
-        -- lua from nix with pre = true
-        ${normalized.preInlineConfigs}
-        -- run the init.lua (or init.vim)
-        if vim.fn.filereadable(nixCats.configDir .. "/init.lua") == 1 then
-          dofile(nixCats.configDir .. "/init.lua")
-        elseif vim.fn.filereadable(nixCats.configDir .. "/init.vim") == 1 then
-          vim.cmd.source(nixCats.configDir .. "/init.vim")
-        end
-        -- all other lua from nix plugin specs
-        ${normalized.inlineConfigs}
-        -- optionalLuaAdditions
-        ${optLua.post}
-        ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}'';
-
     in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
       src = pkgs.replaceVars ./nixCats.lua {
-        inherit nixCatsSettings nixCatsCats nixCatsPetShop nixCatsPawsible nixCatsExtra nixCatsInitMain;
+        nixCatsPawsible = utils.n2l.toLua allPluginDeps;
+        nixCatsExtra = utils.n2l.toLua extraTableLua;
+        nixCatsCats = utils.n2l.toLua (categories // extraValues);
+        nixCatsSettings = utils.n2l.toLua (settings // extraValues);
+        nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace {
+          inherit categories final_cat_defs_set;
+          sections = pkgs.lib.mapAttrsToList (n: _: [ n ]) base_sections ++ host_builder.new_sections;
+        });
+        nixCatsInitMain = let
+          processExtraLua = with builtins; field: section: if isString section then section else pkgs.lib.pipe section [
+            filterFlattenUnique
+            (map (x: if isString x then { config = x; priority = 150; } else x // { priority = x.priority or 150; }))
+            (sort (a: b: a.priority < b.priority))
+            (map (v: v.config or ((import ./errors.nix).optLua field)))
+            (concatStringsSep "\n")
+          ];
+          optLua = {
+            pre = processExtraLua "optionalLuaPreInit" optionalLuaPreInit;
+            post = processExtraLua "optionalLuaAdditions" optionalLuaAdditions;
+          };
+        in /*lua*/''
+          ${pkgs.lib.optionalString (settings.autoconfigure == "prefix" || settings.autoconfigure == true) normalized.passthru_initLua}
+          -- optionalLuaPreInit
+          ${optLua.pre}
+          -- lua from nix with pre = true
+          ${normalized.preInlineConfigs}
+          -- run the init.lua (or init.vim)
+          if vim.fn.filereadable(nixCats.configDir .. "/init.lua") == 1 then
+            dofile(nixCats.configDir .. "/init.lua")
+          elseif vim.fn.filereadable(nixCats.configDir .. "/init.vim") == 1 then
+            vim.cmd.source(nixCats.configDir .. "/init.vim")
+          end
+          -- all other lua from nix plugin specs
+          ${normalized.inlineConfigs}
+          -- optionalLuaAdditions
+          ${optLua.post}
+          ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}'';
       };
     } ''
       mkdir -p $out/doc
