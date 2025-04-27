@@ -358,8 +358,9 @@ https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make
   a flexible set of categories, each containing arbitrary Bash code
   to run before the wrapper starts within the wrapper's Bash environment.
   # WARNING: only use this if you know what you are doing and why you need
-  to do it. Whenever possible, use `wrapperArgs` or `extraWrapperArgs` instead.
-  This section works the same as `extraWrapperArgs` but for bash.
+  to do it. This section works the same as `extraWrapperArgs` but for bash.
+  # WARNING: This section is disabled when `useBinaryWrapper` setting is
+  enabled.
 
 <extraCats>
   a flexible set of categories, each containing a list of attribute paths,
@@ -756,6 +757,25 @@ These are the defaults:
     # .dependencies attribute. By default nixCats will add them.
     # If for some reason you want to avoid that, set this to false.
     autoPluginDeps = true;
+
+    # If you wish to use neovim as a shebang on darwin,
+    # you will need to use the binary wrapper.
+    # It is not faster, and it is much more limited.
+    useBinaryWrapper = false;
+    # CAUTION: This will have drastic effects on your configuration.
+    # bashBeforeWrapper section in categoryDefinitions will be disabled.
+    # Using `--run` wrapper argument will throw an error on build.
+    # You will no longer be able to use
+    # "quoted strings with spaces"
+    # in your `--add-flags` wrapper arguments.
+    # in addition, there are other differences between the two wrapper generators
+    # see: https://nixos.org/manual/nixpkgs/stable/#fun-makeWrapper
+    # and for more info on quoted strings with spaces
+    # https://github.com/NixOS/nixpkgs/pull/400649
+    # makeShellWrapper (the default)
+    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+    # makeBinaryWrapper
+    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ma/makeBinaryWrapper/make-binary-wrapper.sh
 
     # each package outputs a module via passthru.
     # this will set the namespace for the module options
