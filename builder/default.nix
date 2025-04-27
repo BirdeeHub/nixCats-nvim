@@ -1,8 +1,8 @@
 # Copyright (c) 2023 BirdeeHub 
 # Licensed under the MIT license 
 {
-  nclib
-  , utils
+  nclib ? import ../utils/lib.nix
+  , utils ? import ../utils
 }: let
   process_args = { luaPath
   , categoryDefinitions
