@@ -244,26 +244,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  mkNixosModules = {
-    dependencyOverlays ? null
-    , luaPath ? ""
-    , keepLuaBuilder ? null
-    , categoryDefinitions ? (_:{})
-    , packageDefinitions ? {}
-    , defaultPackageName ? null
-    , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
-    , nixpkgs ? null
-    , extra_pkg_config ? {}
-    , extra_pkg_params ? {}
-    , ... }:
-    (import ./mkModules.nix {
-      isHomeManager = false;
-      oldDependencyOverlays = dependencyOverlays;
-      nclib = lib;
-      utils = import ./.;
-      inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config extra_pkg_params moduleNamespace;
-    });
+  mkNixosModules = import ./mkModules.nix {
+    isHomeManager = false;
+    nclib = lib;
+    utils = import ./.;
+  };
 
   /**
     takes all the arguments of the main builder function but as a single set,
@@ -329,26 +314,11 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ---
   */
-  mkHomeModules = {
-    dependencyOverlays ? null
-    , luaPath ? ""
-    , keepLuaBuilder ? null
-    , categoryDefinitions ? (_:{})
-    , packageDefinitions ? {}
-    , defaultPackageName ? null
-    , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
-    , nixpkgs ? null
-    , extra_pkg_config ? {}
-    , extra_pkg_params ? {}
-    , ... }:
-    (import ./mkModules.nix {
-      isHomeManager = true;
-      oldDependencyOverlays = dependencyOverlays;
-      nclib = lib;
-      utils = import ./.;
-      inherit nixpkgs luaPath keepLuaBuilder categoryDefinitions
-        packageDefinitions defaultPackageName extra_pkg_config extra_pkg_params moduleNamespace;
-    });
+  mkHomeModules = import ./mkModules.nix {
+    isHomeManager = true;
+    nclib = lib;
+    utils = import ./.;
+  };
 
   /**
     see :h [nixCats.flake.outputs.utils.n2l](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.utils.n2l)

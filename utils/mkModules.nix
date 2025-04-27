@@ -2,15 +2,16 @@
 # Licensed under the MIT license
 {
   isHomeManager
-  , defaultPackageName ? null
+  , utils ? import ./.
+  , nclib ? import ./lib.nix
+}: {
+  defaultPackageName ? null
   , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
-  , oldDependencyOverlays ? null
+  , dependencyOverlays ? null
   , luaPath ? ""
   , keepLuaBuilder ? null
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
-  , utils ? import ./.
-  , nclib ? import ./lib.nix
   , nixpkgs ? null
   , ...
 }@inhargs:
@@ -58,29 +59,29 @@
         then main_options_set.nixpkgs_version
         else nixpkgs;
 
-      dependencyOverlays = (if builtins.isAttrs oldDependencyOverlays
+      depOvers = (if builtins.isAttrs dependencyOverlays
         then nclib.warnfn ''
           # NixCats deprecation warning
           Do not wrap your dependencyOverlays list in a set of systems.
           They should just be a list.
           Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
           See :h nixCats.flake.outputs.getOverlays
-          '' oldDependencyOverlays.${pkgs.system}
-        else if builtins.isList oldDependencyOverlays
-          then oldDependencyOverlays
+          '' dependencyOverlays.${pkgs.system}
+        else if builtins.isList dependencyOverlays
+          then dependencyOverlays
           else []) ++ (main_options_set.addOverlays or []) ++ (options_set.addOverlays or []);
 
       extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
       extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
 
       newPkgsParams = if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
-        then if dependencyOverlays != []
-          then { pkgs = pkgs.appendOverlays dependencyOverlays; }
+        then if depOvers != []
+          then { pkgs = pkgs.appendOverlays depOvers; }
           else { inherit pkgs; }
         else {
           nixpkgs = if pkgsoptions != null then pkgsoptions else pkgs;
           pkgs = if pkgsoptions == null then pkgs else null;
-          dependencyOverlays = (if pkgsoptions != null then pkgs.overlays else []) ++ dependencyOverlays;
+          dependencyOverlays = (if pkgsoptions != null then pkgs.overlays else []) ++ depOvers;
           inherit (pkgs) system;
           inherit extra_pkg_params;
           extra_pkg_config = (if pkgsoptions != null then pkgs.config else {}) // extra_pkg_config;
