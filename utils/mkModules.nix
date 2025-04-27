@@ -110,10 +110,8 @@
       packages = lib.mkIf main_options_set.enable mappedPackageAttrs;
   }) // {
     users.users = builtins.mapAttrs (uname: user_options_set: {
-      packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall) (lib.pipe config [
-        (lib.attrByPath (moduleNamespace ++ [ "out" "users" uname "packages" ]) {})
-        builtins.attrValues
-      ]);
+      packages = lib.mkIf (user_options_set.enable && ! user_options_set.dontInstall)
+        (builtins.attrValues (lib.attrByPath (moduleNamespace ++ [ "out" "users" uname "packages" ]) {} config));
     }) userops;
     environment.systemPackages = lib.mkIf (main_options_set.enable && ! main_options_set.dontInstall) mappedPackages;
   });
