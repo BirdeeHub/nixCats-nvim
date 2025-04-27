@@ -65,6 +65,7 @@
       aliases = null;
       nvimSRC = null;
       neovim-unwrapped = null;
+      useBinaryWrapper = false;
       suffix-path = true;
       suffix-LD = true;
       collate_grammars = true;
@@ -175,8 +176,13 @@
       finalwraprc = if builtins.isString settings.wrapRc
         then utils.n2l.types.inline-unsafe.mk { body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc})''; }
         else settings.wrapRc;
-      extraValues = {
+      categoriesPlus = categories // {
         nixCats_wrapRc = finalwraprc;
+        nixCats_packageName = name;
+        inherit nixCats_config_location;
+      };
+      settingsPlus = settings // {
+        wrapRc = finalwraprc;
         nixCats_packageName = name;
         inherit nixCats_config_location;
       };
@@ -184,8 +190,8 @@
       src = pkgs.replaceVars ./nixCats.lua {
         nixCatsPawsible = utils.n2l.toLua allPluginDeps;
         nixCatsExtra = utils.n2l.toLua extraTableLua;
-        nixCatsCats = utils.n2l.toLua (categories // extraValues);
-        nixCatsSettings = utils.n2l.toLua (settings // extraValues);
+        nixCatsCats = utils.n2l.toLua categoriesPlus;
+        nixCatsSettings = utils.n2l.toLua settingsPlus;
         nixCatsPetShop = utils.n2l.toLua (sorting.getCatSpace {
           inherit categories final_cat_defs_set;
           sections = pkgs.lib.mapAttrsToList (n: _: [ n ]) base_sections ++ host_builder.new_sections;
@@ -229,6 +235,7 @@
     '';
   in {
     inherit pkgs;
+    useBinaryWrapper = settings.useBinaryWrapper == true;
     pass = (args.nixCats_passthru or {}) // {
       keepLuaBuilder = utils.baseBuilder luaPath; # why is this still a thing?
       nixCats_packageName = name;
@@ -266,8 +273,9 @@
       userLinkables = filterFlattenUnique sharedLibraries;
       userEnvVars = filterAndFlattenEnvVars "environmentVariables" environmentVariables;
       makeWrapperArgs = filterAndFlattenWrapArgs "wrapperArgs" wrapperArgs;
-      bashBeforeWrapper = if builtins.isString bashBeforeWrapper
-        then [bashBeforeWrapper] else filterAndFlattenXtraWrapArgs "bashBeforeWrapper" bashBeforeWrapper;
+      bashBeforeWrapper = if settings.useBinaryWrapper == true then []
+        else if builtins.isString bashBeforeWrapper then [bashBeforeWrapper]
+        else filterAndFlattenXtraWrapArgs "bashBeforeWrapper" bashBeforeWrapper;
       extraMakeWrapperArgs = filterAndFlattenXtraWrapArgs "extraWrapperArgs" extraWrapperArgs;
       # the function you would have passed to lua.withPackages
       extraLuaPackages = combineCatsOfFuncs "lua" extraLuaPackages;
@@ -318,8 +326,10 @@
     };
   in {
     inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper setupLua manifestLua; # <- generated args
-    passAsFile = [ "bashBeforeWrapper" "setupLua" "manifestLua" ];
-    nativeBuildInputs = [ processed.pkgs.makeWrapper ]; # <- set here plain so that it is overrideable
+    passAsFile = [ "setupLua" "manifestLua" ] ++ (if final_processed.useBinaryWrapper then [] else [ "bashBeforeWrapper" ]);
+    nativeBuildInputs = [
+      (if final_processed.useBinaryWrapper then processed.pkgs.makeBinaryWrapper else processed.pkgs.makeWrapper)
+    ];
     preferLocalBuild = true; # <- set here plain so that it is overrideable
     dontUnpack = true;
     passthru = processed.pass // {
