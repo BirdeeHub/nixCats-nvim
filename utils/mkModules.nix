@@ -13,8 +13,10 @@
   , categoryDefinitions ? (_:{})
   , packageDefinitions ? {}
   , nixpkgs ? null
+  , extra_pkg_config ? {}
+  , extra_pkg_params ? {}
   , ...
-}@inhargs:
+}:
 { config, pkgs, lib, ... }: {
 
   imports = [ (import ./mkOpts.nix {
@@ -71,10 +73,10 @@
           then dependencyOverlays
           else []) ++ (main_options_set.addOverlays or []) ++ (options_set.addOverlays or []);
 
-      extra_pkg_params = if builtins.isAttrs (inhargs.extra_pkg_params or null) then inhargs.extra_pkg_params else {};
-      extra_pkg_config = if builtins.isAttrs (inhargs.extra_pkg_config or null) then inhargs.extra_pkg_config else {};
+      extra_params = if builtins.isAttrs extra_pkg_params then extra_pkg_params else {};
+      extra_config = if builtins.isAttrs extra_pkg_config then extra_pkg_config else {};
 
-      newPkgsParams = if extra_pkg_params == {} && extra_pkg_config == {} && pkgsoptions == null
+      newPkgsParams = if extra_params == {} && extra_config == {} && pkgsoptions == null
         then if depOvers != []
           then { pkgs = pkgs.appendOverlays depOvers; }
           else { inherit pkgs; }
@@ -83,8 +85,8 @@
           pkgs = if pkgsoptions == null then pkgs else null;
           dependencyOverlays = (if pkgsoptions != null then pkgs.overlays else []) ++ depOvers;
           inherit (pkgs) system;
-          inherit extra_pkg_params;
-          extra_pkg_config = (if pkgsoptions != null then pkgs.config else {}) // extra_pkg_config;
+          inherit extra_params;
+          extra_pkg_config = (if pkgsoptions != null then pkgs.config else {}) // extra_config;
         };
 
     in lib.pipe options_set.packageNames [
