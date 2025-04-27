@@ -227,8 +227,7 @@
         ${pkgs.lib.optionalString (settings.autoconfigure == "suffix") normalized.passthru_initLua}'';
 
     in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
-      src = pkgs.substituteAll {
-        src = ./nixCats.lua;
+      src = pkgs.replaceVars ./nixCats.lua {
         inherit nixCatsSettings nixCatsCats nixCatsPetShop nixCatsPawsible nixCatsExtra nixCatsInitMain;
       };
     } ''
