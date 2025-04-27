@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.10](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.9...v7.2.10) (2025-04-27)
+
+
+### Bug Fixes
+
+* **builder:** see latest refactor ([8df6e65](https://github.com/BirdeeHub/nixCats-nvim/commit/8df6e65b22669118afec2ef31b0a2b9d7622d506))
+
 ## [7.2.9](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.8...v7.2.9) (2025-04-27)
 
 
