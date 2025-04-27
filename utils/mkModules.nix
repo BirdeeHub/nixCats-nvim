@@ -17,7 +17,8 @@
 { config, pkgs, lib, ... }: {
 
   imports = [ (import ./mkOpts.nix {
-    inherit utils nclib defaultPackageName luaPath packageDefinitions isHomeManager moduleNamespace;
+    inherit utils nclib isHomeManager moduleNamespace;
+    defaultPackageName = if defaultPackageName != null && packageDefinitions ? "${defaultPackageName}" then defaultPackageName else null;
   }) ];
 
   config = let
@@ -61,11 +62,13 @@
         modulePkgDefs = pkgmerger utils.deepmergeCats options_set.packageDefinitions.replace options_set.packageDefinitions.merge;
       in pkgmerger stratWithExisting packageDefinitions modulePkgDefs;
 
-      newLuaBuilder = (if options_set.luaPath != "" then (utils.baseBuilder options_set.luaPath)
-        else 
-          (if keepLuaBuilder != null
-            then keepLuaBuilder else 
-            builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option"));
+      newLuaBuilder = if options_set.luaPath != ""
+        then utils.baseBuilder options_set.luaPath
+        else if luaPath != "" && luaPath != null
+        then utils.baseBuilder luaPath
+        else if keepLuaBuilder != null
+        then keepLuaBuilder
+        else builtins.throw "no luaPath or builder with applied luaPath supplied to mkModules or luaPath module option";
 
       newPkgsParams = let
         pkgsoptions = if options_set.nixpkgs_version != null

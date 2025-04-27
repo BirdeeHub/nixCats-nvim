@@ -1,13 +1,12 @@
 # Copyright (c) 2023 BirdeeHub
 # Licensed under the MIT license
 {
-  isHomeManager
+  isHomeManager ? false
   , defaultPackageName ? null
   , moduleNamespace ? [ (if defaultPackageName != null then defaultPackageName else "nixCats") ]
-  , luaPath ? ""
-  , packageDefinitions ? {}
   , nclib ? import ./lib.nix
   , utils ? import ./.
+  , ...
 }:
 { lib, ... }: let
   catDef = nclib.mkCatDefType lib.mkOptionType false;
@@ -57,7 +56,7 @@ in {
     };
 
     luaPath = mkOption {
-      default = luaPath;
+      default = "";
       type = types.oneOf [ types.str types.path types.package ];
       description = ''
         The path to your nvim config directory in the store.
@@ -67,7 +66,7 @@ in {
     };
 
     packageNames = mkOption {
-      default = if defaultPackageName != null && packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
+      default = if defaultPackageName != null then [ defaultPackageName ] else [];
       type = (types.listOf types.str);
       description = ''A list of packages from packageDefinitions to include'';
       example = ''
@@ -294,7 +293,7 @@ in {
           };
 
           luaPath = mkOption {
-            default = luaPath;
+            default = "";
             type = types.oneOf [ types.str types.path types.package ];
             description = ''
               The path to your nvim config directory in the store.
@@ -304,7 +303,7 @@ in {
           };
 
           packageNames = mkOption {
-            default = if defaultPackageName != null && packageDefinitions ? "${defaultPackageName}" then [ defaultPackageName ] else [];
+            default = if defaultPackageName != null then [ defaultPackageName ] else [];
             type = (types.listOf types.str);
             description = ''A list of packages from packageDefinitions to include'';
             example = ''
