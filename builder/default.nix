@@ -322,12 +322,11 @@
     # reimport nixpkgs multiple times while doing this.
     processed = process_args args;
   in processed.pkgs.stdenv.mkDerivation (finalAttrs: let
-    oldargs = {
+    final_processed = process_args {
       inherit (finalAttrs.passthru) categoryDefinitions packageDefinitions luaPath;
       name = finalAttrs.passthru.nixCats_packageName;
       inherit (processed) pkgs;
     };
-    final_processed = process_args oldargs;
   in {
     inherit (final_processed.drvargs) name meta buildPhase bashBeforeWrapper setupLua manifestLua; # <- generated args
     passAsFile = [ "bashBeforeWrapper" "setupLua" "manifestLua" ];
