@@ -147,14 +147,22 @@ with builtins; let
 
 in {
 
-  toLua = toLuaFull {};
+  toLua = toLuaFull { pretty = true; formatstrings = false; };
 
   prettyLua = toLuaFull { pretty = true; formatstrings = true; };
 
   uglyLua = toLuaFull { pretty = false; formatstrings = false; };
 
+  toUnpacked = list: pipe list [
+    (l: if isList l then l else throw "n2l.toUnpacked requires a list")
+    (map (toLuaFull { pretty = true; formatstrings = false; }))
+    (concatStringsSep ",")
+  ];
+
   inherit mkEnum inline toLuaFull;
   inherit (inline) types typeof member default_subtype;
+
+  mkLuaInline = body: inline.types.inline-unsafe.mk { inherit body; };
 
   resolve = value: let res = inline.resolve value; in
     if isFunction res then (res { pretty = false; }) else res;

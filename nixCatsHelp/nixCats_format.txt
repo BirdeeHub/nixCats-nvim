@@ -1155,7 +1155,9 @@ You may wish to use some functions from it.
 
 The library is exported from the <utils> set as `utils.n2l`
 
-It contains <toLua> and <prettyLua> and <uglyLua> which convert Nix to Lua.
+It contains <toLua> and <prettyLua> and <uglyLua> which convert Nix values to Lua.
+It also contains a <toUnpacked> which converts a nix list
+to comma separated lua values for function arguments.
 
 it contains a <member> function to determine if a value is a special "inline lua" type
 it contains a <typeof> function to determine which special "inline lua" type it is

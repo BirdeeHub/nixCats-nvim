@@ -327,7 +327,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     for the nixCats plugin using lua literals.
 
     ```nix
-    cache_location = utils.n2l.types.inline-safe.mk "vim.fn.stdpath('cache')",
+    cache_location = utils.n2l.types.inline-unsafe.mk { body = "vim.fn.stdpath('cache')"; }
     ```
 
     ---
@@ -337,11 +337,19 @@ with builtins; let lib = import ./lib.nix; in rec {
   /**
     see `h: nixCats.flake.outputs.utils.n2l`
 
-    This is an alias for `utils.n2l.types.inline-safe.mk`
+    ```nix
+    utils.mkLuaInline "[[I am a]] .. [[ lua ]] .. type([[value]])";
+    ```
+
+    alias for
+
+    ```nix
+    body: inline.types.inline-unsafe.mk { inherit body; };
+    ```
 
     ---
   */
-  mkLuaInline = lib.n2l.types.inline-safe.mk;
+  mkLuaInline = lib.n2l.mkLuaInline;
 
   /**
     `flake-utils.lib.eachSystem` but without the flake input

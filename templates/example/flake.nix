@@ -440,7 +440,7 @@
                 thing3 = [ "give" "treat" ];
               }
               "I LOVE KEYBOARDS"
-              (utils.n2l.types.inline-safe.mk ''[[I am a]] .. [[ lua ]] .. type("value")'')
+              (utils.mkLuaInline ''[[I am a]] .. [[ lua ]] .. type("value")'')
             ];
             thing4 = "couch is for scratching";
           };
