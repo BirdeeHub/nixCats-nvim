@@ -36,7 +36,7 @@ in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
   meta = neovim-unwrapped.meta // {
     mainProgram = nixCats_packageName;
-    maintainers = neovim-unwrapped.meta.teams ++ (if lib.maintainers ? birdee then [ lib.maintainers.birdee ] else []);
+    maintainers = neovim-unwrapped.meta.maintainers ++ (if lib.maintainers ? birdee then [ lib.maintainers.birdee ] else []);
   };
   inherit bashBeforeWrapper;
   manifestLua = builtins.concatStringsSep "\n" luaSetupLines;
