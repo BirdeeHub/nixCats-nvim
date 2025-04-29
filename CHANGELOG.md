@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.12](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.11...v7.2.12) (2025-04-29)
+
+
+### Bug Fixes
+
+* **n2l:** added n2l.toUnpacked, which turns a list into a comma separated string of lua values ([e7478d0](https://github.com/BirdeeHub/nixCats-nvim/commit/e7478d0e522d50f9d0e830f3a0f7027914e44d85))
+
 ## [7.2.11](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.10...v7.2.11) (2025-04-27)
 
 
