@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.13](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.12...v7.2.13) (2025-04-29)
+
+
+### Bug Fixes
+
+* **wrapper:** nixpkgs changed neovim maintainers attribute to teams ([#289](https://github.com/BirdeeHub/nixCats-nvim/issues/289)) ([434628a](https://github.com/BirdeeHub/nixCats-nvim/commit/434628aa657da87b1db69461c687ee874307d565))
+
 ## [7.2.12](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.11...v7.2.12) (2025-04-29)
 
 
