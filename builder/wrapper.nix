@@ -36,7 +36,7 @@ in {
   name = "neovim-${lib.getVersion neovim-unwrapped}-${nixCats_packageName}${lib.optionalString (extraName != "") "-${extraName}"}";
   meta = (neovim-unwrapped.meta or {}) // {
     mainProgram = nixCats_packageName;
-    maintainers = if (lib.maintainers or {}) ? birdee then [ lib.maintainers.birdee ] else [];
+    maintainers = (if (lib.maintainers or {}) ? birdee then [ lib.maintainers.birdee ] else []) ++ neovim-unwrapped.meta.maintainers or [];
     teams = neovim-unwrapped.meta.teams or [];
   };
   inherit bashBeforeWrapper;
