@@ -63,7 +63,7 @@ in {
       "--replace-fail" "Name=Neovim" "Name=${nixCats_packageName}"
       "--replace-fail" "TryExec=nvim" "TryExec=${placeholder "out"}/bin/${nixCats_packageName}"
       "--replace-fail" "Icon=nvim" "Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png" ]}
-    ${gnused}/bin/sed -i ${lib.escapeShellArgs [ "/^Exec=nvim/c\\Exec=${placeholder "out"}/bin/${nixCats_packageName} \"%F\"" "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop" ]}
+    ${gnused}/bin/sed -i ${lib.escapeShellArgs [ "/^Exec=nvim/c\\Exec=${placeholder "out"}/bin/${nixCats_packageName} %F" "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop" ]}
     ''
   + ''
     ${lib.concatMapStringsSep "\n" (alias: "ln -s ${lib.escapeShellArgs [ "${placeholder "out"}/bin/${nixCats_packageName}" "${placeholder "out"}/bin/${alias}" ]}") customAliases}
