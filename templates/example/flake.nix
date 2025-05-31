@@ -53,7 +53,10 @@
   # see :help nixCats.flake.outputs
   outputs = { self, nixpkgs, ... }@inputs: let
     inherit (inputs.nixCats) utils;
-    luaPath = "${./.}";
+    luaPath = builtins.path {
+        path = ./.;
+        name = "luaPath";
+      };
     # this is flake-utils eachSystem
     forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
     # the following extra_pkg_config contains any values
