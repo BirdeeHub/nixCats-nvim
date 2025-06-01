@@ -121,7 +121,7 @@ with builtins; let
       else if inline.member value then let
           res = inline.resolve value;
         in if isFunction (res.__functor or res) then res (opts // { _level = level; }) else replacer res
-      else if isPath value then luaEnclose "${value}"
+      else if isPath value then luaEnclose (path { path = value; })
       else if value ? outPath then luaEnclose "${value.outPath}"
       else if isDerivation value then luaEnclose "${value}"
       else if isFunction (value.__functor or value) then addErrorContext ("nixCats.utils.n2l.toLua called on a function with these functionArgs: " + (toJSON (value.__functionArgs or functionArgs value)))

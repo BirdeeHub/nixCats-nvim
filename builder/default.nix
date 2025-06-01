@@ -162,7 +162,7 @@
     nixCats = allPluginDeps: let
       nixCats_config_location = if builtins.isString settings.wrapRc
         then utils.n2l.types.inline-unsafe.mk {
-            body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc}) and "${luaPath}" or '' + (
+            body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc}) and ${utils.n2l.uglyLua luaPath} or '' + (
               if settings.unwrappedCfgPath == null
               then "vim.fn.stdpath('config')"
               else utils.n2l.uglyLua settings.unwrappedCfgPath
