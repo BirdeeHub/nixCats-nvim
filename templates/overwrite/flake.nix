@@ -41,7 +41,7 @@
       # NOTE: the result of this override will be your new package
       # after you put your items into it.
       finalPackage = OGpkg.override {
-        luaPath = "${./.}";
+        luaPath = ./.;
         inherit nixpkgs system;
         extra_pkg_config = {
           # allowUnfree = true;

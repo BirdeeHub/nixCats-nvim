@@ -21,7 +21,7 @@
 {inputs, ... }@attrs: let
   inherit (inputs) nixpkgs; # <-- nixpkgs = inputs.nixpkgsSomething;
   inherit (inputs.nixCats) utils;
-  luaPath = "${./.}";
+  luaPath = ./.;
   forEachSystem = utils.eachSystem nixpkgs.lib.platforms.all;
   # the following extra_pkg_config contains any values
   # which you want to pass to the config set of nixpkgs
