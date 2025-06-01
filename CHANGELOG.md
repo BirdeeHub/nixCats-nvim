@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.14](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.13...v7.2.14) (2025-06-01)
+
+
+### Bug Fixes
+
+* **detnix:** n2l now automatically handles the builtins.path { path } buisness ([753ab0f](https://github.com/BirdeeHub/nixCats-nvim/commit/753ab0f11b3097d6e3a5e4f5b4f2ff9bfb9d3b36))
+
 ## [7.2.13](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.12...v7.2.13) (2025-04-29)
 
 
