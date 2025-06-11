@@ -767,28 +767,4 @@ with builtins; let lib = import ./lib.nix; in rec {
     listToAttrs
   ];
 
-  mergeOverlays = overlist: self: super: lib.warnfn ''
-    nixCats: utils.mergeOverlays AND utils.mergeOverlayLists are being deprecated!
-    They are bad practice due to merging overlays in parallel rather than in sequence,
-    and should NEVER be required. They are not required for anything in nixCats.
-  '' (lib.pipe overlist [
-      (map (value: value self super))
-      (foldl' (lib.pickyRecUpdateUntil {}) {})
-    ]);
-
-  mergeOverlayLists = oldOverlist: newOverlist:
-    mergeOverlays (oldOverlist ++ newOverlist);
-
-  safeOversList = { dependencyOverlays, system ? null }:
-  lib.warnfn ''
-    nixCats.utils.safeOversList deprecated because dependencyOverlays is now always a list
-  ''
-    (if isAttrs dependencyOverlays && system == null then
-      throw "dependencyOverlays is a set, but no system was provided"
-    else if isAttrs dependencyOverlays && dependencyOverlays ? "${system}" then
-      dependencyOverlays.${system}
-    else if isList dependencyOverlays then
-      dependencyOverlays
-    else []);
-
 }

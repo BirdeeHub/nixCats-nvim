@@ -26,14 +26,6 @@
     pkgs = with builtins; (let
       overlays = if isList (args.dependencyOverlays or null)
         then args.dependencyOverlays
-        else if nclib.ncIsAttrs (args.dependencyOverlays or null)
-        then nclib.warnfn ''
-          # NixCats deprecation warning
-          Do not wrap your dependencyOverlays list in a set of systems.
-          They should just be a list.
-          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-          See :h nixCats.flake.outputs.getOverlays
-          '' args.dependencyOverlays.${system}
         else [];
     in if (args.pkgs or null) != null && extra_pkg_config == {} && extra_pkg_params == {} && (args.pkgs.system or null) == system
       then if overlays == [] then args.pkgs else args.pkgs.appendOverlays overlays
@@ -92,21 +84,12 @@
       # set of lists of lists of strings of other categories to enable
       extraCats = {};
     };
-    final_cat_defs_set = (base_sections // (let
-      catdef = categoryDefinitions {
-        # categories depends on extraCats
-        inherit categories pkgs name mkPlugin mkNvimPlugin;
-        settings = initial_settings;
-        extra = extraTableLua;
-      };
-    in catdef
-      // (pkgs.lib.optionalAttrs (catdef ? extraPython3Packages) (nclib.warnfn ''
-        nixCats categoryDefinitions extraPython3Packages section deprecated for python3.libraries
-      '' { python3.libraries = catdef.extraPython3Packages; }))
-      // (pkgs.lib.optionalAttrs (catdef ? extraPython3wrapperArgs) (nclib.warnfn ''
-        nixCats categoryDefinitions extraPython3wrapperArgs section deprecated for python3.extraWrapperArgs
-      '' { python3.extraWrapperArgs = catdef.extraPython3wrapperArgs; })))
-    );
+    final_cat_defs_set = (base_sections // (categoryDefinitions {
+      # categories depends on extraCats
+      inherit categories pkgs name mkPlugin mkNvimPlugin;
+      settings = initial_settings;
+      extra = extraTableLua;
+    }));
     # categories depends on extraCats
     categories = sorting.applyExtraCats (thisPackage.categories or {}) final_cat_defs_set.extraCats;
     extraTableLua = thisPackage.extra or {};
@@ -149,8 +132,9 @@
       plugins = normalized.start ++ normalized.opt;
       invalidHostNames = builtins.attrNames base_sections;
       nixCats_packageName = name;
-      inherit nclib initial_settings final_cat_defs_set;
-      inherit combineCatsOfFuncs filterAndFlattenEnvVars filterAndFlattenWrapArgs filterAndFlattenXtraWrapArgs;
+      settings = initial_settings;
+      inherit nclib final_cat_defs_set combineCatsOfFuncs
+        filterAndFlattenEnvVars filterAndFlattenWrapArgs filterAndFlattenXtraWrapArgs;
     };
 
     # replace the path functions with lua before trying to write a nix function to a lua file
@@ -290,20 +274,7 @@
         src = if settings.nvimSRC != null then settings.nvimSRC else prev.src;
         propagatedBuildInputs = buildInputs ++ (prev.propagatedBuildInputs or []);
       });
-      customAliases = let
-        viAlias = if settings ? viAlias then nclib.warnfn ''
-          nixCats: settings.viAlias is being deprecated
-          use aliases = [ "vi" ]; instead.
-        '' settings.viAlias else false;
-        vimAlias = if settings ? vimAlias then nclib.warnfn ''
-          nixCats: settings.vimAlias is being deprecated
-          use aliases = [ "vim" ]; instead.
-        '' settings.vimAlias else false;
-      in pkgs.lib.unique (
-        pkgs.lib.optional viAlias "vi"
-        ++ pkgs.lib.optional vimAlias "vim"
-        ++ pkgs.lib.optionals (builtins.isList settings.aliases) settings.aliases
-      );
+      customAliases = pkgs.lib.unique (pkgs.lib.optionals (builtins.isList settings.aliases) settings.aliases);
     };
   };
 
@@ -361,13 +332,5 @@ mkOverride main_builder {
     else if pkgsParams.nixpkgs ? "lib"
       then pkgsParams.nixpkgs
       else { outPath = nixpkgspath; lib = newlib; };
-  dependencyOverlays = if builtins.isAttrs (pkgsParams.dependencyOverlays or null)
-    then nclib.warnfn ''
-      # NixCats deprecation warning
-      Do not wrap your dependencyOverlays list in a set of systems.
-      They should just be a list.
-      Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-      See :h nixCats.flake.outputs.getOverlays
-      '' pkgsParams.dependencyOverlays.${system}
-    else pkgsParams.dependencyOverlays or [];
+  dependencyOverlays = pkgsParams.dependencyOverlays or [];
 }

@@ -61,15 +61,7 @@
         then main_options_set.nixpkgs_version
         else nixpkgs;
 
-      depOvers = (if builtins.isAttrs dependencyOverlays
-        then nclib.warnfn ''
-          # NixCats deprecation warning
-          Do not wrap your dependencyOverlays list in a set of systems.
-          They should just be a list.
-          Use `utils.fixSystemizedOverlay` if required to fix occasional malformed flake overlay outputs
-          See :h nixCats.flake.outputs.getOverlays
-          '' dependencyOverlays.${pkgs.system}
-        else if builtins.isList dependencyOverlays
+      depOvers = (if builtins.isList dependencyOverlays
           then dependencyOverlays
           else []) ++ (main_options_set.addOverlays or []) ++ (options_set.addOverlays or []);
 

@@ -1,6 +1,6 @@
 { nclib
 , nixCats_packageName
-, initial_settings # <- post removal of deprecations, this should be renamed to settings
+, settings
 , final_cat_defs_set
 , plugins
 , invalidHostNames
@@ -20,50 +20,11 @@
 , ...
 }: let
 
-  # post removal of deprecations, this should be removed
-  settings = with builtins; let
-    deprecated = {
-      withNodeJs = "node";
-      withPython3 = "python3";
-      withRuby = "ruby";
-      withPerl = "perl";
-    };
-    deprecate = old: name: nclib.warnfn ''
-      nixCats setting ${old} is deprecated in favor of "hosts.${name}.enable"
-      see: [:help nixCats.flake.outputs.settings.hosts](https://nixcats.org/nixCats_format.html#nixCats.flake.outputs.settings.hosts)
-    '';
-  in foldl' (acc: n: lib.recursiveUpdate acc (lib.optionalAttrs (isString (deprecated.${n} or null)) (
-      lib.setAttrByPath [ "hosts" deprecated.${n} "enable" ] (deprecate n deprecated.${n} initial_settings.${n})
-    ))) initial_settings (attrNames initial_settings);
-
-  # the post deprecation version is in the help for hosts
-  # :h nixCats.flake.outputs.settings.hosts
   defaults = {
-    python3 = let
-      maybeWarn = if ! settings ? disablePythonPath && ! settings ? disablePythonSafePath
-        then (v: v) else nclib.warnfn (lib.optionalString (! settings.disablePythonPath or true) ''
-          nixCats: settings.disablePythonPath is deprecated.
-          to override the default value of true, (removing it)
-          redefine the python3 host path to:
-          hosts.python3.path = depfn: (python3.withPackages (p: depfn p ++ [p.pynvim]));
-          in order to prevent it from providing
-          [ "--unset" "PYTHONPATH" ] wrapper arguments by default
-
-        '' + lib.optionalString (settings.disablePythonSafePath or false) ''
-
-          nixCats: settings.disablePythonSafePath is deprecated.
-          in categoryDefinitions, define the following instead
-          python3.wrapperArgs = {
-            yourcatname = [
-              [ "--unset" "PYTHONSAFEPATH" ]
-            ];
-          }
-        '');
-    in {
+    python3 = {
       path = depfn: {
         value = (python3.withPackages (p: depfn p ++ [p.pynvim])).interpreter;
-        args = maybeWarn (lib.optionals (settings.disablePythonPath or true) [ "--unset" "PYTHONPATH" ]
-          ++ lib.optionals (settings.disablePythonSafePath or false) [ "--unset" "PYTHONSAFEPATH" ]);
+        args = [ "--unset" "PYTHONPATH" ];
       };
       pluginAttr = "python3Dependencies";
     };
@@ -78,26 +39,10 @@
     };
     ruby = {
       path = let
-        gemPath = if settings ? "gem_path" then nclib.warnfn ''
-          nixCats: settings.gem_path deprecated.
-          Redefine ruby host path value instead.
-
-          hosts.ruby.path = let
-            rubyEnv = pkgs.bundlerEnv {
-              name = "neovim-ruby-env";
-              postBuild = "ln -sf ''${pkgs.ruby}/bin/* $out/bin";
-              gemdir = ./your/gem/dir;
-            };
-          in {
-            value = "''${rubyEnv}/bin/neovim-ruby-host";
-            nvimArgs = [ "--set" "GEM_HOME" "''${rubyEnv}/''${rubyEnv.ruby.gemPath}" "--suffix" "PATH" ":" "''${rubyEnv}/bin" ];
-          };
-          '' settings.gem_path
-           else "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
         rubyEnv = bundlerEnv {
           name = "neovim-ruby-env";
           postBuild = "ln -sf ${ruby}/bin/* $out/bin";
-          gemdir = gemPath;
+          gemdir = "${pkgs.path}/pkgs/applications/editors/neovim/ruby_provider";
         };
       in {
         value = "${rubyEnv}/bin/neovim-ruby-host";
