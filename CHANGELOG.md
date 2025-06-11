@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.15](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.14...v7.2.15) (2025-06-11)
+
+
+### Bug Fixes
+
+* **deprecations:** Remove all functions and behaviors with deprecation warnings ([425b179](https://github.com/BirdeeHub/nixCats-nvim/commit/425b179bee4150166ab2b25efcc6a78898c64373))
+
 ## [7.2.14](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.13...v7.2.14) (2025-06-01)
 
 
