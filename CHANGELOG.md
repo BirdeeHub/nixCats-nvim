@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.16](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.15...v7.2.16) (2025-06-20)
+
+
+### Bug Fixes
+
+* **example_template:** blink+luasnip cancel active snippet correctly ([c6000fb](https://github.com/BirdeeHub/nixCats-nvim/commit/c6000fb730d4067e3e1d65e9d5a2cbcd1ceaef83))
+
 ## [7.2.15](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.14...v7.2.15) (2025-06-11)
 
 
