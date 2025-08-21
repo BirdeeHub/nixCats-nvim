@@ -21,19 +21,6 @@ Of course, if you only ever download nvim with nix, this isnt needed.]]
 require('nixCatsUtils').setup {
   non_nix_value = true,
 }
---[[
-Nix puts the plugins
-into the directories paq-nvim expects them to be in,
-because both follow the normal neovim scheme.
-So you just put the URLs and build steps in there, and use its opt option to do the same
-thing as putting a plugin in nixCat's optionalPlugins field.
-then load the plugins via paq-nvim
-YOU are in charge of putting the plugin
-urls and build steps in there, which will only be used when not on nix,
-and you should keep any setup functions
-OUT of that file, as they are ONLY loaded when this
-configuration is NOT loaded via nix.
---]]
 require("myLuaConf.non_nix_download")
 -- OK, again, that isnt needed if you load this setup via nix, but it is an option.
 
