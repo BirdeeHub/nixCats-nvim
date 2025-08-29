@@ -147,7 +147,7 @@
             lzextras
             vim-repeat
             plenary-nvim
-            nvim-notify
+            (nvim-notify.overrideAttrs { doCheck = false; }) # TODO: remove overrideAttrs after check is fixed
           ];
           extra = [
             oil-nvim
