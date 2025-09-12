@@ -45,11 +45,14 @@
 
     sorting = import ./sorting.nix { inherit (pkgs) lib; inherit nclib; };
 
-    thisPackage = packageDefinitions.${name} { inherit name pkgs mkPlugin mkNvimPlugin; };
+    pkgDefArgs = { this = thisPackage; inherit name luaPath pkgs mkPlugin mkNvimPlugin; };
+
+    thisPackage = packageDefinitions.${name} pkgDefArgs;
     initial_settings = {
       wrapRc = true;
       extraName = "";
       configDirName = "nvim";
+      wrappedCfgPath = null;
       unwrappedCfgPath = null;
       autowrapRuntimeDeps = "suffix";
       autoconfigure = "prefix";
@@ -144,16 +147,17 @@
     # this function gets passed all the way into the wrapper so that we can also add
     # other dependencies that get resolved later in the process such as treesitter grammars.
     nixCats = allPluginDeps: let
+      wrappedCfgPath = if pkgs.lib.isFunction settings.wrappedCfgPath then settings.wrappedCfgPath pkgDefArgs else settings.wrappedCfgPath;
+      fcfg = if wrappedCfgPath != null then wrappedCfgPath else luaPath;
       nixCats_config_location = if builtins.isString settings.wrapRc
         then utils.n2l.types.inline-unsafe.mk {
-            body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc}) and ${utils.n2l.uglyLua luaPath} or '' + (
+            body = ''not os.getenv(${utils.n2l.uglyLua settings.wrapRc}) and ${utils.n2l.uglyLua fcfg} or '' + (
               if settings.unwrappedCfgPath == null
               then "vim.fn.stdpath('config')"
               else utils.n2l.uglyLua settings.unwrappedCfgPath
             );
           }
-        else if settings.wrapRc == true then
-          luaPath
+        else if settings.wrapRc == true then fcfg
         else if settings.unwrappedCfgPath == null then
           utils.n2l.types.inline-unsafe.mk { body = ''vim.fn.stdpath("config")''; }
         else settings.unwrappedCfgPath;
@@ -168,7 +172,7 @@
       settingsPlus = settings // {
         wrapRc = finalwraprc;
         nixCats_packageName = name;
-        inherit nixCats_config_location;
+        inherit nixCats_config_location wrappedCfgPath;
       };
     in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
       src = pkgs.replaceVars ./nixCats.lua {

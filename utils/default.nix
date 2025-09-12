@@ -78,7 +78,7 @@ with builtins; let lib = import ./lib.nix; in rec {
 
     ```nix
     {
-      nvim = { pkgs, mkPlugin, ... }: {
+      nvim = { pkgs, name, mkPlugin, luaPath, this, ... }: {
         settings = {};
         categories = {
           general = true;

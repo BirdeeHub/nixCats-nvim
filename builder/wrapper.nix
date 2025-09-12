@@ -4,7 +4,6 @@
 # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/neovim/wrapper.nix
 { stdenv
 , lib
-, gnused
 }:
 {
   neovim-unwrapped
@@ -64,7 +63,9 @@ in {
       "--replace-fail" "TryExec=nvim" "TryExec=${placeholder "out"}/bin/${nixCats_packageName}"
       "--replace-fail" "Icon=nvim" "Icon=${neovim-unwrapped}/share/icons/hicolor/128x128/apps/nvim.png" ]}
     sed ${lib.escapeShellArgs [
-      "/^Exec=nvim/c\\Exec=${placeholder "out"}/bin/${nixCats_packageName} %F"
+      ''
+      /^Exec=nvim/c\
+      Exec=${placeholder "out"}/bin/${nixCats_packageName} %F''
       "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop"
     ]} > ./tmp_desk && mv -f ./tmp_desk "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop"
     ''

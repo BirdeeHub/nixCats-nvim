@@ -617,7 +617,9 @@ as well as the general startupPlugins category.
 an example package definition:
 >nix
   packageDefinitions = {
-    nixCats = { pkgs, name, ... }: {
+    # These are all the arguments available to package definition functions
+    # (`this` is the resulting set, be careful with that one!)
+    nixCats = { pkgs, name, mkPlugin, luaPath, this, ... }: {
       setting = {
         wrapRc = true;
         # nvimSRC = inputs.neovim;
@@ -710,6 +712,14 @@ These are the defaults:
     unwrappedCfgPath = null;
     # Will not change anything other than config directory, configDirName
     # is still needed for .local/share or .cache and the like
+
+    # and related, for when wrapRc == true:
+    wrappedCfgPath = null;
+    # if not null, will replace the main luaPath as the wrapped config path
+    # This may be used to apply optional build steps to your config directory per package.
+    # you may get the original `luaPath` in the arguments to your package definition.
+    # if it is a function, it will recieve the same
+    # arguments as packageDefinitions and should return the new path
 
     # use this to pin a specific Neovim version.
     # This one will specify the base Neovim derivation to use.
@@ -924,7 +934,7 @@ The definition for the `python3` host would look like this when fully spelled ou
 You can bundle and wrap anything this way!
 >nix
   packageDefinitions = {
-    packagename = { pkgs, name, mkPlugin, ... }: {
+    packagename = { pkgs, name, ... }: {
       categories = {
       };
       settings = {
