@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.16...v7.3.0) (2025-09-12)
+
+
+### Features
+
+* **wrappedCfgPath:** new setting and args for packageDefinitions ([ad1da96](https://github.com/BirdeeHub/nixCats-nvim/commit/ad1da962e23dfa5bdfd59b2b0b85603a16609848))
+
 ## [7.2.16](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.15...v7.2.16) (2025-06-20)
 
 
