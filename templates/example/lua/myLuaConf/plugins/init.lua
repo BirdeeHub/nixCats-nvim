@@ -74,7 +74,7 @@ require('lze').load {
     -- it is defined in luaUtils template in lua/nixCatsUtils/lzUtils.lua
     -- you could replace this with enabled = nixCats('cat.name') == true
     -- if you didnt care to set a different default for when not using nix than the default you already set
-    for_cat = 'general.markdown',
+    for_cat = 'markdown',
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle", },
     ft = "markdown",
     keys = {
