@@ -23,7 +23,7 @@ end)
 require('lze').load {
   {
     "nvim-lspconfig",
-    for_cat = "general.core",
+    for_cat = "general.always",
     on_require = { "lspconfig" },
     -- NOTE: define a function for lsp,
     -- and it will run for all specs with type(plugin.lsp) == table
