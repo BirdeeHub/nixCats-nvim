@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.0...v7.3.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* **deprecated:** runCommandNoCC -&gt; runCommand ([45b354d](https://github.com/BirdeeHub/nixCats-nvim/commit/45b354d0ae63bc0c57e1728f1a8edf2a5e84bd52))
+
 ## [7.3.0](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.2.16...v7.3.0) (2025-09-12)
 
 
