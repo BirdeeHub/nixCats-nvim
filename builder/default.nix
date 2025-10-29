@@ -174,7 +174,7 @@
         nixCats_packageName = name;
         inherit nixCats_config_location wrappedCfgPath;
       };
-    in pkgs.runCommandNoCC "nixCats-plugin-${name}" {
+    in pkgs.runCommand "nixCats-plugin-${name}" {
       src = pkgs.replaceVars ./nixCats.lua {
         nixCatsPawsible = utils.n2l.toLua allPluginDeps;
         nixCatsExtra = utils.n2l.toLua extraTableLua;
