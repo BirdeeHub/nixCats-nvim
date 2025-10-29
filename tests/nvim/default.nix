@@ -28,7 +28,7 @@
         pkgs.neovimPlugins.hlargs
       ];
       autoconf = [
-        ((pkgs.runCommandNoCC "autoconftest" {} ''mkdir -p $out'').overrideAttrs (prev: {
+        ((pkgs.runCommand "autoconftest" {} ''mkdir -p $out'').overrideAttrs (prev: {
           passthru = prev.passthru or {} // {
             initLua = ''
               vim.g.autoconf_test_nixCats = true
@@ -37,7 +37,7 @@
         }))
       ];
       autodeps = [
-        ((pkgs.runCommandNoCC "autodepstest" {} ''mkdir -p $out'').overrideAttrs (prev: {
+        ((pkgs.runCommand "autodepstest" {} ''mkdir -p $out'').overrideAttrs (prev: {
           runtimeDeps = prev.runtimeDeps or [] ++ [
             (pkgs.writeShellScriptBin "autodeps_test_nixCats" ''
               echo "HELLO WORLD I HAVE BEEN AUTOINCLUDED"
