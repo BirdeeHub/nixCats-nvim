@@ -11,7 +11,7 @@
   Then call this file with:
   myNixCats = import ./path/to/this/dir { inherit inputs; };
   And the new variable myNixCats will contain all outputs of the normal flake format.
-  You could put myNixCats.packages.${pkgs.system}.thepackagename in your packages list.
+  You could put myNixCats.packages.${pkgs.stdenv.hostPlatform.system}.thepackagename in your packages list.
   You could install them with the module and reconfigure them too if you want.
   You should definitely re export them under packages.${system}.packagenames
   from your system flake so that you can still run it via nix run from anywhere.
@@ -113,7 +113,7 @@
         # IMPORTANT:
         # your alias may not conflict with your other packages.
         aliases = [ "vim" ];
-        # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
+        # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
       };
       # and a set of categories that you want
       # (and other information to pass to lua)

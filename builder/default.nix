@@ -14,7 +14,7 @@
       && (isPath luaPath || (isString luaPath && hasContext luaPath) || luaPath.outPath or null != null)) -> (import ./errors.nix).main;
   let
     system = let
-      val = args.system or args.pkgs.system or args.nixpkgs.system or builtins.system or (import ./errors.nix).main;
+      val = args.system or args.pkgs.stdenv.hostPlatform.system or args.nixpkgs.stdenv.hostPlatform.system or builtins.system or (import ./errors.nix).main;
     in if builtins.isString val then val else (import ./errors.nix).main;
     extra_pkg_config = if ! (builtins.isAttrs args.extra_pkg_config or {})
       then (import ./errors.nix).main
@@ -27,7 +27,7 @@
       overlays = if isList (args.dependencyOverlays or null)
         then args.dependencyOverlays
         else [];
-    in if (args.pkgs or null) != null && extra_pkg_config == {} && extra_pkg_params == {} && (args.pkgs.system or null) == system
+    in if (args.pkgs or null) != null && extra_pkg_config == {} && extra_pkg_params == {} && (args.pkgs.stdenv.hostPlatform.system or null) == system
       then if overlays == [] then args.pkgs else args.pkgs.appendOverlays overlays
       else import (args.pkgs.path or args.nixpkgs.path or args.nixpkgs.outPath or args.nixpkgs) ({
           inherit system;
@@ -323,7 +323,7 @@ in luaPath: pkgsParams: categoryDefinitions: packageDefinitions: name: let
     or (if builtins ? system then <nixpkgs> else (import ./errors.nix).main);
   newlib = pkgsParams.pkgs.lib or pkgsParams.nixpkgs.lib or (import "${nixpkgspath}/lib");
   mkOverride = nclib.makeOverridable newlib.overrideDerivation;
-  system = pkgsParams.system or pkgsParams.pkgs.system or pkgsParams.nixpkgs.system or builtins.system or (import ./errors.nix).main;
+  system = pkgsParams.system or pkgsParams.pkgs.stdenv.hostPlatform.system or pkgsParams.nixpkgs.stdenv.hostPlatform.system or builtins.system or (import ./errors.nix).main;
 in
 mkOverride main_builder {
   inherit system luaPath categoryDefinitions packageDefinitions name;

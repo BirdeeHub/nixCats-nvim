@@ -100,7 +100,7 @@
         # IMPORTANT:
         # your aliases may not conflict with your other packages.
         aliases = [ "vim" ];
-        # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.system}.neovim;
+        # neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
       };
       # and a set of categories that you want
       categories = {
