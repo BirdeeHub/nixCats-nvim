@@ -76,7 +76,7 @@
           nixpkgs = if pkgsoptions != null then pkgsoptions else pkgs;
           pkgs = if pkgsoptions == null then pkgs else null;
           dependencyOverlays = (if pkgsoptions != null then pkgs.overlays else []) ++ depOvers;
-          inherit (pkgs) system;
+          inherit (pkgs.stdenv.hostPlatform) system;
           extra_pkg_params = extra_params;
           extra_pkg_config = (if pkgsoptions != null then pkgs.config else {}) // extra_config;
         };

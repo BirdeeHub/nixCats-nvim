@@ -181,8 +181,8 @@ with builtins; let lib = import ./lib.nix; in rec {
     ---
   */
   fixSystemizedOverlay = overlaysSet: outfunc:
-    (final: prev: if !(overlaysSet ? prev.system) then {}
-      else (outfunc prev.system) final prev);
+    (final: prev: if !(overlaysSet ? prev.stdenv.hostPlatform.system) then {}
+      else (outfunc prev.stdenv.hostPlatform.system) final prev);
 
   /**
     takes all the arguments of the main builder function but as a single set,
@@ -575,7 +575,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     packageDefinitions: defaultName: let
       keepLuaBuilder = if isFunction luaPath then luaPath else baseBuilder luaPath;
       makeOverlay = name: final: prev: {
-        ${name} = keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+        ${name} = keepLuaBuilder (pkgsParams // { inherit (final.stdenv.hostPlatform) system; }) categoryDefFunction packageDefinitions name;
       };
       overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // { default = (makeOverlay defaultName); };
     in overlays;
@@ -618,7 +618,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     packageDefinitions: defaultName: let
       keepLuaBuilder = if isFunction luaPath then luaPath else baseBuilder luaPath;
       makeOverlay = name: final: prev: {
-        ${name} = keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+        ${name} = keepLuaBuilder (pkgsParams // { inherit (final.stdenv.hostPlatform) system; }) categoryDefFunction packageDefinitions name;
       };
       overlays = (mapAttrs (name: _: makeOverlay name) packageDefinitions) // {
         default = (makeMultiOverlay luaPath pkgsParams categoryDefFunction packageDefinitions defaultName (attrNames packageDefinitions));
@@ -674,7 +674,7 @@ with builtins; let lib = import ./lib.nix; in rec {
           in
             {
               inherit name;
-              value =  keepLuaBuilder (pkgsParams // { inherit (final) system; }) categoryDefFunction packageDefinitions name;
+              value =  keepLuaBuilder (pkgsParams // { inherit (final.stdenv.hostPlatform) system; }) categoryDefFunction packageDefinitions name;
             }
           ) namesIncList
         );
@@ -707,7 +707,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   in
   (final: prev: {
     ${importName} = listToAttrs (map (name:
-        lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev) system; })
+        lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev.stdenv.hostPlatform) system; })
       ) allnames);
   });
 
@@ -734,7 +734,7 @@ with builtins; let lib = import ./lib.nix; in rec {
     allnames = attrNames package.passthru.packageDefinitions;
   in
   (final: prev: listToAttrs (map (name:
-    lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev) system; })
+    lib.nameValuePair name (package.overrideNixCats { inherit name; inherit (prev.stdenv.hostPlatform) system; })
   ) allnames));
 
   /**
@@ -759,7 +759,7 @@ with builtins; let lib = import ./lib.nix; in rec {
   easyNamedOvers = package: let
     mapfunc = map (name:
       lib.nameValuePair name (final: prev: {
-        ${name} = package.overrideNixCats { inherit (prev) system; };
+        ${name} = package.overrideNixCats { inherit (prev.stdenv.hostPlatform) system; };
       }));
   in lib.pipe package.passthru.packageDefinitions [
     attrNames
