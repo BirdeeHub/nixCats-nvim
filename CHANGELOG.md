@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.1...v7.3.2) (2025-11-04)
+
+
+### Bug Fixes
+
+* **deprecated_pkgs.system:** nixpkgs is deprecating pkgs.system ([360f9d3](https://github.com/BirdeeHub/nixCats-nvim/commit/360f9d39d2aa438ebc0bba4a51a473e236d4ecaf))
+
 ## [7.3.1](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.0...v7.3.1) (2025-10-29)
 
 
