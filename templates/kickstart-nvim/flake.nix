@@ -132,7 +132,7 @@
           cmp_luasnip
           cmp-nvim-lsp
           cmp-path
-          onedark-nvim
+          tokyonight-nvim
           todo-comments-nvim
           mini-nvim
           nvim-treesitter.withAllGrammars
