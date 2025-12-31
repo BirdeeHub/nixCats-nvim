@@ -22,9 +22,10 @@
     in linkFarm name (map mkEntryFromDrv drvs);
 
   grammarMatcher = yes: builtins.filter (drv: let
-    # NOTE: matches if pkgs.neovimUtils.grammarToPlugin was called on it.
+    # NOTE: matches if pkgs.neovimUtils.grammarToPlugin or buildQueries from
+    # pkgs/applications/editors/vim/plugins/nvim-treesitter/overrides.nix was called on it.
     # This only matters for collate_grammars setting and the lazy.nvim wrapper.
-    cond = (builtins.match "^vimplugin-treesitter-grammar-.*" "${lib.getName drv}") != null;
+    cond = (builtins.match "^vimplugin-(nvim-)?treesitter-(grammar|queries)-.*" "${lib.getName drv}") != null;
     match = if yes then cond else ! cond;
   in
   if drv ? outPath then match else ! yes);
