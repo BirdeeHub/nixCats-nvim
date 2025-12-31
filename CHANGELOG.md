@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.2...v7.3.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* **collate-grammars:** prepare for nvim-treesitter main ([#391](https://github.com/BirdeeHub/nixCats-nvim/issues/391)) ([226de71](https://github.com/BirdeeHub/nixCats-nvim/commit/226de716687b413dd76e3fd75d3419a287a5778c))
+
 ## [7.3.2](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.1...v7.3.2) (2025-11-04)
 
 
