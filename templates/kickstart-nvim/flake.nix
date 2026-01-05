@@ -99,6 +99,7 @@
           stdenv.cc.cc
           nix-doc
           lua-language-server
+          tree-sitter
           nixd
           stylua
         ];

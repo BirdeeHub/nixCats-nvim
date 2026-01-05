@@ -144,7 +144,7 @@ so using it will require a little bit of extra setup compared to the 2 above opt
 
 However `nixCats` provides a simple to use [lazy.nvim wrapper](https://nixcats.org/nixCats_luaUtils.html) wrapper that can be used if desired.
 
-It is demonstrated to good effect in the [kickstart-nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim) and [LazyVim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/LazyVim) templates.
+It is demonstrated to good effect in the [kickstart-nvim](https://github.com/BirdeeHub/nixCats-nvim/blob/main/templates/kickstart-nvim) template.
 
 Keep in mind, `lazy.nvim` will prevent Nix from loading any plugins
 unless you also add it to a `lazy.nvim` plugin spec

@@ -1,12 +1,35 @@
 {
   "nodes": {
     "nixCats": {
+      "inputs": {
+        "nixCats": "nixCats_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
+        "dir": "templates/example",
         "lastModified": 1767159145,
         "narHash": "sha256-rnx/0p6D7rKd7mjtgsdSZjpkutJMzUaVyo2mj0rmjWQ=",
         "owner": "BirdeeHub",
         "repo": "nixCats-nvim",
         "rev": "479ab18fbeabaf87564d3fb0eaf99ebebb05f2f8",
+        "type": "github"
+      },
+      "original": {
+        "dir": "templates/example",
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "type": "github"
+      }
+    },
+    "nixCats_2": {
+      "locked": {
+        "lastModified": 1767156047,
+        "narHash": "sha256-mEqFpKn5oGjQ/8xCjYJ2ejUsCwbO9uIuPWE6Q+9VjoE=",
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "rev": "6d86ae5a1170630217a2947fc509f41f1075f1bf",
         "type": "github"
       },
       "original": {
@@ -31,28 +54,10 @@
         "type": "github"
       }
     },
-    "plugins-treesitter-textobjects": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1767434017,
-        "narHash": "sha256-5VeIAW09my+4fqXbzVG7RnLXrjpXAk/g2vd7RbhNws8=",
-        "owner": "nvim-treesitter",
-        "repo": "nvim-treesitter-textobjects",
-        "rev": "28a3494c075ef0f353314f627546537e43c09592",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nvim-treesitter",
-        "ref": "main",
-        "repo": "nvim-treesitter-textobjects",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "nixCats": "nixCats",
-        "nixpkgs": "nixpkgs",
-        "plugins-treesitter-textobjects": "plugins-treesitter-textobjects"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
