@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.3.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.3...v7.3.4) (2026-01-05)
+
+
+### Bug Fixes
+
+* **delete lazyvim:** delete lazyvim template ([c4efa66](https://github.com/BirdeeHub/nixCats-nvim/commit/c4efa6681dc49ce295a5078d2688dc629047c25b))
+* **templates:** templates updated to new treesitter ([fc809f4](https://github.com/BirdeeHub/nixCats-nvim/commit/fc809f43113936910c0709437aaf9c120a9c65cb))
+
 ## [7.3.3](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.2...v7.3.3) (2025-12-31)
 
 
