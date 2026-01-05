@@ -60,7 +60,6 @@
     kickstartconfig = (callFlake utils.templates.kickstart-nvim.path inputswithbase).packages.${system}.default;
     overriding = (callFlake utils.templates.overriding.path inputswithexample).packages.${system}.default;
     overwrite = (callFlake utils.templates.overwrite.path inputswithexample).packages.${system}.default;
-    LazyVim = (callFlake utils.templates.LazyVim.path inputswithbase).packages.${system}.default;
     flakeless = import utils.templates.flakeless.path { inherit pkgs nixCats; };
     simple = import utils.templates.simple.path { inherit pkgs nixCats; treesitter-textobjects = inputs.plugins-treesitter-textobjects; };
 
@@ -91,7 +90,7 @@
       inherit drvtests hometests nixostests;
       inherit exampledrvtests kickstartdrvtests;
       # sanity template build checks
-      inherit overwrite overriding LazyVim flakeless simple;
+      inherit overwrite overriding flakeless simple;
     };
   });
 }

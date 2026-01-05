@@ -71,13 +71,6 @@
       See also [templates/kickstart-nvim/README.md](https://github.com/BirdeeHub/nixCats-nvim/tree/main/templates/kickstart-nvim/README.md).
     '';
   };
-  LazyVim = {
-    path = ./LazyVim;
-    description = ''
-      How to get the LazyVim distribution up and running.
-      See the `kickstart-nvim` template for more info on the lazy wrapper or other utilities used.
-    '';
-  };
   overwrite = {
     path = ./overwrite;
     description = ''
