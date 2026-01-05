@@ -3,6 +3,10 @@
   , nixCats ? builtins.fetchGit {
     url = "https://github.com/BirdeeHub/nixCats-nvim";
   }
+  , treesitter-textobjects ? builtins.fetchGit {
+    url = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects";
+    ref = "main";
+  }
   , ...
 }: let
   # get the nixCats library with the builder function (and everything else) in it
@@ -17,6 +21,7 @@
         lazygit
         lua-language-server
         stylua
+        tree-sitter
         nixd
         alejandra
       ];
@@ -35,6 +40,7 @@
         vim-startuptime
         blink-cmp
         nvim-treesitter.withAllGrammars
+        (mkPlugin "treesitter-textobjects" treesitter-textobjects)
         lualine-nvim
         lualine-lsp-progress
         gitsigns-nvim
