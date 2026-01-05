@@ -28,9 +28,9 @@ jobs:
       - name: Update example config lockfile
         run: |
           nix flake update --flake ./templates/example
-      - name: Update LazyVim template lockfile
+      - name: Update kickstart.nvim template lockfile
         run: |
-          nix flake update --flake ./templates/LazyVim
+          nix flake update --flake ./templates/kickstart-nvim
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
