@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.3.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.4...v7.3.5) (2026-01-16)
+
+
+### Bug Fixes
+
+* **templates:** nvim-treesitter config ([77db3ff](https://github.com/BirdeeHub/nixCats-nvim/commit/77db3ff046f670d9afcac2ccc94ed09e50843aac))
+* **templates:** nvim-treesitter config ([cdcf065](https://github.com/BirdeeHub/nixCats-nvim/commit/cdcf0658e8ff9aaed426cd84377fe3c28807fc99))
+
 ## [7.3.4](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.3...v7.3.4) (2026-01-05)
 
 
