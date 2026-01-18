@@ -228,27 +228,9 @@ I also borrowed code from [nixpkgs](https://github.com/NixOS/nixpkgs) and made m
 
 ## Alternative projects <a name="alternatives"></a>
 
-- [`kickstart.nvim`](https://github.com/nvim-lua/kickstart.nvim):
-  This project was the start of my Neovim journey
-  and I would 100% suggest it over this one to anyone who doesn't use NixOS and is new to Neovim.
-  It does not use Nix to manage plugins, and uses mason.
-
-- [`kickstart-nix.nvim`](https://github.com/mrcjkb/kickstart-nix.nvim):
-  A project that, like this one, also holds to a normal Neovim config structure.
-  It is a template tutorial on loading a directory using the `pkgs.wrapNeovimUnstable` function from nixpkgs.
-
-- [`nixPatch-nvim`](https://github.com/NicoElbers/nixPatch-nvim):
-  Focused specifically for lazy.nvim.
-  A cool unique concept, uses a Zig program to
-  parse lazy.nvim definitions to replace urls with the plugins you put in your Nix lists at build time.
-  Usage is somewhat similar to the lazy.nvim wrapper of nixCats in a standalone flake template.
-  It obviously also does not have the categories, modules, multiple packages, the overriding scheme, etc.
-
-- [`NixVim`](https://github.com/nix-community/nixvim): <a name="nixvim"></a>
-  A Neovim module scheme semi-comparable to Home Manager for Neovim.
-  They try to have a module for as many packages as they can and do a great job,
-  but you can always fall back to writing lua in nix strings if something is missing.
-
-- [`nvf`](https://github.com/NotAShelf/nvf): <a name="nvf"></a>
-  An alternative to NixVim. Another project that attempts to "nixify" everything.
-  Different from NixVim in that it allows you to order the generated configuration (via a directed acyclic graph).
+- [nix-wrapper-modules#neovim](https://birdeehub.github.io/nix-wrapper-modules/neovim.html): [It also has a template like the nixCats `simple` template](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
+  It does everything nixCats does, and more! But it is not specifically tuned for outputting multiple neovims.
+  It does, however, have the capability to do it to the same degree nixCats can.
+  You will need to find your own categorization scheme for that!
+  Luckily, you have the entire module system to work with to make more options!
+  You will find this also makes it easier to jump into.
