@@ -234,3 +234,4 @@ I also borrowed code from [nixpkgs](https://github.com/NixOS/nixpkgs) and made m
   You will need to find your own categorization scheme for that!
   Luckily, you have the entire module system to work with to make more options!
   You will find this also makes it easier to jump into.
+  There is a [pinned discussions thread to ask questions and share tips!](https://github.com/BirdeeHub/nix-wrapper-modules/discussions/188)
