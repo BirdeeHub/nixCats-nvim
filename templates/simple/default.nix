@@ -1,11 +1,7 @@
 {
   pkgs ? import <nixpkgs> {}
-  , nixCats ? builtins.fetchGit {
+  , nixCats ? fetchGit {
     url = "https://github.com/BirdeeHub/nixCats-nvim";
-  }
-  , treesitter-textobjects ? builtins.fetchGit {
-    url = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects";
-    ref = "main";
   }
   , ...
 }: let
@@ -40,7 +36,7 @@
         vim-startuptime
         blink-cmp
         nvim-treesitter.withAllGrammars
-        (mkPlugin "treesitter-textobjects" treesitter-textobjects)
+        nvim-treesitter-textobjects
         lualine-nvim
         lualine-lsp-progress
         gitsigns-nvim

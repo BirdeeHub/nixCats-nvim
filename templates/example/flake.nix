@@ -24,10 +24,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
-    plugins-treesitter-textobjects = {
-      url = "github:nvim-treesitter/nvim-treesitter-textobjects/main";
-      flake = false;
-    };
 
     # see :help nixCats.flake.inputs
     # If you want your plugin to be loaded by the standard overlay,
@@ -214,7 +210,7 @@
             colorful-menu-nvim
           ];
           treesitter = with pkgs.vimPlugins; [
-            pkgs.neovimPlugins.treesitter-textobjects
+            nvim-treesitter-textobjects
             nvim-treesitter.withAllGrammars
             # This is for if you only want some of the grammars
             # (nvim-treesitter.withPlugins (
