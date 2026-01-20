@@ -25,7 +25,9 @@
     # NOTE: matches if pkgs.neovimUtils.grammarToPlugin or buildQueries from
     # pkgs/applications/editors/vim/plugins/nvim-treesitter/overrides.nix was called on it.
     # This only matters for collate_grammars setting and the lazy.nvim wrapper.
-    cond = (builtins.match "^vimplugin-(nvim-)?treesitter-(grammar|queries)-.*" "${lib.getName drv}") != null;
+    cond = drv.passthru.isTreesitterGrammar or false == true
+      || drv.passthru.isTreesitterQuery or false == true
+      || (builtins.match "^vimplugin-(nvim-)?treesitter-(grammar|queries)-.*" "${lib.getName drv}") != null;
     match = if yes then cond else ! cond;
   in
   if drv ? outPath then match else ! yes);

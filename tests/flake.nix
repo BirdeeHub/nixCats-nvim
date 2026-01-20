@@ -29,10 +29,6 @@
       url = "github:m-demare/hlargs.nvim";
       flake = false;
     };
-    "plugins-treesitter-textobjects" = {
-      url = "github:nvim-treesitter/nvim-treesitter-textobjects/main";
-      flake = false;
-    };
   };
   outputs = { self, nixpkgs, ... }@inputs: let
     utils = import ../.;
@@ -61,7 +57,7 @@
     overriding = (callFlake utils.templates.overriding.path inputswithexample).packages.${system}.default;
     overwrite = (callFlake utils.templates.overwrite.path inputswithexample).packages.${system}.default;
     flakeless = import utils.templates.flakeless.path { inherit pkgs nixCats; };
-    simple = import utils.templates.simple.path { inherit pkgs nixCats; treesitter-textobjects = inputs.plugins-treesitter-textobjects; };
+    simple = import utils.templates.simple.path { inherit pkgs nixCats; };
 
     testargs = {
       stateVersion = "24.05";
