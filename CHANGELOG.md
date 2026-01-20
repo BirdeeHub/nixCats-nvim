@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.3.6](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.5...v7.3.6) (2026-01-20)
+
+
+### Bug Fixes
+
+* **treesitter:** update match with nixpkgs, remove textobjects ([ba6db37](https://github.com/BirdeeHub/nixCats-nvim/commit/ba6db37b99c30d63f139dc7c5a04ea440f652247))
+* **treesitter:** update match with nixpkgs, remove textobjects ([b8e96c3](https://github.com/BirdeeHub/nixCats-nvim/commit/b8e96c3f1b29c7f8f8f5378c91e280fde6c86f2a))
+
 ## [7.3.5](https://github.com/BirdeeHub/nixCats-nvim/compare/v7.3.4...v7.3.5) (2026-01-16)
 
 
