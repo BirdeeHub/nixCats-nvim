@@ -40,8 +40,42 @@ for the Lua-natic's Neovim config on Nix
 
 - **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
 
-- **Try out an example!**
-  `nix run 'github:BirdeeHub/nixCats-nvim?dir=templates/example'`
+## Attention:
+
+This repository is in maintenance mode.
+
+Why? I made something better enough to warrant that.
+
+[nix-wrapper-modules](https://github.com/BirdeeHub/nix-wrapper-modules)
+
+Bring this level of control to every program, with the module system!
+
+[docs page for the neovim wrapper](https://birdeehub.github.io/nix-wrapper-modules/neovim.html)
+
+Instead of categories:
+
+[flexible specs that you can add type-safe options to with the module system](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#specs)
+
+They can be used in a similar fashion to the categories here,
+but also in a lot of new ways!
+
+[tips and tricks section at the end](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#tips-and-tricks)
+
+[kickstart.nvim style template](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
+
+The neovim wrapper there can do everything this one can!
+
+However, it also can do everything something like nvf can, if you want.
+
+And on top of that, the interface is more intuitive and easier to call and use elsewhere.
+
+Hope to see you there!
+
+The core nix code of nixCats that makes this project run will continue to work.
+
+It works in a very similar way at its core to the new one and I can mirror maintenance changes here, and I anticipate very few.
+
+However, if a template becomes too much to maintain, I may simply delete it instead! You may have noticed I already did this with one of them.
 
 ## Table of Contents
 
@@ -228,10 +262,10 @@ I also borrowed code from [nixpkgs](https://github.com/NixOS/nixpkgs) and made m
 
 ## Alternative projects <a name="alternatives"></a>
 
-- [nix-wrapper-modules#neovim](https://birdeehub.github.io/nix-wrapper-modules/neovim.html): [It also has a template like the nixCats `simple` template](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
+- [nix-wrapper-modules#neovim](https://birdeehub.github.io/nix-wrapper-modules/neovim.html): [It also has a template!](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
   It does everything nixCats does, and more! But it is not specifically tuned for outputting multiple neovims.
   It does, however, have the capability to do it to the same degree nixCats can.
   You will need to find your own categorization scheme for that!
   Luckily, you have the entire module system to work with to make more options!
   You will find this also makes it easier to jump into.
-  There is a [pinned discussions thread to ask questions and share tips!](https://github.com/BirdeeHub/nix-wrapper-modules/discussions/188)
+  If you have questions, feel free to ask in discussions!
