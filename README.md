@@ -73,7 +73,7 @@ but also in a lot of new ways!
 
 The neovim wrapper there can do everything this one can!
 
-However, it also can do everything something like nvf can, if you want.
+However, it can also do everything something like nvf can, if you want.
 
 And on top of that, the interface is more intuitive and easier to call and use elsewhere.
 
