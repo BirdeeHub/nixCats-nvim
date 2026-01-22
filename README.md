@@ -44,7 +44,15 @@ for the Lua-natic's Neovim config on Nix
 
 This repository is in maintenance mode.
 
-Why? I made something better enough to warrant that.
+The core nix code of nixCats that makes this project run will continue to work.
+
+It works in a very similar way at its core to the new one and I can mirror maintenance changes here, and I anticipate very few.
+
+However, if a template becomes too much to maintain, I may simply delete it instead! You may have noticed I already did this with one of them.
+
+## Why?
+
+I made something better enough to warrant that.
 
 [nix-wrapper-modules](https://github.com/BirdeeHub/nix-wrapper-modules)
 
@@ -70,12 +78,6 @@ However, it also can do everything something like nvf can, if you want.
 And on top of that, the interface is more intuitive and easier to call and use elsewhere.
 
 Hope to see you there!
-
-The core nix code of nixCats that makes this project run will continue to work.
-
-It works in a very similar way at its core to the new one and I can mirror maintenance changes here, and I anticipate very few.
-
-However, if a template becomes too much to maintain, I may simply delete it instead! You may have noticed I already did this with one of them.
 
 ## Table of Contents
 
