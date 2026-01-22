@@ -60,9 +60,9 @@ Bring this level of control to every program, with the module system!
 
 [docs page for the neovim wrapper](https://birdeehub.github.io/nix-wrapper-modules/neovim.html)
 
-Instead of categories:
+Instead of using categories for your neovim:
 
-[flexible specs that you can add type-safe options to with the module system](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#specs)
+[The neovim module takes flexible specs that you can add type-safe options to with the module system](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#specs)
 
 They can be used in a similar fashion to the categories here,
 but also in a lot of new ways!
