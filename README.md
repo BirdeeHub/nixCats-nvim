@@ -8,45 +8,15 @@ for the Lua-natic's Neovim config on Nix
 
 <br/>
 
-- A Neovim package manager written in Nix.
-
-- **Nix is for downloading. Lua is for configuring.**
-  Keep your existing Lua config directory,
-  while Nix provides any dependency in a contained and reproducible way.
-  Configure all downloads from a single Nix file.
-
-- **Multiple Neovim executables.**
-  Using a powerful but effectively optional category system,
-  easily output multiple configured packages that are variations of your main config.
-  The name is short for 'Nix Categories'!
-
-- **Best of both worlds.**
-  Use the Nix Store for full reproducibility and `nix run`,
-  or switch to live reloading with `wrapRc = false`.
-  Or set a variable to use to toggle on the fly!
-  `wrapRc = "UNWRAP_IT"`
-  
-- **No need for Lua in Nix strings.**
-  define arbitrary categories of dependencies in Nix,
-  and pass arbitrary nix values, and have all the info
-  be effortlessly made available in your configuration!
-  
-- **Integrates with NixOS or Home Manager,**
-
-- **Or build it your way!**
-  Configurable as a flake, a derivation, or a module,
-  or even entirely via calling the override function on an existing nixCats based package. <br>
-  It can then be imported and reconfigured without duplication and exported again. And again. and again.
-
-- **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
-
 ## Attention:
 
 This repository is in maintenance mode.
 
+[Please see this project instead](https://birdeehub.github.io/nix-wrapper-modules/neovim.html)
+
 The core nix code of nixCats that makes this project run will continue to work.
 
-It works in a very similar way at its core to the new one and I can mirror maintenance changes here, and I anticipate very few.
+The actual wrapping of neovim works in a very similar way and I can mirror maintenance changes here, and I anticipate very few.
 
 However, if a template becomes too much to maintain, I may simply delete it instead! You may have noticed I already did this with one of them.
 
@@ -78,6 +48,40 @@ However, it can also do everything something like nvf can, if you want.
 And on top of that, the interface is more intuitive and easier to call and use elsewhere.
 
 Hope to see you there!
+
+---
+
+- A Neovim package manager written in Nix.
+
+- **Nix is for downloading. Lua is for configuring.**
+  Keep your existing Lua config directory,
+  while Nix provides any dependency in a contained and reproducible way.
+  Configure all downloads from a single Nix file.
+
+- **Multiple Neovim executables.**
+  Using a powerful but effectively optional category system,
+  easily output multiple configured packages that are variations of your main config.
+  The name is short for 'Nix Categories'!
+
+- **Best of both worlds.**
+  Use the Nix Store for full reproducibility and `nix run`,
+  or switch to live reloading with `wrapRc = false`.
+  Or set a variable to use to toggle on the fly!
+  `wrapRc = "UNWRAP_IT"`
+  
+- **No need for Lua in Nix strings.**
+  define arbitrary categories of dependencies in Nix,
+  and pass arbitrary nix values, and have all the info
+  be effortlessly made available in your configuration!
+  
+- **Integrates with NixOS or Home Manager,**
+
+- **Or build it your way!**
+  Configurable as a flake, a derivation, or a module,
+  or even entirely via calling the override function on an existing nixCats based package. <br>
+  It can then be imported and reconfigured without duplication and exported again. And again. and again.
+
+- **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
 
 ## Table of Contents
 
