@@ -43,45 +43,65 @@ but also in a lot of new ways!
 
 The neovim wrapper there can do everything this one can!
 
-However, it can also do everything something like nvf can, if you want.
+It still allows for configuration with the same philosophy of "install with nix, configure with lua".
 
-And on top of that, the interface is more intuitive and easier to call and use elsewhere.
+But it opens up a lot of new possibilities as well, while reducing initial complexity of the interface.
+
+The lua tips and tricks used in the templates here are all applicable there.
+
+It has an info plugin with a lot of the same information.
+
+Just like nixCats, it allows you to split things up into groups and inform your lua of that,
+and it is still possible to install multiple `neovim` executables at once should that be desired.
+
+However, the ability to override your configuration later is much improved.
+
+You can make your own module options, and then you override it later the same way you configured it in the first place.
+Simply provide another module!
+
+`nixCats` theoretically has a lot of capabilities.
+
+You will find them all there as well, and will likely have an easier time actually making use of them.
 
 Hope to see you there!
 
 ---
 
-- A Neovim package manager written in Nix.
+### Note about using `lazy.nvim` in the new wrapper:
 
-- **Nix is for downloading. Lua is for configuring.**
-  Keep your existing Lua config directory,
-  while Nix provides any dependency in a contained and reproducible way.
-  Configure all downloads from a single Nix file.
+If someone wants to adapt the [`nixCatsUtils/lazyCat.lua`](./templates/luaUtils/lua/nixCatsUtils/lazyCat.lua) file to work with the new wrapper, it would be a simple task.
 
-- **Multiple Neovim executables.**
-  Using a powerful but effectively optional category system,
-  easily output multiple configured packages that are variations of your main config.
-  The name is short for 'Nix Categories'!
+It simply sets some `lazy.nvim` options to treat the nix provided plugins as dev dependencies, and the info plugin in the new one contains the plugin paths just like it does here.
 
-- **Best of both worlds.**
-  Use the Nix Store for full reproducibility and `nix run`,
-  or switch to live reloading with `wrapRc = false`.
-  Or set a variable to use to toggle on the fly!
-  `wrapRc = "UNWRAP_IT"`
-  
-- **No need for Lua in Nix strings.**
-  define arbitrary categories of dependencies in Nix,
-  and pass arbitrary nix values, and have all the info
-  be effortlessly made available in your configuration!
-  
-- **Integrates with NixOS or Home Manager,**
+If you do this, feel free to post about it in discussions on the new repository.
 
-- **Or build it your way!**
-  Configurable as a flake, a derivation, or a module,
-  or even entirely via calling the override function on an existing nixCats based package. <br>
-  It can then be imported and reconfigured without duplication and exported again. And again. and again.
+But this repository only ever contained such a file because it predates both [`lze`](https://github.com/BirdeeHub/lze) and [`lz.n`](https://github.com/lumen-oss/lz.n).
 
-- **Extensive in-editor help** via [:help nixCats](https://nixcats.org/TOC.html).
+They work well with both the built-in neovim plugin manager, and with nix-provided plugins.
+
+They have been around long enough to prove that they actually are a better alternative, at least for this use-case if not others.
+
+Should you decide to not heed this warning and choose `lazy.nvim` anyway, the settings you are looking for are:
+
+- `dev.path`: which can receive a function that receives the spec, and should return the path to the plugin
+
+- `dev.patterns`: set it to `{ "" }` or fetch the names you downloaded from nix from the info plugin
+
+- `dev.fallback = true`: lets it still fall back to downloading via `lazy.nvim` in case you did `dev.patterns = { "" }` and still wanted to be able to do that
+
+- `performance.rtp.reset = false`
+
+- `performance.reset_packpath = false`
+
+Again, using `lazy.nvim` is not the best way to do lazy loading with any nix wrapper scheme, despite the above workarounds.
+
+Use [`lze`](https://github.com/BirdeeHub/lze) or [`lz.n`](https://github.com/lumen-oss/lz.n) instead.
+
+---
+
+## End of important message
+
+And now, most of the readme as it was before `nixCats` became "the old way to do things".
 
 ## Table of Contents
 
