@@ -12,7 +12,9 @@ for the Lua-natic's Neovim config on Nix
 
 This repository is in maintenance mode.
 
-[Please see this project instead](https://birdeehub.github.io/nix-wrapper-modules/neovim.html)
+[Please see this project instead](https://birdeehub.github.io/nix-wrapper-modules/wrapperModules/neovim.html)
+
+[kickstart.nvim style template](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
 
 The core nix code of nixCats that makes this project run will continue to work.
 
@@ -28,16 +30,16 @@ I made something better enough to warrant that.
 
 Bring this level of control to every program, with the module system!
 
-[docs page for the neovim wrapper](https://birdeehub.github.io/nix-wrapper-modules/neovim.html)
+[docs page for the neovim wrapper](https://birdeehub.github.io/nix-wrapper-modules/wrapperModules/neovim.html)
 
 Instead of using categories for your neovim:
 
-[The neovim module takes flexible specs that you can add type-safe options to with the module system](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#specs)
+[The neovim module takes flexible specs that you can add type-safe options to with the module system](https://birdeehub.github.io/nix-wrapper-modules/wrapperModules/neovim.html#specs)
 
 They can be used in a similar fashion to the categories here,
 but also in a lot of new ways!
 
-[tips and tricks section at the end](https://birdeehub.github.io/nix-wrapper-modules/neovim.html#tips-and-tricks)
+[tips and tricks section at the end](https://birdeehub.github.io/nix-wrapper-modules/wrapperModules/neovim.html#tips-and-tricks)
 
 [kickstart.nvim style template](https://github.com/BirdeeHub/nix-wrapper-modules/tree/main/templates/neovim)
 
