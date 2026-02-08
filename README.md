@@ -93,6 +93,9 @@ Should you decide to not heed this warning and choose `lazy.nvim` anyway, the se
 
 - `performance.reset_packpath = false`
 
+You also will have to make sure all names detected by `lazy.nvim` agree with their nix counterpart via that spec's name field,
+or make sure the name from nix agrees with the one from `lazy.nvim` by setting `pname` for that plugin.
+
 Again, using `lazy.nvim` is not the best way to do lazy loading with any nix wrapper scheme, despite the above workarounds.
 
 Use [`lze`](https://github.com/BirdeeHub/lze) or [`lz.n`](https://github.com/lumen-oss/lz.n) instead.
