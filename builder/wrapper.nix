@@ -56,7 +56,7 @@ in {
     mkdir -p $out/nix-support && \
     cp -r ${neovim-unwrapped}/nix-support/* $out/nix-support
   ''
-  + lib.optionalString stdenv.isLinux ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
     mkdir -p $out/share/applications
     substitute ${lib.escapeShellArgs [ "${neovim-unwrapped}/share/applications/nvim.desktop" "${placeholder "out"}/share/applications/${nixCats_packageName}.desktop"
       "--replace-fail" "Name=Neovim" "Name=${nixCats_packageName}"
